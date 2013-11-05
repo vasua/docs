@@ -1,0 +1,331 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ably API Documentation - Realtime Protocol Definition</title>
+    <link rel="stylesheet" type="text/css" href="/assets/stylesheet.css" media="screen">
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+
+    <script src="/assets/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
+    <script src="/assets/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/prettify/prettify.css" media="screen">
+    <script src="/assets/vendor/prettify/prettify-lib.js" type="text/javascript"></script>
+
+    <script src="/assets/javascripts/application.js" type="text/javascript"></script>
+    <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.4.3">
+  </head>
+  <body>
+    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+  <div id="documentation">
+    <h2>Overview</h2>
+<p>The Ably Realtime protocol operates over a connection-oriented, framed, transport. It supports a single connection (and thus a single application) at a time, and enables traffic belonging to multiple channels to be sent over that single connection.</p>
+<p>In the current Ably service the backend supports the Realtime protocol over a WebSocket transport and over a Comet transport. Other transports are possible and this document aims to define the protocol in a transport-independent manner.</p>
+<p>The protocol supports both a text-based format and a binary format using Thrift. All structures passed on the wire are defined in Thrift IDL, although the text-based format does not use Thrift in its encoding. Other encodings may be considered in the future.</p>
+<h2>Formats</h2>
+<p>The unit of any protocol transmission is a <code>TProtocolMessage</code> struct, defined in the Thrift IDL, referred to in this description as a Protocol Message.</p>
+<p>The WebSocket transport transmits Protocol Messages in a single WebSocket data frame. In the binary transport, these are sent as binary data frames, with the Protocol Message being encoded with the standard thrift binary encoding. In the text transport these are sent as text data frames, the text itself being the whitespace-free JSON encoding of the Protocol Message. Empty fields may be encoded as null, or may be handled as undefined (and thus absent from the JSON encoding) and clients should handle both possibilities. (Handling empty fields as undefined is clearly preferable, however, since the encoded text is shorter and the encode and decode overhead is minimised.) Binary data payloads are handled specially in the JSON encoding &#8211; see below for details.</p>
+<p>In the Comet protocol, all request and response bodies contain an array of one or more protocol messages. In the binary protocol this is standard thrift binary encoding of a thrift TMessageSet struct. In the text (JSON) protocol request and response bodies are simply JSON-encoded arrays containing the Protocol Message content. again either in binary (thrift) or text (JSON) encoding.</p>
+<p>Separate sections provide more detailed information on the WebSocket and Comet transports.</p>
+<h2 id="actions">Actions</h2>
+<p>Each Protocol Message has an <code>action</code> (see thrift <code>TAction</code>) that indicates the nature of the message.</p>
+<dl>
+	<dt>HEARTBEAT</dt>
+	<dd>A heartbeat message is sent periodically by the service over a connection in order to keep the connection alive (anticipating that proxies or other gateways may close the connection if it is idle indefinitely) and, in the Comet case, to prevent HTTP request timeout errors. The heartbeat interval is a configurable property of the realtime service and is not selectable by the client.<br><br>
+Heartbeat messages are not exposed to the client app, and are silently consumed in the transport layer of the client library. However, client library unit tests will typically wish to check for the presence of a heartbbeat to confirm that a connection is intact, and therefore client libraries should expose some means for tests to observe the occurrence of heartbeats.<br><br>
+No other message fields are populated in a heartbeat message.</dd>
+</dl>
+<dl>
+	<dt>ACK</dt>
+	<dd>An acknowledgement message, sent from the service to a client, to confirm receipt of one or more messages published by the client. Further details of the acknowledgement protocol is given below.</dd>
+</dl>
+<dl>
+	<dt>NACK</dt>
+	<dd>An negative acknowledgement message, sent from the service to a client, that indicates failure of one or more messages published by the client. Further details of the acknowledgement protocol is given below.</dd>
+</dl>
+<dl>
+	<dt>CONNECT</dt>
+	<dd>Unused. This is a placeholder for transports that might need to pass connection request parameters in a Protocol Message instead of in URI params as happens presently for the WebSocket and Comet transports.</dd>
+</dl>
+<dl>
+	<dt>CONNECTED</dt>
+	<dd>Passed by the service back to a client to signify that a connection request has succeeded, and passing various connection parameters (such as the connection ID). See connection information for each of the transports for more information.</dd>
+</dl>
+<dl>
+	<dt>DISCONNECT</dt>
+	<dd>Passed by a client to the service to indicate that a connection is closing. Once this message is sent the transport will be closed by the service, if it has not already been closed by the client, and all connection state for that connection will be disposed. No connection state recovery is possible.<br><br>
+Note that to disconnect a transport without destroying connection state, the client simply closes the transport without sending any protocol message.</dd>
+</dl>
+<dl>
+	<dt>DISCONNECTED</dt>
+	<dd>Passed by the service to a client in response to a <code>DISCONNECT</code> message.</dd>
+</dl>
+<dl>
+	<dt>ERROR</dt>
+	<dd>Passed by the service to a client to signify an unrecoverable error condition. The scope of the error might be the connection, or a single channel. <code>ERROR</code> messages that apply to a channel have the channel field populated with this channel ID; <code>ERROR</code> messages that apply to the connection have no channel field value.<br><br>
+<code>ERROR</code> messages will have a value in the error field that provides information about the failure condition. Client libraries must make a transition (either of the connection or the relevant channel) to the failed state, and pass the contained error information to the client.<br><br>
+Note that non-fatal errors may occur in various contexts (notably connection state recovery) and <code>CONNECTED</code> and <code>ATTACHED</code> response messages may also have the error field populated with information about those non-fatal conditions. These are handled differently from the unrecoverable conditions indicated with an <code>ERROR</code> message.</dd>
+</dl>
+<dl>
+	<dt>ATTACH</dt>
+	<dd>Sent by a client to the service to request attachment to a channel. The request must include the channel name in the channel field. Attachment is synchronous, and the client library must place the channel object into the pending state until it sees either an <code>ATTACHED</code> (success) response or an <code>ERROR</code> (failed) response.</dd>
+</dl>
+<dl>
+	<dt>ATTACHED</dt>
+	<dd>Sent by the service to a client to indicate successful attachment to a channel. The message contains the channel name in the channel field, and may also contain non-fatal error information in the error field. Clients must move the channel to the attached state and, where present, pass the error information to the caller.<br><br>
+<code>ATTACHED</code> messages may also include a presence field which, if present, contains the current presence set for that channel. The service, equally, might send an <code>ATTACHED</code> message with an empty presence field, and send subsequent PRESENCE message(s) to announce the current presence state to the client. Libraries must handle both possibilities.<br>
+<code>ATTACHED</code> messages are not required to be send in any order relative to their corresponding <code>ATTACH</code> requests, and any other Protocol Message may intervene between the <code>ATTACH</code> and <code>ATTACHED</code> messages.<br><br>
+Clients must silently ignore an <code>ATTACHED</code> response if the channel is not in the pending state.</dd>
+</dl>
+<dl>
+	<dt>DETACH</dt>
+	<dd>Sent by a client to the service to request detachment to a channel. The request must include the channel name in the channel field. Detachment is acknowledged by the service, but the the client library must place the channel object into the detached state immediately on sending the <code>DETACH</code> request.</dd>
+</dl>
+<dl>
+	<dt>DETACHED</dt>
+	<dd>Sent by the service to a client to indicate successful detachment from a channel. The message contains the channel name in the channel field, and may also contain non-fatal error information in the error field. Clients must move the channel to the detached state if not already detached and, where present, pass the error information to the caller.</dd>
+</dl>
+<dl>
+	<dt>PRESENCE</dt>
+	<dd>Indicates that the Protocol Message has a payload of one or more PresenceMessages associated with a single channel. <code>PRESENCE</code> messages may be sent in either direction. The channel associated with these presence updates is indicated in the channel field.<br><br>
+The serial number of the message must be included in the <code>msgSerial</code> field (in the client &rarr; service direction) or in the <code>connectionSerial</code> field (in the service &rarr; client direction). Further information on message serial numbering is given below.</dd>
+</dl>
+<dl>
+	<dt>MESSAGE</dt>
+	<dd>Indicates that the Protocol Message has a payload of one or more Messages associated with a single channel. <code>MESSAGE</code> messages may be sent in either direction. The channel associated with these messages is indicated in the channel field.<br><br>
+The serial number of the message must be included in the <code>msgSerial</code> field (in the client &rarr; service direction) or in the <code>connectionSerial</code> field (in the service &rarr; client direction). Further information on message serial numbering is given below.</dd>
+</dl>
+<h2>Protocol Message fields</h2>
+<p>ProtocolMessages are populated with one or more of the following fields.</p>
+<dl>
+	<dt>TAction action</dt>
+	<dd>Indicates the purpose of the message. See <a href="#actions">Actions</a> above.</dd>
+</dl>
+<dl>
+	<dt>i32 count</dt>
+	<dd>The count field is used for <code>ACK</code> and <code>NACK</code> actions. See <a href="#message-acknowledgement">message acknowledgement protocol</a>.</dd>
+</dl>
+<dl>
+	<dt>TError error</dt>
+	<dd>Contains error information. See <code>TError</code> type description for details of the contained information. The error field is populated in an <code>ERROR</code> message and may also be populated to provide supplementary information (eg for non-fatal errors) in various other message types (<code>CONNECTED</code>, <code>ATTACHED</code>, <code>DETACHED</code>, <code>ACK</code>, <code>NACK</code>).</dd>
+</dl>
+<dl>
+	<dt>string connectionId</dt>
+	<dd>Contains a string connection ID. This field is populated in all Protocol Messages from the service to be client that relate to a particular connection, starting with the <code>CONNECTED</code> response in which the ID of the new connection is announced.</dd>
+</dl>
+<dl>
+	<dt>i64 connectionSerial</dt>
+	<dd>Contains a serial number for a message on the current connection, in <code>MESSAGE</code> and <code>PRESENCE</code> protocol messages sent from the service to the client. The <code>connectionSerial</code> is a zero-based, serially increasing number which, in combination with the <code>connectionId</code>, uniquely identifies an attempted delivery of a Protocol Message to the client. The client uses the connection serial to track the receipt of messages, and may specify the <code>connectionSerial</code> when performing connection state recovery.</dd>
+</dl>
+<dl>
+	<dt>i64 msgSerial</dt>
+	<dd>Contains a serial number for a message sent from the client to the service. The <code>msgSerial</code> is a zero-based, serially increasing number which, in combination with the <code>connectionId</code>, uniquely identifies the message across the system. The <code>msgSerial</code> is also used in the message acknowledgement protocol.</dd>
+</dl>
+<dl>
+	<dt>i64 timestamp</dt>
+	<dd>An optional timestamp, applied by the service in messages sent to the client, to indicate the system time at which the message was sent. Note that this differs from the timestamp field of a <code>Message</code> or <code>PresenceMessage</code> which is an indication of the timestamp of receipt of that message by the system.<br><br>
+Currently there are no requirements for the client library to process the timestamp.</dd>
+</dl>
+<dl>
+	<dt>list<TMessage> messages</dt>
+	<dd>A ProtocolMessage with a <code>MESSAGE</code> action contains one or more messages belonging to a channel. The messages field of the ProtocolMessage contains a collection of messages (<code>list&lt;TMessage&gt;</code> in Thrift, or an array of <code>Message</code> objects in JSON).</dd>
+</dl>
+<dl>
+	<dt>list<TPresence> presence</dt>
+	<dd>A ProtocolMessage with a <code>PRESENCE</code> action contains one or more presence updates belonging to a channel. The presence field of the ProtocolMessage contains a collection of presence messages (<code>list&lt;TPresence&gt;</code> in Thrift, or an array of <code>PresenceMessage</code> objects in JSON).<br><br>
+The presence field may also be populated in an <code>ATTACHED</code> response, and then contains the presence set for that channel.</dd>
+</dl>
+<h2>Other message structs</h2>
+<p>The protocol relies on a number of structs embedded in Protocol Messages.</p>
+<h3>TError</h3>
+<p>A struct containing error information. This is used for unrecoverable error conditions (relating to connections, channels or individual messages) and also &#8220;informatively&#8221; for non-fatal errors in <code>ATTACHED</code> or <code>CONNECTED</code> responses.</p>
+<p>TError contains the following fields.</p>
+<dl>
+	<dt>i16 statusCode</dt>
+	<dd>An optional HTTP response code that most closely matches the nature of the error. This is typically also the actual HTTP response code if this error is reported as an HTTP response to a Comet request.</dd>
+</dl>
+<dl>
+	<dt>i16 code</dt>
+	<dd>An Ably-specific error code that indicates the specific error condition. The various codes are defined in errors.json. Implementations may use errors.json to provide descriptive error messages to clients.</dd>
+</dl>
+<dl>
+	<dt>string reason</dt>
+	<dd>An optional string message that indicates the error condition, and may contain specific identifying information (eg channel name or message serial, for example).</dd>
+</dl>
+<h3>TData and TType (Thrift only)</h3>
+<p>This is the general type that carries a message payload in a Thrift-encoded message, either as the <code>data</code> member of a <code>TMessage</code> or as the <code>clientData</code> member of a <code>TPresence</code>. TData is a union type, with a type indication and a number of typed members as required to be ably to encode any of the supported data types.</p>
+<p>The supported types are as follows.</p>
+<dl>
+	<dt>NONE</dt>
+	<dd>Unused, but may be required in future to represent a void type.</dd>
+</dl>
+<dl>
+	<dt>TRUE</dt>
+	<dd>Boolean type, value true.</dd>
+</dl>
+<dl>
+	<dt>FALSE</dt>
+	<dd>Boolean type, value false.</dd>
+</dl>
+<dl>
+	<dt>INT32</dt>
+	<dd>A signed int32 value.</dd>
+</dl>
+<dl>
+	<dt>INT64</dt>
+	<dd>A signed int64 value. This is portably defined in the protocol to be able to handle the full signed 64 bit range, but Javascript implementations pass this value to the client in a JS Number type, and therefore will lose precision in any number that does not fit into the available 53 mantissa bits.</dd>
+</dl>
+<dl>
+	<dt>DOUBLE</dt>
+	<dd>An IEEE 64-bit double-precision floating point number.</dd>
+</dl>
+<dl>
+	<dt>STRING</dt>
+	<dd>A Unicode string. On the wire it is encoded in UTF8 but client libraries should present this as a native string type and not a byte array.</dd>
+</dl>
+<dl>
+	<dt>BUFFER</dt>
+	<dd>A byte array.</dd>
+</dl>
+<dl>
+	<dt>JSONARRAY</dt>
+	<dd>A JSON Array value, encoded using its JSON encoding for transmission.</dd>
+</dl>
+<dl>
+	<dt>JSONOBJECT</dt>
+	<dd>A JSON Object value, encoded using its JSON encoding for transmission.</dd>
+</dl>
+<h3>Data (JSON only)</h3>
+<p>In transports that support JSON encoding, primitive data types (Boolean, Number) and the JSON Object and Array types are represented as their natural JSON value in the enclosing type. For example, a Message with an int32 payload would be encoded in JSON (with whitespace added here for clarity) as:</p>
+<pre><code>{
+  "name": "my_event",
+  "data": 12345
+}</code></pre>
+<p>For string and binary payload types, an <code>encoded</code> member is optionally added to the enclosing type. The only supported encodings are &#8220;utf8&#8221; for strings and &#8220;base64&#8221; for binary. If the encoding member is omitted it defaults to &#8220;utf8&#8221;.</p>
+<p>Therefore, the following encoded messages each have string type:</p>
+<pre><code>{
+  "name": "my_event",
+  "data": "my string payload"
+}
+{
+  "name": "my_event",
+  "data": "my string payload",
+  "encoding": "utf8"
+}</code></pre>
+<p>The following encoded message has binary type:</p>
+<pre><code>{
+  "name": "my_event",
+  "data": "bXkgYmluYXJ5IHBheWxvYWQ=",
+  "encoding": "base64"
+}</code></pre>
+<p>The base64 encoding used is RFC4648 and clients must accept and process values with or without linefeeds.</p>
+<h3>Message</h3>
+<p>This is an individual channel message, as defined in the Thrift <code>TMessage</code> struct.</p>
+<p>The members are as follows.</p>
+<dl>
+	<dt>string name</dt>
+	<dd>The optional event name.</dd>
+</dl>
+<dl>
+	<dt>string clientId</dt>
+	<dd>The optional clientId of the client that sent the message.<br><br>
+Client libraries do not need to populate this field if the clientId is implicit (ie a clientId was specified when the library was initialised, and is therefore connection-wide. Also, this field will be empty if no clientId has been specified either on library initialisation or when publishing the message.<br><br>
+Messages sent from the service to the client will contain a clientId if one is available.</dd>
+</dl>
+<dl>
+	<dt>i64 timestamp</dt>
+	<dd>This is the timestamp indicating the time at which the message was received by the system from the publishing client. The timestamp is included in messages sent by the service to the client. The field is expected to be empty in messages sent from a client to the service.</dd>
+</dl>
+<dl>
+	<dt>TData data</dt>
+	<dd>The payload of the message.</dd>
+</dl>
+<h3>Presence Message</h3>
+<p>This is an individual channel presence update, as defined in the Thrift <code>TPresence</code> struct.</p>
+<p>The members are as follows.</p>
+<dl>
+	<dt>TPresenceState state</dt>
+	<dd>The presence action (<code>ENTER</code>, <code>LEAVE</code>, or <code>UPDATE</code>) encoded as the ordinal in the <code>TPresenceState</code> enum.</dd>
+</dl>
+<dl>
+	<dt>string clientId</dt>
+	<dd>The clientId string.</dd>
+</dl>
+<dl>
+	<dt>TData clientData</dt>
+	<dd>Optional message payload (eg status line).</dd>
+</dl>
+<dl>
+	<dt>string memberId</dt>
+	<dd>An optional member identifier if required to disambiguate multiple connected and entered members having the same clientId. When there are multiple members with the same clientId entered to the channel there will be multiple corresponding <code>ENTER</code> events.<br><br>
+If the memberId of an already-entered member changes (eg in the situation that a new connection inherits from another connection, the new (clientId, memberId) combination is not considered to be a new member but it is indicated as an <code>UPDATE</code> of the already-entered member, with a change in the value of memberId.</dd>
+</dl>
+<h2 id="message-acknowledgement">Message acknowledgement protocol</h2>
+<p>The Ably client API allows a caller to provide a success callback when publishing messages, or presence updates, to the Ably service. The callback is called, either with success or a failure code, once the Ably service has indicated whether or not it has processed the message successfully. The callback is not simply an indication that the message sent without error; it is confirmation that the service has processed the message sufficiently that its onward delivery to relevant attached clients is now guaranteed.</p>
+<p>In the Comet transport, success or failure is indicated on a per-call basis with an <code>ACK</code> or <code>NACK</code> <code>TMessage</code> body in the HTTP response to the <code>send</code> API call.</p>
+<p>In the WebSocket transport, the service indicates success or failure to the client with the message acknowledgement protocol. This is a simple series of <code>ACK</code> or <code>NACK</code> responses, each addressing a contiguous sequence (by <code>msgSerial</code>) of messages.</p>
+<p>An <code>ACK</code> message contains a <code>msgSerial</code> and <code>count</code> value. Receipt of this message signifies that the messages whose serial numbers are:</p>
+<pre><code>{ msgSerial ... msgSerial + count - 1 }</code></pre>
+<p>have been processed successfully.</p>
+<p>Similarly, a <code>NACK</code> message contains a <code>msgSerial</code> and <code>count</code> value and usually also an <code>error</code> value. Receipt of this message signifies that the messages whose serial numbers are:</p>
+<pre><code>{ msgSerial ... msgSerial + count - 1 }</code></pre>
+<p>have encountered processing failures. The client library must call the callback, if supplied, with the contained error value, or with an error value that indicates an internal error.</p>
+<p><code>ACK</code> responses are sent so as to be responsive to the client but also to avoid sending a response for every single published message; when the client is publishing at a high rate the <code>ACK</code> responses will be sent periodically with an interval of 500ms (say) so many hundreds of messages my be covered in a single <code>ACK</code> response.</p>
+<p><code>NACK</code> responses are sent as soon as an error has arisen, and in any event only cover multiple messages to the extent that those messages are subject to the same underlying failure (since the error information is provided once for the group of <code>NACK</code>&#8217;d messages, not individually.</p>
+<p>It is a protocol error if the system sends an <code>ACK</code> or <code>NACK</code> that skips past one or more <code>msgSerial</code> without there having been either and <code>ACK</code> or <code>NACK</code>; but a client in this situation should treat this case as implicitly <code>NACK</code>ing the skipped messages.</p>
+<p>It is also a protocol error if the system sends an <code>ACK</code> or <code>NACK</code> that covers a <code>msgSerial</code> that was covered by an earlier <code>ACK</code> or <code>NACK</code>; in such cases the client library must silently ignore the response insofar as it relates to <code>msgSerial</code>s that were covered previously (whether the response is the same now or different).</p>
+  </div>
+  <div id="sidebar">
+  <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
+  <ul>
+<li class=''><a href='/root/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
+<li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
+</ul>
+  <h2><a href="/realtime/">Real-time client lib</a></h2>
+<ul>
+<li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
+<li class=''><a href='/realtime/connection/'>Connection</a></li>
+<li class=''><a href='/realtime/channels-messages/'>Channels and Messages</a></li>
+<li class=''><a href='/realtime/presence/'>Presence</a></li>
+<li class=''><a href='/realtime/authentication/'>Authentication</a></li>
+<li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/statistics/'>Statistics</a></li>
+</ul>
+  <h2><a href="/rest/">REST client lib</a></h2>
+<ul>
+<li class=''><a href='/rest/usage/'>Usage</a></li>
+<li class=''><a href='/rest/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest/presence/'>Presence</a></li>
+<li class=''><a href='/rest/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest/history/'>History</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+</ul>
+  <h2><a href="/rest-api/">REST API</a></h2>
+<ul>
+</ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class='selected'><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
+</ul>
+  <h2>Other</h2>
+<ul>
+<li class=''><a href='/other/authentication/'>Authentication</a></li>
+<li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
+</ul>
+  <ul>
+<li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+<li><a href="https://ably.io">Visit Ably.io</a></li>
+</ul>
+</div>
+</body>
+</html>

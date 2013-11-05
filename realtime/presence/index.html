@@ -1,0 +1,398 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ably API Documentation - Presence</title>
+    <link rel="stylesheet" type="text/css" href="/assets/stylesheet.css" media="screen">
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+
+    <script src="/assets/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
+    <script src="/assets/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/prettify/prettify.css" media="screen">
+    <script src="/assets/vendor/prettify/prettify-lib.js" type="text/javascript"></script>
+
+    <script src="/assets/javascripts/application.js" type="text/javascript"></script>
+    <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.4.3">
+  </head>
+  <body>
+    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+  <div id="documentation">
+    
+      <nav class="jump-to-nav">
+        <div class="form">
+          <select id="jump-to-nav">
+            <option>Jump to ...</option>
+            <optgroup label='Help with'>
+<option id="anchor-title">Presence</option>
+</optgroup>
+<optgroup label='Presence API reference'>
+<option id="anchor-enter">enter</option>
+<option id="anchor-enter-client">enterClient</option>
+<option id="anchor-update">update</option>
+<option id="anchor-update-client">updateClient</option>
+<option id="anchor-leave">leave</option>
+<option id="anchor-leave-client">leaveClient</option>
+<option id="anchor-subscribe">subscribe</option>
+<option id="anchor-unsubscribe">unsubscribe</option>
+<option id="anchor-get">get</option>
+</optgroup>
+<optgroup label='Related types'>
+<option id="anchor-presence-message">PresenceMessage</option>
+<option id="anchor-presence-listener">PresenceListener</option>
+</optgroup>
+          </select>
+        </div>
+      </nav>
+    
+    <header>
+      
+        <div class="breadcrumb"><a href="/realtime/">Realtime Client API</a><span class="separator">/</span></div>
+      
+      
+        <h1 id="title">Presence</h1>
+      
+    </header>
+    <article>
+      <p>Ably Channels support the concept of presence. Each channel may have a presence set associated with it, which is a set of clientIds for those clients that have announced their presence by entering the channel.</p>
+<p>A client must be attached to a channel, and must have the relevant permission, in order to enter, although the library implicitly calls <code>attach()</code> if the client is not attached at the time <code>enter()</code> is called. As with other channel messages, the library allows presence messages to be submitted immediately, and these are queued until such time as the channel is attached, or the attach fails (or the connection fails). Ably maintains the presence set for each channel, broadcasts enter/leave events to all subscribed clients, and allows clients to query to obtain the set of present clients at any time.</p>
+<p>A client that has access to presence state for a channel is passed the current presence state once it attaches.</p>
+<p>A client&#8217;s <code>clientId</code> must be authenticated in order that the client may enter a channel. This means either that the client connects using basic auth (a client in possession of a key can uphold any claimed identity) or using a token that has been issued for that <code>clientId</code>.</p>
+<p>A given <code>clientId</code> might be present multiple times, via different connections. As far as Ably is concerned these are different members of the presence set. A member of the presence set is, therefore, the combination of a <code>clientId</code> string and a <code>memberId</code> string unique to a connection.</p>
+<p>Each member entering a presence channel may include a payload in the <code>clientData</code> attribute of the <code>PresenceMessage</code> and this is then included in the presence updates broadcast to subscribed clients. Clients can update this <code>clientData</code> whilst being members of the channel.</p>
+<p>A number of presence actions are therefore defined.</p>
+<dl>
+	<dt>enter</dt>
+	<dd>A clientId, or a clientId/memberId combination, is entering the presence channel.</dd>
+</dl>
+<dl>
+	<dt>leave</dt>
+	<dd>A clientId, or a clientId/memberId combination, is leaving the presence channel.</dd>
+</dl>
+<dl>
+	<dt>update</dt>
+	<dd>An already-present clientId or clientId/memberId combination has been updated.</dd>
+</dl>
+<p>The client library does not itself track the presence state of the member it represents; a client may send a <code>leave</code> or <code>update</code> event, for example, without having previously entered via that client instance. This is because that same <code>clientId</code> might have entered the channel on an earlier connection, and the present connection, having inherited from that earlier connection, will adopt that <code>clientId</code>/<code>memberId</code> combination.</p>
+<p>The Ably service tracks members&#8217; presence as clients detach from channels and as connections are dropped, generating <code>leave</code> events as appropriate.</p>
+<h2>Presence Messages</h2>
+<p>An Ably Realtime <code>PresenceMessage</code> has an <code>action</code>, a <code>clientId</code>, and optionally a <code>clientData</code> member carrying a status message or other data associated with the action. As with Message payloads, various primitive and object types are portably defined and supported in all clients, enabling clients to be interoperable across languages and environments.</p>
+<h3>Presence subscription</h3>
+<div lang="javascript,nodejs">
+<p>A client can subscribe to all presence messages for a channel by passing a listener function to the <code>subscribe</code> method.</p>
+<pre lang="javascript,nodejs"><code lang="javascript,nodejs">channel.presence.subscribe(function(message) {
+  console.log('presence message received with action ' + message.action);
+  console.log('message clientData:' + message.clientData);
+});
+</code></pre>
+<p>Previously registered listeners can be removed.</p>
+<pre lang="javascript,nodejs"><code lang="javascript,nodejs">channel.presence.unsubscribe(myListener);
+</code></pre>
+<p></div><div lang="java"><br />
+A client can register for presence messages for a channel by implementing <a href="#presence-listener">PresenceListener</a> and calling the <code>subscribe(PresenceListener listener)</code> method. The listener is passed the new <code>PresenceMessage</code> on each message.</p>
+<pre lang="java"><code lang="java">channel.presence.subscribe(new PresenceListener() {
+	@Override
+	public void onPresenceMessage(PresenceMessage[] messages) {
+		System.out.println(messages.length " new presence messages arrived");
+	}});
+</code></pre>
+<p>Previously registered listeners can be removed.</p>
+<pre lang="java"><code lang="java">channel.presence.unsubscribe(myListener);
+</code></pre>
+</div>
+<h3>Getting channel presence state</h3>
+<p>A Channel&#8217;s <code>presence</code> <span lang="default">property</span><span lang="java">field</span> exposes a <code>get</code> method whereby a client can discover the set of all members present on the channel.</p>
+<pre lang="javascript"><code lang="javascript">var members = channel.presence.get();
+console.log('There are ' + members.length + ' members present');</code></pre>
+<pre lang="nodejs"><code lang="nodejs">var members = channel.presence.get();
+console.log('There are ' + members.length + ' members present');</code></pre>
+<pre lang="java"><code lang="java">PresenceMessage[] members = channel.presence.get();
+System.out.println("There are " + members.length + " members present");</code></pre>
+<p>The client keeps track of the presence set from the time that the channel is attached; a up to date presence set is delivered to the client following attach, and the presence set is updated on each message seen subsequently. Thus this <code>get</code> method synchronously returns the already-known presence set, and does not trigger a new request to the Ably service.</p>
+<h3>Publishing presence changes</h3>
+<p>A Channel&#8217;s <code>presence</code> <span lang="default">property</span><span lang="java">field</span> exposes methods for each of the presence actions whereby a client can publish presence changes.</p>
+<pre lang="javascript"><code lang="javascript">channel.presence.enter('I\'m here', function(err) {
+  if(err)
+    console.log('Unable to publish presence; err = ' + err.message);
+  else
+    console.log('Presence channel successfully entered');
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">channel.presence.enter('I\'m here', function(err) {
+  if(err)
+    console.log('Unable to publish presence; err = ' + err.message);
+  else
+    console.log('Presence channel successfully entered');
+});</code></pre>
+<pre lang="java"><code lang="java">import io.ably.realtime.CompletionListener;
+channel.presence.enter("I'm here", new CompletionListener() {
+	@Override
+	public void onError(ErrorInfo reason) {
+		System.out.println("Unable to publish presence; err = " + reason.message);
+	}
+	@Override
+	public void onSuccess() {
+		System.out.println("Presence channel successfully entered");
+	}
+});</code></pre>
+<p>An Ably client instance might, if on an application server for example, publish messages on behalf of multiple distinct clientIds. The channel&#8217;s <code>presence</code> object therefore also supports methods that enable presence messages to be published for a clientId specified at the time of the call, rather than for a clientId specified when the library was instanced.</p>
+<p>In order to be able to publish presence changes for arbitrary clientIds, the client library must have been instanced either with a key, or with a token bound to the wildcard clientId.</p>
+<pre lang="javascript"><code lang="javascript">channel.presence.enterClient('someClient', 'I\'m here', function(err) {
+  if(err)
+    console.log('Unable to publish presence; err = ' + err.message);
+  else
+    console.log('Presence channel successfully entered for someClient');
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">channel.presence.enterClient('someClient', 'I\'m here', function(err) {
+  if(err)
+    console.log('Unable to publish presence; err = ' + err.message);
+  else
+    console.log('Presence channel successfully entered for someClient');
+});</code></pre>
+<pre lang="java"><code lang="java">import io.ably.realtime.CompletionListener;
+channel.presence.enterClient("someClient", "I'm here", new CompletionListener() {
+	@Override
+	public void onError(ErrorInfo reason) {
+		System.out.println("Unable to publish presence; err = " + reason.message);
+	}
+	@Override
+	public void onSuccess() {
+		System.out.println("Presence channel successfully entered for someClient");
+	}
+});</code></pre>
+<h1>API Reference</h1>
+<div class="inline-toc">
+<ul><li>Presence reference
+<ul>
+<li>
+Methods
+<ul>
+<li><a href='#enter'>enter</a></li>
+<li><a href='#enter-client'>enterClient</a></li>
+<li><a href='#update'>update</a></li>
+<li><a href='#update-client'>updateClient</a></li>
+<li><a href='#leave'>leave</a></li>
+<li><a href='#leave-client'>leaveClient</a></li>
+<li><a href='#subscribe'>subscribe</a></li>
+<li><a href='#unsubscribe'>unsubscribe</a></li>
+<li><a href='#get'>get</a></li>
+</ul>
+</li>
+<li>
+Related types
+<ul>
+<li><a href='#presence-message'>PresenceMessage</a></li>
+<li><a href='#presence-listener'>PresenceListener</a></li>
+</ul>
+</li>
+</ul>
+</li></ul>
+</div><h2>Methods</h2>
+<h6 lang="default" id="enter">enter(clientData, callback)</h6>
+<h6 lang="java" id="enter">public void enter(Object clientData, CompletionListener listener)</h6>
+<p>Enter this presence channel. The Ably library must have been initialised with a <code>clientId</code>, and must have been supplied either with a key, or a token bound to that <code>clientId</code>.</p>
+<p>This method sends a <code>PresenceMessage</code> for the client&#8217;s <code>clientId</code> and optional <code>clientData</code>. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><span lang="java">Object</span>clientData</dt>
+	<dd>An optional payload for the message.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>Callback to be called on completion.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion.</dd>
+</dl>
+<h6 lang="default" id="enter-client">enterClient(clientId, clientData, callback)</h6>
+<h6 lang="java" id="enter-client">public void enter(String clientId, Object clientData, CompletionListener listener)</h6>
+<p>Enter this presence channel for the given clientId. This method is provided to support connections (eg connections from application server instances) that act on behalf of multiple clientIds. In order to be able to enter the channel with this method, the Ably library must have been instanced either with a key, or with a token bound to the wildcard clientId.</p>
+<p>This method sends a <code>PresenceMessage</code> for the given <code>clientId</code> and optional <code>clientData</code>. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><span lang="java">String</span>clientId</dt>
+	<dd>The clientId for the message.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">Object</span>clientData</dt>
+	<dd>An optional payload for the message.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>Callback to be called on completion.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion.</dd>
+</dl>
+<h6 lang="default" id="update">update(clientData, callback)</h6>
+<h6 lang="java" id="update">public void update(Object clientData, CompletionListener listener)</h6>
+<p>Update the presence data for this client. The Ably library must have been initialised with a <code>clientId</code>, and must have been supplied either with a key, or a token bound to that <code>clientId</code>.</p>
+<p>This method sends a <code>PresenceMessage</code> for the client&#8217;s <code>clientId</code> and optional <code>clientData</code>. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><span lang="java">Object</span>clientData</dt>
+	<dd>An optional payload for the message.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>Callback to be called on completion.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion.</dd>
+</dl>
+<h6 lang="default" id="update-client">updateClient(clientId, clientData, callback)</h6>
+<h6 lang="java" id="update-client">public void updateClient(String clientId, Object clientData, CompletionListener listener)</h6>
+<p>Enter update the <code>clientData</code> for the given present clientId on this presence channel. This is the analogue of <code>enterClient</code>, for the update action.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><span lang="java">String</span>clientId</dt>
+	<dd>The clientId for the message.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">Object</span>clientData</dt>
+	<dd>An optional payload for the message.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>Callback to be called on completion.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion.</dd>
+</dl>
+<h6 lang="default" id="leave">leave(callback)</h6>
+<h6 lang="java" id="leave">public void leave(CompletionListener listener)</h6>
+<p>Leave this presence channel. This is subject to the same authentication requirements as the <a href="#enter">enter</a> method above.</p>
+<p>This method sends a <code>PresenceMessage</code> for the client&#8217;s <code>clientId</code> and optional <code>clientData</code>. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>Callback to be called on completion.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion.</dd>
+</dl>
+<h6 lang="default" id="leave-client">leaveClient(clientId, callback)</h6>
+<h6 lang="java" id="leave-client">public void leaveClient(String clientId, CompletionListener listener)</h6>
+<p>This is the analogue of <a href="#enter-client">enterClient</a>, for the <code>leave</code> action.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><span lang="java">String</span>clientId</dt>
+	<dd>The clientId for the message.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>Callback to be called on completion.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion.</dd>
+</dl>
+<h6 lang="default" id="subscribe">subscribe(listener)</h6>
+<h6 lang="java" id="subscribe">public void subscribe(PresenceListener listener)</h6>
+<p>Subscribe to presence messages for this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the PresenceListener interface</span>, which is called each time one or more messages arrives on the channel.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><div lang="javascript,nodejs">listener</div></dt>
+	<dd>The listener function to call for each message.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>The MessageListener to be notified on completion.</dd>
+</dl>
+<h6 lang="default" id="unsubscribe">unsubscribe(listener)</h6>
+<h6 lang="java" id="unsubscribe">public void unsubscribe(PresenceListener listener)</h6>
+<p>Unsubscribe a previously subscribed listener.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><div lang="javascript,nodejs">listener</div></dt>
+	<dd>The listener function registered on subscription.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>The PresenceListener registered on subscription.</dd>
+</dl>
+<h6 lang="default" id="get">get()</h6>
+<h6 lang="java" id="get">public PresenceMessage[] get()</h6>
+<p>Get the current presence set for this channel. This returns synchronously with the presence set already known by the client.</p>
+<h2 id="presence-message">PresenceMessage</h2>
+<p>A <code>PresenceMessage</code> encapsulates an individual presence update sent or received in Ably. A presence message has the following members.</p>
+<dl>
+	<dt><span lang="java">String</span>clientId</dt>
+	<dd>The id of the client associated with the update. This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the clientId is known, for messages delivered to subscribers. It is not required to populate the clientId of a message before publishing it.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">String</span>memberId</dt>
+	<dd>A unique id for the client associated with the update, to disambiguate in the case that a single clientId is simultaneously present multiple times (eg on different connections). This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the memberId is known, for messages delivered to subscribers.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">Object</span>clientData</dt>
+	<dd>An optional message payload for a status line or other data associated with the presence update. The data may be one of the supported payload datatypes.</dd>
+</dl>
+<h2 id="presence-listener">PresenceListener</h2>
+<div lang="javascript,nodejs">
+<p>A <code>PresenceListener</code> function may be subscribed for all presence messages received on the channel. The message is passed as the first argument to the listener.</p>
+<p></div><div lang="java"><br />
+A implementation of the <code>PresenceListener</code> interface may be registered to be notified of  arrival of presence messages on the channel. A <code>PresenceMessage[]</code> is passed as the first argument of the listener&#8217;s <code>onPresenceMessage</code> method whenever a presence message is received on the channel.</p>
+</div>
+    </article>
+    <hr class="back">
+    <a href="#documentation">Back to top</a>
+  </div>
+  <div id="sidebar">
+  <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
+  <ul>
+<li class=''><a href='/root/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
+<li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
+</ul>
+  <h2><a href="/realtime/">Real-time client lib</a></h2>
+<ul>
+<li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
+<li class=''><a href='/realtime/connection/'>Connection</a></li>
+<li class=''><a href='/realtime/channels-messages/'>Channels and Messages</a></li>
+<li class='selected'><a href='/realtime/presence/'>Presence</a></li>
+<li class=''><a href='/realtime/authentication/'>Authentication</a></li>
+<li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/statistics/'>Statistics</a></li>
+</ul>
+  <h2><a href="/rest/">REST client lib</a></h2>
+<ul>
+<li class=''><a href='/rest/usage/'>Usage</a></li>
+<li class=''><a href='/rest/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest/presence/'>Presence</a></li>
+<li class=''><a href='/rest/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest/history/'>History</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+</ul>
+  <h2><a href="/rest-api/">REST API</a></h2>
+<ul>
+</ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
+</ul>
+  <h2>Other</h2>
+<ul>
+<li class=''><a href='/other/authentication/'>Authentication</a></li>
+<li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
+</ul>
+  <ul>
+<li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+<li><a href="https://ably.io">Visit Ably.io</a></li>
+</ul>
+</div>
+</body>
+</html>

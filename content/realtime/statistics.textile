@@ -1,5 +1,0 @@
----
-title: Statistics
-section: realtime
-index: 70
----

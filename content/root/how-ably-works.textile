@@ -1,5 +1,0 @@
----
-title: How Ably works
-section: root
-index: 20
----

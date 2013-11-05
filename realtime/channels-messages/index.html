@@ -1,0 +1,501 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ably API Documentation - Channels and Messages</title>
+    <link rel="stylesheet" type="text/css" href="/assets/stylesheet.css" media="screen">
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+
+    <script src="/assets/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
+    <script src="/assets/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/prettify/prettify.css" media="screen">
+    <script src="/assets/vendor/prettify/prettify-lib.js" type="text/javascript"></script>
+
+    <script src="/assets/javascripts/application.js" type="text/javascript"></script>
+    <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.4.3">
+  </head>
+  <body>
+    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+  <div id="documentation">
+    
+      <nav class="jump-to-nav">
+        <div class="form">
+          <select id="jump-to-nav">
+            <option>Jump to ...</option>
+            <optgroup label='Help with'>
+<option id="anchor-title">Channels and messages</option>
+</optgroup>
+<optgroup label='Channel API reference'>
+<option id="anchor-publish">publish</option>
+<option id="anchor-subscribe">subscribe</option>
+<option id="anchor-unsubscribe">unsubscribe</option>
+<option id="anchor-attach">attach</option>
+<option id="anchor-detach">detach</option>
+</optgroup>
+<optgroup label='Related types'>
+<option id="anchor-message">Message</option>
+<option id="anchor-message-listener">MessageListener</option>
+<option id="anchor-channel-state-listener">ChannelStateListener</option>
+<option id="anchor-completion-listener">CompletionListener</option>
+<option id="anchor-channel-options">ChannelOptions</option>
+</optgroup>
+          </select>
+        </div>
+      </nav>
+    
+    <header>
+      
+        <div class="breadcrumb"><a href="/realtime/">Realtime Client API</a><span class="separator">/</span></div>
+      
+      
+        <h1 id="title">Channels and Messages</h1>
+      
+    </header>
+    <article>
+      <p>The Ably Realtime service organises the traffic within any application into named channels. Channels are the &#8220;unit&#8221; of message distribution; clients attach to channels to subscribe to messages, and every message broadcast by the service is associated with a unique channel.</p>
+<h3>Channel lifecycle</h3>
+<p>Channels are not pre-configured; they are created on demand when clients attach, and remain active until such time that there are no remaining attached clients. Applications do have, however, the ability to pre-configure one or more channel namespaces (ie name prefixes), and associate different attributes and access rights with those namespaces.</p>
+<p>Clients attach to a channel in order to participate on that channel in any way (either to publish, subscribe, or be present on the channel). Channel attach and detach operations are synchronous &#8211; after initiating an attach request, the client must wait for a response that confirms that the channel is established on the service, and that the client has the rights necessary to access the channel.</p>
+<p>A number of states are therefore defined for a channel.</p>
+<dl>
+	<dt>initialised</dt>
+	<dd>A channel object having this state has been initialised but no attach has yet been attempted.</dd>
+</dl>
+<dl>
+	<dt>pending</dt>
+	<dd>An attach has been initiated by sending a request to the service. This is a transient state; it will be followed either<br />
+by a transition to attached or failed.</dd>
+</dl>
+<dl>
+	<dt>attached</dt>
+	<dd>Attach has succeeded. In the attached state a client may publish, and subscribe to, messages.</dd>
+</dl>
+<dl>
+	<dt>detached</dt>
+	<dd>The channel, having previously been attached, has been detached.</dd>
+</dl>
+<dl>
+	<dt>failed</dt>
+	<dd>An indefinite failure condition. This state is entered if a channel error has been received from the Ably service (such as an attempt to attach without the necessary access rights).</dd>
+</dl>
+<p>Although the attach operation can be initiated explicitly by a client, it is more common for the client to perform a publish or subscribe operation, and the client library will initiate the attach if the channel is not already attached. The client library allows clients to begin publishing messages to a channel as soon as the attach has been initiated, and messages are queued until such time as the attach has succeeded or failed.</p>
+<h4>Obtaining a channel instance</h4>
+<p>A <code>Channel</code> object is a reference to a single channel. A channel instance is obtained from the <code>channels</code> collection of the Ably <code>Realtime</code> instance.</p>
+<pre lang="javascript"><code lang="javascript">var channel = realtime.channels.get('myChannel');</code></pre>
+<pre lang="nodejs"><code lang="nodejs">var channel = realtime.channels.get('myChannel');</code></pre>
+<pre lang="java"><code lang="java">import io.ably.realtime.Channel;
+Channel channel = realtime.channels.get("myChannel");</code></pre>
+<h4>Listening for state changes</h4>
+<div lang="javascript,nodejs">
+<p>The <code>channel</code> object is an <code>EventEmitter</code> and emits an event whose name is the new state whenever there is a channel state change. As with all events from an <code>EventEmitter</code> in the Ably library, <code>this</code> within the listener function is a reference to an event object whose <code>name</code> property is the name of the event that fired. This allows a listener to listen for all events with a single registration and know, which event fired when it is entered.</p>
+<pre lang="javascript,nodejs"><code lang="javascript,nodejs">channel.on('attached', function() {
+  console.log('channel ' + channel.name + ' is now attached');
+});
+</code></pre>
+<p>Alternatively a listener may be registered so that it receives all state change events.</p>
+<pre lang="javascript,nodejs"><code lang="javascript,nodejs">var myListener = function() {
+  console.log('New channel state is ' + this.name);
+});
+['attached', 'detached', 'failed'].forEach(function(event) {
+  channel.on(event, myListener);
+});
+</code></pre>
+<p>Previously registered listeners can be removed individually or all together.</p>
+<pre lang="javascript,nodejs"><code lang="javascript,nodejs">/* remove a listener registered for a single event */
+channel.off('attached', myListener);
+
+/* remove a listener registered for all events */
+channel.off(myListener);
+</code></pre>
+<p></div><div lang="java"><br />
+A client can register for connection state changes by implementing <a href="#channel-state-listener">ChannelStateListener</a> and adding it to the <code>stateListeners</code> Collection. The listener is passed the new <code>ChannelState</code> on each state change event together with reason or error information where available.</p>
+<pre lang="java"><code lang="java">channel.stateListeners.add(new ChannelStateListener() {
+	@Override
+	public void onChannelStateChanged(ChannelState state, ErrorInfo reason) {
+		System.out.println("New state is " + state.name());
+	}});
+</code></pre>
+<p>Previously registered listeners can be removed individually or all together.</p>
+<pre lang="java"><code lang="java">/* remove a single listener */
+channel.stateListeners.remove(myListener);
+
+/* remove all event listeners */
+channel.stateListeners.clear();
+</code></pre>
+</div>
+<h3>Channel namespaces</h3>
+<p>One or more channel namespaces, or channel name prefixes, may be configured for an app. When a channel is created whose name is prefixed with one of the namespaces, the channel assumes certain configured attributes associated with that namespace.</p>
+<p>Namespace-prefixed names are delimited by a single colon &#8216;:&#8217;; the first component of the channel name (from the start up to and including the last character before the colon) is the namespace. A channel name may validly contain a colon even if the namespace component does not correspond to a namespace; also, a channel may contain multiple colons and only the component up to the first colon will be matched with a namespace. The only restriction on channel names is that a channel name may not start with a colon and may not be empty.</p>
+<p>Namespaces are defined and configured via the application dashboard. Namespace attributes that can be configured are:</p>
+<ul>
+	<li>whether or not channels belonging to that namespace require clients to be authenticated;</li>
+	<li>whether or not channel messages are persisted;</li>
+	<li>whether or not clients are required to be connected over a TLS connection.</li>
+</ul>
+<p>Key or token capabilities can also specify access rights based on channel namespace.</p>
+<h2>Messages</h2>
+<p>An Ably Realtime Message has a <code>data</code> member carrying the payload of the message. Various primitive and object types are portably defined and supported in all clients, enabling clients to be interoperable despite being hosted in different languages or environments.</p>
+<p>The supported payload types are primitive types (boolean, int32, double, string), JSON-encoded objects and arrays, and buffers containing arbitrary binary data. Client libraries detect the supplied message payload and encode the message appropriately.</p>
+<h3>Message subscription</h3>
+<p>A message sent via the Ably Realtime service contains a payload, the message <code>data</code>, and optionally also has an event <code>name</code>. The name does not affect the distribution of a channel message to clients but may be used as a subscription filter, allowing a client to register a listener that only sees a subset of the messages on the channel. When subscribing, a message listener can subscribe to see all messages on the channel or only a subset whose name matches a given <code>name</code> string.</p>
+<div lang="javascript,nodejs">
+<p>A client can subscribe to all messages on a channel by passing a listener function to the <code>subscribe</code> method.</p>
+<pre lang="javascript,nodejs"><code lang="javascript,nodejs">channel.subscribe(function(message) {
+  console.log('message received for event ' + message.name);
+  console.log('message data:' + message.data);
+});
+</code></pre>
+<p>Alternatively a listener may be registered so that it is called only for messages having a specific event name.</p>
+<pre lang="javascript,nodejs"><code lang="javascript,nodejs">channel.subscribe('myEvent', function(message) {
+  console.log('message received for event ' + message.name);
+  console.log('message data:' + message.data);
+});
+</code></pre>
+<p>Previously registered listeners can be removed individually or all together.</p>
+<pre lang="javascript,nodejs"><code lang="javascript,nodejs">/* remove a listener registered for a single event */
+channel.unsubscribe('myEvent', myListener);
+
+/* remove a listener registered for all events */
+channel.unsubscribe(myListener);
+</code></pre>
+<p></div><div lang="java"><br />
+A client can register for messages on a channel by implementing <a href="#message-listener">MessageListener</a> and calling the <code>subscribe(MessageListener listener)</code> or <code>subscribe(String eventName, MessageListener listener)</code> method. The listener is passed the new <code>Message</code> on each message.</p>
+<pre lang="java"><code lang="java">channel.subscribe(new MessageListener() {
+	@Override
+	public void onMessage(Message[] messages) {
+		System.out.println(messages.length " new messages arrived");
+	}});
+</code></pre>
+<p>Alternatively a listener may be registered so that it is called only for messages having a specific event name.</p>
+<pre lang="java"><code lang="java">channel.subscribe("myEvent", new MessageListener() {
+	@Override
+	public void onMessage(Message[] messages) {
+		System.out.println(messages.length " new messages arrived");
+	}});
+</code></pre>
+<p>Previously registered listeners can be removed individually or all together.</p>
+<pre lang="java"><code lang="java">/* remove a single listener */
+channel.unsubscribe(myListener);
+
+/* remove a listener registered for all events */
+channel.unsubscribe("myEvent", myListener);
+</code></pre>
+</div>
+<h3>Publishing messages</h3>
+<p>Channels expose a <code>publish</code> method whereby a client can publish either a single message or an array of messages to a channel. A listener optionally passed in to the <code>publish</code> method enables the client to know whether or not the operation succeeded.</p>
+<pre lang="javascript"><code lang="javascript">channel.publish("myEvent", "This is my message", function(err) {
+  if(err)
+    console.log('Unable to publish message; err = ' + err.message);
+  else
+    console.log('Message successfully sent');
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">channel.publish("myEvent", "This is my message", function(err) {
+  if(err)
+    console.log('Unable to publish message; err = ' + err.message);
+  else
+    console.log('Message successfully sent');
+});</code></pre>
+<pre lang="java"><code lang="java">import io.ably.realtime.CompletionListener;
+channel.publish("myEvent", "This is my message", new CompletionListener() {
+	@Override
+	public void onError(ErrorInfo reason) {
+		System.out.println("Unable to publish message; err = " + reason.message);
+	}
+	@Override
+	public void onSuccess() {
+		System.out.println("Message successfully sent");
+	}
+});</code></pre>
+<h1>API Reference</h1>
+<div class="inline-toc">
+<ul><li>Channels and messages reference
+<ul>
+<li>
+Methods
+<ul>
+<li><a href='#publish-data'>publish(name, data)</a></li>
+<li><a href='#publish-msg'>publish(message)</a></li>
+<li><a href='#publish-msg-array'>publish(messages)</a></li>
+<li><a href='#subscribe-listener'>subscribe(listener)</a></li>
+<li><a href='#subscribe-event'>subscribe(name, listener)</a></li>
+<li><a href='#subscribe-event-array'>subscribe(names, listener)</a></li>
+<li><a href='#unsubscribe-listener'>unsubscribe(listener)</a></li>
+<li><a href='#unsubscribe-event'>unsubscribe(name, listener)</a></li>
+<li><a href='#attach'>attach()</a></li>
+<li><a href='#detach'>detach()</a></li>
+</ul>
+</li>
+<li>
+Related types
+<ul>
+<li><a href='#message'>Message</a></li>
+<li><a href='#message-listener'>MessageListener</a></li>
+<li><a href='#channel-state-listener'>ChannelStateListener</a></li>
+<li><a href='#completion-listener'>CompletionListener</a></li>
+<li><a href='#channel-options'>ChannelOptions</a></li>
+</ul>
+</li>
+</ul>
+</li></ul>
+</div><h2>Methods</h2>
+<h6 id="publish">publish</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>publish(name, data, callback)</span><span lang='java'>public void publish(String name, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Publish a single message on this channel based on a given event name and payload. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><span lang="java">String</span>name</dt>
+	<dd>The event name.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">Object</span>data</dt>
+	<dd>The payload of the message.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>Callback to be called on completion.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion.</dd>
+</dl>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>publish(message, callback)</span><span lang='java'>public void publish(Message message, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Publish a single message object on this channel. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><span lang="java">Message</span>message</dt>
+	<dd>The message to send.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>Callback to be called on completion.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion.</dd>
+</dl>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>publish(messages, callback)</span><span lang='java'>public void publish(Message[] messages, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Publish several messages on this channel. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><span lang="java">Message[]</span>messages</dt>
+	<dd>An array of messages to send.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>Callback to be called on completion.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion.</dd>
+</dl>
+<h6 id="subscribe">subscribe</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>subscribe(listener)</span><span lang='java'>public void subscribe(<a href="#message-listener">MessageListener</a> listener)</span></p>
+</blockquote>
+<p>Subscribe to messages on this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the <a href="#message-listener">MessageListener</a> interface</span>, which is called each time one or more messages arrives on the channel.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><div lang="javascript,nodejs">listener</div></dt>
+	<dd>The listener function to call for each message.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>The <a href="#message-listener">MessageListener</a> to be notified on completion.</dd>
+</dl>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>subscribe(name, listener)</span><span lang='java'>public void subscribe(String name, <a href="#message-listener">MessageListener</a> listener)</span></p>
+</blockquote>
+<p>Subscribe to messages with a given event <code>name</code> on this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the <a href="#message-listener">MessageListener</a> interface</span>, which is called each time one or more matching messages arrives on the channel.</p>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>subscribe(names, listener)</span><span lang='java'>public void subscribe(String[] names, <a href="#message-listener">MessageListener</a> listener)</span></p>
+</blockquote>
+<p>Subscribe a single listener to messages on this channel for multiple event @name@s.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><span lang="java">String</span>name</dt>
+	<dd>The event name.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">listener</div></dt>
+	<dd>The listener function to call for each message.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>The <a href="#message-listener">MessageListener</a> to be notified on completion.</dd>
+</dl>
+<h6 id="unsubscribe">unsubscribe</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>unsubscribe(listener)</span><span lang='java'>public void unsubscribe(<a href="#message-listener">MessageListener</a> listener)</span></p>
+</blockquote>
+<p>Unsubscribe to messages on this channel. This removes an earlier subscription.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><div lang="javascript,nodejs">listener</div></dt>
+	<dd>The listener function registered on subscription.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>The <a href="#message-listener">MessageListener</a> registered on subscription.</dd>
+</dl>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>unsubscribe(name, listener)</span><span lang='java'>public void unsubscribe(String name, <a href="#message-listener">MessageListener</a> listener)</span></p>
+</blockquote>
+<p>Unsubscribe to messages on this channel. This removes an earlier event-specific subscription.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><span lang="java">String</span>name</dt>
+	<dd>The event name.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">listener</div></dt>
+	<dd>The listener function registered on subscription.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">listener</div></dt>
+	<dd>The <a href="#message-listener">MessageListener</a> registered on subscription.</dd>
+</dl>
+<h6 id="attach">attach</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>attach()</span><span lang='java'>attach()</span></p>
+</blockquote>
+<p>Attach to this channel. This will be called implicitly when required if the client calls either <code>publish()</code> or <code>subscribe()</code>.</p>
+<h6 id="detach">detach</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>detach()</span><span lang='java'>public void detach()</span></p>
+</blockquote>
+<p>Detach from this channel.</p>
+<h2>Public members</h2>
+<p>A <code>Channel</code> object exposes the following public members.</p>
+<dl>
+	<dt><span lang="java">public ChannelState</span>state</dt>
+	<dd>Indicates the current state of this channel.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">public String</span>name</dt>
+	<dd>The channel name of the this channel.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">public Presence</span>presence</dt>
+	<dd>The <a href="/realtime/presence">presence</a> object for this channel.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">public ErrorInfo</span>reason</dt>
+	<dd>Information relating to the transition to the current state, as an Ably <code>ErrorInfo</code> object. This contains an error code and message and, in the failed state in particular, provides diagnostic error information.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">stateListeners</div></dt>
+	<dd>A collection of <a href="#channel-state-listener">ChannelStateListener</a> objects that will be notified of channel state changes.</dd>
+</dl>
+<h2 id="message">Message</h2>
+<p>A <code>Message</code> encapsulates an individual message sent or received in Ably. A message has the following members.</p>
+<dl>
+	<dt><span lang="java">String</span>name</dt>
+	<dd>The event name for the message. The name may be used to allow listeners to subscribed selectively for only a subset of the messages on the channel.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">Object</span>data</dt>
+	<dd>The payload of the message. The data may be one of the supported payload datatypes.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">String</span>clientId</dt>
+	<dd>The clientId of the client that published the message. This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the clientId is known, for messages delivered to subscribers. It is not required to populate the clientId of a message before publishing it.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">long</span>timestamp</dt>
+	<dd>The system timestamp of the message, in milliseconds since the epoch. This <span lang="default">property</span><span lang="java">field</span> is populated by the system for messages delivered to subscribers. It is not required to populate the timestamp of a message before publishing it.</dd>
+</dl>
+<h2 id="message-listener">MessageListener</h2>
+<div lang="javascript,nodejs">
+<p>A <code>MessageListener</code> function may be subscribed for all messages, or messages having specific event names, received on the channel. The message is passed as the first argument to the listener, and the message event <code>name</code> will be the <code>name</code> property of <code>this</code> when the listener is called.</p>
+<p></div><div lang="java"><br />
+A implementation of the <code>MessageListener</code> interface may be registered to be notified of message arrival on the channel. A <code>Message[]</code> is passed as the first argument of the listener&#8217;s <code>onMessage</code> method whenever a message matching the listener&#8217;s registration is received on the channel.</p>
+</div>
+<h2 id="channel-state-listener">ChannelStateListener</h2>
+<div lang="javascript,nodejs">
+<p>The <code>Channel</code> instance is an <code>EventEmitter</code> and emits events corresponding to each of the channel states, ie <code>pending</code>, <code>attached</code>, <code>detached</code> or <code>failed</code>. A <code>ChannelStateListener</code> function may be registered for any of these events and will be notified on any transition to that state. A listener may register for multiple, or all, events, and the event name (thus the new channel state) will be the <code>name</code> property of <code>this</code> when the listener is called.</p>
+<p></div><div lang="java"><br />
+A implementation of the <code>ChannelStateListener</code> interface may be registered to be notified of channel state changes. Each time a listener is called it is passed a <code>ChannelState</code> indicating the new state.</p>
+</div>
+<h2 id="completion-listener">CompletionListener</h2>
+<p>Channel <code>publish</code> operations optionally take <span lang="default">callback</span><span lang="java">implementation of the <code>CompletionListener</code> interface</span> to be called on completion of the operation with an indication of success or failure.</p>
+<div lang="javascript,nodejs">
+<p>The callback is called with an optional error argument. An omitted or falsy error argument indicates success. On error, the error argument contains details of the error.</p>
+<p></div><div lang="java"><br />
+On success the listener&#8217;s <code>onSuccess()</code> method is called. If the operation failed, the listener&#8217;s <code>onError()</code> method is called with an <code>ErrorInfo</code> contains details of the error.</p>
+</div>
+<h2 id="channel-options">ChannelOptions</h2>
+<p>A <code>ChannelOptions</code> may optionally be specified when instancing a Channel, and this may be used to specify channel-specific options.</p>
+<p>Currently the only supported channel options are encryption-related.</p>
+<dl>
+	<dt><span lang="java">public boolean</span>encrypted</dt>
+	<dd>Requests encryption for this channel.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">public Object</span>cipherParams</dt>
+	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). Default cipher params for the implementation may be obtained by calling <code>Crypto.getDefaultParams()</code>.</dd>
+</dl>
+    </article>
+    <hr class="back">
+    <a href="#documentation">Back to top</a>
+  </div>
+  <div id="sidebar">
+  <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
+  <ul>
+<li class=''><a href='/root/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
+<li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
+</ul>
+  <h2><a href="/realtime/">Real-time client lib</a></h2>
+<ul>
+<li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
+<li class=''><a href='/realtime/connection/'>Connection</a></li>
+<li class='selected'><a href='/realtime/channels-messages/'>Channels and Messages</a></li>
+<li class=''><a href='/realtime/presence/'>Presence</a></li>
+<li class=''><a href='/realtime/authentication/'>Authentication</a></li>
+<li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/statistics/'>Statistics</a></li>
+</ul>
+  <h2><a href="/rest/">REST client lib</a></h2>
+<ul>
+<li class=''><a href='/rest/usage/'>Usage</a></li>
+<li class=''><a href='/rest/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest/presence/'>Presence</a></li>
+<li class=''><a href='/rest/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest/history/'>History</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+</ul>
+  <h2><a href="/rest-api/">REST API</a></h2>
+<ul>
+</ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
+</ul>
+  <h2>Other</h2>
+<ul>
+<li class=''><a href='/other/authentication/'>Authentication</a></li>
+<li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
+</ul>
+  <ul>
+<li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+<li><a href="https://ably.io">Visit Ably.io</a></li>
+</ul>
+</div>
+</body>
+</html>

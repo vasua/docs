@@ -1,0 +1,201 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ably API Documentation - Usage</title>
+    <link rel="stylesheet" type="text/css" href="/assets/stylesheet.css" media="screen">
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+
+    <script src="/assets/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
+    <script src="/assets/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/prettify/prettify.css" media="screen">
+    <script src="/assets/vendor/prettify/prettify-lib.js" type="text/javascript"></script>
+
+    <script src="/assets/javascripts/application.js" type="text/javascript"></script>
+    <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.4.3">
+  </head>
+  <body>
+    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+  <div id="documentation">
+    
+      <nav class="jump-to-nav">
+        <div class="form">
+          <select id="jump-to-nav">
+            <option>Jump to ...</option>
+            <optgroup label='Help with'>
+<option id="anchor-title">Usage</option>
+</optgroup>
+<optgroup label='API reference'>
+<option id="anchor-constructor">Constructor</option>
+</optgroup>
+          </select>
+        </div>
+      </nav>
+    
+    <header>
+      
+        <div class="breadcrumb"><a href="/rest/">REST Client Library</a><span class="separator">/</span></div>
+      
+      
+        <h1 id="title">Usage</h1>
+      
+    </header>
+    <article>
+      <p>The REST client library is available in <a href="https://ably.io/download/rest-client-libraries">most popular languages</a> with a<br />
+consistent API between languages.  You can view this documentation in each supported language using the<br />
+language selector navigation.</p>
+<div lang="nodejs"> The REST library for Javascript targets node.js clients and servers. It is obtainable as a module<br />
+direcly from npm using<br />
+<br />
+bc[sh]. npm install ably-js<br />
+<br />
+The ably-js module contains both REST and Realtime libraries, and the REST library is a subset of Realtime; however,<br />
+each is exported separately by the module:<br />
+<br />
+bc[javascript]. var Ably = require(&#8216;ably-js&#8217;);<br />
+<br />
+The REST constructor is <a href="#constructor"><code>Ably.Rest</code></a>; the Realtime constructor is <a href="/realtime"><code>Ably.Realtime</code></a>.</div><div lang="ruby"> The REST library for Ruby is obtainable as a RubyGem direcly using<br />
+<br />
+bc[sh]. gem install ably-rest<br />
+<br />
+If using bundler, simply add the following to your Gemfile and run <code>bundle install</code>:<br />
+<br />
+bc[ruby]. gem &#8216;ably-rest&#8217;</div><div lang="java"> The REST library for Java is downloadable as a JAR from<br />
+<a href="https://github.com/ably/ably-java/bin">https://github.com/ably/ably-java/bin</a><br />
+<br />
+Ensure this JAR is included in your class path.<br />
+<br />
+bc[java]. import io.ably.rest.AblyRest;</div>
+<p><em>Note: Since the REST client library is a direct subset of the Realtime client library, all <a href="/realtime">Realtime client<br />
+libraries</a> also provide access to the functionality of the REST client library.</em></p>
+<h1>Rest Object Reference</h1>
+<h2 id="constructor">Constructor</h2>
+<h6 lang="nodejs">new Ably.Rest(options)</h6>
+<h6 lang="ruby">Ably::Rest.new(options)</h6>
+<h6 lang="java">new AblyRest(options)</h6>
+<p>Operations are performed after first instancing the library:</p>
+<pre lang="nodejs"><code lang="nodejs">var Ably = require('ably-js'), Rest = new Ably.Rest(options);</code></pre>
+<pre lang="ruby"><code lang="ruby">rest = Ably::Rest.new(options)</code></pre>
+<pre lang="java"><code lang="java">AblyRest rest = new AblyRest(options)</code></pre>
+<p>The Rest library may be instanced multiple times with different <code>options</code> in any given context. Except where specified<br />
+otherwise, instances operate independently of one another.</p>
+<p>The set of all supported options is given below.</p>
+<h3>Essential options</h3>
+<p>The REST library needs to know the application identifier, or <code>appId</code>, and also requires credentials or other<br />
+information required to be able to authenticate to the Ably service. The application id can be specified explicitly with<br />
+an <code>appId</code> option, or is more typically given implicitly by passing a <code>key</code> or <code>token</code> option when constructing the<br />
+library.</p>
+<p>The <code>key</code> option takes a key string, as obtained from the <a href="https://ably.io/dashboard">application dashboard</a>. Use this<br />
+option if you wish to use Basic authentication, or if you want to be able to request tokens without needing to defer to<br />
+a separate entity to sign token requests. Note that initialising the library with a <code>key</code> does not necessarily mean that<br />
+the library will use Basic auth; but knowing the key it is able to create and sign token requests and use token<br />
+authentication when appropriate.</p>
+<p>The <code>token</code> option takes a token string, and assumes the token has been obtained from some other instance that requested<br />
+the token. Use the token option if you are provided with a token to use and you do not have a key (or do not have a key<br />
+with the capabilities that you require).</p>
+<p>Since tokens are short-lived, it is rarely sufficient to start with a token, without the means for refreshing it. The<br />
+<code>authUrl</code> and <code>authCallback</code> options are provided to allow a user of the library to issue new token requests as<br />
+required; these options even permit the library to be instanced without either <code>key</code> or <code>token</code>, and an initial token<br />
+will be obtained when required.</p>
+<dl>
+	<dt>appId</dt>
+	<dd>The application id. This option is only required if the application id cannot be inferred either from a <code>key</code><br />
+or <code>token</code> option. If given, it is the application id as indicated on the <a href="https://ably.io/dashboard">application<br />
+dashboard</a>. &#8211; key</dd>
+	<dd>The full key string, as obtained from the <a href="https://ably.io/dashboard">application<br />
+dashboard</a>. Use this option if you wish to use Basic auth, or wish to be able to issue tokens<br />
+without needing to defer to a separate entity to sign token requests. &#8211; token</dd>
+	<dd>A token string, as the value of the<br />
+<code>id</code> property of a <code>token_details</code> component of a token response. &#8211; authCallback</dd>
+	<dd><span lang="nodejs">A Javascript<br />
+function to call when a new token is required.</span><span lang="ruby">A lambda function to call when a new token is<br />
+required</span> The role of the callback is to generate a signed <code>token request</code> this is then submitted by the library<br />
+to the <code>requestToken</code> API. See below for the callback function signature. &#8211; authUrl</dd>
+	<dd>A URL that the library may use to<br />
+obtain a signed token request. For example, this can be used by a client to obtain signed token requests from an<br />
+application server. &#8211; authHeaders</dd>
+	<dd>A set of headers to be added to any request made to the <code>authUrl</code>.  Useful when an<br />
+application requires these to be added to validate the request or implement the response. &#8211; authParams</dd>
+	<dd>A set of<br />
+<code>POST</code> params to be added to any request made to the <code>authUrl</code>.  Useful when an application require these to be added to<br />
+validate the request or implement the response.</dd>
+</dl>
+<h3>Other options</h3>
+<p>The following further options are supported by the library.</p>
+<dl>
+	<dt>encrypted</dt>
+	<dd><em>false, or in the case of a browser client, to the state of the document that loaded the library</em> A<br />
+boolean value, indicating whether or not a TLS (&#8220;SSL&#8221;) secure connection should be used.  Note that unpaid Ably accounts<br />
+are unable to use encrypted Real-time connections. &#8211; clientId</dd>
+	<dd>A client id, used for identifying this client for<br />
+presence purposes. The clientId can be any string. This option is primarily intended to be used in situations where the<br />
+library is instanced with a key; note that a clientId may also be implicit in a token used to instance the library; an<br />
+error will be raised if a clientId specified here conflicts with the clientId implicit in the token. &#8211; log</dd>
+	<dd>Parameters<br />
+to control the log output of the library. The supplied value must be an object that may contain one or both of the<br />
+following entries: <code>level</code>: a number controlling the verbosity of the output from 1 (minimum, errors only) to 4<br />
+(maximum); <code>handler</code>: a function to handle each line of log output. If <code>handler</code> is not specified, <code>console.log</code> is<br />
+used. &#8211; transports</dd>
+	<dd>An array of transports to use, in descending order of preference. The available transports are:<br />
+<code>web_socket</code>, <code>flash_socket</code>, <code>xhr</code>, <code>jsonp</code>. The default is to try all available transports among those listed, in that<br />
+order.</dd>
+</dl>
+    </article>
+    <hr class="back">
+    <a href="#documentation">Back to top</a>
+  </div>
+  <div id="sidebar">
+  <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
+  <ul>
+<li class=''><a href='/root/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
+<li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
+</ul>
+  <h2><a href="/realtime/">Real-time client lib</a></h2>
+<ul>
+<li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
+<li class=''><a href='/realtime/connection/'>Connection</a></li>
+<li class=''><a href='/realtime/channels-messages/'>Channels and Messages</a></li>
+<li class=''><a href='/realtime/presence/'>Presence</a></li>
+<li class=''><a href='/realtime/authentication/'>Authentication</a></li>
+<li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/statistics/'>Statistics</a></li>
+</ul>
+  <h2><a href="/rest/">REST client lib</a></h2>
+<ul>
+<li class='selected'><a href='/rest/usage/'>Usage</a></li>
+<li class=''><a href='/rest/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest/presence/'>Presence</a></li>
+<li class=''><a href='/rest/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest/history/'>History</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+</ul>
+  <h2><a href="/rest-api/">REST API</a></h2>
+<ul>
+</ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
+</ul>
+  <h2>Other</h2>
+<ul>
+<li class=''><a href='/other/authentication/'>Authentication</a></li>
+<li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
+</ul>
+  <ul>
+<li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+<li><a href="https://ably.io">Visit Ably.io</a></li>
+</ul>
+</div>
+</body>
+</html>
