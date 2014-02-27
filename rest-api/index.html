@@ -39,22 +39,30 @@
 	<li>retrieval of presence state and presence;</li>
 	<li>retrieval of statistics for application usage.</li>
 </ul>
-<p>Ably also provides <a href="/rest/client-libaries">REST client libraries for a range of languages</a> including <a href="https://ably.io/download/rest-client-libraries#java">Java</a>, <a href="https://ably.io/download/rest-client-libraries#python">Python</a>, <a href="https://ably.io/download/rest-client-libraries#ruby">Ruby</a>, <a href="https://ably.io/download/rest-client-libraries#dotnet">.NET</a>.</p>
+<p>Ably also provides <a href="https://ably.io/download/rest-client-libraries">REST client libraries for a range of languages</a> including <a href="https://ably.io/download/rest-client-libraries#javascript">Javascript</a>, <a href="https://ably.io/download/rest-client-libraries#java">Java</a>, <a href="https://ably.io/download/rest-client-libraries#python">Python</a>, <a href="https://ably.io/download/rest-client-libraries#ruby">Ruby</a>, <a href="https://ably.io/download/rest-client-libraries#dotnet">.NET</a>.</p>
 <h2 id="common">Common API behaviour</h2>
-<p>The REST API defaults to returning results, and expects request bodies, in JSON format. An Accept header is used to specify an alternative response format, and the following formats are allowed:</p>
+<h3>General</h3>
+<p>The REST API defaults to returning results, and expects request bodies, in JSON format. An Accept header is used to specify a specific response format &#8211; JSON or an alternative &#8211; and the following formats are allowed:</p>
 <ul>
+	<li><code>applicaton/json</code>: JSON;</li>
 	<li><code>applicaton/javascript</code>: for JSONP. A <code>callback</code> query parameter is also expected, which defaults simply to &#8220;callback&#8221;;</li>
-	<li><code>text/xml</code>: for XML; XML support is planned for the future.</li>
-	<li><code>text/html</code>: HTML.</li>
+	<li><code>application/x-thrift</code>: the Apache Thrift binary encoding for certain Ably-specific types relating to the Ably API;</li>
+	<li><code>text/html</code>: HTML</li>
 </ul>
-<p>It is also possible to specify the response format with the <code>format</code> query parameter (with supported values being <code>json</code>, <code>jsonp</code>, <code>html</code>, <code>xml</code>). Any Accept header takes precedence over a <code>format</code> parameter.</p>
-<p>Response data types and layouts are documented in the context of each API or route.</p>
-<p>A response statusCode of 200, or 201 in the case of POST, indicates success. A successful result will typically provide a response body but certain operations (such as DELETE) may respond with an empty response body.</p>
+<p>It is also possible to specify the response format with the <code>format</code> query parameter (with supported values being <code>json</code>, <code>jsonp</code>, <code>binary</code>, <code>html</code>). Any Accept header takes precedence over a <code>format</code> parameter.</p>
+<p>Similarly, POST requests may contain a request body in JSON or other formats as indicated by a <code>Content-Type</code> header. The supported content types are:</p>
+<ul>
+	<li><code>applicaton/json</code>: JSON;</li>
+	<li><code>application/x-thrift</code>: the Apache Thrift binary encoding for certain Ably-specific types relating to the Ably API;</li>
+	<li><code>application/x-www-form-urlencoded</code>: Form-encoded.</li>
+</ul>
+<p>Specific request and response data types are documented in the context of each API or route.</p>
+<p>A response status code of 20X (200, 201 or 204) indicates success. A successful result will typically provide a response body but certain operations (such as DELETE) may respond with a 204 response and no response body.</p>
 <p>All other <a href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes">standard HTTP statusCodes</a> signify an error. Errors from all APIs are returned as an object of the form:</p>
 <pre lang="json"><code lang="json">{
   error: {
     code: &lt;ably error code&gt;,
-    reason: &lt;reason string&gt;,
+    message: &lt;string&gt;,
     statusCode: &lt;http status code&gt;
   }
 }</code></pre>
@@ -64,11 +72,56 @@
 	<dd>A specific reason code as defined in the public errors definition (link TBD), where one is known</dd>
 	<dt>statusCode</dt>
 	<dd>Where a code is not available, the statusCode provides a generic indication of the nature of the failure</dd>
-	<dt>reason</dt>
-	<dd>The reason string is an English language string that aims to provide useful information to the developer. It is not necessarily intended to be an informative string for the end user</dd>
+	<dt>message</dt>
+	<dd>The message string is an English language string that aims to provide useful information to the developer. It is not necessarily intended to be an informative string for the end user</dd>
 </dl>
 <p>Wherever possible, success response bodies contain links, in <a href="http://en.wikipedia.org/wiki/HATEOAS">HATEOS</a> style, to other resources relevant to the response; where these are present these are included as <code>href</code> attributes on the applicable part of the response object.</p>
 <p>GET, PUT, POST and DELETE are available in all contexts where they make sense. GET is always idempotent.</p>
+<h3>Pagination</h3>
+<p>REST APIs whose responses may have unbounded size have paginated responses; that is, if a full response to the query could exceed a limit (a default or a <code>limit</code> given as a parameter to the call) the first response contains a subset of the results, and further &#8220;pages&#8221; of the result are available on subsequent requests. Each response (the initial response and responses to each subsequent request) is accompanied by one or more relative links relating to the current query.</p>
+<p>Responses contain one or more of the following relative links:</p>
+<dl>
+	<dt><code>first</code></dt>
+	<dd>a link to the first page of results for this query. This link also makes the query repeatable; any params that are resolved at query time (for example default values for omitted time-related params) have their resolved values included explicitly in the <code>first</code> link.</dd>
+</dl>
+<dl>
+	<dt>current</dt>
+	<dd>a stable link to the current page of results.</dd>
+</dl>
+<dl>
+	<dt>next</dt>
+	<dd>on each page except the last in a paginated result, the next link is a link to the next page of results.</dd>
+</dl>
+<p>Relative links are presented by default as an <a href="http://tools.ietf.org/html/rfc5988">RFC 5988 Link HTTP response header</a>; there is a separate <code>Link</code> header for each relative link accompanying the response. The rel types used are <code>first</code>, <code>next</code> and <code>current</code> as specified in the RFC.</p>
+<p>A <code>Link</code> header has the format:</p>
+<blockquote>
+<p>Link: &lt;&lt;url&gt;&gt;; rel=&#8220;&lt;rel&gt;&#8221;</p>
+</blockquote>
+<p>where <code>&lt;url&gt;</code> is the URL of the link and <code>&lt;rel&gt;</code> is the relation type.</p>
+<p>For example:</p>
+<blockquote>
+<p>Link: &lt;./stats?start=1380794880000&amp;end=1380794881058&amp;limit=100&amp;unit=minute<br />
+&amp;direction=forwards&amp;format=json&amp;first_start=1380794880000&gt;; rel=&#8220;first&#8221;</p>
+</blockquote>
+<p>In principle the link URL might be any valid URL but in practice it will always be a relative URL, and it must be interpreted relative to the original query URL. Clients should treat link URLs opaquely; in particular, params (such as <code>first_start</code> in the example above) may be undocumented and unsupported except where a client uses the link URL in its entirety.</p>
+<p>Clients that are unable to process response headers may also request an <code>envelope</code> response type.</p>
+<h3>Envelope response format</h3>
+<p>A client that is unable to access response headers or status code can request an <code>envelope</code> response that contains the usual response, plus <code>Link</code> header information and the response status code wrapped in an object as a single response body. This is useful for JSONP and may be useful in other environments. Envelope responses are only supported for JSON, JSONP and HTML formats.</p>
+<p>A client requests an envelope response by including an <code>envelope=true</code> param in the request.</p>
+<p>An envelope response body then has the format:</p>
+<pre>
+{
+    "statusCode": &lt;status code&gt;,
+    "response": &lt;result of API call&gt;,
+    "rel": {
+        "first": &lt;URL&gt;,
+        ...
+    }
+}
+
+</pre>
+<p>where the <code>response</code> member references the API result in the usual format. The <code>rel</code> member, present only in paginated responses, includes each of the rel links associated with the response.</p>
+<p>Envelope responses always are always made with a 200 status code; the status of the API request itself must be obtained from the <code>statusCode</code> member of the response body.</p>
 <h2>Authentication</h2>
 <p>To understand the REST API it is easiest first to understand the various authentication methods that Ably supports.</p>
 <p>Clients can access Ably, whether using REST or the Real-time service, by two methods.</p>
@@ -102,10 +155,10 @@
 	<dt>end</dt>
 	<dd><em>now</em> The end of the query interval as a time in milliseconds since the epoch.</dd>
 	<dt>limit</dt>
-	<dd><em>1000</em> The maximum number of records to return. A limit greater than 10000 is invalid.</dd>
+	<dd><em>100</em> The maximum number of records to return. A limit greater than 10000 is invalid.</dd>
 	<dt>direction</dt>
 	<dd><em>backwards</em> The direction of this query. The direction determines the order of the returned result array, but also determines which end of the query interval is the start point for the search.</dd>
-	<dt>by</dt>
+	<dt>unit</dt>
 	<dd><em><code>minute</code></em> One of the values <code>minute</code>, <code>hour</code>, <code>day</code> or <code>month</code>, specifying the unit of aggregation in the returned results.</dd>
 </dl>
 <h5>Options</h5>
@@ -115,7 +168,7 @@
 	<dt>Content-Type</dt>
 	<dd>not applicable</dd>
 	<dt>Accept</dt>
-	<dd><code>application/json</code> by default, or <code>text/html</code>, <code>text/xml</code></dd>
+	<dd><code>application/json</code> by default, or <code>text/html</code>, <code>application/x-thrift</code>, <code>text/xml</code></dd>
 	<dt>Authentication required</dt>
 	<dd>yes (<a href="#basic">basic</a> or <a href="#token">token</a>)</dd>
 </dl>
@@ -167,7 +220,7 @@
 <h2>Channel routes</h2>
 <p>Routes providing access to the messaging service within a channel scope.</p>
 <h3 id="publish">Publish one or more events on a channel</h3>
-<h6>POST /channels/<code>&lt;channel id&gt;</code>/publish</h6>
+<h6>POST /channels/<code>&lt;channel id&gt;</code>/messages</h6>
 <p>Publish a message on a channel. Note that since the REST API is stateless, publication using this API is of single messages, outside the context of any specific connection.</p>
 <p>The request body contains message details and is an object of the form:</p>
 <pre lang="json"><code lang="json">{
@@ -186,7 +239,7 @@
 <h5>Options</h5>
 <dl>
 	<dt>Alternative paths</dt>
-	<dd><pre>GET /channels/<code>&lt;channel id&gt;</code>/history</pre></dd>
+	<dd><pre>GET /channels/<code>&lt;channel id&gt;</code>/publish</pre></dd>
 	<dt>Request body</dt>
 	<dd>JSON or formformat, see above.</dd>
 	<dt>Content-Type</dt>
@@ -199,7 +252,7 @@
 <h5>Returns</h5>
 <p>Nothing</p>
 <h3 id="channel-history">Retrieve message history for a channel</h3>
-<h6>GET /channels/<code>&lt;channel id&gt;</code>/history</h6>
+<h6>GET /channels/<code>&lt;channel id&gt;</code>/messages</h6>
 <h5>Parameters</h5>
 <dl>
 	<dt>start</dt>
@@ -207,7 +260,7 @@
 	<dt>end</dt>
 	<dd><em>now</em> The end of the query interval as a time in milliseconds since the epoch. A message qualifies as a member of the result set if its system timestamp is equal to, or less than, this time.</dd>
 	<dt>limit</dt>
-	<dd><em>1,000</em> The maximum number of records to return. A limit greater than 10000 is invalid.</dd>
+	<dd><em>100</em> The maximum number of records to return. A limit greater than 10000 is invalid.</dd>
 	<dt>direction</dt>
 	<dd><em>backwards</em> The direction of this query. The direction determines the order of the returned result array, but also determines which end of the query interval is the start point for the search.</dd>
 	<dt>by</dt>
@@ -242,9 +295,9 @@ If <code>hour</code>, the result is an array of references to (channel + hour) p
 <p>In the case of an <code>hour</code> query, each member is a <code>channel/hour</code> reference. (Detailed description TBD.)</p>
 <h3 id="presence">Retrieve instantaneous presence status for a channel</h3>
 <h6>GET /channels/<code>&lt;channel id&gt;</code>/presence</h6>
-<p>Detailed description TBD.</p>
+<p>Obtain the set of members currently present for a channel.</p>
 <h5>Parameters</h5>
-<p>TBD</p>
+<p>None</p>
 <h5>Options</h5>
 <dl>
 	<dt>Alternative paths</dt>
@@ -254,32 +307,59 @@ If <code>hour</code>, the result is an array of references to (channel + hour) p
 	<dt>Content-Type</dt>
 	<dd>not applicable</dd>
 	<dt>Accept</dt>
-	<dd><code>application/json</code> by default, or <code>text/html</code>, <code>text/xml</code></dd>
+	<dd><code>application/json</code> by default, or <code>text/html</code>, <code>application/x-thrift</code>, <code>text/xml</code></dd>
 	<dt>Auth required</dt>
 	<dd>yes (<a href="#basic">basic</a> or <a href="#token">token</a>)</dd>
 </dl>
 <h5>Returns</h5>
-<p>TBD</p>
+<p>A successful request returns an array containing the members that are currently present on the given channel. If there are no members present, an empty collection is returned.</p>
+<p>JSON response bodies are arrays with each member being a <code>presence-message</code> object of the form:</p>
+<pre lang="json"><code lang="json">{
+  state: &lt;presence state&gt;,
+  clientId: &lt;member client id&gt;,
+  memberId: &lt;a unique member identifier&gt;,
+  clientData: &lt;message payload&gt;,
+  timestamp: &lt;message timestamp&gt;
+}</code></pre>
+<p>Thrift response bodies are instances of <code>TPresenceArray</code> encoded using the Thrift binary encoding.</p>
 <h3 id="presence-history">Retrieve presence history for a channel</h3>
 <h6>GET /channels/<code>&lt;channel id&gt;</code>/presence/history</h6>
-<p>Detailed description TBD.</p>
+<p>Obtain the history of presence messages for a channel.</p>
 <h5>Parameters</h5>
-<p>TBD</p>
+<dl>
+	<dt>start</dt>
+	<dd><em>beginning of time</em> The start of the query interval as a time in milliseconds since the epoch. A message qualifies as a member of the result set if its system timestamp (not necessarily the same as a timestamp applied by the client before submission) is equal to, or greater than, this time.</dd>
+	<dt>end</dt>
+	<dd><em>now</em> The end of the query interval as a time in milliseconds since the epoch. A message qualifies as a member of the result set if its system timestamp is equal to, or less than, this time.</dd>
+	<dt>limit</dt>
+	<dd><em>100</em> The maximum number of records to return. A limit greater than 10000 is invalid.</dd>
+	<dt>direction</dt>
+	<dd><em>backwards</em> The direction of this query. The direction determines the order of the returned result array, but also determines which end of the query interval is the start point for the search.</dd>
+</dl>
 <h5>Options</h5>
 <dl>
 	<dt>Alternative paths</dt>
-	<dd><pre>GET /channels/<code>&lt;channel id&gt;</code>/presence/history</pre></dd>
+	<dd><pre>GET /channels/<code>&lt;channel id&gt;</code>/messages?type=presence</pre></dd>
 	<dt>Request body</dt>
 	<dd>not applicable</dd>
 	<dt>Content-Type</dt>
 	<dd>not applicable</dd>
 	<dt>Accept</dt>
-	<dd><code>application/json</code> by default, or <code>text/html</code>, <code>text/xml</code></dd>
+	<dd><code>application/json</code> by default, or <code>text/html</code>, <code>application/x-thrift</code>, <code>text/xml</code></dd>
 	<dt>Auth required</dt>
 	<dd>yes (<a href="#basic">basic</a> or <a href="#token">token</a>)</dd>
 </dl>
 <h5>Returns</h5>
-<p>TBD</p>
+<p>A successful request returns an array containing the members that are currently present on the given channel. If there are no members present, an empty collection is returned.</p>
+<p>JSON response bodies are arrays with each member being a <code>presence-message</code> object of the form:</p>
+<pre lang="json"><code lang="json">{
+  state: &lt;presence state&gt;,
+  clientId: &lt;member client id&gt;,
+  memberId: &lt;a unique member identifier&gt;,
+  clientData: &lt;message payload&gt;,
+  timestamp: &lt;message timestamp&gt;
+}</code></pre>
+<p>Thrift response bodies are instances of <code>TPresenceArray</code> encoded using the Thrift binary encoding.</p>
 <h2>Authentication</h2>
 <h3 id="requesttoken">Request an access token</h3>
 <h6>POST /keys/<code>key id</code>/requestToken</h6>
@@ -340,37 +420,39 @@ If <code>hour</code>, the result is an array of references to (channel + hour) p
 <li class=''><a href='/realtime/history/'>History</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 </ul>
-  <h2><a href="/rest/">REST client lib</a></h2>
+  <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest/usage/'>Usage</a></li>
-<li class=''><a href='/rest/channels-messages/'>Channels &amp; Messages</a></li>
-<li class=''><a href='/rest/presence/'>Presence</a></li>
-<li class=''><a href='/rest/authentication/'>Authentication</a></li>
-<li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
-<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
+<li class=''><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
+<li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest-client-library/history/'>History</a></li>
+<li class=''><a href='/rest-client-library/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest-client-library/encryption/'>Encryption</a></li>
 </ul>
   <h2 class="selected"><a href="/rest-api/">REST API</a></h2>
 <ul>
-</ul>
-  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
-<ul>
-<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
-<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
-<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 </ul>
   <h2>Other</h2>
 <ul>
 <li class=''><a href='/other/authentication/'>Authentication</a></li>
 <li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
 </ul>
-  <ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 <li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+</ul>
+  <ul>
 <li><a href="https://ably.io">Visit Ably.io</a></li>
 </ul>
 </div>
+
 </body>
 </html>

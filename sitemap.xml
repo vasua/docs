@@ -6,32 +6,12 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/realtime/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>http://ably.github.com/rest-api/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest/usage/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/rest/history/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/rest/presence/</loc>
+    <loc>http://ably.github.com/realtime/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -46,22 +26,22 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest/statistics/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/rest/encryption/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>http://ably.github.com/realtime/history/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>http://ably.github.com/realtime/presence/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/realtime/statistics/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/rest-client-library/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -76,16 +56,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest/authentication/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/realtime/statistics/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>http://ably.github.com/other/authentication/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -96,12 +66,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest/channels-messages/</loc>
+    <loc>http://ably.github.com/realtime/authentication/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/realtime/authentication/</loc>
+    <loc>http://ably.github.com/rest-client-library/usage/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -121,12 +91,37 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>http://ably.github.com/rest-client-library/history/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://ably.github.com/client-lib-development-guide/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>http://ably.github.com/rest-client-library/presence/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/rest-client-library/statistics/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/rest-client-library/encryption/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://ably.github.com/client-lib-development-guide/comet/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/rest-client-library/authentication/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -151,7 +146,17 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>http://ably.github.com/rest-client-library/channels-messages/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://ably.github.com/client-lib-development-guide/websocket/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/client-lib-development-guide/encryption/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

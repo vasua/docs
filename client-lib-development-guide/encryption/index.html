@@ -1,0 +1,223 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ably API Documentation - Encryption</title>
+    <link rel="stylesheet" type="text/css" href="/assets/stylesheet.css" media="screen">
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+
+    <script src="/assets/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
+    <script src="/assets/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/prettify/prettify.css" media="screen">
+    <script src="/assets/vendor/prettify/prettify-lib.js" type="text/javascript"></script>
+
+    <script src="/assets/javascripts/application.js" type="text/javascript"></script>
+    <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.4.3">
+  </head>
+  <body>
+    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+  <div id="documentation">
+    <p>Ably client libraries support encryption of message content, making it easier to build apps that encrypt content fully end-to-end.</p>
+<h2>Objectives and Scope</h2>
+<p>The libraries support encryption purely as a convenience; the libraries ensure interoperability between environments by having compatible implementations of encryption algorithms and by making common choices on format, mode, padding etc. However, Ably intentionally does not manage the distribution of keys between clients, and end-to-end encryption is enabled without exposing keys to the Ably service at all. This has the advantage that Ably demonstrably has no access to the unencrypted contents of your messages, but also means that each app is responsible for enabling the distribution of keys to clients independently of Ably.</p>
+<p>The client library support for encryption supports symmetric encryption only, and requires each participating client to each specify the correct secret key when creating a <code>Channel</code> instance. Clients that do not specify a key will be delivered the still-encrypted message payloads that they may then still wish to decrypt offline.</p>
+<p>The client libraries are designed to be extensible, but initially only support the AES algorithm (with a default key length of 128 bits) and CBC mode. These defaults are intended to ensure that encryption support can be provided in all target environments and platforms.</p>
+<p>Encryption is supported for both REST and Realtime publish operations. Decryption is supported in Realtime message subscriptions and in REST and Realtime history operations.</p>
+<p>The key in use at any given time is known the client library, but the Ably service has no visibility of the key; it knows only that a given message payload was encrypted. When accessing messages via the history API, it is the caller&#8217;s responsibility to ensure that the correct key is used for the requested interval.</p>
+<p>Encryption on message data payloads only, and other message metadata is not encrypted; for example the <code>clientId</code>, event <code>name</code> or <code>timestamp</code>. This means that messages with a specific event name can still be routed by the library to the correct handler even if the recipient does not have the key; the encrypted payload data is delivered instead. Furthermore, the payload data type is not encrypted &#8211; this is regarded as metadata just like other message metadata. Boolean payloads are not encrypted at all, since the value is represented in the type.</p>
+<p>Encryption options (algorithm, key, etc) are specified on a per-channel basis; it is expected that apps will wish to have both unencrypted and encrypted channels on a single connection.</p>
+<h2>Encrypted message format</h2>
+<h3>Message representation</h3>
+<p>All Ably messages &#8211; whose structure is defined in the <code>TMessage</code> struct in <code>clientmessage.thrift</code> &#8211; carry their payload in a <code>data</code> member, with various supported data types. The representation is different for JSON- or Thrift-encoded messages. A given encrypted message can be exchanged using either the binary or JSON protocol and encryption and decryption are interoperable between the representations.</p>
+<p>In the case of the JSON encoding, the <code>data</code> member either contains the data value directly (either a primitive, or JSON Object or Array) or contains an encoded string value, with the encoding (only <code>base64</code> is supported) specified in an <code>encoding</code> property of the message. For unencrypted messages, type is implicit; the type is either the type pf the JSON data property, or is implicitly a binary buffer when an <code>encoding</code> is present.</p>
+<p>In the case of an encrypted message the <code>data</code> member always carries the encrypted message payload as a base64-encoded string and the <code>encoding</code> member contains the string <code>cipher+base64</code>. The type of the unencrypted payload is then indicated explicitly by adding a <code>type</code> property to the message, which contains the numeric value of the underlying data type, as defined in the <code>TType</code> enum on <code>clientmessage.thrift</code>.</p>
+<p>Therefore in the JSON encoding, an encrypted message is represented as follows:</p>
+<pre>{
+	name: &lt;name&gt;,
+	timestamp: &lt;timestamp&gt;,
+	"data": &lt;string containing base64-encoded representation of encrypted data&gt;,
+	"type": &lt;TType ordinal value of unencrypted data value&gt;,
+	"encoding": "cipher+base64"
+}
+
+</pre>
+<p>For Thrift binary-encoded messages, the <code>data</code> member is a <code>TData</code> struct which contains an explicit type indication. The <code>type</code> member contains a <code>TType</code> value, and the value is contained in the <code>xxxData</code> member that is compatible with its type.</p>
+<p>For encrypted messages, the encrypted value is instead contained in the <code>cipherData</code>;the <code>type</code> remains unchanged, and represents the type of the unencrypted value. The encrypted message is a Thrift-encoded version of the following <code>TMessage</code>:</p>
+<pre>{
+	name: &lt;name&gt;,
+	timestamp: &lt;timestamp&gt;,
+	data: {
+		type: &lt;TType for unencrypted data value&gt;,
+		cipherData: &lt;binary data for encrypted data&gt;
+	}
+}
+
+</pre>
+<h3>Plaintext</h3>
+<p>Each possible data value type is canonically converted to a byte array before being encrypted, as follows:</p>
+<dl>
+	<dt>INT32</dt>
+	<dd>the 4-byte array containing the big-endian representation of the int32 value;</dd>
+</dl>
+<dl>
+	<dt>INT64</dt>
+	<dd>the 8-byte array containing the big-endian representation of the int64 value;</dd>
+</dl>
+<dl>
+	<dt>DOUBLE</dt>
+	<dd>the 8-byte array containing the big-endian representation of the IEEE754 int64-encoded value;</dd>
+</dl>
+<dl>
+	<dt>STRING</dt>
+	<dd>the utf8-encoding of the string, without any trailing null byte;</dd>
+</dl>
+<dl>
+	<dt>BUFFER</dt>
+	<dd>the unmodified buffer contents;</dd>
+</dl>
+<dl>
+	<dt>JSONOBJECT</dt>
+	<dd>the utf8-encoding of the JSON-stringified value of the object;</dd>
+</dl>
+<dl>
+	<dt>JSONARRAY</dt>
+	<dd>the utf8-encoding of the JSON-stringified value of the array;.</dd>
+</dl>
+<p>Note that Boolean values, having a type only and no value member, are unencrypted.</p>
+<h3>Conversion to ciphertext</h3>
+<p>Conversion from plaintext to ciphertext requires the following steps:</p>
+<ul>
+	<li>Obtain an initialisation vector (IV). This can be obtained from a local secure random source.</li>
+</ul>
+<ul>
+	<li>Pad the plaintext. The plaintext is padded to be a multiple of 16 bytes (the AES block length) using PKCS#7 (<a href="http://tools.ietf.org/html/rfc5652#section-6.3">RFC 5652</a>).</li>
+</ul>
+<ul>
+	<li>Encrypt the plaintext. This is performed using AES-CBC using the IV and padded plaintext.</li>
+</ul>
+<ul>
+	<li>Construct the ciphertext message payload. This is the concatenation of the 16-byte IV followed by the ciphertext bytes.</li>
+</ul>
+<h2>Examples</h2>
+<p>The following step-by-step example illustrates the encryption process described above.</p>
+<p>The ably-js repository contains a utility, <code>tools/crypto/generate-test-data</code> which can be used to generate the output for each of these intermediate steps as a way to test client library operation.</p>
+<p>The message to be encrypted is one with event name <code>example</code> and message data:</p>
+<pre>'The quick brown fox'
+</pre>
+<p>It will be encrypted with the following crypto parameters:</p>
+<pre>algorithm: aes128
+
+key:
+00000000: 93e3 5cc9 7753 fd1a 79b4 d884 e7dc fddf  .c\IwS}.y4X.g\}_
+(16 bytes)
+
+iv:
+00000000: 284c e48d 4bdc 9d42 8a77 6b53 2dc7 b5c0  (Ld.K\.B.wkS-G5@
+(16 bytes)
+</pre>
+<p>The unencrypted JSON message representation would be:</p>
+<pre>{
+  name: 'example',
+  data: 'The quick brown fox'
+}
+</pre>
+<p>The unencrypted Thrift message representation would be:</p>
+<pre>TData({
+  type: 6,
+  stringData: 'The quick brown fox'
+})
+</pre>
+<p>The plaintext before encryption, without padding, is the UTF8 encoding of the string data:</p>
+<pre>00000000: 5468 6520 7175 6963 6b20 6272 6f77 6e20  The.quick.brown.
+00000010: 666f 78                                  fox
+(19 bytes)
+</pre>
+<p>The plaintext before encryption now including padding:</p>
+<pre>00000000: 5468 6520 7175 6963 6b20 6272 6f77 6e20  The.quick.brown.
+00000010: 666f 780d 0d0d 0d0d 0d0d 0d0d 0d0d 0d0d  fox.............
+(32 bytes)
+</pre>
+<p>The raw cipher output based on the parameters above is:</p>
+<pre>00000000: 835c cfce 0cfd be37 b792 1204 1d45 68a4  .\ON.}&gt;77....Eh$
+00000010: df7f 6e38 174a ff50 7323 bbca 16b0 e284  _.n8.J.Ps#;J.0b.
+(32 bytes)
+</pre>
+<p>The encrypted value to be wrapped in the message is the result of concatenating the iv and the raw cipher output:</p>
+<pre>00000000: 284c e48d 4bdc 9d42 8a77 6b53 2dc7 b5c0  (Ld.K\.B.wkS-G5@
+00000010: 835c cfce 0cfd be37 b792 1204 1d45 68a4  .\ON.}&gt;77....Eh$
+00000020: df7f 6e38 174a ff50 7323 bbca 16b0 e284  _.n8.J.Ps#;J.0b.
+(48 bytes)
+</pre>
+<p>When represented as an encrypted message in JSON format:</p>
+<pre>{
+  name: 'example',
+  data: 'KEzkjUvcnUKKd2tTLce1wINcz84M/b43t5ISBB1FaKTff244F0r/UHMju8oWsOKE',
+  encoding: 'cipher+base64',
+  type: 6
+}
+</pre>
+<p>When represented as an encrypted message in Thrift format:</p>
+<pre>TData({
+  type: 6,
+  cipherData: 284c e48d 4bdc 9d42 8a77 6b53 2dc7 b5c0 835c cfce 0cfd be37
+              b792 1204 1d45 68a4 df7f 6e38 174a ff50 7323 bbca 16b0 e284&gt;
+})
+</pre>
+  </div>
+  <div id="sidebar">
+  <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
+  <ul>
+<li class=''><a href='/root/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
+<li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
+</ul>
+  <h2><a href="/realtime/">Real-time client lib</a></h2>
+<ul>
+<li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
+<li class=''><a href='/realtime/connection/'>Connection</a></li>
+<li class=''><a href='/realtime/channels-messages/'>Channels and Messages</a></li>
+<li class=''><a href='/realtime/presence/'>Presence</a></li>
+<li class=''><a href='/realtime/authentication/'>Authentication</a></li>
+<li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/statistics/'>Statistics</a></li>
+</ul>
+  <h2><a href="/rest-client-library/">REST client lib</a></h2>
+<ul>
+<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
+<li class=''><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
+<li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest-client-library/history/'>History</a></li>
+<li class=''><a href='/rest-client-library/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest-client-library/encryption/'>Encryption</a></li>
+</ul>
+  <h2><a href="/rest-api/">REST API</a></h2>
+<ul>
+</ul>
+  <h2>Other</h2>
+<ul>
+<li class=''><a href='/other/authentication/'>Authentication</a></li>
+<li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
+</ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class='selected'><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
+<li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+</ul>
+  <ul>
+<li><a href="https://ably.io">Visit Ably.io</a></li>
+</ul>
+</div>
+
+</body>
+</html>

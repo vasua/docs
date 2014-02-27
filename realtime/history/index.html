@@ -65,15 +65,13 @@
 </dl>
 <p>It is not possible to navigate backwards through a result set, but each page can be obtained by navigating to it by going back to <code>first</code> and then <code>next</code>. Of course, if the intention is to display results in the opposite order, the <code>direction</code> param should be used in the initial query to specify the intended direction of pagination.</p>
 <p>Relative links are presented by default as an <a href="http://tools.ietf.org/html/rfc5988">RFC 5988 Link HTTP response header</a>; there is a separate Link header for each relative link accompanying the response. The rel types used are <code>first</code>, <code>next</code> and <code>current</code> as specified in the RFC. A Link header has the format:</p>
-<blockquote>
-<p>Link: &lt;&lt;url&gt;&gt;; rel=&#8220;&lt;rel&gt;&#8221;</p>
-</blockquote>
+<p>bq.<br />
+Link: &lt;&lt;url&gt;&gt;; rel=&#8220;&lt;rel&gt;&#8221;</p>
 <p>where <code>&lt;url&gt;</code> is the URL of the link and <code>&lt;rel&gt;</code> is the relation type.</p>
 <p>For example:</p>
-<blockquote>
-<p>Link: &lt;./history?start=1380794880000&amp;end=1380794881058&amp;limit=100&amp;by=minute<br />
+<p>bq.<br />
+Link: &lt;./history?start=1380794880000&amp;end=1380794881058&amp;limit=100&amp;by=minute<br />
 &amp;direction=forwards&amp;format=json&amp;first_start=1380794880000&gt;; rel=&#8220;first&#8221;</p>
-</blockquote>
 <p>In principle the URL might be any valid URL but in practice it will always be a relative URL, and it must be interpreted relative to the query URL. Clients should treat the URL opaquely; in particular, params (such as <code>first_start</code> in the example above) are undocumented and unsupported except where a client uses the link URL in its entirety.</p>
 <p>In the case of a JSON response body format it is also possible to request that the rel response metadata is inline in the response body by specifying <code>rel_format=inline</code> in the request URL. (The <code>rel_format</code> param also takes the value <code>rel_format=link</code> to request Link header metadata explicitly.) In the inline case the response body then has the format:</p>
 <pre>
@@ -126,17 +124,17 @@ channel = rest.channels.get('channel0')</code></pre>
 <blockquote class="definition">
 <p class="definition">channel.history(options, callback)</p>
 </blockquote>
-<p>This call queries the REST <a href="/rest/spec#channel-history"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/history</code></a> API</p>
+<p>This call queries the REST <a href="/rest-api#channel-history"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/history</code></a> API</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>options</dt>
-	<dd>is an optional object containing the query parameters, as specified in the <a href="/rest/spec#channel-history">REST API</a> documentation.</dd>
+	<dd>is an optional object containing the query parameters, as specified in the <a href="/rest-api#channel-history">REST API</a> documentation.</dd>
 	<dt>callback</dt>
 	<dd>is a function of the form: <code>callback(err, result)</code><br />
 where:<br />
 <ul><br />
-<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest/spec#common">REST API</a> documentation</li><br />
-<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest/spec#channel-history">REST API</a></li><br />
+<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
+<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api#channel-history">REST API</a></li><br />
 </ul></dd>
 </dl>
 <h4>Request options</h4>
@@ -198,37 +196,39 @@ Similarly, in the special case of json only, the request path may include the ex
 <li class='selected'><a href='/realtime/history/'>History</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 </ul>
-  <h2><a href="/rest/">REST client lib</a></h2>
+  <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest/usage/'>Usage</a></li>
-<li class=''><a href='/rest/channels-messages/'>Channels &amp; Messages</a></li>
-<li class=''><a href='/rest/presence/'>Presence</a></li>
-<li class=''><a href='/rest/authentication/'>Authentication</a></li>
-<li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
-<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
+<li class=''><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
+<li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest-client-library/history/'>History</a></li>
+<li class=''><a href='/rest-client-library/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest-client-library/encryption/'>Encryption</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
-</ul>
-  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
-<ul>
-<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
-<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
-<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 </ul>
   <h2>Other</h2>
 <ul>
 <li class=''><a href='/other/authentication/'>Authentication</a></li>
 <li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
 </ul>
-  <ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 <li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+</ul>
+  <ul>
 <li><a href="https://ably.io">Visit Ably.io</a></li>
 </ul>
 </div>
+
 </body>
 </html>

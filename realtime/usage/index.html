@@ -49,7 +49,7 @@
       
     </header>
     <article>
-      <p>The Realtime library attempts to establish, and maintain, a single connection to the Ably realtime service. The library extends, and depends on, the <a href="/rest/usage">REST library</a>, which provides access to the <a href="/rest-api">REST-based Ably APIs</a>, and the <a href="/rest/authentication">Auth API</a> in particular.</p>
+      <p>The Realtime library attempts to establish, and maintain, a single connection to the Ably realtime service. The library extends, and depends on, the <a href="/rest-client-library/usage">REST library</a>, which provides access to the <a href="/rest-api">REST-based Ably APIs</a>, and the <a href="/rest-client-library/authentication">Auth API</a> in particular.</p>
 <p>Whereas the REST API is stateless, the Realtime API maintains connection and channel state.</p>
 <p>The Realtime client library is available for <a href="https://ably.io/download/realtime-client-libraries">several popular environments</a>, with the same functionality and similar API supported across all languages. You can view this documentation in each of the supported languages using the language selector navigation.</p>
 <div lang="javascript">The Realtime library for browser Javascript environments is loaded from the Ably CDN.<br />
@@ -71,7 +71,7 @@ var realtime = new Ably.Realtime(options);</code></pre></div><div lang="ruby">Th
 <br />
 If using bundler, simply add the following to your Gemfile and run <code>bundle install</code>:<br />
 <br />
-<pre lang="ruby"><code lang="ruby">gem 'ably-realtime'</code></pre></div><div lang="java">The Realtime library for Java is downloadable as a JAR from <br />
+<pre lang="ruby"><code lang="ruby">gem 'ably-realtime'</code></pre></div><div lang="java">The Realtime library for Java is downloadable as a JAR from<br />
 <a href="https://github.com/ably/ably-java/releases">https://github.com/ably/ably-java/releases</a>.<br />
 <br />
 Ensure this JAR is included in your classpath.<br />
@@ -133,7 +133,7 @@ The Ably constructor&#8217;s <code>Options</code> argument is an object with one
 </dl>
 <dl>
 	<dt>authCallback</dt>
-	<dd>A <span lang="default">function</span><span lang="java">TokenCallback instance</span> to call when a new token is required.</span>. The role of the callback is to generate a signed <code>token request</code> which may then be submitted by the library to the <code>requestToken</code> API. See <a href="/rest/authentication">authentication</a> for details of the token request format and associated API calls.</dd>
+	<dd>A <span lang="default">function</span><span lang="java">TokenCallback instance</span> to call when a new token is required.</span>. The role of the callback is to generate a signed <code>token request</code> which may then be submitted by the library to the <code>requestToken</code> API. See <a href="/rest-client-library/authentication">authentication</a> for details of the token request format and associated API calls.</dd>
 </dl>
 <dl>
 	<dt>authUrl</dt>
@@ -208,37 +208,39 @@ Note that the log level and log handler have global scope in the library and wil
 <li class=''><a href='/realtime/history/'>History</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 </ul>
-  <h2><a href="/rest/">REST client lib</a></h2>
+  <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest/usage/'>Usage</a></li>
-<li class=''><a href='/rest/channels-messages/'>Channels &amp; Messages</a></li>
-<li class=''><a href='/rest/presence/'>Presence</a></li>
-<li class=''><a href='/rest/authentication/'>Authentication</a></li>
-<li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
-<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
+<li class=''><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
+<li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest-client-library/history/'>History</a></li>
+<li class=''><a href='/rest-client-library/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest-client-library/encryption/'>Encryption</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
-</ul>
-  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
-<ul>
-<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
-<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
-<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 </ul>
   <h2>Other</h2>
 <ul>
 <li class=''><a href='/other/authentication/'>Authentication</a></li>
 <li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
 </ul>
-  <ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 <li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+</ul>
+  <ul>
 <li><a href="https://ably.io">Visit Ably.io</a></li>
 </ul>
 </div>
+
 </body>
 </html>

@@ -43,7 +43,7 @@
     
     <header>
       
-        <div class="breadcrumb"><a href="/rest/">REST Client Library</a><span class="separator">/</span></div>
+        <div class="breadcrumb"><a href="/rest-client-library/">REST Client Library</a><span class="separator">/</span></div>
       
       
         <h1 id="title">Channels &amp; Messages</h1>
@@ -78,22 +78,22 @@ channel.publish('announcement', { message: 'Luke has arrived'});</code></pre>
 <li>
 Methods
 <ul>
-<li><a href='#publish'>Publish</a></li>
-<li><a href='#history'>History</a></li>
-<li><a href='#stats'>Stats</a></li>
-<li><a href='#presence'>Presence</a></li>
+<li><a href='#publish'>publish</a></li>
+<li><a href='#history'>history</a></li>
+<li><a href='#stats'>stats</a></li>
+<li><a href='#presence'>presence</a></li>
 </ul>
 </li>
 </ul>
 </li></ul>
 </div><h2 id="channel-object">Channel Object Reference</h2>
-<p>The Channel object is is created by getting a channel from the <a href="/rest/usage#constructor">@Ably object</a> channels class.</p>
+<p>The Channel object is is created by getting a channel from the <a href="/rest-client-library/usage#constructor">@Ably object</a> channels class.</p>
 <h3>Methods</h3>
 <h6 id="publish">publish</h6>
 <blockquote class="definition">
 <p class="definition"><span lang='nodejs'>channel.publish(event, data, callback)</span><span lang='ruby'>channel.publish(event, data) → success</span><span lang='java'>channel.publish(String event, Object data) → Boolean success</span></p>
 </blockquote>
-<p>This call queries the REST <a href="/rest-api/#publish"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/publish</code></a> API.</p>
+<p>This call queries the REST <a href="/rest-api#publish"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/publish</code></a> API.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>event</dt>
@@ -104,7 +104,7 @@ Methods
 	<dd>is a function of the form: <code>callback(err, result)</code><br />
 where:<br />
 <ul><br />
-<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api/#common">REST API</a> documentation</li><br />
+<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
 <li>On success, <code>result</code> contains the object returned in the response body, which may be empty.</li><br />
 </ul></dd>
 </dl>
@@ -129,17 +129,17 @@ where:<br />
 <blockquote class="definition">
 <p class="definition"><span lang='nodejs'>channel.history(options, callback)</span><span lang='ruby'>channel.history(options) → json_result</span><span lang='java'>channel.history(OptionsHash options) → JSONResult</span></p>
 </blockquote>
-<p>This call queries the REST <a href="/rest-api/#channel-history"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/history</code></a> API.</p>
+<p>This call queries the REST <a href="/rest-api#channel-history"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/history</code></a> API.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>options</dt>
-	<dd>an optional object containing the query parameters, as specified in the <a href="/rest-api/#channel-history">REST API</a>.</dd>
+	<dd>an optional object containing the query parameters, as specified in the <a href="/rest-api#channel-history">REST API</a>.</dd>
 	<dt><div lang="nodejs">callback</div></dt>
 	<dd>is a function of the form: <code>callback(err, result)</code><br />
 where:<br />
 <ul><br />
-<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api/#common">REST API</a> documentation</li><br />
-<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api/#channel-history">REST API</a>.<br />
+<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
+<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api#channel-history">REST API</a>.<br />
   Example <code>result</code>:<br />
   <pre lang="json"><code>[{
     "name": "&lt;event name&gt;",
@@ -179,17 +179,17 @@ where:<br />
 <blockquote class="definition">
 <p class="definition"><span lang='nodejs'>channel.stats(options, callback)</span><span lang='ruby'>channel.stats(options) → json_result</span><span lang='java'>channel.stats(OptionsHash options) → JSONResult</span></p>
 </blockquote>
-<p>This call queries the REST <a href="/rest-api/#channel-stats"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/stats</code></a> API.</p>
+<p>This call queries the REST <a href="/rest-api#channel-stats"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/stats</code></a> API.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>options</dt>
-	<dd>an optional object containing the query parameters, as specified in the <a href="/rest-api/#channel-stats">REST API</a>.</dd>
+	<dd>an optional object containing the query parameters, as specified in the <a href="/rest-api#channel-stats">REST API</a>.</dd>
 	<dt><div lang="nodejs">callback</div></dt>
 	<dd>is a function of the form: <code>callback(err, result)</code><br />
 where:<br />
 <ul><br />
-<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api/#common">REST API</a> documentation</li><br />
-<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api/#channel-stats">REST API</a>.<br />
+<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
+<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api#channel-stats">REST API</a>.<br />
   Example <code>result</code>:<br />
   <pre lang="json"><code>[{
     "an example": "&lt;needs to be inserted here&gt;",
@@ -200,7 +200,7 @@ where:<br />
 </dl>
 <div lang="ruby,java">
 <h4>Returns</h4>
-<p>On success, <span lang="ruby"><code>json_result</code></span><span lang="java"><code>JSONResult</code></span> contains an array of statistics for the request granularity as specified in <a href="/rest-api/#channel-stats">REST API</a>.</p>
+<p>On success, <span lang="ruby"><code>json_result</code></span><span lang="java"><code>JSONResult</code></span> contains an array of statistics for the request granularity as specified in <a href="/rest-api#channel-stats">REST API</a>.</p>
 <p>Example <span lang="ruby"><code>json_result</code></span><span lang="java"><code>JSONResult</code></span>:</p>
 <pre lang="json"><code lang="json">[{
     "an example": "&lt;needs to be inserted here&gt;",
@@ -225,17 +225,17 @@ where:<br />
 <blockquote class="definition">
 <p class="definition"><span lang='nodejs'>channel.presence(options, callback)</span><span lang='ruby'>channel.presence(options) → json_result</span><span lang='java'>channel.presence(OptionsHash options) → JSONResult</span></p>
 </blockquote>
-<p>This call queries the REST <a href="/rest-api/#channel-presence"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/presence</code></a> API.</p>
+<p>This call queries the REST <a href="/rest-api#channel-presence"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/presence</code></a> API.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>options</dt>
-	<dd>an optional object containing the query parameters, as specified in the <a href="/rest-api/#channel-presence">REST API</a>.</dd>
+	<dd>an optional object containing the query parameters, as specified in the <a href="/rest-api#channel-presence">REST API</a>.</dd>
 	<dt><div lang="nodejs">callback</div></dt>
 	<dd>is a function of the form: <code>callback(err, result)</code><br />
 where:<br />
 <ul><br />
-<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api/#common">REST API</a> documentation</li><br />
-<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api/#channel-presence">REST API</a>.<br />
+<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
+<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api#channel-presence">REST API</a>.<br />
   Example <code>result</code>:<br />
   <pre lang="json"><code>[{
     "an example": "&lt;needs to be inserted here&gt;",
@@ -246,7 +246,7 @@ where:<br />
 </dl>
 <div lang="ruby,java">
 <h4>Returns</h4>
-<p>On success, <span lang="ruby"><code>json_result</code></span><span lang="java"><code>JSONResult</code></span> contains an array representing each client present on the channel as specified in <a href="/rest-api/#channel-presence">REST API</a>.</p>
+<p>On success, <span lang="ruby"><code>json_result</code></span><span lang="java"><code>JSONResult</code></span> contains an array representing each client present on the channel as specified in <a href="/rest-api#channel-presence">REST API</a>.</p>
 <p>Example <span lang="ruby"><code>json_result</code></span><span lang="java"><code>JSONResult</code></span>:</p>
 <pre lang="json"><code lang="json">[{
     "an example": "&lt;needs to be inserted here&gt;",
@@ -288,37 +288,39 @@ where:<br />
 <li class=''><a href='/realtime/history/'>History</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 </ul>
-  <h2><a href="/rest/">REST client lib</a></h2>
+  <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest/usage/'>Usage</a></li>
-<li class='selected'><a href='/rest/channels-messages/'>Channels &amp; Messages</a></li>
-<li class=''><a href='/rest/presence/'>Presence</a></li>
-<li class=''><a href='/rest/authentication/'>Authentication</a></li>
-<li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
-<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
+<li class='selected'><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
+<li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest-client-library/history/'>History</a></li>
+<li class=''><a href='/rest-client-library/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest-client-library/encryption/'>Encryption</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
-</ul>
-  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
-<ul>
-<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
-<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
-<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 </ul>
   <h2>Other</h2>
 <ul>
 <li class=''><a href='/other/authentication/'>Authentication</a></li>
 <li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
 </ul>
-  <ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 <li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+</ul>
+  <ul>
 <li><a href="https://ably.io">Visit Ably.io</a></li>
 </ul>
 </div>
+
 </body>
 </html>

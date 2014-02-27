@@ -66,14 +66,14 @@
 <p>A key string is structured as a triple <code>&lt;app id&gt;:&lt;key id&gt;:&lt;key value&gt;</code>, where:</p>
 <dl>
 	<dt>app id</dt>
-	<dd>identifier for the application: this id is used in the <a href="/rest">REST API</a> and is needed to instance the REST or Real-time client library if you do not have a key string.</dd>
+	<dd>identifier for the application: this id is used in the <a href="/rest-api">REST API</a> and is needed to instance the REST or Real-time client library if you do not have a key string.</dd>
 	<dt>key id</dt>
 	<dd>(public) identifier for the key in question: this uniquely identifies the key and is a system-assigned, URL-safe, identifier.</dd>
 	<dt>key value</dt>
 	<dd>key &#8220;secret&#8221;: a secret string, system-generated, uniquely associated with this key.</dd>
 </dl>
 <h5>Token request format</h5>
-<p>A token request is made against the <a href="/rest#requesttoken"><code>requestToken</code></a> endpoint, with a <em>token request</em> in the request body. The token request comprises:</p>
+<p>A token request is made against the <a href="/rest-api#requesttoken"><code>requestToken</code></a> endpoint, with a <em>token request</em> in the request body. The token request comprises:</p>
 <ul>
 	<li>the key id;</li>
 	<li>a capability (ie a set of resource paths and, for each, a set of operations) which should be a subset of the set of capability associated with that token;</li>
@@ -177,37 +177,39 @@ Note that a newline character is added for each field, including any empty clien
 <li class=''><a href='/realtime/history/'>History</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 </ul>
-  <h2><a href="/rest/">REST client lib</a></h2>
+  <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest/usage/'>Usage</a></li>
-<li class=''><a href='/rest/channels-messages/'>Channels &amp; Messages</a></li>
-<li class=''><a href='/rest/presence/'>Presence</a></li>
-<li class=''><a href='/rest/authentication/'>Authentication</a></li>
-<li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
-<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
+<li class=''><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
+<li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest-client-library/history/'>History</a></li>
+<li class=''><a href='/rest-client-library/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest-client-library/encryption/'>Encryption</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
-</ul>
-  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
-<ul>
-<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
-<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
-<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 </ul>
   <h2>Other</h2>
 <ul>
 <li class='selected'><a href='/other/authentication/'>Authentication</a></li>
 <li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
 </ul>
-  <ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 <li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+</ul>
+  <ul>
 <li><a href="https://ably.io">Visit Ably.io</a></li>
 </ul>
 </div>
+
 </body>
 </html>

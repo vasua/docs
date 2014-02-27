@@ -30,7 +30,7 @@
 <option id="anchor-title">Presence</option>
 </optgroup>
 <optgroup label='API reference'>
-<option id="anchor-presence">Presence method</option>
+<option id="anchor-presence">presence</option>
 </optgroup>
           </select>
         </div>
@@ -38,7 +38,7 @@
     
     <header>
       
-        <div class="breadcrumb"><a href="/rest/">REST Client Library</a><span class="separator">/</span></div>
+        <div class="breadcrumb"><a href="/rest-client-library/">REST Client Library</a><span class="separator">/</span></div>
       
       
         <h1 id="title">Presence</h1>
@@ -52,7 +52,7 @@
 <pre lang="ruby"><code lang="ruby">rest = Ably::Rest.new(options)
 channel = rest.channels.get('channel0')
 presence = channel.presence</code></pre>
-<p>The presence call in the REST client library directly mirrors the <a href="/rest-api/#presence">REST API</a>.</p>
+<p>The presence call in the REST client library directly mirrors the <a href="/rest-api#presence">REST API</a>.</p>
 <h1>API reference</h1>
 <div class="inline-toc">
 <ul><li>Presence
@@ -60,7 +60,7 @@ presence = channel.presence</code></pre>
 <li>
 Methods
 <ul>
-<li><a href='#presence'>Presence</a></li>
+<li><a href='#presence'>presence</a></li>
 </ul>
 </li>
 </ul>
@@ -69,9 +69,9 @@ Methods
 <h3>Methods</h3>
 <h6>presence</h6>
 <blockquote class="definition">
-<p class="definition">channel.presence(options, callback)</p>
+<p class="definition"><span lang='nodejs'>channel.presence(options, callback)</span><span lang='ruby'>channel.presence(options) → json_result</span><span lang='java'>channel.presence(OptionsHash options) → JSONResult</span></p>
 </blockquote>
-<p>This call queries the REST <a href="/rest-api/#presence"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/presence</code></a> API.</p>
+<p>This call queries the REST <a href="/rest-api#presence"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/presence</code></a> API.</p>
 <p>Detailed description TBD.</p>
     </article>
     <hr class="back">
@@ -94,37 +94,39 @@ Methods
 <li class=''><a href='/realtime/history/'>History</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 </ul>
-  <h2><a href="/rest/">REST client lib</a></h2>
+  <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest/usage/'>Usage</a></li>
-<li class=''><a href='/rest/channels-messages/'>Channels &amp; Messages</a></li>
-<li class='selected'><a href='/rest/presence/'>Presence</a></li>
-<li class=''><a href='/rest/authentication/'>Authentication</a></li>
-<li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
-<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
+<li class=''><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class='selected'><a href='/rest-client-library/presence/'>Presence</a></li>
+<li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest-client-library/history/'>History</a></li>
+<li class=''><a href='/rest-client-library/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest-client-library/encryption/'>Encryption</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
-</ul>
-  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
-<ul>
-<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
-<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
-<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 </ul>
   <h2>Other</h2>
 <ul>
 <li class=''><a href='/other/authentication/'>Authentication</a></li>
 <li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
 </ul>
-  <ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 <li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+</ul>
+  <ul>
 <li><a href="https://ably.io">Visit Ably.io</a></li>
 </ul>
 </div>
+
 </body>
 </html>

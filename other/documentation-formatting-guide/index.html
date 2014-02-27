@@ -42,6 +42,8 @@
     
     <header>
       
+        <div class="breadcrumb"><a href="/client-lib-development-guide/">Client Library Development Guide</a><span class="separator">/</span></div>
+      
       
         <h1 id="title">Documentation Formatting Guide</h1>
       
@@ -62,8 +64,10 @@ jump_to: # Optional YAML tag that will insert a "jump to" navigation based on YA
   "API methods":
     - "Item 2" # auto-links to #item-2
     - "Item 3" # auto-links to #item-3
+    - "Language specific content"#language-specific-content
  ---</code></pre>
 <p>View this page&#8217;s Textile markup for an example of the jump to navigation.</p>
+<p>Note that if you have referenced an anchor that has language specific content, the jump to navigation will automatically update to reflect the new content for that anchor whenever a language is selected, and ignore the text you have provided.</p>
 <h2 id="markup-fundamentals">Markup fundamentals</h2>
 <h3>Headings</h3>
 <p>The title of the page is automatically inserted into the page using a <code>h1.</code> tag.  A simple breadcrumb navigation will be shown if the page has an index other than zero, and a page with index 0 exists.</p>
@@ -72,13 +76,13 @@ jump_to: # Optional YAML tag that will insert a "jump to" navigation based on YA
 <code>h2.</code> used for the key secondary headings on a page, and will be used within the in-context navigation.<br />
 <code>h3.</code> used for the key tertiary headings, all paragraph text that follows is indented<br />
 <code>h4.</code> to <code>h5.</code> used for further headings decreasing in emphasis used in a typical hierarchical fashion<br />
-<code>h6.</code> used to designate a definition or reference, see <a href="/rest/rest#history">REST history section in maroon</a> for an example of how this is used</p>
+<code>h6.</code> used to designate a definition or reference, see <a href="/rest-client-library/history">REST history section in maroon</a> for an example of how this is used</p>
 <p><code>h[1-6](#anchor-id).</code> used with any heading tag to add an HTML ID that can be linked to using anchor tags</p>
 <h3>Documentation links</h3>
 <p>Absolute reference links such as <code>"Google":http://www.google.com</code> can be used as normal.</p>
-<p>All links to other documentation pages must follow the format <code>"REST Channels":/rest/channels"</code> and must resolve to a relative path for this repository.  When imported into the main Ably website, the links will be automatically modified to link to the correct page in the Ably webite documentation.<br />
-Anchor links can be used as follows <code>"REST spec stats":/rest/rest#stats</code>.</p>
-<p>Links can also contain mono-spaced code references within the link using the format <code>"@mono-spaced-link-text@":/rest/channels</code>, which would appear as <a href="/rest/channels"><code>mono-spaced-link-text</code></a></p>
+<p>All links to other documentation pages must follow the format <code>"REST Channels":/rest-client-library/channels-messages"</code> and must resolve to a relative path for this repository.  When imported into the main Ably website, the links will be automatically modified to link to the correct page in the Ably webite documentation.<br />
+Anchor links can be used as follows <code>"REST spec stats":/rest-client-library/statistics#stats</code>.</p>
+<p>Links can also contain mono-spaced code references within the link using the format <code>"@mono-spaced-link-text@":/rest-client-library/channels-messages</code>, which would appear as <a href="/rest-client-library/channels-messages"><code>mono-spaced-link-text</code></a></p>
 <h2 id="code-blocks">Code blocks</h2>
 <p>Simple code keywords inline within your content are used commonly by wrapping them the @ symbol.  For example <code>@method@</code> is presented as <code>method</code>.</p>
 <p>For all code blocks, a language in lowercase must be specified.  Languages currently supported are <code>javascript</code>, <code>java</code>, <code>python</code>, <code>ruby</code>, <code>nodejs</code>, <code>ios</code>, <code>csharp</code>, <code>cplusplus</code>, <code>c</code>, <code>appcelerator</code>, <code>phonegap</code>, <code>html</code>, <code>json</code>, <code>sh</code>, <code>yaml</code>.  A code block must be prefixed and suffixed with a line break, and must use the following syntax:</p>
@@ -117,7 +121,7 @@ a += 1;</code></pre>
 <h3>Non-formatted mono-spaced code blocks</h3>
 <p>If you want to provide a non-formatted mono-spaced box with code, then use a pre. block instead without specifying a language.  This will generate a box styled as follows:</p>
 <pre>this.code is('mono-spaced')</pre>
-<h2 id="language-specific-content">Language specific content</h2>
+<h2 id="language-specific-content"><span lang='default'>Language specific content (default selected)</span><span lang='javascript'>Language specific content (Javascript selected)</span><span lang='nodejs'>Language specific content (Node.js selected)</span><span lang='csharp'>Language specific content (C# selected)</span><span lang='ruby'>Language specific content (Ruby selected)</span><span lang='java'>Language specific content (Java selected)</span></h2>
 <p>Within this documentation repository&#8217;s static site, all language specific content is wrapped in light dotted lines for clarity.  However, when imported into the main Ably website, content will not be wrapped in dotted lines.  Unlike code blocks, if you specify a single language specific block of content, it will only be shown if the language matches.  Single language code blocks in contrast will appear regardless of which language is selected.</p>
 <p>You can specify multiple languages per language specific content block such as <code>&lt;span class="ruby,java"&gt;</code>.</p>
 <p>Whenever you need to vary the content based on the language selected by the user in the top language navigation, you have the following options available:</p>
@@ -145,6 +149,13 @@ p1. This block will be shown when Ruby is selected
 <p>The language currently being viewed is: <span lang="javascript">javascript</span><span lang="ruby">ruby</span></p>
 <p>Here is another examples using an additional default language tag in the format <code>&lt;span lang="default"&gt;</code> of all <code>&lt;/span&gt;</code>:</p>
 <p>The language <span lang="javascript">javascript</span><span lang="ruby">ruby</span><span lang="default">of all</span> is currently being viewed</p>
+<h3>Method or object reference / definitions with language variations <code>h6(#requesttoken). definition</code></h3>
+<p>When you need to vary the reference or definition of a method or object property by language, you can use <code>h6</code> tags with the language defined on the next line as follows:</p>
+<pre lang="text"><code lang="text">h6(#method-anchor-example).
+  default: fooBar
+  ruby:    foo_bar</code></pre>
+<p>will render as:</p>
+<h6 id="method-anchor-example"><span lang='default'>fooBar</span><span lang='ruby'>foo_bar</span></h6>
 <h3>Language definition lists</h3>
 <p>Please refer to Definition lists below for instructions on how to specify a language for definitions and lists.</p>
 <h3>Supported languages</h3>
@@ -282,7 +293,8 @@ p1. This block will be shown when Ruby is selected
   Channel Object Reference:
     - Methods:
       - Publish # the anchor link #publish will be used
-      - History#manually-curated-anchor-link</code></pre>
+      - History#manually-curated-anchor-link
+      - Language Specific Content#language-specific-content</code></pre>
 <p>The above code produces the following element:</p>
 <div class="inline-toc">
 <ul><li>Channel Object Reference
@@ -292,11 +304,13 @@ Methods
 <ul>
 <li><a href='#publish'>Publish</a></li>
 <li><a href='#manually-curated-anchor-link'>History</a></li>
+<li><a href='#language-specific-content'>Language Specific Content</a></li>
 </ul>
 </li>
 </ul>
 </li></ul>
-</div><h2 id="other-custom-styles">Other custom styles</h2>
+</div><p>Note that if you have referenced an anchor that has language specific content, the Table of Contents will automatically update to reflect the new content for that anchor whenever a language is selected, and ignore the text you have provided.</p>
+<h2 id="other-custom-styles">Other custom styles</h2>
 <p class="tip">Tips can be shown using the markup <code>p(tip).</code></p>
     </article>
     <hr class="back">
@@ -319,37 +333,39 @@ Methods
 <li class=''><a href='/realtime/history/'>History</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 </ul>
-  <h2><a href="/rest/">REST client lib</a></h2>
+  <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest/usage/'>Usage</a></li>
-<li class=''><a href='/rest/channels-messages/'>Channels &amp; Messages</a></li>
-<li class=''><a href='/rest/presence/'>Presence</a></li>
-<li class=''><a href='/rest/authentication/'>Authentication</a></li>
-<li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
-<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
+<li class=''><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
+<li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest-client-library/history/'>History</a></li>
+<li class=''><a href='/rest-client-library/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest-client-library/encryption/'>Encryption</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
-</ul>
-  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
-<ul>
-<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
-<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
-<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 </ul>
   <h2>Other</h2>
 <ul>
 <li class=''><a href='/other/authentication/'>Authentication</a></li>
 <li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
 </ul>
-  <ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 <li class='selected'><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+</ul>
+  <ul>
 <li><a href="https://ably.io">Visit Ably.io</a></li>
 </ul>
 </div>
+
 </body>
 </html>

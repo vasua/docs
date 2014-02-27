@@ -30,7 +30,8 @@
 <option id="anchor-title">History</option>
 </optgroup>
 <optgroup label='API reference'>
-<option id="anchor-channel-history">Channel history</option>
+<option id="anchor-channel-object-history">Channel object history</option>
+<option id="anchor-history">history</option>
 </optgroup>
           </select>
         </div>
@@ -38,7 +39,7 @@
     
     <header>
       
-        <div class="breadcrumb"><a href="/rest/">REST Client Library</a><span class="separator">/</span></div>
+        <div class="breadcrumb"><a href="/rest-client-library/">REST Client Library</a><span class="separator">/</span></div>
       
       
         <h1 id="title">History</h1>
@@ -70,8 +71,8 @@
 <p>where <code>&lt;url&gt;</code> is the URL of the link and <code>&lt;rel&gt;</code> is the relation type.</p>
 <p>For example:</p>
 <blockquote>
-<p>Link: &lt;./history?start=1380794880000&amp;end=1380794881058&amp;limit=100&amp;by=minute<br />
-&amp;direction=forwards&amp;format=json&amp;first_start=1380794880000&gt;; rel=&#8220;first&#8221;</p>
+<p>Link: &lt;./history?start=1380794880000&amp;end=1380794881058&amp;limit=100&amp;<br />
+by=minute&amp;direction=forwards&amp;format=json&amp;first_start=1380794880000&gt;; rel=&#8220;first&#8221;</p>
 </blockquote>
 <p>In principle the URL might be any valid URL but in practice it will always be a relative URL, and it must be interpreted relative to the query URL. Clients should treat the URL opaquely; in particular, params (such as <code>first_start</code> in the example above) are undocumented and unsupported except where a client uses the link URL in its entirety.</p>
 <p>In the case of a JSON response body format it is also possible to request that the rel response metadata is inline in the response body by specifying <code>rel_format=inline</code> in the request URL. (The <code>rel_format</code> param also takes the value <code>rel_format=link</code> to request Link header metadata explicitly.) In the inline case the response body then has the format:</p>
@@ -88,48 +89,38 @@
 <p>where the <code>data</code> member references the history result in the usual format and each of the rel links associated with the response is present in the <code>rel</code> member, with the link URL in the same format as above.</p>
 <h1>API reference</h1>
 <div class="inline-toc">
-<ul><li>Application history
-<ul>
-<li>
-Methods
-<ul>
-<li><a href='#history'>History</a></li>
-</ul>
-</li>
-</ul>
-</li></ul>
 <ul><li>Channel object history
 <ul>
 <li>
 Methods
 <ul>
-<li><a href='#channel-history'>History</a></li>
+<li><a href='#history'>history</a></li>
 </ul>
 </li>
 </ul>
 </li></ul>
-</div><h2 id="channel-history">Channel object history</h2>
+</div><h2 id="channel-object-history">Channel object history</h2>
 <p>With the REST client library, the Channel object must be created in order to retrieve history or stats for the required channel:</p>
 <pre lang="javascript"><code lang="javascript">var Rest = new Ably.Rest(options),
     channel = Rest.channels.get('channel0');</code></pre>
 <pre lang="ruby"><code lang="ruby">rest = Ably::Rest.new(options)
 channel = rest.channels.get('channel0')</code></pre>
 <h3>Methods</h3>
-<h6>history</h6>
+<h6 id="history">history</h6>
 <blockquote class="definition">
 <p class="definition">channel.history(options, callback)</p>
 </blockquote>
-<p>This call queries the REST <a href="/rest/spec#channel-history"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/history</code></a> API</p>
+<p>This call queries the REST <a href="/rest-api#channel-history"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/history</code></a> API</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>options</dt>
-	<dd>is an optional object containing the query parameters, as specified in the <a href="/rest/spec#channel-history">REST API</a> documentation.</dd>
+	<dd>is an optional object containing the query parameters, as specified in the <a href="/rest-api#channel-history">REST API</a> documentation.</dd>
 	<dt>callback</dt>
 	<dd>is a function of the form: <code>callback(err, result)</code><br />
 where:<br />
 <ul><br />
-<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest/spec#common">REST API</a> documentation</li><br />
-<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest/spec#channel-history">REST API</a></li><br />
+<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
+<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api#channel-history">REST API</a></li><br />
 </ul></dd>
 </dl>
 <h4>Request options</h4>
@@ -187,37 +178,39 @@ Similarly, in the special case of json only, the request path may include the ex
 <li class=''><a href='/realtime/history/'>History</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 </ul>
-  <h2><a href="/rest/">REST client lib</a></h2>
+  <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest/usage/'>Usage</a></li>
-<li class=''><a href='/rest/channels-messages/'>Channels &amp; Messages</a></li>
-<li class=''><a href='/rest/presence/'>Presence</a></li>
-<li class=''><a href='/rest/authentication/'>Authentication</a></li>
-<li class='selected'><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
-<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
+<li class=''><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
+<li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
+<li class='selected'><a href='/rest-client-library/history/'>History</a></li>
+<li class=''><a href='/rest-client-library/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest-client-library/encryption/'>Encryption</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
-</ul>
-  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
-<ul>
-<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
-<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
-<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 </ul>
   <h2>Other</h2>
 <ul>
 <li class=''><a href='/other/authentication/'>Authentication</a></li>
 <li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
 </ul>
-  <ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
 <li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+</ul>
+  <ul>
 <li><a href="https://ably.io">Visit Ably.io</a></li>
 </ul>
 </div>
+
 </body>
 </html>
