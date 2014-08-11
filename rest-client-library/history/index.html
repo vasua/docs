@@ -48,7 +48,7 @@
     <article>
       <p>The REST client library provides message history for channels. For channels that have persistence enabled, all messages are persisted every few seconds and are then retrievable via the REST API.</p>
 <h3>History queries</h3>
-<p>The REST API, provides a <code>/history</code> route on an channel, which performs a history query against the database. These queries may be scoped by <code>start</code> and <code>end</code> time, may be queried in a given <code>direction</code> and may include a <code>limit</code> on the number of records returned.</p>
+<p>The REST API provides a <code>GET /messages</code> route on an channel, which performs a query for message history on the channel. These queries may be scoped by <code>start</code> and <code>end</code> time, may be queried in a given <code>direction</code> and may include a <code>limit</code> on the number of records returned.</p>
 <p>History results are paginated and therefore accompanied with one or more relative links relating to the current query. Where the number of results returned exceeds the query limit &#8211; which is either the value of the <code>limit</code> param or the default limit of 100 &#8211; the query result contains pages with the limited number of records, and a relative link to the next page.</p>
 <p>Responses contain one or more of the following relative links:</p>
 <dl>
@@ -110,7 +110,7 @@ channel = rest.channels.get('channel0')</code></pre>
 <blockquote class="definition">
 <p class="definition">channel.history(options, callback)</p>
 </blockquote>
-<p>This call queries the REST <a href="/rest-api#channel-history"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/history</code></a> API</p>
+<p>This call queries the REST <a href="/rest-api#channel-history"><code>channels/&lt;channel id&gt;/history</code></a> API</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>options</dt>
@@ -180,8 +180,8 @@ Similarly, in the special case of json only, the request path may include the ex
 </ul>
   <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
-<li class=''><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest-client-library/usage/'>Using the REST library</a></li>
+<li class=''><a href='/rest-client-library/channels-messages/'>Channels and Messages</a></li>
 <li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
 <li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
 <li class='selected'><a href='/rest-client-library/history/'>History</a></li>

@@ -33,6 +33,7 @@
 <option id="anchor-publish">publish</option>
 <option id="anchor-subscribe">subscribe</option>
 <option id="anchor-unsubscribe">unsubscribe</option>
+<option id="anchor-history">history</option>
 <option id="anchor-attach">attach</option>
 <option id="anchor-detach">detach</option>
 </optgroup>
@@ -57,9 +58,10 @@
     </header>
     <article>
       <p>The Ably Realtime service organises the traffic within any application into named channels. Channels are the &#8220;unit&#8221; of message distribution; clients attach to channels to subscribe to messages, and every message broadcast by the service is associated with a unique channel.</p>
-<h3>Channel lifecycle</h3>
+<h3>Channels in the Realtime API</h3>
 <p>Channels are not pre-configured; they are created on demand when clients attach, and remain active until such time that there are no remaining attached clients. Applications do have, however, the ability to pre-configure one or more channel namespaces (ie name prefixes), and associate different attributes and access rights with those namespaces.</p>
 <p>Clients attach to a channel in order to participate on that channel in any way (either to publish, subscribe, or be present on the channel). Channel attach and detach operations are synchronous &#8211; after initiating an attach request, the client must wait for a response that confirms that the channel is established on the service, and that the client has the rights necessary to access the channel.</p>
+<h4>Channel states</h4>
 <p>A number of states are therefore defined for a channel.</p>
 <dl>
 	<dt>initialised</dt>
@@ -89,6 +91,11 @@ by a transition to attached or failed.</dd>
 <pre lang="nodejs"><code lang="nodejs">var channel = realtime.channels.get('myChannel');</code></pre>
 <pre lang="java"><code lang="java">import io.ably.realtime.Channel;
 Channel channel = realtime.channels.get("myChannel");</code></pre>
+<p>A set of <a href="#channel-options">channel options</a> may also be passed when getting a channel instance.</p>
+<pre lang="javascript"><code lang="javascript">var channel = realtime.channels.get('myChannel', channelOpts);</code></pre>
+<pre lang="nodejs"><code lang="nodejs">var channel = realtime.channels.get('myChannel', channelOpts);</code></pre>
+<pre lang="java"><code lang="java">import io.ably.realtime.Channel;
+Channel channel = realtime.channels.get("myChannel", channelOpts);</code></pre>
 <h4>Listening for state changes</h4>
 <div lang="javascript,nodejs">
 <p>The <code>channel</code> object is an <code>EventEmitter</code> and emits an event whose name is the new state whenever there is a channel state change. As with all events from an <code>EventEmitter</code> in the Ably library, <code>this</code> within the listener function is a reference to an event object whose <code>name</code> property is the name of the event that fired. This allows a listener to listen for all events with a single registration and know, which event fired when it is entered.</p>
@@ -210,6 +217,46 @@ channel.publish("myEvent", "This is my message", new CompletionListener() {
 		System.out.println("Message successfully sent");
 	}
 });</code></pre>
+<h3>Retrieving message history</h3>
+<p>Channels expose a <code>history</code> method whereby a client can obtain messages previously sent on the channel. It provides access to the persisted history, as with the REST API, but also enables access to instantaneous or &#8220;live&#8221; history for attached channels.</p>
+<p>This live history provides the ability to obtain continuous message history up to the point that a realtime channel was attached and also supports recent history for channels that do not have persistence enabled.</p>
+<p>History results are paginated and therefore accompanied with one or more relative links relating to the current query. Where the number of results returned exceeds the query limit &#8211; which is either the value of the <code>limit</code> param or the default limit of 100 &#8211; the query result contains pages with the limited number of records, and a relative link to the next page.</p>
+<pre lang="javascript"><code lang="javascript">var params = {direction: 'backwards', limit: '100'};
+channel.history(params, function(err, messages, rel) {
+  if(err) {
+    console.log('Unable to get channel history; err = ' + err.message);
+  } else {
+    console.log(messages.length + ' messages received in first result');
+    if(rel &amp;&amp; rel.next) {
+      channel.history(rel.next, function(...) { ... });
+    }
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">var params = {direction: 'backwards', limit: '100'};
+channel.history(params, function(err, messages, rel) {
+  if(err) {
+    console.log('Unable to get channel history; err = ' + err.message);
+  } else {
+    console.log(messages.length + ' messages received in first result');
+    if(rel &amp;&amp; rel.next) {
+      channel.history(rel.next, function(...) { ... });
+    }
+});</code></pre>
+<pre lang="java"><code lang="java">import io.ably.types.Message;
+import io.ably.types.Param;
+import io.ably.types.PaginatedResult;
+Param[] params = new Param[] {
+  new Param("direction", "backwards"),
+  new Param("limit", 100)
+};
+PaginatedResult&lt;Message&gt; messages = channel.history(params);
+System.out.println(messages.asArray().length + " messages received in first result");
+if(messages.getNext()) {
+  PaginatedResult&lt;Message&gt; nextPage = channel.history(messages.getNext());
+  System.out.println(...);
+}</code></pre>
+<p>See the <a href="/realtime/history">history</a> documentation for further details of the supported query parameters.</p>
+<h2>Presence</h2>
+<p>Channels expose a <code>presence</code> member which a client can use to obtain channel presence information and to enter and leave the presence channel itself. See the <a href="/realtime/presence">presence</a> documentation for details.</p>
 <h1>API Reference</h1>
 <div class="inline-toc">
 <ul><li>Channels and messages reference
@@ -225,8 +272,17 @@ Methods
 <li><a href='#subscribe-event-array'>subscribe(names, listener)</a></li>
 <li><a href='#unsubscribe-listener'>unsubscribe(listener)</a></li>
 <li><a href='#unsubscribe-event'>unsubscribe(name, listener)</a></li>
+<li><a href='#history'>history()</a></li>
 <li><a href='#attach'>attach()</a></li>
 <li><a href='#detach'>detach()</a></li>
+</ul>
+</li>
+<li>
+Members
+<ul>
+<li><a href='#members'>state</a></li>
+<li><a href='#members'>name</a></li>
+<li><a href='#members'>presence</a></li>
 </ul>
 </li>
 <li>
@@ -364,17 +420,70 @@ Related types
 	<dt><div lang="java">listener</div></dt>
 	<dd>The <a href="#message-listener">MessageListener</a> registered on subscription.</dd>
 </dl>
+<h6 id="history">history</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='nodejs'>channel.history(params, callback)</span><span lang='ruby'>channel.history(options) → json_result</span><span lang='java'>public PaginatedResult&lt;Message&gt; history(Param[] params)</span></p>
+</blockquote>
+<p>Get message history for this channel.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt>params</dt>
+	<dd>an optional object containing the query parameters, as specified in the <a href="/realtime/history">history</a> API documentation.</dd>
+	<dt><div lang="nodejs,javascript">callback</div></dt>
+	<dd>is a function of the form: <code>callback(err, messages, relParams)</code><br />
+where:<br />
+<ul><br />
+<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
+<li>on success, <code>messages</code> contains the query result as an array of Message objects.</li><br />
+<li>where applicable, <code>relParams</code> is a map containing query params for each of the pagination links in the query response (see below).</li><br />
+</ul></dd>
+</dl>
+<p>Further details of the supported query params are in the <a href="/realtime/history">history API</a> documentation.</p>
+<div lang="java">
+<h4>Returns</h4>
+<p>On success, the returned <a href="#paginated-result">PaginatedResult</a> encapsulates a collection of <code>Message</code> objects corresponding to the current page of results, and also provides query parameters for any applicable related (eg <code>first</code> or <code>next</code> result pages).</p>
+<p>Failure to retrieve the history will raise an <code>AblyException</code>.</p>
+<p></div><div lang="ruby"><br />
+h4. Returns</p>
+<p>On success, <span lang="ruby"><code>json_result</code></span> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api/#channel-history">REST API</a>.</p>
+<p>Example <span lang="ruby"><code>json_result</code></span>:</p>
+<pre lang="json"><code lang="json">[{
+  "name": "&lt;event name&gt;",
+  "channel": "&lt;channel id&gt;",
+  "data": "&lt;message payload&gt;",
+  "timestamp": "&lt;message timestamp&gt;"
+}]</code></pre>
+<p>Failure to retrieve the history will raise an exception &#8211; typical exceptions include:<br />
+  <div lang="ruby"></p>
+<ul>
+	<li><code>Ably::NetworkUnavailableException</code></li>
+	<li><code>Ably::QuotaExceededException</code></li>
+	<li><code>Ably::AuthenticationFailureException</code><br />
+  </div></li>
+</ul>
+<p></div><div lang="nodejs,javascript"></p>
+<h4>Pagination</h4>
+<p>A paginated result is indicated in the <code>relParams</code> callback argument. For each available link, <code>relParams</code> contains a map of params to pass to a subsequent <code>history()</code> call.<br />
+  Example <code>relParams</code>:<br />
+  <pre lang="json"><code>[{
+    "first": {"start": 1380794880000, "end": 138079488105, ...},
+    "current": {"start": 1380794880000, "end": 138079488105, ...},
+    "next": {"start": 1380794880000, "end": 138079488105, ...}
+  }]</code></pre></p>
+<p>Further details of the paginated response are in the <a href="/realtime/history">history API</a> documentation.</p>
+</div>
 <h6 id="attach">attach</h6>
 <blockquote class="definition">
 <p class="definition"><span lang='default'>attach()</span><span lang='java'>attach()</span></p>
 </blockquote>
-<p>Attach to this channel. This will be called implicitly when required if the client calls either <code>publish()</code> or <code>subscribe()</code>.</p>
+<p>Attach to this channel. Any resulting channel state change will be indicated to any registered &#8220;ChannelStateListener&#8221;#channel-state-listener.</p>
+<p><code>attach()</code> will be called implicitly when required if the client calls either <code>publish()</code> or <code>subscribe()</code>.</p>
 <h6 id="detach">detach</h6>
 <blockquote class="definition">
 <p class="definition"><span lang='default'>detach()</span><span lang='java'>public void detach()</span></p>
 </blockquote>
-<p>Detach from this channel.</p>
-<h2>Public members</h2>
+<p>Detach from this channel. Any resulting channel state change will be indicated to any registered &#8220;ChannelStateListener&#8221;#channel-state-listener.</p>
+<h2 id="members">Public members</h2>
 <p>A <code>Channel</code> object exposes the following public members.</p>
 <dl>
 	<dt><span lang="java">public ChannelState</span>state</dt>
@@ -444,6 +553,22 @@ On success the listener&#8217;s <code>onSuccess()</code> method is called. If th
 	<dt><span lang="java">public Object</span>cipherParams</dt>
 	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). Default cipher params for the implementation may be obtained by calling <code>Crypto.getDefaultParams()</code>.</dd>
 </dl>
+<div lang="java">
+<h2 id="paginated-result">PaginatedResult</h2>
+<p>A <code>PaginatedResult</code> is an interface that represents the result of a query that supports pagination. An instance of <code>PaginatedResult</code> encapsulates a collection of <code>Message</code> objects representing the current page of results, and provides the means &#8211; in the form of <code>Param[]</code> to perform queries for subsequent or related pages.</p>
+<dl>
+	<dt>public Message[] asArray()</dt>
+	<dd>Returns the current page of results as an Array.</dd>
+	<dt>public List&lt;Message&gt;</dt>
+	<dd>Returns the current page of results as a List.</dd>
+	<dt>public Param[] getFirst()</dt>
+	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the first call in this paginated sequence.</dd>
+	<dt>public Param[] getCurrent()</dt>
+	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the current call in this paginated sequence.</dd>
+	<dt>public Param[] getNext()</dt>
+	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the next call in this paginated sequence.</dd>
+</dl>
+</div>
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>
@@ -467,8 +592,8 @@ On success the listener&#8217;s <code>onSuccess()</code> method is called. If th
 </ul>
   <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
-<li class=''><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest-client-library/usage/'>Using the REST library</a></li>
+<li class=''><a href='/rest-client-library/channels-messages/'>Channels and Messages</a></li>
 <li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
 <li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
 <li class=''><a href='/rest-client-library/history/'>History</a></li>

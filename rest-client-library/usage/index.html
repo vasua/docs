@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Ably API Documentation - Usage</title>
+    <title>Ably API Documentation - Using the REST library</title>
     <link rel="stylesheet" type="text/css" href="/assets/stylesheet.css" media="screen">
     <link rel="shortcut icon" href="/assets/favicon.ico">
 
@@ -41,11 +41,11 @@
         <div class="breadcrumb"><a href="/rest-client-library/">REST Client Library</a><span class="separator">/</span></div>
       
       
-        <h1 id="title">Usage</h1>
+        <h1 id="title">Using the REST library</h1>
       
     </header>
     <article>
-      <p>The REST client library is available in <a href="https://ably.io/download/rest-client-libraries">most popular languages</a> with a consistent API between languages.  You can view this documentation in each supported language using the language selector navigation.</p>
+      <p>The REST client library provides access to the Ably REST API. The library is available is available for <a href="https://ably.io/download/rest-client-libraries">several popular environments</a>, with the same functionality and similar API supported across all languages. You can view this documentation in each of the supported languages using the language selector navigation.</p>
 <div lang="nodejs">
 <p>The REST library for Javascript targets node.js clients and servers. It is obtainable as a module direcly from npm using</p>
 <pre lang="sh"><code lang="sh">npm install ably-js</code></pre>
@@ -64,51 +64,160 @@
 </div>
 <p><em>Note: Since the REST client library is a direct subset of the Realtime client library, all <a href="/realtime">Realtime client libraries</a> also provide access to the functionality of the REST client library.</em></p>
 <h1>API Reference</h1>
-<h2 id="constructor">Constructor</h2>
-<h6 lang="nodejs">new Ably.Rest(options)</h6>
+<h6 lang="javascript">AblyRest(keyStr)</h6>
+<h6 lang="nodejs">AblyRest(keyStr)</h6>
+<h6 lang="ruby">Ably::Rest.new(keyStr)</h6>
+<h6 lang="java">AblyRest(String keyStr)</h6>
+<p>Instance the library passing only a key string. All other options assume default values.</p>
+<h6 lang="javascript">AblyRest(options)</h6>
+<h6 lang="nodejs">AblyRest(options)</h6>
 <h6 lang="ruby">Ably::Rest.new(options)</h6>
-<h6 lang="java">new AblyRest(options)</h6>
-<p>Operations are performed after first instancing the library:</p>
-<pre lang="nodejs"><code lang="nodejs">var Ably = require('ably-js'), Rest = new Ably.Rest(options);</code></pre>
-<pre lang="ruby"><code lang="ruby">rest = Ably::Rest.new(options)</code></pre>
-<pre lang="java"><code lang="java">AblyRest rest = new AblyRest(options)</code></pre>
-<p>The Rest library may be instanced multiple times with different <code>options</code> in any given context. Except where specified otherwise, instances operate independently of one another.</p>
-<p>The set of all supported options is given below.</p>
-<h3>Essential options</h3>
-<p>The REST library needs to know the application identifier, or <code>appId</code>, and also requires credentials or other information required to be able to authenticate to the Ably service. The application id can be specified explicitly with an <code>appId</code> option, or is more typically given implicitly by passing a <code>key</code> or <code>token</code> option when constructing the library.</p>
-<p>The <code>key</code> option takes a key string, as obtained from the <a href="https://ably.io/dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or if you want to be able to request tokens without needing to defer to a separate entity to sign token requests. Note that initialising the library with a <code>key</code> does not necessarily mean that the library will use Basic auth; but knowing the key it is able to create and sign token requests and use token authentication when appropriate.</p>
+<h6 lang="java">AblyRest(Options options)</h6>
+<p>Instance the library specifying an <a href="#options">Options</a> instance.</p>
+<p>The Rest constructor is used to instance the library.The Rest library may be instanced multiple times with different <code>options</code> in any given context. Except where specified otherwise, instances operate independently of one another.</p>
+<p>The Rest library needs to know the application identifier, or <code>appId</code>, and also requires credentials or other information required to be able to authenticate to the Ably service. The application id can be specified explicitly with an <code>appId</code> option, or is more typically given implicitly by passing a <code>key</code> or <code>token</code> option when constructing the library.</p>
+<p>The <code>key</code> option takes a key string, as obtained from the <a href="https://ably.io/dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or if you want to be able to request tokens without needing to defer to<br />
+a separate entity to sign token requests. Note that initialising the library with a <code>key</code> does not necessarily mean that the library will use Basic auth; but knowing the key it is able to create and sign token requests and use token authentication when necessary.</p>
 <p>The <code>token</code> option takes a token string, and assumes the token has been obtained from some other instance that requested the token. Use the token option if you are provided with a token to use and you do not have a key (or do not have a key with the capabilities that you require).</p>
-<p>Since tokens are short-lived, it is rarely sufficient to start with a token, without the means for refreshing it. The <code>authUrl</code> and <code>authCallback</code> options are provided to allow a user of the library to issue new token requests as required; these options even permit the library to be instanced without either <code>key</code> or <code>token</code>, and an initial token will be obtained when required.</p>
+<p>Since tokens are short-lived, it is rarely sufficient to start with a token, without the means for refreshing it. The <code>authUrl</code> and <code>authCallback</code> options are provided to allow a user of the library to issue new token requests as required; these options even permit the library to be instanced without either <code>key</code> or <code>token</code>, and an initial token<br />
+will be obtained when required.</p>
+<p>See <a href="#options">Options</a> for the full set of initialisation options.</p>
+<h2 id="methods">Methods</h2>
+<h6 id="stats">stats</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='nodejs'>rest.stats(options, callback)</span><span lang='ruby'>rest.stats(options) → json_result</span><span lang='java'>public PaginatedResult&lt;Stats&gt; stats(Param[] params)</span></p>
+</blockquote>
+<p>This call queries the REST <a href="/rest-api#stats"><code>/stats</code></a> API.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt>params</dt>
+	<dd>an optional object containing the query parameters, as specified in the <a href="/rest-client-library/stats">stats</a> API documentation.</dd>
+	<dt><div lang="nodejs,javascript">callback</div></dt>
+	<dd>is a function of the form: <code>callback(err, stats, relParams)</code><br />
+where:<br />
+<ul><br />
+<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
+<li>on success, <code>stats</code> contains the query result as an array of Stats objects.</li><br />
+<li>where applicable, <code>relParams</code> is a map containing query params for each of the pagination links in the query response (see below).</li><br />
+</ul></dd>
+</dl>
+<p>Further details of the supported query params are in the <a href="/rest/stats">stats API</a> documentation.</p>
+<div lang="java">
+<h4>Returns</h4>
+<p>On success, the returned <a href="#paginated-result">PaginatedResult</a> encapsulates a collection of <code>Stats</code> objects corresponding to the current page of results, and also provides query parameters for any applicable related (eg <code>first</code> or <code>next</code> result pages).</p>
+<p>Failure to retrieve the stats will raise an <code>AblyException</code>.</p>
+<p></div><div lang="ruby"><br />
+h4. Returns</p>
+<p>On success, <span lang="ruby"><code>json_result</code></span> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api/#stats">REST API</a>.</p>
+<p>Example <span lang="ruby"><code>json_result</code></span>:</p>
+<pre lang="json"><code lang="json">[{
+  "name": "&lt;event name&gt;",
+  "channel": "&lt;channel id&gt;",
+  "data": "&lt;message payload&gt;",
+  "timestamp": "&lt;message timestamp&gt;"
+}]</code></pre>
+<p>Failure to retrieve the history will raise an exception &#8211; typical exceptions include:<br />
+  <div lang="ruby"></p>
+<ul>
+	<li><code>Ably::NetworkUnavailableException</code></li>
+	<li><code>Ably::QuotaExceededException</code></li>
+	<li><code>Ably::AuthenticationFailureException</code><br />
+  </div></li>
+</ul>
+<p></div><div lang="nodejs,javascript"></p>
+<h4>Pagination</h4>
+<p>A paginated result is indicated in the <code>relParams</code> callback argument. For each available link, <code>relParams</code> contains a map of params to pass to a subsequent <code>stats()</code> call.<br />
+  Example <code>relParams</code>:<br />
+  <pre lang="json"><code>[{
+    "first": {"start": 1380794880000, "end": 138079488105, ...},
+    "current": {"start": 1380794880000, "end": 138079488105, ...},
+    "next": {"start": 1380794880000, "end": 138079488105, ...}
+  }]</code></pre></p>
+<p>Further details of the paginated response are in the <a href="/rest-client-library/statistics">stats API</a> documentation.</p>
+</div>
+<h2 id="members">Public members</h2>
+<p>The Realtime object exposes the following public <span lang="default">properties</span><span lang="java">fields</span>.</p>
+<dl>
+	<dt><span lang="java">public final</span>channels</dt>
+	<dd>The collection of channels instanced, indexed by channel name. See <a href="/realtime/channels-messages/">channels and messages</a> for more information.</dd>
+</dl>
+<h2 id="options">Options</h2>
+<div lang="java">
+<p>The Ably constructor&#8217;s <code>Options</code> argument is an instance of <code>io.ably.types.Options</code>, constructed either with the default no-argument constructor or with a key string. The following options may be specified.</p>
+<p></div><div lang="default"><br />
+The Ably constructor&#8217;s <code>Options</code> argument is an object with one or more of the following properties.</p>
+</div>
 <dl>
 	<dt>appId</dt>
 	<dd>The application id. This option is only required if the application id cannot be inferred either from a <code>key</code> or <code>token</code> option. If given, it is the application id as indicated on the <a href="https://ably.io/dashboard">application dashboard</a>.</dd>
+</dl>
+<dl>
 	<dt>key</dt>
-	<dd>The full key string, as obtained from the <a href="https://ably.io/dashboard">application dashboard</a>. Use this option if you wish to use Basic auth, or wish to be able to issue tokens without needing to defer to a separate entity to sign token requests.</dd>
+	<dd>The full key string, as obtained from the <a href="https://ably.io/dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or wish to be able to issue tokens without needing to defer to a separate entity to sign token requests.</dd>
+</dl>
+<dl>
 	<dt>token</dt>
 	<dd>A token string, as the value of the <code>id</code> property of a <code>token_details</code> component of a token response.</dd>
+</dl>
+<dl>
 	<dt>authCallback</dt>
-	<dd><span lang="nodejs">A Javascript function to call when a new token is required.</span><span lang="ruby">A lambda function to call when a new token is required</span> The role of the callback is to generate a signed <code>token request</code> this is then submitted by the library to the <code>requestToken</code> API. See below for the callback function signature.</dd>
+	<dd>A <span lang="default">function</span><span lang="java">TokenCallback instance</span> to call when a new token is required.</span>. The role of the callback is to generate a signed <code>token request</code> which may then be submitted by the library to the <code>requestToken</code> API. See <a href="/rest-client-library/authentication">authentication</a> for details of the token request format and associated API calls.</dd>
+</dl>
+<dl>
 	<dt>authUrl</dt>
 	<dd>A URL that the library may use to obtain a signed token request. For example, this can be used by a client to obtain signed token requests from an application server.</dd>
+</dl>
+<dl>
 	<dt>authHeaders</dt>
 	<dd>A set of headers to be added to any request made to the <code>authUrl</code>.  Useful when an application requires these to be added to validate the request or implement the response.</dd>
+</dl>
+<dl>
 	<dt>authParams</dt>
 	<dd>A set of <code>POST</code> params to be added to any request made to the <code>authUrl</code>.  Useful when an application require these to be added to validate the request or implement the response.</dd>
 </dl>
-<h3>Other options</h3>
-<p>The following further options are supported by the library.</p>
 <dl>
-	<dt>encrypted</dt>
-	<dd><em>false, or in the case of a browser client, to the state of the document that loaded the library</em> A boolean value, indicating whether or not a TLS (&#8220;SSL&#8221;) secure connection should be used.  Note that unpaid Ably accounts are unable to use encrypted Real-time connections.</dd>
+	<dt>tls</dt>
+	<dd><em>true</em> A boolean value, indicating whether or not a TLS (&#8220;SSL&#8221;) secure connection should be used.</dd>
+</dl>
+<dl>
 	<dt>clientId</dt>
 	<dd>A client id, used for identifying this client for presence purposes. The clientId can be any string. This option is primarily intended to be used in situations where the library is instanced with a key; note that a clientId may also be implicit in a token used to instance the library; an error will be raised if a clientId specified here conflicts with the clientId implicit in the token.</dd>
-	<dt>log</dt>
-	<dd>Parameters to control the log output of the library. The supplied value must be an object that may contain one or both of the following entries: <code>level</code>: a number controlling the verbosity of the output from 1 (minimum, errors only) to 4<br />
-(maximum); <code>handler</code>: a function to handle each line of log output. If <code>handler</code> is not specified, <code>console.log</code> is<br />
-used.</dd>
-	<dt>transports</dt>
-	<dd>An array of transports to use, in descending order of preference. The available transports are: <code>web_socket</code>, <code>flash_socket</code>, <code>xhr</code>, <code>jsonp</code>. The default is to try all available transports among those listed, in that order.</dd>
 </dl>
+<dl>
+	<dt><div lang="javascript,nodejs,ruby">log</div></dt>
+	<dd>Parameters to control the log output of the library. The supplied value must be an object that may contain one or both of the following entries:<br />
+<ul><li><code>level</code>: a number controlling the verbosity of the output from 1 (minimum, errors only) to 4 (most verbose);</li><br />
+<li><code>handler</code>: a function to handle each line of log output. If <code>handler</code> is not specified, <code>console.log</code> is used.</li></ul><br />
+Note that the log level and log handler have global scope in the library and will thus not act independently between library instances when multiple library instances are existing concurrently.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">logLevel</div></dt>
+	<dd>An int controlling the verbosity of the output from 1 (minimum, errors only) to 4 (most verbose). Note that the <code>logLevel</code> is a static variable in the library and will thus not act independently between library instances when multiple library instances are existing concurrently.</dd>
+</dl>
+<dl>
+	<dt><div lang="java">logHandler</div></dt>
+	<dd>A <code>PrintStream</code> to handle each line of log output. If <code>logHandler</code> is not specified, <code>System.out</code> is used. Note that the <code>logHandler</code> is a static variable in the library and will thus not act independently between library instances when multiple library instances are existing concurrently.</dd>
+</dl>
+<dl>
+	<dt>useTextProtocol</dt>
+	<dd><em>false</em> The browser client library detects whether or not the browser has the capability to use the binary protocol, and enables this option if the browser requires the use of the text protocol.</dd>
+</dl>
+<div lang="java">
+<h2 id="paginated-result">PaginatedResult</h2>
+<p>A <code>PaginatedResult</code> is an interface that represents the result of a query that supports pagination. An instance of <code>PaginatedResult</code> encapsulates a collection of <code>Stats</code> objects representing the current page of results, and provides the means &#8211; in the form of <code>Param[]</code> to perform queries for subsequent or related pages.</p>
+<dl>
+	<dt>public Stats[] asArray()</dt>
+	<dd>Returns the current page of results as an Array.</dd>
+	<dt>public List&lt;Stats&gt;</dt>
+	<dd>Returns the current page of results as a List.</dd>
+	<dt>public Param[] getFirst()</dt>
+	<dd>Returns the params to pass to a <code>stats()</code> call to reproduce the first call in this paginated sequence.</dd>
+	<dt>public Param[] getCurrent()</dt>
+	<dd>Returns the params to pass to a <code>stats()</code> call to reproduce the current call in this paginated sequence.</dd>
+	<dt>public Param[] getNext()</dt>
+	<dd>Returns the params to pass to a <code>stats()</code> call to reproduce the next call in this paginated sequence.</dd>
+</dl>
+</div>
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>
@@ -132,8 +241,8 @@ used.</dd>
 </ul>
   <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class='selected'><a href='/rest-client-library/usage/'>Usage</a></li>
-<li class=''><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class='selected'><a href='/rest-client-library/usage/'>Using the REST library</a></li>
+<li class=''><a href='/rest-client-library/channels-messages/'>Channels and Messages</a></li>
 <li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
 <li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
 <li class=''><a href='/rest-client-library/history/'>History</a></li>

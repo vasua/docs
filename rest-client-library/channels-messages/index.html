@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Ably API Documentation - Channels & Messages</title>
+    <title>Ably API Documentation - Channels and Messages</title>
     <link rel="stylesheet" type="text/css" href="/assets/stylesheet.css" media="screen">
     <link rel="shortcut icon" href="/assets/favicon.ico">
 
@@ -34,7 +34,6 @@
 <option id="anchor-channel-object">Channel object</option>
 <option id="anchor-publish">publish</option>
 <option id="anchor-history">history</option>
-<option id="anchor-stats">stats</option>
 <option id="anchor-presence">presence</option>
 </optgroup>
           </select>
@@ -46,54 +45,139 @@
         <div class="breadcrumb"><a href="/rest-client-library/">REST Client Library</a><span class="separator">/</span></div>
       
       
-        <h1 id="title">Channels &amp; Messages</h1>
+        <h1 id="title">Channels and Messages</h1>
       
     </header>
     <article>
-      <h2 id="help-join">Joining a channel</h2>
-<p>In the REST client library, a <code>Channel</code> object must be obtained in order to publish messages on that channel, or access the channel methods or classes:</p>
-<pre lang="nodejs"><code lang="nodejs">var Rest = new Ably.Rest(options),
-    channel = Rest.channels.get('channel0');</code></pre>
-<pre lang="ruby"><code lang="ruby">rest = Ably::Rest.new(options)
-channel = rest.channels.get('channel0')</code></pre>
-<pre lang="java"><code lang="java">Rest rest = new Ably.Rest(options);
-Channel channel = rest.channels.get('channel0');</code></pre>
-<p>A shortcut method is also provided to retrieve a <code>Channel</code>:</p>
-<pre lang="nodejs"><code lang="nodejs">var channel = Rest.channel('channel0');</code></pre>
-<pre lang="ruby"><code lang="ruby">channel = Rest.channel('channel0')</code></pre>
-<pre lang="java"><code lang="java">Channel channel = Rest.channel("channel0");</code></pre>
-<h2 id="help-publish">Publishing messages</h2>
-<p>Publishing a message to a channel requires an event identifier for the message and an arbitrary payload.  Payloads can be either a primitive serializable data type, or a binary object.  If a message could not be delivered successfully, then an error will be returned.</p>
-<pre lang="nodejs"><code lang="nodejs">var channel = Rest.channel('channel0');
-channel.publish('announcement', { message: 'Luke has arrived'});</code></pre>
-<pre lang="ruby"><code lang="ruby">channel = Rest.channel('channel0')
-channel.publish 'announcement', { message: 'Luke has arrived'}</code></pre>
-<pre lang="java"><code lang="java">Channel channel = Rest.channel("channel0");
-channel.publish('announcement', { message: 'Luke has arrived'});</code></pre>
-<p>The channel-specific calls in the client library directly mirror the <a href="/rest-api">REST API</a>.</p>
+      <p>The Ably Realtime service organises the traffic within any application into named channels. Channels are the &#8220;unit&#8221; of message distribution; clients attach to channels to subscribe to messages, and every message broadcast by the service is associated with a unique channel.</p>
+<h3>Channels in the REST API</h3>
+<p>Channels are not pre-configured; they are created on demand when realtime clients attach, and remain active until such time that there are no remaining attached clients. Applications do have, however, the ability to pre-configure one or more channel namespaces (ie name prefixes), and associate different attributes and access rights with those namespaces.</p>
+<p>In the REST API, channels are stateless; a <a href="#publish">publish</a> operation causes the channel to be established within the realtime system if it does not already exist, but this state is invisible to the REST client.</p>
+<h4>Obtaining a channel instance</h4>
+<p>A <code>Channel</code> object is a reference to a single channel. A channel instance is obtained from the <code>channels</code> collection of the Ably <code>Rest</code> instance.</p>
+<pre lang="javascript"><code lang="javascript">var channel = rest.channels.get('myChannel');</code></pre>
+<pre lang="nodejs"><code lang="nodejs">var channel = rest.channels.get('myChannel');</code></pre>
+<pre lang="java"><code lang="java">import io.ably.realtime.Channel;
+Channel channel = rest.channels.get("myChannel");</code></pre>
+<p>A set of <a href="#channel-options">channel options</a> may also be passed when getting a channel instance.</p>
+<pre lang="javascript"><code lang="javascript">var channel = rest.channels.get('myChannel', channelOpts);</code></pre>
+<pre lang="nodejs"><code lang="nodejs">var channel = rest.channels.get('myChannel', channelOpts);</code></pre>
+<pre lang="java"><code lang="java">import io.ably.rest.Channel;
+Channel channel = rest.channels.get("myChannel", channelOpts);</code></pre>
+<h3>Channel namespaces</h3>
+<p>One or more channel namespaces, or channel name prefixes, may be configured for an app. When a channel is created whose name is prefixed with one of the namespaces, the channel assumes certain configured attributes associated with that namespace.</p>
+<p>Namespace-prefixed names are delimited by a single colon &#8216;:&#8217;; the first component of the channel name (from the start up to and including the last character before the colon) is the namespace. A channel name may validly contain a colon even if the namespace component does not correspond to a namespace; also, a channel may contain multiple colons and only the component up to the first colon will be matched with a namespace. The only restriction on channel names is that a channel name may not start with a colon and may not be empty.</p>
+<p>Namespaces are defined and configured via the application dashboard. Namespace attributes that can be configured are:</p>
+<ul>
+	<li>whether or not channels belonging to that namespace require clients to be authenticated;</li>
+	<li>whether or not channel messages are persisted;</li>
+	<li>whether or not clients are required to be connected over a TLS connection.</li>
+</ul>
+<p>Key or token capabilities can also specify access rights based on channel namespace.</p>
+<h2>Messages</h2>
+<p>An Ably Realtime Message has a <code>data</code> member carrying the payload of the message. Various primitive and object types are portably defined and supported in all clients, enabling clients to be interoperable despite being hosted in different languages or environments.</p>
+<p>The supported payload types are primitive types (boolean, int32, double, string), JSON-encoded objects and arrays, and buffers containing arbitrary binary data. Client libraries detect the supplied message payload and encode the message appropriately.</p>
+<h3>Publishing messages</h3>
+<p>Channels expose a <code>publish</code> method whereby a client can publish either a single message or an array of messages to a channel. A listener optionally passed in to the <code>publish</code> method enables the client to know whether or not the operation succeeded.</p>
+<pre lang="javascript"><code lang="javascript">channel.publish("myEvent", "This is my message", function(err) {
+  if(err)
+    console.log('Unable to publish message; err = ' + err.message);
+  else
+    console.log('Message successfully sent');
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">channel.publish("myEvent", "This is my message", function(err) {
+  if(err)
+    console.log('Unable to publish message; err = ' + err.message);
+  else
+    console.log('Message successfully sent');
+});</code></pre>
+<pre lang="java"><code lang="java">import io.ably.rest.CompletionListener;
+channel.publish("myEvent", "This is my message", new CompletionListener() {
+	@Override
+	public void onError(ErrorInfo reason) {
+		System.out.println("Unable to publish message; err = " + reason.message);
+	}
+	@Override
+	public void onSuccess() {
+		System.out.println("Message successfully sent");
+	}
+});</code></pre>
+<h3>Retrieving message history</h3>
+<p>Channels expose a <code>history</code> method whereby a client can obtain messages previously sent on  those channels that have persistence enabled.</p>
+<p>History results are paginated and therefore accompanied with one or more relative links relating to the current query. Where the number of results returned exceeds the query limit &#8211; which is either the value of the <code>limit</code> param or the default limit of 100 &#8211; the query result contains pages with the limited number of records, and a relative link to the next page.</p>
+<pre lang="javascript"><code lang="javascript">var params = {direction: 'backwards', limit: '100'};
+channel.history(params, function(err, messages, rel) {
+  if(err) {
+    console.log('Unable to get channel history; err = ' + err.message);
+  } else {
+    console.log(messages.length + ' messages received in first result');
+    if(rel &amp;&amp; rel.next) {
+      channel.history(rel.next, function(...) { ... });
+    }
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">var params = {direction: 'backwards', limit: '100'};
+channel.history(params, function(err, messages, rel) {
+  if(err) {
+    console.log('Unable to get channel history; err = ' + err.message);
+  } else {
+    console.log(messages.length + ' messages received in first result');
+    if(rel &amp;&amp; rel.next) {
+      channel.history(rel.next, function(...) { ... });
+    }
+});</code></pre>
+<pre lang="java"><code lang="java">import io.ably.types.Message;
+import io.ably.types.Param;
+import io.ably.types.PaginatedResult;
+Param[] params = new Param[] {
+  new Param("direction", "backwards"),
+  new Param("limit", 100)
+};
+PaginatedResult&lt;Message&gt; messages = channel.history(params);
+System.out.println(messages.asArray().length + " messages received in first result");
+if(messages.getNext()) {
+  PaginatedResult&lt;Message&gt; nextPage = channel.history(messages.getNext());
+  System.out.println(...);
+}</code></pre>
+<p>See the <a href="/rest-client-library/history">history</a> documentation for further details of the supported query parameters.</p>
+<h2>Presence</h2>
+<p>Channels expose a <code>presence</code> member which a client can use to obtain channel presence information. See the <a href="/rest-client-library/presence">presence</a> documentation for details.</p>
 <h1>API Reference</h1>
 <div class="inline-toc">
-<ul><li>Channel object reference
+<ul><li>Channels and messages reference
 <ul>
 <li>
 Methods
 <ul>
-<li><a href='#publish'>publish</a></li>
-<li><a href='#history'>history</a></li>
-<li><a href='#stats'>stats</a></li>
-<li><a href='#presence'>presence</a></li>
+<li><a href='#publish-data'>publish(name, data)</a></li>
+<li><a href='#publish-msg'>publish(message)</a></li>
+<li><a href='#publish-msg-array'>publish(messages)</a></li>
+<li><a href='#history'>history()</a></li>
+</ul>
+</li>
+<li>
+Members
+<ul>
+<li><a href='#members'>name</a></li>
+<li><a href='#members'>presence</a></li>
+</ul>
+</li>
+<li>
+Related types
+<ul>
+<li><a href='#message'>Message</a></li>
+<li><a href='#message-listener'>MessageListener</a></li>
+<li><a href='#completion-listener'>CompletionListener</a></li>
+<li><a href='#channel-options'>ChannelOptions</a></li>
 </ul>
 </li>
 </ul>
 </li></ul>
-</div><h2 id="channel-object">Channel Object Reference</h2>
-<p>The Channel object is is created by getting a channel from the <a href="/rest-client-library/usage#constructor">@Ably object</a> channels class.</p>
-<h3>Methods</h3>
+</div><h2>Methods</h2>
 <h6 id="publish">publish</h6>
 <blockquote class="definition">
 <p class="definition"><span lang='nodejs'>channel.publish(event, data, callback)</span><span lang='ruby'>channel.publish(event, data) → success</span><span lang='java'>channel.publish(String event, Object data) → Boolean success</span></p>
 </blockquote>
-<p>This call queries the REST <a href="/rest-api#publish"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/publish</code></a> API.</p>
+<p>This call queries the REST <a href="/rest-api#publish"><code>channels/&lt;channel id&gt;/publish</code></a> API.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>event</dt>
@@ -127,33 +211,31 @@ where:<br />
 </div>
 <h6 id="history">history</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='nodejs'>channel.history(options, callback)</span><span lang='ruby'>channel.history(options) → json_result</span><span lang='java'>channel.history(OptionsHash options) → JSONResult</span></p>
+<p class="definition"><span lang='nodejs'>channel.history(params, callback)</span><span lang='ruby'>channel.history(options) → json_result</span><span lang='java'>public PaginatedResult&lt;Message&gt; history(Param[] params)</span></p>
 </blockquote>
-<p>This call queries the REST <a href="/rest-api#channel-history"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/history</code></a> API.</p>
+<p>Get message history for this channel.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt>options</dt>
-	<dd>an optional object containing the query parameters, as specified in the <a href="/rest-api#channel-history">REST API</a>.</dd>
-	<dt><div lang="nodejs">callback</div></dt>
-	<dd>is a function of the form: <code>callback(err, result)</code><br />
+	<dt>params</dt>
+	<dd>an optional object containing the query parameters, as specified in the <a href="/realtime/history">history</a> API documentation.</dd>
+	<dt><div lang="nodejs,javascript">callback</div></dt>
+	<dd>is a function of the form: <code>callback(err, messages, relParams)</code><br />
 where:<br />
 <ul><br />
 <li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
-<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api#channel-history">REST API</a>.<br />
-  Example <code>result</code>:<br />
-  <pre lang="json"><code>[{
-    "name": "&lt;event name&gt;",
-    "channel": "&lt;channel id&gt;",
-    "data": "&lt;message payload&gt;",
-    "timestamp": "&lt;message timestamp&gt;"
-  }]</code></pre><br />
-</li><br />
+<li>on success, <code>messages</code> contains the query result as an array of Message objects.</li><br />
+<li>where applicable, <code>relParams</code> is a map containing query params for each of the pagination links in the query response (see below).</li><br />
 </ul></dd>
 </dl>
-<div lang="ruby,java">
+<p>Further details of the supported query params are in the <a href="/rest/history">history API</a> documentation.</p>
+<div lang="java">
 <h4>Returns</h4>
-<p>On success, <span lang="ruby"><code>json_result</code></span><span lang="java"><code>JSONResult</code></span> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api/#channel-history">REST API</a>.</p>
-<p>Example <span lang="ruby"><code>json_result</code></span><span lang="java"><code>JSONResult</code></span>:</p>
+<p>On success, the returned <a href="#paginated-result">PaginatedResult</a> encapsulates a collection of <code>Message</code> objects corresponding to the current page of results, and also provides query parameters for any applicable related (eg <code>first</code> or <code>next</code> result pages).</p>
+<p>Failure to retrieve the history will raise an <code>AblyException</code>.</p>
+<p></div><div lang="ruby"><br />
+h4. Returns</p>
+<p>On success, <span lang="ruby"><code>json_result</code></span> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api/#channel-history">REST API</a>.</p>
+<p>Example <span lang="ruby"><code>json_result</code></span>:</p>
 <pre lang="json"><code lang="json">[{
   "name": "&lt;event name&gt;",
   "channel": "&lt;channel id&gt;",
@@ -166,66 +248,24 @@ where:<br />
 	<li><code>Ably::NetworkUnavailableException</code></li>
 	<li><code>Ably::QuotaExceededException</code></li>
 	<li><code>Ably::AuthenticationFailureException</code><br />
-  </div><div lang="java"></li>
-</ul>
-<ul>
-	<li><code>Ably.NetworkUnavailableException</code></li>
-	<li><code>Ably.QuotaExceededException</code></li>
-	<li><code>Ably.AuthenticationFailureException</code><br />
   </div></li>
 </ul>
-</div>
-<h6 id="stats">stats</h6>
-<blockquote class="definition">
-<p class="definition"><span lang='nodejs'>channel.stats(options, callback)</span><span lang='ruby'>channel.stats(options) → json_result</span><span lang='java'>channel.stats(OptionsHash options) → JSONResult</span></p>
-</blockquote>
-<p>This call queries the REST <a href="/rest-api#channel-stats"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/stats</code></a> API.</p>
-<h4>Parameters</h4>
-<dl>
-	<dt>options</dt>
-	<dd>an optional object containing the query parameters, as specified in the <a href="/rest-api#channel-stats">REST API</a>.</dd>
-	<dt><div lang="nodejs">callback</div></dt>
-	<dd>is a function of the form: <code>callback(err, result)</code><br />
-where:<br />
-<ul><br />
-<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
-<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api#channel-stats">REST API</a>.<br />
-  Example <code>result</code>:<br />
+<p></div><div lang="nodejs,javascript"></p>
+<h4>Pagination</h4>
+<p>A paginated result is indicated in the <code>relParams</code> callback argument. For each available link, <code>relParams</code> contains a map of params to pass to a subsequent <code>history()</code> call.<br />
+  Example <code>relParams</code>:<br />
   <pre lang="json"><code>[{
-    "an example": "&lt;needs to be inserted here&gt;",
-    "illustrating": "&lt;a simple stats result&gt;"
-  }]</code></pre><br />
-</li><br />
-</ul></dd>
-</dl>
-<div lang="ruby,java">
-<h4>Returns</h4>
-<p>On success, <span lang="ruby"><code>json_result</code></span><span lang="java"><code>JSONResult</code></span> contains an array of statistics for the request granularity as specified in <a href="/rest-api#channel-stats">REST API</a>.</p>
-<p>Example <span lang="ruby"><code>json_result</code></span><span lang="java"><code>JSONResult</code></span>:</p>
-<pre lang="json"><code lang="json">[{
-    "an example": "&lt;needs to be inserted here&gt;",
-    "illustrating": "&lt;a simple stats result&gt;"
-  }]</code></pre>
-<p>Failure to retrieve the stats will raise an exception &#8211; typical exceptions include:<br />
-  <div lang="ruby"></p>
-<ul>
-	<li><code>Ably::NetworkUnavailableException</code></li>
-	<li><code>Ably::QuotaExceededException</code></li>
-	<li><code>Ably::AuthenticationFailureException</code><br />
-  </div><div lang="java"></li>
-</ul>
-<ul>
-	<li><code>Ably.NetworkUnavailableException</code></li>
-	<li><code>Ably.QuotaExceededException</code></li>
-	<li><code>Ably.AuthenticationFailureException</code><br />
-  </div></li>
-</ul>
+    "first": {"start": 1380794880000, "end": 138079488105, ...},
+    "current": {"start": 1380794880000, "end": 138079488105, ...},
+    "next": {"start": 1380794880000, "end": 138079488105, ...}
+  }]</code></pre></p>
+<p>Further details of the paginated response are in the <a href="/realtime/history">history API</a> documentation.</p>
 </div>
 <h6 id="presence">presence</h6>
 <blockquote class="definition">
 <p class="definition"><span lang='nodejs'>channel.presence(options, callback)</span><span lang='ruby'>channel.presence(options) → json_result</span><span lang='java'>channel.presence(OptionsHash options) → JSONResult</span></p>
 </blockquote>
-<p>This call queries the REST <a href="/rest-api#channel-presence"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/presence</code></a> API.</p>
+<p>This call queries the REST <a href="/rest-api#channel-presence"><code>channels/&lt;channel id&gt;/presence</code></a> API.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>options</dt>
@@ -267,6 +307,51 @@ where:<br />
   </div></li>
 </ul>
 </div>
+<h2 id="message">Message</h2>
+<p>A <code>Message</code> encapsulates an individual message sent or received in Ably. A message has the following members.</p>
+<dl>
+	<dt><span lang="java">String</span>name</dt>
+	<dd>The event name for the message. The name may be used to allow listeners to subscribed selectively for only a subset of the messages on the channel.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">Object</span>data</dt>
+	<dd>The payload of the message. The data may be one of the supported payload datatypes.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">String</span>clientId</dt>
+	<dd>The clientId of the client that published the message. This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the clientId is known, for messages delivered to subscribers. It is not required to populate the clientId of a message before publishing it.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">long</span>timestamp</dt>
+	<dd>The system timestamp of the message, in milliseconds since the epoch. This <span lang="default">property</span><span lang="java">field</span> is populated by the system for messages delivered to subscribers. It is not required to populate the timestamp of a message before publishing it.</dd>
+</dl>
+<h2 id="channel-options">ChannelOptions</h2>
+<p>A <code>ChannelOptions</code> may optionally be specified when instancing a Channel, and this may be used to specify channel-specific options.</p>
+<p>Currently the only supported channel options are encryption-related.</p>
+<dl>
+	<dt><span lang="java">public boolean</span>encrypted</dt>
+	<dd>Requests encryption for this channel.</dd>
+</dl>
+<dl>
+	<dt><span lang="java">public Object</span>cipherParams</dt>
+	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). Default cipher params for the implementation may be obtained by calling <code>Crypto.getDefaultParams()</code>.</dd>
+</dl>
+<div lang="java">
+<h2 id="paginated-result">PaginatedResult</h2>
+<p>A <code>PaginatedResult</code> is an interface that represents the result of a query that supports pagination. An instance of <code>PaginatedResult</code> encapsulates a collection of <code>Message</code> objects representing the current page of results, and provides the means &#8211; in the form of <code>Param[]</code> to perform queries for subsequent or related pages.</p>
+<dl>
+	<dt>public Message[] asArray()</dt>
+	<dd>Returns the current page of results as an Array.</dd>
+	<dt>public List&lt;Message&gt;</dt>
+	<dd>Returns the current page of results as a List.</dd>
+	<dt>public Param[] getFirst()</dt>
+	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the first call in this paginated sequence.</dd>
+	<dt>public Param[] getCurrent()</dt>
+	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the current call in this paginated sequence.</dd>
+	<dt>public Param[] getNext()</dt>
+	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the next call in this paginated sequence.</dd>
+</dl>
+</div>
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>
@@ -290,8 +375,8 @@ where:<br />
 </ul>
   <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
-<li class='selected'><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest-client-library/usage/'>Using the REST library</a></li>
+<li class='selected'><a href='/rest-client-library/channels-messages/'>Channels and Messages</a></li>
 <li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
 <li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
 <li class=''><a href='/rest-client-library/history/'>History</a></li>

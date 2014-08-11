@@ -174,49 +174,86 @@
 </dl>
 <h5>Returns</h5>
 <p>In each case a successful result is an array containing the items that match the query (and it may be empty).</p>
-<p>Each member is a stats object of the form:</p>
-<pre lang="json"><code lang="json">{
-    published: {
-        messageCount: &lt;&gt;,
-        messageSize: &lt;&gt;
-    },
-    deliveredAll: {
-        messageCount: &lt;&gt;,
-        messageSize: &lt;&gt;
-    },
-    deliveredRest: {
-        messageCount: &lt;&gt;,
-        messageSize: &lt;&gt;
-    },
-    deliveredRealtime: {
-        messageCount: &lt;&gt;,
-        messageSize: &lt;&gt;
-    },
-    deliveredPost: {
-        messageCount: &lt;&gt;,
-        messageSize: &lt;&gt;
-    }
-}</code></pre>
-<p>where:</p>
-<dl>
-	<dt>published</dt>
-	<dd>messages published (i.e. sent from a client to Ably) by all methods (REST + Real-time)</dd>
-	<dt>deliveredRealtime</dt>
-	<dd>messages delivered (i.e. sent from Ably to a client) over Real-time connections. Each client that receives a message is counted separately (i.e. one message sent to 2 clients counts as 2)</dd>
-	<dt>deliveredRest</dt>
-	<dd>messages obtained via the REST history API (i.e. messages retrieved by clients by querying the history, not in real-time). Again each separate client access is counted</dd>
-	<dt>deliveredPost</dt>
-	<dd>messages delivered (i.e. sent from Ably to a client) over a webhook. Each client that receives a message is counted separately.</dd>
-	<dt>deliveredAll</dt>
-	<dd>sum of all of the delivered messages listed prior, and is the number that is checked when enforcing account limits.</dd>
-</dl>
-<p>For each of these, there is separately an indication of:</p>
-<dl>
-	<dt>messageCount</dt>
-	<dd>number of individual messages</dd>
-	<dt>messageSize</dt>
-	<dd>aggregate size of those messages; Ably calculates <code>messageSize</code> for a given message as the size of the message payload when encoded in bytes plus the byte length of the message event name.</dd>
-</dl>
+<p>Stats records contain a hierarchy of elements relating to messages, connections and other resources consumed in an interval. An example of a full stats record is given below. Any single record may contain a subset of the elements, omitting empty sections.</p>
+<pre>
+{
+	"all": {
+		"all": { "count": 354, "data": 27200 },
+		"messages": { "count": 354, "data": 27200 },
+		"presence": { "count": 0, "data": 0 }
+	},
+	"inbound": {
+		"all": {
+			"all": { "count": 130, "data": 10318 },
+			"messages": { "count": 130, "data": 10318 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"realtime": {
+			"all": { "count": 130, "data": 10318 },
+			"messages": { "count": 130, "data": 10318 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"rest": {
+			"all": { "count": 0, "data": 0 },
+			"messages": { "count": 0, "data": 0 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"push": {
+			"all": { "count": 0, "data": 0 },
+			"messages": { "count": 0, "data": 0 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"httpStream": {
+			"all": { "count": 0, "data": 0 },
+			"messages": { "count": 0, "data": 0 },
+			"presence": { "count": 0, "data": 0 }
+		}
+	},
+	"outbound": {
+		"all": {
+			"all": { "count": 224, "data": 16882 },
+			"messages": { "count": 224, "data": 16882 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"realtime": {
+			"all": { "count": 206, "data": 16074 },
+			"messages": { "count": 206, "data": 16074 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"rest": {
+			"all": { "count": 18, "data": 808 },
+			"messages": { "count": 18, "data": 808 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"push": {
+			"all": { "count": 0, "data": 0 },
+			"messages": { "count": 0, "data": 0 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"httpStream": {
+			"all": { "count": 0, "data": 0 },
+			"messages": { "count": 0, "data": 0 },
+			"presence": { "count": 0, "data": 0 }
+		}
+	},
+	"persisted": {
+		"all": { "count": 473, "data": 37914 },
+		"messages": { "count": 473, "data": 37914 },
+		"presence": { "count": 0, "data": 0 }
+	},
+	"connections": {
+		"all": { "opened": 0, "peak": 0, "mean": 0, "min": 0, "refused": 0 },
+		"plain": { "opened": 0, "peak": 0, "mean": 0, "min": 0, "refused": 0 },
+		"tls": { "opened": 0, "peak": 0, "mean": 0, "min": 0, "refused": 0 }
+	},
+	"channels": { "opened": 22, "peak": 0, "mean": 0, "min": 0, "refused": 0 },
+	"apiRequests": { "succeeded": 6, "failed": 0, "refused": 0 },
+	"tokenRequests": { "succeeded": 0, "failed": 0, "refused": 0 },
+	"count": 0,
+	"intervalId": "2013-10-31:22:10",
+}
+
+</pre>
 <h2>Channel routes</h2>
 <p>Routes providing access to the messaging service within a channel scope.</p>
 <h3 id="publish">Publish one or more events on a channel</h3>
@@ -422,8 +459,8 @@ If <code>hour</code>, the result is an array of references to (channel + hour) p
 </ul>
   <h2><a href="/rest-client-library/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest-client-library/usage/'>Usage</a></li>
-<li class=''><a href='/rest-client-library/channels-messages/'>Channels &amp; Messages</a></li>
+<li class=''><a href='/rest-client-library/usage/'>Using the REST library</a></li>
+<li class=''><a href='/rest-client-library/channels-messages/'>Channels and Messages</a></li>
 <li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
 <li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
 <li class=''><a href='/rest-client-library/history/'>History</a></li>
