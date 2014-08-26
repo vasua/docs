@@ -16,12 +16,20 @@
     <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
 
     <!-- you don't need to keep this, but it's cool for stats! -->
-    <meta name="generator" content="nanoc 3.4.3">
+    <meta name="generator" content="nanoc 3.7.2">
   </head>
   <body>
     <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
   <div id="documentation">
-    <p>We aim to have the most comprehensive set of client libraries for Ably covering all widely used platforms and languages.<br />
+    
+    <header>
+      
+      
+        <h1 id="title">Client Library Development Guide</h1>
+      
+    </header>
+    <article>
+      <p>We aim to have the most comprehensive set of client libraries for Ably covering all widely used platforms and languages.<br />
 The reference material in this section is intended to support developers in creating, extending or bugfixing libraries for environments that we do not support already.</p>
 <p><a href="https://ably.io/download/realtime-client-libraries">See the list of existing libraries »</a></p>
 <h2>Overview</h2>
@@ -39,12 +47,15 @@ The reference material in this section is intended to support developers in crea
 the Ably REST interface.</p>
 <p>The Realtime interface, on the other hand, is implemented using an Ably-defined protocol (over WebSockets and other transports) and, although that protocol is published, we reserve the right to change the protocol and drop support for<br />
 superseded protocol versions at any time. Of course, we don&#8217;t want to make life difficult for library developers, so any incompatible changes will be very carefully considered, but nonetheless developers must regard the protocol definition as being subject to change. Application developers using the Ably Realtime API should use the client library and can expect that API to be stable and supported even if the protocol changes underneath.</p>
-<h2>Staging environment and library testing</h2>
+<h2>Sandbox environment and library testing</h2>
 <p>The libraries each have test suites, and the test suites will run tests within temporary applications and accounts that are created during test setup. Although Ably does not provide a public provisioning API for account management (in the production system this is available only through the dashboard) there is a limited API provided via the REST<br />
-interface, in the staging environment only, to enable test applications and keys to be provisioned. Therefore, all tests are set up to run against the staging environment.</p>
+interface in the sandbox environment only, to enable test applications and keys to be provisioned. Therefore, all tests are set up to run against the sandbox environment.</p>
 <p>See <a href="test-api">Test API</a> for details about the test routes provided in the REST API.</p>
 <h2>Protocol definition</h2>
 <p>The core a Realtime library implementation is the implementation of the Ably protocol.</p>
+    </article>
+    <hr class="back">
+    <a href="#documentation">Back to top</a>
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
@@ -89,8 +100,7 @@ interface, in the staging environment only, to enable test applications and keys
 <li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
-<li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+<li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
 </ul>
   <ul>
 <li><a href="https://ably.io">Visit Ably.io</a></li>

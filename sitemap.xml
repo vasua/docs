@@ -6,12 +6,12 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest-api/</loc>
+    <loc>http://ably.github.com/realtime/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/realtime/</loc>
+    <loc>http://ably.github.com/rest-api/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -86,11 +86,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/other/client-lib-developer/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>http://ably.github.com/rest-client-library/history/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -116,12 +111,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/client-lib-development-guide/comet/</loc>
+    <loc>http://ably.github.com/rest-client-library/authentication/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest-client-library/authentication/</loc>
+    <loc>http://ably.github.com/client-lib-development-guide/comet/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -131,22 +126,17 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/other/documentation-formatting-guide/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>http://ably.github.com/client-lib-development-guide/protocol/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/client-lib-development-guide/recovery/</loc>
+    <loc>http://ably.github.com/rest-client-library/channels-messages/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest-client-library/channels-messages/</loc>
+    <loc>http://ably.github.com/client-lib-development-guide/recovery/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -162,6 +152,11 @@
   </url>
   <url>
     <loc>http://ably.github.com/client-lib-development-guide/connection-manager/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/client-lib-development-guide/documentation-formatting-guide/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

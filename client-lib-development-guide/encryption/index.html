@@ -16,13 +16,36 @@
     <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
 
     <!-- you don't need to keep this, but it's cool for stats! -->
-    <meta name="generator" content="nanoc 3.4.3">
+    <meta name="generator" content="nanoc 3.7.2">
   </head>
   <body>
     <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
   <div id="documentation">
-    <p>Ably client libraries support encryption of message content, making it easier to build apps that encrypt content fully end-to-end.</p>
-<h2>Objectives and Scope</h2>
+    
+      <nav class="jump-to-nav">
+        <div class="form">
+          <select id="jump-to-nav">
+            <option>Jump to ...</option>
+            <optgroup label='Help with'>
+<option id="anchor-objectives-and-scope">Objectives and Scope</option>
+<option id="anchor-encrypted-message-format">Encrypted message format</option>
+<option id="anchor-examples">Examples</option>
+</optgroup>
+          </select>
+        </div>
+      </nav>
+    
+    <header>
+      
+        <div class="breadcrumb"><a href="/client-lib-development-guide/">Client Library Development Guide</a><span class="separator">/</span></div>
+      
+      
+        <h1 id="title">Encryption</h1>
+      
+    </header>
+    <article>
+      <p>Ably client libraries support encryption of message content, making it easier to build apps that encrypt content fully end-to-end.</p>
+<h2 id="objectives-and-scope">Objectives and Scope</h2>
 <p>The libraries support encryption purely as a convenience; the libraries ensure interoperability between environments by having compatible implementations of encryption algorithms and by making common choices on format, mode, padding etc. However, Ably intentionally does not manage the distribution of keys between clients, and end-to-end encryption is enabled without exposing keys to the Ably service at all. This has the advantage that Ably demonstrably has no access to the unencrypted contents of your messages, but also means that each app is responsible for enabling the distribution of keys to clients independently of Ably.</p>
 <p>The client library support for encryption supports symmetric encryption only, and requires each participating client to each specify the correct secret key when creating a <code>Channel</code> instance. Clients that do not specify a key will be delivered the still-encrypted message payloads that they may then still wish to decrypt offline.</p>
 <p>The client libraries are designed to be extensible, but initially only support the AES algorithm (with a default key length of 128 bits) and CBC mode. These defaults are intended to ensure that encryption support can be provided in all target environments and platforms.</p>
@@ -30,7 +53,7 @@
 <p>The key in use at any given time is known the client library, but the Ably service has no visibility of the key; it knows only that a given message payload was encrypted. When accessing messages via the history API, it is the caller&#8217;s responsibility to ensure that the correct key is used for the requested interval.</p>
 <p>Encryption on message data payloads only, and other message metadata is not encrypted; for example the <code>clientId</code>, event <code>name</code> or <code>timestamp</code>. This means that messages with a specific event name can still be routed by the library to the correct handler even if the recipient does not have the key; the encrypted payload data is delivered instead. Furthermore, the payload data type is not encrypted &#8211; this is regarded as metadata just like other message metadata. Boolean payloads are not encrypted at all, since the value is represented in the type.</p>
 <p>Encryption options (algorithm, key, etc) are specified on a per-channel basis; it is expected that apps will wish to have both unencrypted and encrypted channels on a single connection.</p>
-<h2>Encrypted message format</h2>
+<h2 id="encrypted-message-format">Encrypted message format</h2>
 <h3>Message representation</h3>
 <p>All Ably messages &#8211; whose structure is defined in the <code>TMessage</code> struct in <code>clientmessage.thrift</code> &#8211; carry their payload in a <code>data</code> member, with various supported data types. The representation is different for JSON- or Thrift-encoded messages. A given encrypted message can be exchanged using either the binary or JSON protocol and encryption and decryption are interoperable between the representations.</p>
 <p>In the case of the JSON encoding, the <code>data</code> member either contains the data value directly (either a primitive, or JSON Object or Array) or contains an encoded string value, with the encoding (only <code>base64</code> is supported) specified in an <code>encoding</code> property of the message. For unencrypted messages, type is implicit; the type is either the type pf the JSON data property, or is implicitly a binary buffer when an <code>encoding</code> is present.</p>
@@ -102,7 +125,7 @@
 <ul>
 	<li>Construct the ciphertext message payload. This is the concatenation of the 16-byte IV followed by the ciphertext bytes.</li>
 </ul>
-<h2>Examples</h2>
+<h2 id="examples">Examples</h2>
 <p>The following step-by-step example illustrates the encryption process described above.</p>
 <p>The ably-js repository contains a utility, <code>tools/crypto/generate-test-data</code> which can be used to generate the output for each of these intermediate steps as a way to test client library operation.</p>
 <p>The message to be encrypted is one with event name <code>example</code> and message data:</p>
@@ -167,6 +190,9 @@ iv:
               b792 1204 1d45 68a4 df7f 6e38 174a ff50 7323 bbca 16b0 e284&gt;
 })
 </pre>
+    </article>
+    <hr class="back">
+    <a href="#documentation">Back to top</a>
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
@@ -211,8 +237,7 @@ iv:
 <li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
-<li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+<li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
 </ul>
   <ul>
 <li><a href="https://ably.io">Visit Ably.io</a></li>

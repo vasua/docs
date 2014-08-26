@@ -483,7 +483,7 @@ div.global-lang-container {
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   z-index: 5;
-  box-shadow: 0 0 7px #ff9900; }
+  box-shadow: 0 0 7px #F90; }
   div.global-lang-container:before {
     top: -3px;
     content: "View documentation in:";
@@ -505,7 +505,7 @@ div.global-lang-container {
       div.global-lang-container ul li.selected {
         cursor: default;
         color: white;
-        background-color: #ff9900; }
+        background-color: #F90; }
         div.global-lang-container ul li.selected:hover {
           color: white; }
       div.global-lang-container ul li:hover {

@@ -16,16 +16,45 @@
     <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
 
     <!-- you don't need to keep this, but it's cool for stats! -->
-    <meta name="generator" content="nanoc 3.4.3">
+    <meta name="generator" content="nanoc 3.7.2">
   </head>
   <body>
     <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
   <div id="documentation">
-    <h2>Overview</h2>
+    
+      <nav class="jump-to-nav">
+        <div class="form">
+          <select id="jump-to-nav">
+            <option>Jump to ...</option>
+            <optgroup label='Help with'>
+<option id="anchor-overview">Overview</option>
+<option id="anchor-formats">Formats</option>
+<option id="anchor-actions">Actions</option>
+<option id="anchor-protocol-message-fields">Protocol Message fields</option>
+<option id="anchor-other-message-structs">Other message structs</option>
+<option id="anchor-message-acknowledgement-protocol">Message acknowledgement protocol</option>
+</optgroup>
+<optgroup label='API reference'>
+
+</optgroup>
+          </select>
+        </div>
+      </nav>
+    
+    <header>
+      
+        <div class="breadcrumb"><a href="/client-lib-development-guide/">Client Library Development Guide</a><span class="separator">/</span></div>
+      
+      
+        <h1 id="title">Realtime Protocol Definition</h1>
+      
+    </header>
+    <article>
+      <h2 id="overview">Overview</h2>
 <p>The Ably Realtime protocol operates over a connection-oriented, framed, transport. It supports a single connection (and thus a single application) at a time, and enables traffic belonging to multiple channels to be sent over that single connection.</p>
 <p>In the current Ably service the backend supports the Realtime protocol over a WebSocket transport and over a Comet transport. Other transports are possible and this document aims to define the protocol in a transport-independent manner.</p>
 <p>The protocol supports both a text-based format and a binary format using Thrift. All structures passed on the wire are defined in Thrift IDL, although the text-based format does not use Thrift in its encoding. Other encodings may be considered in the future.</p>
-<h2>Formats</h2>
+<h2 id="formats">Formats</h2>
 <p>The unit of any protocol transmission is a <code>TProtocolMessage</code> struct, defined in the Thrift IDL, referred to in this description as a Protocol Message.</p>
 <p>The WebSocket transport transmits Protocol Messages in a single WebSocket data frame. In the binary transport, these are sent as binary data frames, with the Protocol Message being encoded with the standard thrift binary encoding. In the text transport these are sent as text data frames, the text itself being the whitespace-free JSON encoding of the Protocol Message. Empty fields may be encoded as null, or may be handled as undefined (and thus absent from the JSON encoding) and clients should handle both possibilities. (Handling empty fields as undefined is clearly preferable, however, since the encoded text is shorter and the encode and decode overhead is minimised.) Binary data payloads are handled specially in the JSON encoding &#8211; see below for details.</p>
 <p>In the Comet protocol, all request and response bodies contain an array of one or more protocol messages. In the binary protocol this is standard thrift binary encoding of a thrift TMessageSet struct. In the text (JSON) protocol request and response bodies are simply JSON-encoded arrays containing the Protocol Message content. again either in binary (thrift) or text (JSON) encoding.</p>
@@ -98,7 +127,7 @@ The serial number of the message must be included in the <code>msgSerial</code> 
 	<dd>Indicates that the Protocol Message has a payload of one or more Messages associated with a single channel. <code>MESSAGE</code> messages may be sent in either direction. The channel associated with these messages is indicated in the channel field.<br><br>
 The serial number of the message must be included in the <code>msgSerial</code> field (in the client &rarr; service direction) or in the <code>connectionSerial</code> field (in the service &rarr; client direction). Further information on message serial numbering is given below.</dd>
 </dl>
-<h2>Protocol Message fields</h2>
+<h2 id="protocol-message-fields">Protocol Message fields</h2>
 <p>ProtocolMessages are populated with one or more of the following fields.</p>
 <dl>
 	<dt>TAction action</dt>
@@ -138,7 +167,7 @@ Currently there are no requirements for the client library to process the timest
 	<dd>A ProtocolMessage with a <code>PRESENCE</code> action contains one or more presence updates belonging to a channel. The presence field of the ProtocolMessage contains a collection of presence messages (<code>list&lt;TPresence&gt;</code> in Thrift, or an array of <code>PresenceMessage</code> objects in JSON).<br><br>
 The presence field may also be populated in an <code>ATTACHED</code> response, and then contains the presence set for that channel.</dd>
 </dl>
-<h2>Other message structs</h2>
+<h2 id="other-message-structs">Other message structs</h2>
 <p>The protocol relies on a number of structs embedded in Protocol Messages.</p>
 <h3>TError</h3>
 <p>A struct containing error information. This is used for unrecoverable error conditions (relating to connections, channels or individual messages) and also &#8220;informatively&#8221; for non-fatal errors in <code>ATTACHED</code> or <code>CONNECTED</code> responses.</p>
@@ -277,6 +306,9 @@ If the memberId of an already-entered member changes (eg in the situation that a
 <p><code>NACK</code> responses are sent as soon as an error has arisen, and in any event only cover multiple messages to the extent that those messages are subject to the same underlying failure (since the error information is provided once for the group of <code>NACK</code>&#8217;d messages, not individually.</p>
 <p>It is a protocol error if the system sends an <code>ACK</code> or <code>NACK</code> that skips past one or more <code>msgSerial</code> without there having been either and <code>ACK</code> or <code>NACK</code>; but a client in this situation should treat this case as implicitly <code>NACK</code>ing the skipped messages.</p>
 <p>It is also a protocol error if the system sends an <code>ACK</code> or <code>NACK</code> that covers a <code>msgSerial</code> that was covered by an earlier <code>ACK</code> or <code>NACK</code>; in such cases the client library must silently ignore the response insofar as it relates to <code>msgSerial</code>s that were covered previously (whether the response is the same now or different).</p>
+    </article>
+    <hr class="back">
+    <a href="#documentation">Back to top</a>
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
@@ -321,8 +353,7 @@ If the memberId of an already-entered member changes (eg in the situation that a
 <li class='selected'><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/other/client-lib-developer/'>Notes (To be deleted)</a></li>
-<li class=''><a href='/other/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+<li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
 </ul>
   <ul>
 <li><a href="https://ably.io">Visit Ably.io</a></li>
