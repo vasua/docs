@@ -22,6 +22,36 @@
     <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
   <div id="documentation">
     
+      <nav class="jump-to-nav">
+        <div class="form">
+          <select id="jump-to-nav">
+            <option>Jump to ...</option>
+            <optgroup label='Help with'>
+<option id="anchor-title">Overview</option>
+<option id="anchor-common">Common API behaviour</option>
+<option id="anchor-authentication">Authentication</option>
+<option id="anchor-basic-authentication">Basic Authentication</option>
+<option id="anchor-token-authentication">Token Authentication</option>
+</optgroup>
+<optgroup label='Channel API'>
+<option id="anchor-publish">publish</option>
+<option id="anchor-presence">presence</option>
+<option id="anchor-presence-history">presence-history</option>
+<option id="anchor-channel-history">history</option>
+</optgroup>
+<optgroup label='Authentication API'>
+<option id="anchor-requesttoken">requestToken</option>
+</optgroup>
+<optgroup label='Application API'>
+<option id="anchor-stats">stats</option>
+</optgroup>
+<optgroup label='Utilities API'>
+<option id="anchor-time">time</option>
+</optgroup>
+          </select>
+        </div>
+      </nav>
+    
     <header>
       
       
@@ -94,15 +124,13 @@
 </dl>
 <p>Relative links are presented by default as an <a href="http://tools.ietf.org/html/rfc5988">RFC 5988 Link HTTP response header</a>; there is a separate <code>Link</code> header for each relative link accompanying the response. The rel types used are <code>first</code>, <code>next</code> and <code>current</code> as specified in the RFC.</p>
 <p>A <code>Link</code> header has the format:</p>
-<blockquote>
-<p>Link: &lt;&lt;url&gt;&gt;; rel=&#8220;&lt;rel&gt;&#8221;</p>
-</blockquote>
+<p>bq.<br />
+Link: &lt;&lt;url&gt;&gt;; rel=&#8220;&lt;rel&gt;&#8221;</p>
 <p>where <code>&lt;url&gt;</code> is the URL of the link and <code>&lt;rel&gt;</code> is the relation type.</p>
 <p>For example:</p>
-<blockquote>
-<p>Link: &lt;./stats?start=1380794880000&amp;end=1380794881058&amp;limit=100&amp;unit=minute<br />
+<p>bq.<br />
+Link: &lt;./stats?start=1380794880000&amp;end=1380794881058&amp;limit=100&amp;unit=minute<br />
 &amp;direction=forwards&amp;format=json&amp;first_start=1380794880000&gt;; rel=&#8220;first&#8221;</p>
-</blockquote>
 <p>In principle the link URL might be any valid URL but in practice it will always be a relative URL, and it must be interpreted relative to the original query URL. Clients should treat link URLs opaquely; in particular, params (such as <code>first_start</code> in the example above) may be undocumented and unsupported except where a client uses the link URL in its entirety.</p>
 <p>Clients that are unable to process response headers may also request an <code>envelope</code> response type.</p>
 <h3>Envelope response format</h3>
@@ -122,139 +150,27 @@
 </pre>
 <p>where the <code>response</code> member references the API result in the usual format. The <code>rel</code> member, present only in paginated responses, includes each of the rel links associated with the response.</p>
 <p>Envelope responses always are always made with a 200 status code; the status of the API request itself must be obtained from the <code>statusCode</code> member of the response body.</p>
-<h2>Authentication</h2>
+<h2 id="authentication">Authentication</h2>
 <p>To understand the REST API it is easiest first to understand the various authentication methods that Ably supports.</p>
 <p>Clients can access Ably, whether using REST or the Real-time service, by two methods.</p>
-<h4>Basic Authentication</h4>
+<h3 id="basic-authentication">Basic Authentication</h3>
 <p>Using one of the application keys created via the application dashboard. Basic Authentication is the simplest method to use but has two important limitations:</p>
 <ul>
 	<li>the application key is transmitted over the network as part of a request; therefore it may only be used over TLS (HTTPS or &#8220;SSL&#8221;) connections. This can be a performance disadvantage in some network environments where long round-trip times are amplified by the SSL handshake.</li>
 	<li>the client using the API must be in possession of the application key, which potentially exposes the key to compromise. For example, it is not advisable simply to embed the key in a script in a public web page.</li>
 </ul>
-<h5>Usage in HTTP request header</h5>
+<h4>Usage in HTTP request header</h4>
 <pre>Authorization: Basic &lt;Base64-encoded key&gt;</pre>
 <p>where <code>&lt;Base64-encoded key&gt;</code> is the full application key string obtained through the dashboard, encoded with <a href="http://www.ietf.org/rfc/rfc4648.txt">RFC 4648 Base64</a>.</p>
 <p>When using a generic HTTP client library that accepts separate username and password arguments for an HTTP request, the application key can be split at the first colon, with the initial segment being used as the username, and the remaining string (without the leading colon) used as the password.</p>
-<h4>Token Authentication</h4>
+<h3 id="token-authentication">Token Authentication</h3>
 <p>Using a token obtained via the REST API <a href="#requesttoken"><code>requestToken</code></a> endpoint. Tokens are authentication tokens that only have a short lifetime, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of access rights, or being limited to use by a specific client &#8211; and therefore token-based authentication provides the flexibility to implement access control policies in the application. See <a href="/authentication">Authentication</a> for more details.</p>
 <p>The <a href="#requesttoken"><code>requestToken</code></a> endpoint may be used without explicit authentication, relying on the implicit authentication of submitting a validly signed token request.</p>
-<h5>Usage in HTTP request header</h5>
+<h4>Usage in HTTP request header</h4>
 <pre>Authorization: Bearer &lt;token string&gt;</pre>
 <p>The <code>&lt;token string&gt;</code> does not need to be encoded or escaped. If using a generic HTTP client library it will probably be necessary to add the <code>Authorization</code> header explicitly.</p>
-<h1>API routes</h1>
-<h2>Application routes</h2>
-<p>Routes providing access to the messaging service within an application scope.</p>
-<h3 id="stats">Retrieve usage statistics for an application</h3>
-<h6>GET /stats</h6>
-<p>The Ably system can be queried to obtain usage statistics for a given application, and results are provided aggregated across all channels in use in the application in the specified period. Stats may be used to track usage against account quotas.</p>
-<p>Stats queries are made by specifying a query interval and the granularity expected in the results. The query interval is expressed as a start and end time, each being a timestamp in milliseconds since the epoch. Stats are aggregated by the system in &#8216;subminute&#8217; intervals of 6s (ie 0.1m), so query interval start and end times are rounded down to the nearest subminute boundary.</p>
-<h5>Parameters</h5>
-<dl>
-	<dt>start</dt>
-	<dd><em>beginning of time</em> The start of the query interval as a time in milliseconds since the epoch.</dd>
-	<dt>end</dt>
-	<dd><em>now</em> The end of the query interval as a time in milliseconds since the epoch.</dd>
-	<dt>limit</dt>
-	<dd><em>100</em> The maximum number of records to return. A limit greater than 10000 is invalid.</dd>
-	<dt>direction</dt>
-	<dd><em>backwards</em> The direction of this query. The direction determines the order of the returned result array, but also determines which end of the query interval is the start point for the search.</dd>
-	<dt>unit</dt>
-	<dd><em><code>minute</code></em> One of the values <code>minute</code>, <code>hour</code>, <code>day</code> or <code>month</code>, specifying the unit of aggregation in the returned results.</dd>
-</dl>
-<h5>Options</h5>
-<dl>
-	<dt>Request body</dt>
-	<dd>not applicable</dd>
-	<dt>Content-Type</dt>
-	<dd>not applicable</dd>
-	<dt>Accept</dt>
-	<dd><code>application/json</code> by default, or <code>text/html</code>, <code>application/x-thrift</code>, <code>text/xml</code></dd>
-	<dt>Authentication required</dt>
-	<dd>yes (<a href="#basic">basic</a> or <a href="#token">token</a>)</dd>
-</dl>
-<h5>Returns</h5>
-<p>In each case a successful result is an array containing the items that match the query (and it may be empty).</p>
-<p>Stats records contain a hierarchy of elements relating to messages, connections and other resources consumed in an interval. An example of a full stats record is given below. Any single record may contain a subset of the elements, omitting empty sections.</p>
-<pre>
-{
-	"all": {
-		"all": { "count": 354, "data": 27200 },
-		"messages": { "count": 354, "data": 27200 },
-		"presence": { "count": 0, "data": 0 }
-	},
-	"inbound": {
-		"all": {
-			"all": { "count": 130, "data": 10318 },
-			"messages": { "count": 130, "data": 10318 },
-			"presence": { "count": 0, "data": 0 }
-		},
-		"realtime": {
-			"all": { "count": 130, "data": 10318 },
-			"messages": { "count": 130, "data": 10318 },
-			"presence": { "count": 0, "data": 0 }
-		},
-		"rest": {
-			"all": { "count": 0, "data": 0 },
-			"messages": { "count": 0, "data": 0 },
-			"presence": { "count": 0, "data": 0 }
-		},
-		"push": {
-			"all": { "count": 0, "data": 0 },
-			"messages": { "count": 0, "data": 0 },
-			"presence": { "count": 0, "data": 0 }
-		},
-		"httpStream": {
-			"all": { "count": 0, "data": 0 },
-			"messages": { "count": 0, "data": 0 },
-			"presence": { "count": 0, "data": 0 }
-		}
-	},
-	"outbound": {
-		"all": {
-			"all": { "count": 224, "data": 16882 },
-			"messages": { "count": 224, "data": 16882 },
-			"presence": { "count": 0, "data": 0 }
-		},
-		"realtime": {
-			"all": { "count": 206, "data": 16074 },
-			"messages": { "count": 206, "data": 16074 },
-			"presence": { "count": 0, "data": 0 }
-		},
-		"rest": {
-			"all": { "count": 18, "data": 808 },
-			"messages": { "count": 18, "data": 808 },
-			"presence": { "count": 0, "data": 0 }
-		},
-		"push": {
-			"all": { "count": 0, "data": 0 },
-			"messages": { "count": 0, "data": 0 },
-			"presence": { "count": 0, "data": 0 }
-		},
-		"httpStream": {
-			"all": { "count": 0, "data": 0 },
-			"messages": { "count": 0, "data": 0 },
-			"presence": { "count": 0, "data": 0 }
-		}
-	},
-	"persisted": {
-		"all": { "count": 473, "data": 37914 },
-		"messages": { "count": 473, "data": 37914 },
-		"presence": { "count": 0, "data": 0 }
-	},
-	"connections": {
-		"all": { "opened": 0, "peak": 0, "mean": 0, "min": 0, "refused": 0 },
-		"plain": { "opened": 0, "peak": 0, "mean": 0, "min": 0, "refused": 0 },
-		"tls": { "opened": 0, "peak": 0, "mean": 0, "min": 0, "refused": 0 }
-	},
-	"channels": { "opened": 22, "peak": 0, "mean": 0, "min": 0, "refused": 0 },
-	"apiRequests": { "succeeded": 6, "failed": 0, "refused": 0 },
-	"tokenRequests": { "succeeded": 0, "failed": 0, "refused": 0 },
-	"count": 0,
-	"intervalId": "2013-10-31:22:10",
-}
-
-</pre>
-<h2>Channel routes</h2>
+<h1 id="api">API routes</h1>
+<h2 id="channel">Channel routes</h2>
 <p>Routes providing access to the messaging service within a channel scope.</p>
 <h3 id="publish">Publish one or more events on a channel</h3>
 <h6>POST /channels/<code>&lt;channel id&gt;</code>/messages</h6>
@@ -416,7 +332,119 @@ If <code>hour</code>, the result is an array of references to (channel + hour) p
 </dl>
 <h5>Returns</h5>
 <p><code>&lt;token response&gt;</code></p>
-<h2>Utilities</h2>
+<h2 id="application">Application routes</h2>
+<p>Routes providing access to the messaging service within an application scope.</p>
+<h3 id="stats">Retrieve usage statistics for an application</h3>
+<h6>GET /stats</h6>
+<p>The Ably system can be queried to obtain usage statistics for a given application, and results are provided aggregated across all channels in use in the application in the specified period. Stats may be used to track usage against account quotas.</p>
+<p>Stats queries are made by specifying a query interval and the granularity expected in the results. The query interval is expressed as a start and end time, each being a timestamp in milliseconds since the epoch. Stats are aggregated by the system in &#8216;subminute&#8217; intervals of 6s (ie 0.1m), so query interval start and end times are rounded down to the nearest subminute boundary.</p>
+<h5>Parameters</h5>
+<dl>
+	<dt>start</dt>
+	<dd><em>beginning of time</em> The start of the query interval as a time in milliseconds since the epoch.</dd>
+	<dt>end</dt>
+	<dd><em>now</em> The end of the query interval as a time in milliseconds since the epoch.</dd>
+	<dt>limit</dt>
+	<dd><em>100</em> The maximum number of records to return. A limit greater than 10000 is invalid.</dd>
+	<dt>direction</dt>
+	<dd><em>backwards</em> The direction of this query. The direction determines the order of the returned result array, but also determines which end of the query interval is the start point for the search.</dd>
+	<dt>unit</dt>
+	<dd><em><code>minute</code></em> One of the values <code>minute</code>, <code>hour</code>, <code>day</code> or <code>month</code>, specifying the unit of aggregation in the returned results.</dd>
+</dl>
+<h5>Options</h5>
+<dl>
+	<dt>Request body</dt>
+	<dd>not applicable</dd>
+	<dt>Content-Type</dt>
+	<dd>not applicable</dd>
+	<dt>Accept</dt>
+	<dd><code>application/json</code> by default, or <code>text/html</code>, <code>application/x-thrift</code>, <code>text/xml</code></dd>
+	<dt>Authentication required</dt>
+	<dd>yes (<a href="#basic">basic</a> or <a href="#token">token</a>)</dd>
+</dl>
+<h5>Returns</h5>
+<p>In each case a successful result is an array containing the items that match the query (and it may be empty).</p>
+<p>Stats records contain a hierarchy of elements relating to messages, connections and other resources consumed in an interval. An example of a full stats record is given below. Any single record may contain a subset of the elements, omitting empty sections.</p>
+<pre>
+{
+  "all": {
+    "all": { "count": 354, "data": 27200 },
+    "messages": { "count": 354, "data": 27200 },
+    "presence": { "count": 0, "data": 0 }
+  },
+  "inbound": {
+    "all": {
+      "all": { "count": 130, "data": 10318 },
+      "messages": { "count": 130, "data": 10318 },
+      "presence": { "count": 0, "data": 0 }
+    },
+    "realtime": {
+      "all": { "count": 130, "data": 10318 },
+      "messages": { "count": 130, "data": 10318 },
+      "presence": { "count": 0, "data": 0 }
+    },
+    "rest": {
+      "all": { "count": 0, "data": 0 },
+      "messages": { "count": 0, "data": 0 },
+      "presence": { "count": 0, "data": 0 }
+    },
+    "push": {
+      "all": { "count": 0, "data": 0 },
+      "messages": { "count": 0, "data": 0 },
+      "presence": { "count": 0, "data": 0 }
+    },
+    "httpStream": {
+      "all": { "count": 0, "data": 0 },
+      "messages": { "count": 0, "data": 0 },
+      "presence": { "count": 0, "data": 0 }
+    }
+  },
+  "outbound": {
+    "all": {
+      "all": { "count": 224, "data": 16882 },
+      "messages": { "count": 224, "data": 16882 },
+      "presence": { "count": 0, "data": 0 }
+    },
+    "realtime": {
+      "all": { "count": 206, "data": 16074 },
+      "messages": { "count": 206, "data": 16074 },
+      "presence": { "count": 0, "data": 0 }
+    },
+    "rest": {
+      "all": { "count": 18, "data": 808 },
+      "messages": { "count": 18, "data": 808 },
+      "presence": { "count": 0, "data": 0 }
+    },
+    "push": {
+      "all": { "count": 0, "data": 0 },
+      "messages": { "count": 0, "data": 0 },
+      "presence": { "count": 0, "data": 0 }
+    },
+    "httpStream": {
+      "all": { "count": 0, "data": 0 },
+      "messages": { "count": 0, "data": 0 },
+      "presence": { "count": 0, "data": 0 }
+    }
+  },
+  "persisted": {
+    "all": { "count": 473, "data": 37914 },
+    "messages": { "count": 473, "data": 37914 },
+    "presence": { "count": 0, "data": 0 }
+  },
+  "connections": {
+    "all": { "opened": 0, "peak": 0, "mean": 0, "min": 0, "refused": 0 },
+    "plain": { "opened": 0, "peak": 0, "mean": 0, "min": 0, "refused": 0 },
+    "tls": { "opened": 0, "peak": 0, "mean": 0, "min": 0, "refused": 0 }
+  },
+  "channels": { "opened": 22, "peak": 0, "mean": 0, "min": 0, "refused": 0 },
+  "apiRequests": { "succeeded": 6, "failed": 0, "refused": 0 },
+  "tokenRequests": { "succeeded": 0, "failed": 0, "refused": 0 },
+  "count": 0,
+  "intervalId": "2013-10-31:22:10",
+}
+
+</pre>
+<h2 id="utilities">Utilities</h2>
 <h3 id="time">Get the service time</h3>
 <h6>GET /time</h6>
 <p>This returns the service time in milliseconds since the epoch. This may be used by clients that do not have local access to a sufficiently accurate time source when generating a token request. (Token requests include a timestamp and have a limited validity period to help defend against replay attacks.)</p>
