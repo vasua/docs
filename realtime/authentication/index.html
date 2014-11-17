@@ -59,7 +59,7 @@
 	<li>the client using the API must be in possession of the application key, which potentially exposes the key to compromise. For example, it is not advisable simply to embed the key in a script in a public web page.</li>
 </ul>
 <p><strong>Token Authentication</strong> uses a token obtained via the REST API <a href="#requesttoken"><code>requestToken</code></a> endpoint. Tokens are authentication tokens that only have a short lifetime, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of access rights, or being limited to use by a specific client &#8211; and therefore token-based authentication provides the flexibility to implement access control policies in the application. See <a href="/authentication">Authentication</a> for more details.</p>
-<p>Both the <a href="/rest-client-library/usage#constructor">REST</a> and <a href="/realtime/usage#constructor">Realtime</a>, libraries would typically be instanced with either a <code>key</code> or a <code>token</code> option, and these given credentials are used to authenticate requests made by the library. In this situation, the library assumes responsibility for authentication operations, calling any <code>authUrl</code> or <code>authCallback</code> as needed. REST operations and Realtime connections can then proceed using the given credentials with no need to make further calls to the authentication-specific functionality in the library.</p>
+<p>Both the <a href="/rest/usage#constructor">REST</a> and <a href="/realtime/usage#constructor">Realtime</a>, libraries would typically be instanced with either a <code>key</code> or a <code>token</code> option, and these given credentials are used to authenticate requests made by the library. In this situation, the library assumes responsibility for authentication operations, calling any <code>authUrl</code> or <code>authCallback</code> as needed. REST operations and Realtime connections can then proceed using the given credentials with no need to make further calls to the authentication-specific functionality in the library.</p>
 <p>The principal use-case for <code>auth</code> object is to make requests for tokens to issue to other clients. A subsidiary use-case is to preemptively trigger renewal of a token or to acquire a new token with a revised set of capabilities.</p>
 <p>The REST client library provides the ability to issue tokens using the the <a href="/rest-api#requesttoken"><code>requestToken</code> API endpoint</a>, and also provides a number of helper functions to simplify the use of the authentication API.</p>
 <p>The <a href="#requesttoken"><code>requestToken</code></a> endpoint may itself be used without explicit authentication, relying on the implicit authentication of submitting a validly signed token request.</p>
@@ -288,7 +288,7 @@ Options specified in this way will supplement or override the corresponding opti
 </dl>
 <dl>
 	<dt><span lang="java">public String</span> mac</dt>
-	<dd>The Message Authentication Code (MAC) for this request. See <a href="/rest-client-library/authentication">the Authentication documentation</a> for more details on the construction of the MAC.</dd>
+	<dd>The Message Authentication Code (MAC) for this request. See <a href="/rest/authentication">the Authentication documentation</a> for more details on the construction of the MAC.</dd>
 </dl>
 <h2 id="token-details">TokenDetails</h2>
 <p>A <code>TokenDetails</code> object contains the parameters of a response from a successful token request the service. This contains the token string itself plus various items of metadata relating to that token.</p>
@@ -307,7 +307,7 @@ Options specified in this way will supplement or override the corresponding opti
 </dl>
 <dl>
 	<dt><span lang="java">public String</span> capability</dt>
-	<dd>The capability associated with this token. See <a href="/rest-client-library/authentication">the Authentication documentation</a> for more details on capabilities.</dd>
+	<dd>The capability associated with this token. See <a href="/rest/authentication">the Authentication documentation</a> for more details on capabilities.</dd>
 </dl>
 <dl>
 	<dt><span lang="java">public String</span> clientId</dt>
@@ -334,15 +334,15 @@ Options specified in this way will supplement or override the corresponding opti
 <li class=''><a href='/realtime/history/'>History</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 </ul>
-  <h2><a href="/rest-client-library/">REST client lib</a></h2>
+  <h2><a href="/rest/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest-client-library/usage/'>Using the REST library</a></li>
-<li class=''><a href='/rest-client-library/channels-messages/'>Channels and Messages</a></li>
-<li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
-<li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
-<li class=''><a href='/rest-client-library/history/'>History</a></li>
-<li class=''><a href='/rest-client-library/statistics/'>Statistics</a></li>
-<li class=''><a href='/rest-client-library/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest/usage/'>Using the REST library</a></li>
+<li class=''><a href='/rest/channels-messages/'>Channels and Messages</a></li>
+<li class=''><a href='/rest/presence/'>Presence</a></li>
+<li class=''><a href='/rest/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest/history/'>History</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/encryption/'>Encryption</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
@@ -351,6 +351,7 @@ Options specified in this way will supplement or override the corresponding opti
 <ul>
 <li class=''><a href='/other/authentication/'>Authentication</a></li>
 <li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/other/migrating/'>Migrating to Ably</a></li>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>

@@ -6,6 +6,11 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>http://ably.github.com/rest/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://ably.github.com/realtime/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -16,12 +21,42 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>http://ably.github.com/rest/usage/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/rest/history/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/rest/presence/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://ably.github.com/other/webhooks/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>http://ably.github.com/realtime/usage/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/rest/encryption/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/rest/statistics/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/other/migrating/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -41,12 +76,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest-client-library/</loc>
+    <loc>http://ably.github.com/realtime/connection/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/realtime/connection/</loc>
+    <loc>http://ably.github.com/rest/authentication/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -66,12 +101,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/realtime/authentication/</loc>
+    <loc>http://ably.github.com/rest/channels-messages/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest-client-library/usage/</loc>
+    <loc>http://ably.github.com/realtime/authentication/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -86,32 +121,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest-client-library/history/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>http://ably.github.com/client-lib-development-guide/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/rest-client-library/presence/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/rest-client-library/statistics/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/rest-client-library/encryption/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/rest-client-library/authentication/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -126,17 +136,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/client-lib-development-guide/protocol/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/rest-client-library/channels-messages/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>http://ably.github.com/client-lib-development-guide/recovery/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/client-lib-development-guide/protocol/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

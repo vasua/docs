@@ -115,22 +115,24 @@
 	<dd>a link to the first page of results for this query. This link also makes the query repeatable; any params that are resolved at query time (for example default values for omitted time-related params) have their resolved values included explicitly in the <code>first</code> link.</dd>
 </dl>
 <dl>
-	<dt>current</dt>
+	<dt><code>current</code></dt>
 	<dd>a stable link to the current page of results.</dd>
 </dl>
 <dl>
-	<dt>next</dt>
+	<dt><code>next</code></dt>
 	<dd>on each page except the last in a paginated result, the next link is a link to the next page of results.</dd>
 </dl>
 <p>Relative links are presented by default as an <a href="http://tools.ietf.org/html/rfc5988">RFC 5988 Link HTTP response header</a>; there is a separate <code>Link</code> header for each relative link accompanying the response. The rel types used are <code>first</code>, <code>next</code> and <code>current</code> as specified in the RFC.</p>
 <p>A <code>Link</code> header has the format:</p>
-<p>bq.<br />
-Link: &lt;&lt;url&gt;&gt;; rel=&#8220;&lt;rel&gt;&#8221;</p>
+<blockquote>
+<p>Link: &lt;&lt;url&gt;&gt;; rel=&#8220;&lt;rel&gt;&#8221;</p>
+</blockquote>
 <p>where <code>&lt;url&gt;</code> is the URL of the link and <code>&lt;rel&gt;</code> is the relation type.</p>
 <p>For example:</p>
-<p>bq.<br />
-Link: &lt;./stats?start=1380794880000&amp;end=1380794881058&amp;limit=100&amp;unit=minute<br />
-&amp;direction=forwards&amp;format=json&amp;first_start=1380794880000&gt;; rel=&#8220;first&#8221;</p>
+<blockquote>
+<p>Link: &lt;./stats?start=1380794880000&amp;end=1380794881058&amp;limit=100&amp;unit=minute&amp;direction=forwards<br />
+&amp;format=json&amp;first_start=1380794880000&gt;; rel=&#8220;first&#8221;</p>
+</blockquote>
 <p>In principle the link URL might be any valid URL but in practice it will always be a relative URL, and it must be interpreted relative to the original query URL. Clients should treat link URLs opaquely; in particular, params (such as <code>first_start</code> in the example above) may be undocumented and unsupported except where a client uses the link URL in its entirety.</p>
 <p>Clients that are unable to process response headers may also request an <code>envelope</code> response type.</p>
 <h3>Envelope response format</h3>
@@ -485,15 +487,15 @@ If <code>hour</code>, the result is an array of references to (channel + hour) p
 <li class=''><a href='/realtime/history/'>History</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 </ul>
-  <h2><a href="/rest-client-library/">REST client lib</a></h2>
+  <h2><a href="/rest/">REST client lib</a></h2>
 <ul>
-<li class=''><a href='/rest-client-library/usage/'>Using the REST library</a></li>
-<li class=''><a href='/rest-client-library/channels-messages/'>Channels and Messages</a></li>
-<li class=''><a href='/rest-client-library/presence/'>Presence</a></li>
-<li class=''><a href='/rest-client-library/authentication/'>Authentication</a></li>
-<li class=''><a href='/rest-client-library/history/'>History</a></li>
-<li class=''><a href='/rest-client-library/statistics/'>Statistics</a></li>
-<li class=''><a href='/rest-client-library/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest/usage/'>Using the REST library</a></li>
+<li class=''><a href='/rest/channels-messages/'>Channels and Messages</a></li>
+<li class=''><a href='/rest/presence/'>Presence</a></li>
+<li class=''><a href='/rest/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest/history/'>History</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/encryption/'>Encryption</a></li>
 </ul>
   <h2 class="selected"><a href="/rest-api/">REST API</a></h2>
 <ul>
@@ -502,6 +504,7 @@ If <code>hour</code>, the result is an array of references to (channel + hour) p
 <ul>
 <li class=''><a href='/other/authentication/'>Authentication</a></li>
 <li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/other/migrating/'>Migrating to Ably</a></li>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
