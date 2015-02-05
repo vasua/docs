@@ -31,6 +31,7 @@
 <option id="anchor-meta-data">Meta data</option>
 <option id="anchor-markup-fundamentals">Markup fundamentals</option>
 <option id="anchor-code-blocks">Code blocks</option>
+<option id="anchor-code-blocks-github-style">Code blocks Github style</option>
 <option id="anchor-language-specific-content">Language specific content</option>
 <option id="anchor-definition-lists">Definition lists</option>
 <option id="anchor-inline-toc">Inline Table of Contents</option>
@@ -109,6 +110,29 @@ a += 1;</code></pre>
 <p>Note that if you don&#8217;t include a full set of languages, or at least provide a <code>default</code> language, then a language selector will appear.  In the example below, no language has been specified for <code>javascript</code> or <code>nodejs</code>.  Select Javascript in the top nav to see what happens when a language is not available.</p>
 <pre lang="ruby"><code lang="ruby"># this is ruby</code></pre>
 <pre lang="csharp"><code lang="csharp">// this is C#</code></pre>
+<h2 id="code-blocks-github-style">Code blocks Github style</h2>
+<p>As an alternative, you can use Github styled code blocks using triple backticks with the language specified after the backticks in square brackets.  The advantage of Github blocks over traditional Textile blocks is that line breaks are supported.  Please note that lower level indentation is stripped</p>
+<pre><code>```[javascript,default]
+  var a = 1;
+<br/>  a = 2; // note this works in spite of the line break
+```
+<br/>```[ruby]
+  a = 1
+<br/>  a = 2
+```
+<br/>```[csharp]
+  int a = 1;
+<br/>  a = 2;
+```</code></pre>
+<p>generates the following where the code shown is governed by the language selected in the floating top nav</p>
+<pre lang="javascript"><code lang="javascript">var a = 1;
+<br/>a = 2; // note this works in spite of the line break</code></pre>
+<pre lang="default"><code lang="default">var a = 1;
+<br/>a = 2; // note this works in spite of the line break</code></pre>
+<pre lang="ruby"><code lang="ruby">a = 1
+<br/>a = 2</code></pre>
+<pre lang="csharp"><code lang="csharp">int a = 1;
+<br/>a = 2;</code></pre>
 <h3>Isolated language blocks (always present) versus grouped language blocks</h3>
 <p>For both code blocks, if a single language code block appears without another contiguous language block before or after it, then it will always be shown regardless of the current language selected by the viewer.  This is to ensure that should you wish to show a simple HTML block or a Javascript code block with formatting for example, this can be done without worrying it will be hidden.  For example:</p>
 <pre lang="text"><code lang="text">bc[html]. &lt;html&gt;
