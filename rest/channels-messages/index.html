@@ -16,7 +16,7 @@
     <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
 
     <!-- you don't need to keep this, but it's cool for stats! -->
-    <meta name="generator" content="nanoc 3.7.2">
+    <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
     <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
@@ -51,8 +51,6 @@
     <article>
       <p>The Ably Realtime service organises the traffic within any application into named channels. Channels are the &#8220;unit&#8221; of message distribution; clients attach to channels to subscribe to messages, and every message broadcast by the service is associated with a unique channel.</p>
 <h3>Channels in the REST API</h3>
-<p>Channels are not pre-configured; they are created on demand when realtime clients attach, and remain active until such time that there are no remaining attached clients. Applications do have, however, the ability to pre-configure one or more channel namespaces (ie name prefixes), and associate different attributes and access rights with those namespaces.</p>
-<p>In the REST API, channels are stateless; a <a href="#publish">publish</a> operation causes the channel to be established within the realtime system if it does not already exist, but this state is invisible to the REST client.</p>
 <h4>Obtaining a channel instance</h4>
 <p>A <code>Channel</code> object is a reference to a single channel. A channel instance is obtained from the <code>channels</code> collection of the Ably <code>Rest</code> instance.</p>
 <pre lang="javascript"><code lang="javascript">var channel = rest.channels.get('myChannel');</code></pre>

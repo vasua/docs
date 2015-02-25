@@ -16,7 +16,7 @@
     <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
 
     <!-- you don't need to keep this, but it's cool for stats! -->
-    <meta name="generator" content="nanoc 3.7.2">
+    <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
     <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
@@ -47,12 +47,16 @@
     </header>
     <article>
       <p>The REST client library provides message history for channels. For channels that have persistence enabled, all messages are persisted every few seconds and are then retrievable via the REST API.</p>
+<h3>Enabling persistent history</h3>
+<p>To enable history on a channel, it is necessary to add a channel rule in your &#8220;Application&#8221; settings.</p>
+<p>In your &#8220;Account Dashboard&#8221;, click on Manage on any of your applications, then click on the &#8220;Settings&#8221; tab. From this page, you will be able to manage your channel rules and create new ones.</p>
+<p>Click on &#8220;Add new rule&#8221; and fill the form to create a new restriction on a specific channel. Particularly, you can check the checkbox for &#8220;Persist Messages&#8221; to store a day worth of messages.</p>
 <h3>History queries</h3>
-<p>The REST API provides a <code>GET /messages</code> route on an channel, which performs a query for message history on the channel. These queries may be scoped by <code>start</code> and <code>end</code> time, may be queried in a given <code>direction</code> and may include a <code>limit</code> on the number of records returned.</p>
+<p>The REST API provides a <code>GET /messages</code> route on a channel, which performs a query for message history on the channel. These queries may be scoped by <code>start</code> and <code>end</code> time, may be queried in a given <code>direction</code> and may include a <code>limit</code> on the number of records returned.</p>
 <p>History results are paginated and therefore accompanied with one or more relative links relating to the current query. Where the number of results returned exceeds the query limit &#8211; which is either the value of the <code>limit</code> param or the default limit of 100 &#8211; the query result contains pages with the limited number of records, and a relative link to the next page.</p>
 <p>Responses contain one or more of the following relative links:</p>
 <dl>
-	<dt><code>first</code></dt>
+	<dt>first</dt>
 	<dd>a link to the first page of results for this query. This link also makes the query stable; where params are resolved at query time (particularly <code>end</code> which is resolved to the current time if not specified explicitly) then the <code>first</code> link contains the resolved values of those params so that it will repeatably resolve to the same param values each time. (This does not necessarily mean that the query results will be identical, if the last remaining messages for a given time interval are persisted between two invocations of the same query.)</dd>
 </dl>
 <dl>
