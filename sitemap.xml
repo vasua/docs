@@ -61,6 +61,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>http://ably.github.com/other/statistics/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://ably.github.com/realtime/history/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -71,12 +76,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/realtime/statistics/</loc>
+    <loc>http://ably.github.com/realtime/connection/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/realtime/connection/</loc>
+    <loc>http://ably.github.com/realtime/statistics/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -96,12 +101,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/root/quick-start-guide/</loc>
+    <loc>http://ably.github.com/rest/channels-messages/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest/channels-messages/</loc>
+    <loc>http://ably.github.com/root/quick-start-guide/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

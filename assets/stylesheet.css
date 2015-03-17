@@ -345,6 +345,15 @@ hr.back {
     #documentation pre[lang].linenums[lang]::before {
       position: relative;
       left: 5px; }
+    #documentation pre[lang].bash.linenums ol {
+      margin-left: 15px; }
+      #documentation pre[lang].bash.linenums ol li {
+        list-style-type: none; }
+        #documentation pre[lang].bash.linenums ol li.L0::before {
+          content: "$";
+          position: absolute;
+          left: 14px;
+          color: #333; }
     #documentation pre[lang][lang=javascript]::before {
       content: "Javascript"; }
     #documentation pre[lang][lang=java]::before {

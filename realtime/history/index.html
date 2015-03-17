@@ -8,9 +8,12 @@
 
     <script src="/assets/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
     <script src="/assets/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
+    <script src="/assets/vendor/javascripts/base64.js" type="text/javascript"></script>
 
     <link rel="stylesheet" type="text/css" href="/assets/vendor/prettify/prettify.css" media="screen">
     <script src="/assets/vendor/prettify/prettify-lib.js" type="text/javascript"></script>
+
+    <script src="//cdn.ably.io/lib/ably.min.js" type="text/javascript"></script>
 
     <script src="/assets/javascripts/application.js" type="text/javascript"></script>
     <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
@@ -20,6 +23,7 @@
   </head>
   <body>
     <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+
   <div id="documentation">
     
       <nav class="jump-to-nav">
@@ -130,17 +134,17 @@ channel = rest.channels.get('channel0')</code></pre>
 <blockquote class="definition">
 <p class="definition">channel.history(options, callback)</p>
 </blockquote>
-<p>This call queries the REST <a href="/rest-api#channel-history"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/history</code></a> API</p>
+<p>This call queries the REST <a href="/rest-api#message-history"><code>/apps/&lt;app id&gt;/channels/&lt;channel id&gt;/history</code></a> API</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>options</dt>
-	<dd>is an optional object containing the query parameters, as specified in the <a href="/rest-api#channel-history">REST API</a> documentation.</dd>
+	<dd>is an optional object containing the query parameters, as specified in the <a href="/rest-api#message-history">REST API</a> documentation.</dd>
 	<dt>callback</dt>
 	<dd>is a function of the form: <code>callback(err, result)</code><br />
 where:<br />
 <ul><br />
 <li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
-<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api#channel-history">REST API</a></li><br />
+<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api#message-history">REST API</a></li><br />
 </ul></dd>
 </dl>
 <h4>Request options</h4>
@@ -219,6 +223,7 @@ Similarly, in the special case of json only, the request path may include the ex
 <ul>
 <li class=''><a href='/other/authentication/'>Authentication</a></li>
 <li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/other/statistics/'>Application Statistics</a></li>
 <li class=''><a href='/other/migrating/'>Migrating to Ably</a></li>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
