@@ -198,7 +198,7 @@
 <pre lang="sh"><code lang="sh">curl https://rest.ably.io/channels/rest-example/messages \
  -u "{{API_KEY}}"</code></pre>
 <h3 id="token-authentication">Token Authentication</h3>
-<p>Using a token obtained via the REST API <a href="#requesttoken"><code>requestToken</code></a> endpoint. Tokens are authentication tokens that only have a short lifetime, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of access rights, or being limited to use by a specific client &#8211; and therefore token-based authentication provides the flexibility to implement access control policies in the application. See <a href="/other/authentication">Authentication</a> for more details.</p>
+<p>Using a token obtained via the REST API <a href="#requesttoken"><code>requestToken</code></a> endpoint. Tokens are authentication tokens that only have a short lifetime, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of access rights, or being limited to use by a specific client &#8211; and therefore token-based authentication provides the flexibility to implement access control policies in the application. See <a href="/general/authentication">Authentication</a> for more details.</p>
 <p>The <a href="#requesttoken"><code>requestToken</code></a> endpoint may be used without explicit authentication, relying on the implicit authentication of submitting a validly signed token request.</p>
 <h4>Usage in HTTP request header</h4>
 <pre>Authorization: Bearer &lt;Base64-encoded token string&gt;</pre>
@@ -341,7 +341,7 @@
 <h2>Authentication</h2>
 <h3 id="requesttoken">Request an access token</h3>
 <h6>POST rest.ably.io/keys/<code>key id</code>/requestToken</h6>
-<p>This is the means by which clients obtain access tokens to use the service. The construction of a token request is described in the <a href="/other/authentication">Authentication</a> page. The resulting <code>token response</code> object contains the token properties as defined in <a href="/other/authentication">Authentication</a>.</p>
+<p>This is the means by which clients obtain access tokens to use the service. The construction of a token request is described in the <a href="/general/authentication">Authentication</a> page. The resulting <code>token response</code> object contains the token properties as defined in <a href="/general/authentication">Authentication</a>.</p>
 <p>Example request:</p>
 <pre lang="sh"><code lang="sh">curl -X POST "https://rest.ably.io/keys/{{API_KEY_ID}}/requestToken" \
  -u "{{API_KEY}}" \
@@ -409,7 +409,7 @@
 <h5>Returns</h5>
 <p>In each case a successful result is an array containing the items that match the query (and it may be empty).</p>
 <p>Stats records contain a hierarchy of elements relating to messages, connections and other resources consumed in an interval. Any single record may contain a subset of the elements, omitting empty sections.</p>
-<p><a href="/other/statistics">See a complete example of a statistics response</a>.</p>
+<p><a href="/general/statistics">See a complete example of a statistics response</a>.</p>
 <h2 id="utilities">Utilities</h2>
 <h3 id="time">Get the service time</h3>
 <h6>GET rest.ably.io/time</h6>
@@ -463,21 +463,25 @@
   <h2 class="selected"><a href="/rest-api/">REST API</a></h2>
 <ul>
 </ul>
-  <h2>Other</h2>
+  <h2>General</h2>
 <ul>
-<li class=''><a href='/other/authentication/'>Authentication</a></li>
-<li class=''><a href='/other/webhooks/'>Receiving Webhooks</a></li>
-<li class=''><a href='/other/statistics/'>Application Statistics</a></li>
-<li class=''><a href='/other/migrating/'>Migrating to Ably</a></li>
+<li class=''><a href='/general/authentication/'>Authentication</a></li>
+<li class=''><a href='/general/channel-rules-namespaces/'>Channel Rules and Namespaces</a></li>
+<li class=''><a href='/general/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/general/statistics/'>Application Statistics</a></li>
+<li class=''><a href='/general/migrating/'>Migrating to Ably</a></li>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
-<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
-<li class=''><a href='/client-lib-development-guide/recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-fallback/'>Data center fallback to route around network issues</a></li>
 <li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
 </ul>
   <ul>

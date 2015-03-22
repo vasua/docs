@@ -1,0 +1,309 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ably API Documentation - Sandbox Test API</title>
+    <link rel="stylesheet" type="text/css" href="/assets/stylesheet.css" media="screen">
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+
+    <script src="/assets/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
+    <script src="/assets/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
+    <script src="/assets/vendor/javascripts/base64.js" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/prettify/prettify.css" media="screen">
+    <script src="/assets/vendor/prettify/prettify-lib.js" type="text/javascript"></script>
+
+    <script src="//cdn.ably.io/lib/ably.min.js" type="text/javascript"></script>
+
+    <script src="/assets/javascripts/application.js" type="text/javascript"></script>
+    <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.7.5">
+  </head>
+  <body>
+    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+
+  <div id="documentation">
+    
+      <nav class="jump-to-nav">
+        <div class="form">
+          <select id="jump-to-nav">
+            <option>Jump to ...</option>
+            <optgroup label='Help with'>
+<option id="anchor-title">Overview</option>
+<option id="anchor-new-app">Provisioning an app</option>
+<option id="anchor-stats-data">Creating stats fixture data</option>
+</optgroup>
+          </select>
+        </div>
+      </nav>
+    
+    <header>
+      
+        <div class="breadcrumb"><a href="/client-lib-development-guide/">Client Library Development Guide</a><span class="separator">/</span></div>
+      
+      
+        <h1 id="title">Sandbox Test API</h1>
+      
+    </header>
+    <article>
+      <h2>Overview</h2>
+<p>All <a href="https://www.ably.io/download">client libraries</a> have test suites that by default will run their tests against temporary applications that are created during test setup. Although Ably does not provide a public provisioning API for account management (in the production system this is available only through the <a href="https://www.ably.io/#signup">website registration</a> and <a href="https://www.ably.io/dashboard">dashboard</a>) there is a limited API provided via the REST<br />
+interface in the sandbox environment to enable test applications and keys to be provisioned. Therefore, all tests are set up to run against the special client-library focussed sandbox environment.</p>
+<h3 id="new-app">Provisioning a new App</h3>
+<h6>POST sandbox-rest.ably.io/apps</h6>
+<p>Provisioning a new app in the sandbox environment does not require any authentication, however the apps created have low message and connection limits and are automatically deleted soon after they are created.  Apps created in the sandbox environment are designed to be used for client library tests only. If you require a sandbox app for your real-time application, you should provision an app from within your <a href="https://ably.io/dashboard">Ably dashboard</a> that will be isolated from any other apps you have within your account, but will offer all the features and scalability of any production application.</p>
+<p>The request body contains message details and is an object of the form:</p>
+<pre lang="javascript"><code lang="javascript">{
+  keys: [
+    /* Array of requested API keys &amp; capabilities
+       See https://www.ably.io/documentation/general/authentication */
+  ],
+  namespaces: [
+    /* Array of channel namespace rules
+       See https://www.ably.io/documentation/general/channel-rules-namespaces */
+  ],
+  channels: [
+    /* Array of fixture data to persist in history for tests */
+    {
+      "name": /* channel name String */
+      "presence":[
+        /* Array of member hashes on the channel with clientId and optional data */
+      ]
+    }
+  ]
+}</code></pre>
+<p>Example request:</p>
+<pre lang="sh"><code lang="sh">curl -X POST https://sandbox-rest.ably.io/apps \
+ -H "Content-Type: application/json" \
+ --data '
+  {
+    "keys":[
+      {},
+      {
+        "capability": "{ \"*\":[\"subscribe\",\"publish\"] }"
+      },
+      {
+        "capability": "{ \"private\":[\"subscribe\",\"publish\"], \"chat\":[\"presence\"] }"
+      }
+    ],
+    "namespaces":[
+      { "id":"persisted", "persisted":true },
+      { "id":"chat", "persisted":true }
+    ],
+    "channels":[
+      {
+        "name":"chat",
+        "presence":[
+          { "clientId":"John", "data":"john@test.com" },
+          { "clientId":"Dave", "data":"dave@test.com" }
+        ]
+      }
+    ]
+  }'</code></pre>
+<h5>Options</h5>
+<dl>
+	<dt>Content-Type</dt>
+	<dd><code>application/json</code> default, or <code>application/x-msgpack</code></dd>
+	<dt>Accept</dt>
+	<dd><code>application/json</code> default, or <code>application/x-msgpack</code></dd>
+	<dt>Auth required</dt>
+	<dd>no</dd>
+</dl>
+<h5>Returns</h5>
+<p>Once the app, keys and associated fixture data is provisioned within the sandbox environment, a <code>json_result</code> with details on the app and keys for authentication is returned.</p>
+<p>Example <code>json_result</code>:</p>
+<pre lang="json"><code lang="json">{
+  "status": 1,
+  "created": 1427027306492,
+  "modified": 1427027306492,
+  "tlsOnly": false,
+  "labels": "autodelete",
+  "id": "RvMHnA:mO_fpQ",
+  "appId": "mO_fpQ",
+  "accountId": "RvMHnA",
+  "keys": [
+    {
+      "id": "TfycQA",
+      "scopeId": "app:mO_fpQ",
+      "status": 0,
+      "type": 0,
+      "value": "z_Qclvo2g5hoZS49",
+      "created": 1427027306880,
+      "modified": 1427027306880,
+      "capability": "{\"*\":[\"*\"]}",
+      "expires": 1427030906880,
+      "privileged": false
+    },
+    {
+      "id": "JpfL9Q",
+      "scopeId": "app:mO_fpQ",
+      "status": 0,
+      "type": 0,
+      "value": "IgcN3ppcaB6STi8i",
+      "created": 1427027306956,
+      "modified": 1427027306956,
+      "capability": "{\"*\":[\"publish\",\"subscribe\"]}",
+      "expires": 1427030906956,
+      "privileged": false
+    },
+    {
+      "id": "y_BGvA",
+      "scopeId": "app:mO_fpQ",
+      "status": 0,
+      "type": 0,
+      "value": "VDAzscwkqMG3k6lF",
+      "created": 1427027306957,
+      "modified": 1427027306957,
+      "capability": "{\"chat\":[\"presence\"],\"private\":[\"publish\",\"subscribe\"]}",
+      "expires": 1427030906957,
+      "privileged": false
+    }
+  ],
+  "namespaces": [
+    {
+      "id": "persisted",
+      "created": 1427027307112,
+      "modified": 1427027307112,
+      "persisted": true
+    },
+    {
+      "id": "chat",
+      "created": 1427027307117,
+      "modified": 1427027307117,
+      "persisted": true
+    }
+  ],
+  "connections": [
+    {
+      "name": "sole",
+      "key": "SxWts_hwr1vTKXWY"
+    }
+  ],
+  "channels": [
+    {
+      "name": "chat",
+      "presence": [
+        {
+          "clientId": "John",
+          "data": "john@test.com"
+        },
+        {
+          "clientId": "Dave",
+          "data": "dave@test.com"
+        }
+      ],
+      "connection": "sole"
+    }
+  ]
+}</code></pre>
+<h3 id="stats-data">Creating stats fixture data</h3>
+<h6>POST sandbox-rest.ably.io/stats</h6>
+<p>In order to streamline the development of client libraries, Ably provides a mechanism to inject stats fixture data into an application set up within the sandbox environment. Without this end point, to test statistics you have to generate real events and wait or the stats to become available (they are aggregrated in one minute intervals globally).</p>
+<p>See <a href="/general/statistics">application statistics</a> for more information on the metrics available for each app.</p>
+<p>Example request:</p>
+<pre lang="sh"><code lang="sh">curl https://sandbox-rest.ably.io/stats \
+  -u "[[API_KEY_FROM_APP_CREATION]]" \
+  --data '[
+  {
+    "intervalId":"2014-02-03:15:03",
+    "inbound": {
+      "realtime": {
+        "messages": {"count":50, "data":5000}
+      }
+    },
+    "outbound": {
+      "realtime": {
+        "messages": {"count":20, "data":2000}
+      }
+    }
+  },
+  {
+    "intervalId":"2014-02-03:15:04",
+    "inbound": {
+      "realtime": {
+        "messages": {"count":70, "data":7000}
+      }
+    }
+    "persisted": {
+      "presence": {"count":20, "data":2000}
+    },
+    "connections": {
+      "tls": {"peak":20, "opened":10}
+    }
+  }
+]</code></pre>
+<h5>Options</h5>
+<dl>
+	<dt>Content-Type</dt>
+	<dd><code>application/json</code> default, or <code>application/x-msgpack</code></dd>
+	<dt>Accept</dt>
+	<dd><code>application/json</code> default, or <code>application/x-msgpack</code></dd>
+	<dt>Auth required</dt>
+	<dd>yes (<a href="/rest-api#basic-authentication">basic</a> or <a href="/rest-api#token-authentication">token</a>)</dd>
+</dl>
+<h5>Returns</h5>
+<p>Once the stats data has been persisted, the stats fixtures are returned in a <code>json_result</code> array.</p>
+    </article>
+    <hr class="back">
+    <a href="#documentation">Back to top</a>
+  </div>
+  <div id="sidebar">
+  <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
+  <ul>
+<li class=''><a href='/root/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
+<li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
+</ul>
+  <h2><a href="/realtime/">Real-time client lib</a></h2>
+<ul>
+<li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
+<li class=''><a href='/realtime/connection/'>Connection</a></li>
+<li class=''><a href='/realtime/channels-messages/'>Channels and Messages</a></li>
+<li class=''><a href='/realtime/presence/'>Presence</a></li>
+<li class=''><a href='/realtime/authentication/'>Authentication</a></li>
+<li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/statistics/'>Statistics</a></li>
+</ul>
+  <h2><a href="/rest/">REST client lib</a></h2>
+<ul>
+<li class=''><a href='/rest/usage/'>Using the REST library</a></li>
+<li class=''><a href='/rest/channels-messages/'>Channels and Messages</a></li>
+<li class=''><a href='/rest/presence/'>Presence</a></li>
+<li class=''><a href='/rest/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest/history/'>History</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+</ul>
+  <h2><a href="/rest-api/">REST API</a></h2>
+<ul>
+</ul>
+  <h2>General</h2>
+<ul>
+<li class=''><a href='/general/authentication/'>Authentication</a></li>
+<li class=''><a href='/general/channel-rules-namespaces/'>Channel Rules and Namespaces</a></li>
+<li class=''><a href='/general/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/general/statistics/'>Application Statistics</a></li>
+<li class=''><a href='/general/migrating/'>Migrating to Ably</a></li>
+</ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
+<li class='selected'><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
+<li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-fallback/'>Data center fallback to route around network issues</a></li>
+<li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+</ul>
+  <ul>
+<li><a href="https://ably.io">Visit Ably.io</a></li>
+</ul>
+</div>
+
+</body>
+</html>
