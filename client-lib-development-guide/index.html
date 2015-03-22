@@ -58,6 +58,9 @@
 <h2>Developing an Ably client library</h2>
 <p>If you are interested in developing or forking one of our client libraries, please do <a href="https://www.ably.io/contact">get in touch</a> as we&#8217;d love to help.  Equally, if you feel we&#8217;re missing a client library for your platform or language, do <a href="https://www.ably.io/contact">get in touch</a> and we&#8217;ll see what we can do to help.</p>
 <p>The following resources are useful references when developing client libraries for Ably:</p>
+<h3>Client library feature prioritisation</h3>
+<p>Whilst all <a href="https://www.ably.io/download">officially supported Ably client libraries</a> support all features defined in the <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">specification</a>, we recommend an approach that focuses on the most commonly used features first.</p>
+<p>See our <a href="/client-lib-development-guide/feature-prioritisation">recommended client library development feature prioritisation</a></p>
 <h3>Sandbox environment for client library testing</h3>
 <p>All of the Ably client libraries have test suites that run the test suite against temporary apps that are created during the test setup. Although Ably does not provide a public provisioning API for account management (in the production system this is available only through the website registration and dashboard) there is a limited API provided via the REST<br />
 interface in the sandbox environment to enable test applications and keys to be provisioned automatically for each test run. Therefore, all tests are set up to run against the sandbox environment.</p>
@@ -81,7 +84,7 @@ interface in the sandbox environment to enable test applications and keys to be 
 	<li><a href="/client-lib-development-guide/connection-recovery">Connection recovery</a></li>
 	<li><a href="/client-lib-development-guide/connection-fallback">Data center fallback to route around network issues</a></li>
 </ul>
-<h3>Documentation</h3>
+<h3 id="doc-steps">Documentation</h3>
 <p>All client libraries share API documentation within this repository so that where possible, the documentation is <a href="http://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY</a>.  Where client libraries differ in regards to their API or usage, the language specific variations are documented in this repository, which in turn are replicated in the primary <a href="https://www.ably.io/documentation">Ably documentation</a>.</p>
 <p>All client libraries developed or modified must reflect the changes to this documentation.  You can fork this repository at <a href="https://github.com/ably/docs">https://github.com/ably/docs</a> and issue a Pull Request.</p>
 <p>Read how to use our <a href="/client-lib-development-guide/documentation-formatting-guide">Ably Textile format</a>.</p>
@@ -129,6 +132,7 @@ interface in the sandbox environment to enable test applications and keys to be 
 </ul>
   <h2 class="selected"><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
+<li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
 <li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
@@ -137,7 +141,7 @@ interface in the sandbox environment to enable test applications and keys to be 
 <li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-fallback/'>Data center fallback to route around network issues</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-fallback/'>Connection host fallback</a></li>
 <li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
 </ul>
   <ul>
