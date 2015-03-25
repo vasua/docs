@@ -50,99 +50,76 @@
     </header>
     <article>
       <h2 id="overview">Overview</h2>
-<p>The Ably Realtime service supports client connections over multiple transports. The WebSocket transport is the primary<br />
-transport for efficient connection by browser clients that are websocket-capable, and any other client environment that<br />
-offers direct TCP socket access.</p>
-<p>The WebSocket transport transmits Protocol Messages in a single WebSocket data frame. In the binary transport, these<br />
-are sent as binary data frames, with the Protocol Message being encoded with the standard thrift binary encoding.<br />
-In the text transport these are sent as text data frames containing JSON-encoded ProtocolMessage objects. The protocol<br />
-definition specifies the content and interpretation of the various protocol messages.</p>
+<p>The Ably Real-time service supports client connections over multiple transports. The WebSocket transport is the primary transport for efficient connection by browser clients that are websocket-capable, and any other client environment that offers direct TCP socket access.</p>
+<p>The WebSocket transport transmits <a href="/client-lib-development-guide/protocol">Protocol Messages</a> in a single WebSocket data frame. In the binary transport, these are sent as binary data frames, with the <a href="/client-lib-development-guide/protocol">Protocol Message</a> being encoded with <a href="http://msgpack.org/">MessagePack encoding</a>.  In the text transport these are sent as text data frames containing JSON-encoded ProtocolMessage objects. The <a href="/client-lib-development-guide/protocol">protocol definition</a> specifies the content and interpretation of the various protocol messages.</p>
 <p>This section defines details that are transport-specific, covering:</p>
 <ul>
-	<li>connection;</li>
-	<li>disconnection;</li>
-	<li>WebSocket protocol draft support.</li>
+	<li>connection</li>
+	<li>disconnection</li>
+	<li>WebSocket protocol draft support</li>
 </ul>
 <h2 id="connection">Connection</h2>
-<p>Establishment of a WebSocket transport requires that the client makes a WebSocket or secure WebSocket connection to the<br />
-Ably WebSocket host (realtime.ably.io or one of the ws fallback hosts). The client library must allow the client to<br />
-specify a non-default host, at least to be able to connect to the sandbox environment at sandbox-realtime.ably.io.</p>
-<p>TLS connections are supported only for accounts that have TLS enabled. Certain apps may be configured to require TLS<br />
-connections and will reject non-TLS connections.</p>
-<p>The connection URI must be a valid WebSocket URI as specified in http://tools.ietf.org/html/rfc6455#section-3 with an<br />
-empty path component. The URI must include a valid set of authorisation params and a valid set of connection params,<br />
-each as specified below.</p>
+<p>Establishment of a WebSocket transport requires that the client makes a WebSocket or secure WebSocket connection to the Ably WebSocket host (realtime.ably.io or one of the <a href="/client-lib-development-guide/connection-fallback">WebSocket fallback hosts</a>). The client library must allow the client to specify a non-default host or environment, at least to be able to connect to the sandbox environment at sandbox-realtime.ably.io.</p>
+<p>Certain apps may be configured to require TLS connections and will reject non-TLS connections.</p>
+<p>The connection URI must be a valid WebSocket URI as specified in http://tools.ietf.org/html/rfc6455#section-3 with an empty path component. The URI must include a valid set of authorisation params and a valid set of connection params, each as specified below.</p>
 <h3>Authorisation params</h3>
 <p>Authorisation params must be either basic authorisation params or token authorisation params.</p>
 <p>Basic auth params:</p>
-<p>key_id (mandatory)<br />
-key_value (mandatory)</p>
-<p>The key_id and key_value are obtained from the library initialisation options.</p>
+<ul>
+	<li><code>key_id</code> (mandatory API app &amp; key id appearing before the <code>:</code> symbol)</li>
+	<li><code>key_value</code> (mandatory API key secret)</li>
+</ul>
+<p>The <code>key_id</code> and <code>key_value</code> are obtained from the library initialisation options.</p>
 <p>Token auth params:</p>
-<p>access_token (mandatory)</p>
-<p>If the library has been initialised with a clientId then the authorisation params must include a &#8220;client_id&#8221; param with<br />
-the clientId value. In the case of token auth, the token must either have been issued against that clientId or against<br />
-the wildcard clientId.</p>
+<ul>
+	<li><code>access_token</code> (mandatory token ID)</li>
+</ul>
+<p>If the library has been initialised with a clientId then the authorisation params must include a &#8220;client_id&#8221; param with the clientId value. In the case of token auth, the token must either have been issued against that clientId or against the wildcard clientId.</p>
 <h3>Connection params</h3>
 <p>Connection params cover protocol mode and recovery mode.</p>
-<p>Protocol mode is specified with the optional &#8220;binary&#8221; param:</p>
-<p>binary (optional); possible values &#8220;true&#8221;, &#8220;false&#8221;; default if omitted is &#8220;true&#8221;.</p>
-<p>The connection recovery mode is one of &#8220;clean&#8221;, &#8220;resume&#8221; or &#8220;recover&#8221;. Clean mode is the default, and is assumed if no<br />
-connection params are specified.</p>
-<p>Resume or recover mode are specified by including a &#8220;resume&#8221; or &#8220;recover&#8221; param respectively. In each case the value of<br />
-that param is the connectionId string of the connection that is being recovered.</p>
-<p>Resume and recover mode also require a &#8220;connection_serial&#8221; param to be specified whose value is the (decimal<br />
-representation of the) serial number of the last message received.</p>
+<p>Protocol mode is specified with the protocol param:</p>
+<ul>
+	<li><code>protocol</code>; possible values &#8220;msgpack&#8221; for the binary MessagePack encoding, &#8220;json&#8221; for the text based JSON encoding</li>
+</ul>
+<p>The connection recovery mode is one of &#8220;clean&#8221;, &#8220;resume&#8221; or &#8220;recover&#8221;. Clean mode is the default, and is assumed if no connection params are specified.</p>
+<p>Resume or recover mode are specified by including a <code>resume</code> or <code>recover</code> param respectively. In each case the value of that param is the private connectionKey string of the connection that is being recovered.</p>
+<p>Resume and recover mode also require a <code>connection_serial</code> param to be specified whose value is the (decimal representation of the) serial number of the last message received.</p>
 <h3>Failed connections</h3>
 <p>In the event of a connection failure, the service may respond in two ways.</p>
-<p>First, the service may simply refuse the connection and there will be no handshake. The library must report this to the<br />
-client as a 401 Unauthorized error with no further error information.</p>
-<p>Alternatively, the service may accept the WebSocket connection and complete the handshake, and then send an ERROR<br />
-Protocol Message with further error information, followed by a normal close of the WebSocket connection. In this case<br />
-the library must report that error information as the reason for connection failure to the client.</p>
-<p>At any time after a successful connection, the service may initiate termination of the connection by sending an ERROR<br />
-message; this might occur for example if the credentials have been revoked, or the account has breached a hard<br />
-connection limit. If a connection ERROR message is received, the error information must be passed to the client as the<br />
-failure reason.</p>
+<p>First, the service may simply refuse the connection and there will be no handshake. The library must report this to the client as a 401 Unauthorized error with no further error information.</p>
+<p>Alternatively, the service may accept the WebSocket connection and complete the handshake, and then send an <code>ERROR</code> <a href="/client-lib-development-guide/protocol">Protocol Message</a> with further error information, followed by a normal close of the WebSocket connection. In this case the library must report that error information as the reason for connection failure to the client.</p>
+<p>At any time after a successful connection, the service may initiate termination of the connection by sending an <code>ERROR</code> message; this might occur for example if the credentials have been revoked, or the account has breached a hard connection limit. If a connection <code>ERROR</code> message is received, the error information must be passed to the client as the failure reason.</p>
 <h2 id="disconnection">Disconnection</h2>
-<p>Disconnection of the transport, in the case that the client wishes to be able to recover connection state, simply<br />
-requires the client to perform a normal close on the WebSocket.</p>
-<p>Closing the connection, resulting in disposal of connection state, is achieved by sending a DISCONNECT message. The<br />
-client can then perform a normal close on the WebSocket.</p>
-<p>Abnormal termination for whatever reason (a transition to the failed connection state) again just requires a normal<br />
-close of the WebSocket.</p>
+<p>Disconnection of the transport, in the case that the client wishes to be able to recover connection state, simply requires the client to perform a normal close on the WebSocket.</p>
+<p>Closing the connection, resulting in disposal of connection state, is achieved by sending a <code>CLOSE</code> message. The client should then wait a short period for a <code>CLOSED</code> message, however the client can also simply perform a normal close on the WebSocket.</p>
+<p>Abnormal termination for whatever reason (a transition to the failed connection state) again just requires a normal close of the WebSocket.</p>
 <p>WebSocket close events that are initiated by the remote end are handled as follows.</p>
-<p>A normal close, if the client end had already initiated an explicit DISCONNECT, are reported to the client as a<br />
-transition to the closed state.</p>
+<p>A normal close, if the client end had already initiated an explicit <code>CLOSE</code>, are reported to the client as a transition to the closed state once a <code>CLOSED</code> message is received or the connection is closed.</p>
 <p>Any other normal close, or a close with one of the following codes:</p>
 <ul>
-	<li>GOING_AWAY (1001)</li>
-	<li>ABNORMAL_CLOSE (1006)</li>
+	<li><code>GOING_AWAY</code> (1001)</li>
+	<li><code>ABNORMAL_CLOSE</code> (1006)</li>
 </ul>
-<p>is reported to the client as a transition to the disconnected or the suspended state,<br />
-depending on whether or not the client has exceeded the suspended timeout.</p>
+<p>is reported to the client as a transition to the disconnected or the suspended state, depending on whether or not the client has exceeded the suspended timeout.</p>
 <p>Any close with any of the following codes:</p>
 <ul>
-	<li>CLOSE_PROTOCOL_ERROR (1002)</li>
-	<li>REFUSE (1003)</li>
-	<li>NO_UTF8 (1007)</li>
-	<li>POLICY_VALIDATION (1008)</li>
-	<li>TOOBIG (1009)</li>
-	<li>EXTENSION (1010)</li>
-	<li>UNEXPECTED_CONDITION (1011)</li>
-	<li>TLS_ERROR (1015)</li>
+	<li><code>CLOSE_PROTOCOL_ERROR</code> (1002)</li>
+	<li><code>REFUSE</code> (1003)</li>
+	<li><code>NO_UTF8</code> (1007)</li>
+	<li><code>POLICY_VALIDATION</code> (1008)</li>
+	<li><code>TOOBIG</code> (1009)</li>
+	<li><code>EXTENSION</code> (1010)</li>
+	<li><code>UNEXPECTED_CONDITION</code> (1011)</li>
+	<li><code>TLS_ERROR</code> (1015)</li>
 </ul>
-<p>is reported as a transition to the failed state. The reason code is derived from the reported<br />
-WebSocket reason code as follows:</p>
+<p>is reported as a transition to the failed state. The reason code is derived from the reported WebSocket reason code as follows:</p>
 <ul>
-	<li>REFUSE, POLICY_VALIDATION : 40100;</li>
-	<li>TOOBIG : 40000;</li>
-	<li>any other code : 80000.</li>
+	<li><code>REFUSE</code>, <code>POLICY_VALIDATION</code> (0100)</li>
+	<li><code>TOOBIG</code> (40000)</li>
+	<li>any other code (80000)</li>
 </ul>
 <h2 id="websocket-draft-protocol-support">WebSocket protocol draft support</h2>
-<p>Clients must use the RFC 6455 WebSocket protocol. Browsers that support earlier drafts are accommodated by the service<br />
-based on specific knowledge of the state of those browser&#8217;s conformance to a particular draft; the Ably service does<br />
-attempt to comply with any draft other than the RFC.</p>
+<p>Clients must use the <a href="https://tools.ietf.org/html/rfc6455">RFC 6455 WebSocket protocol</a>. Browsers that support earlier drafts are accommodated by the service based on specific knowledge of the state of those browser&#8217;s conformance to a particular draft; the Ably service does attempt to comply with any draft other than the RFC.</p>
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>

@@ -136,6 +136,38 @@ a += 1;</code></pre>
 <br/>a = 2</code></pre>
 <pre lang="csharp"><code lang="csharp">int a = 1;
 <br/>a = 2;</code></pre>
+<h3 id="code-editor">Try it now code editor</h3>
+<p class="tip">In order to publish code examples to JSBin, your <a href="https://github.com/ably/docs/blob/source/config/jsbin_config.example.yaml">/config/jsbin_config.yaml</a> must be set up with a valid JSBin API key.</p>
+<p>Code examples that run in your browser can be included in this documentation repo within the <a href="https://github.com/ably/docs/tree/source/content/code">/content/code folder</a>.  Every code example must contain Javascript, HTML and CSS that will be launched in our <a href="https://jsbin.ably.io">custom Ably JSBin</a>.</p>
+<p>The following example shows how you can easily add a &#8220;Try it&#8221; button to your code example that will launch the code from the path you provide in our Ably JSBin code editor:</p>
+<pre lang="text"><code lang="text">bc[javascript](code-editor open-jsbin open-jsbin-uqacud).
+var ably = new Ably.Realtime('{{API_KEY}}');</code></pre>
+<p>generates the following:</p>
+<pre class="code-editor open-jsbin open-jsbin-uqacud" lang="javascript"><code class="code-editor open-jsbin open-jsbin-uqacud" lang="javascript">var ably = new Ably.Realtime('{{API_KEY}}');</code></pre>
+<h3 id="variables">Variables</h3>
+<p>In your code examples you can use handlebar like variables that are replaced with values at runtime.  This is especially useful when you need to show examples that use a Token that may expire for example.  When using the variables, please ensure that the case is matched exactly and that the variable is surrounded by single or double-quotes as CodeMirror colour coding can prevent the variables from being identified.</p>
+<p>The following variables are supported:</p>
+<ul>
+	<li>{{API_KEY_ID}}</li>
+	<li>{{API_KEY}}</li>
+	<li>{{API_KEY_BASE64}}</li>
+	<li>{{TOKEN}}</li>
+	<li>{{TOKEN_BASE64}}</li>
+	<li>{{MS_SINCE_EPOCH}}</li>
+	<li>{{SECONDS_SINCE_EPOCH}}</li>
+	<li>{{RANDOM_CHANNEL_NAME}}</li>
+	<li>{{SIGNED_TOKEN_REQUEST_EXAMPLE}}</li>
+</ul>
+<p>Example of the above variables being used in a code block below:</p>
+<pre><code>API_KEY_ID: "{{API_KEY_ID}}"
+API_KEY: "{{API_KEY}}"
+API_KEY_BASE64: "{{API_KEY_BASE64}}"
+TOKEN: "{{TOKEN}}"
+TOKEN_BASE64: "{{TOKEN_BASE64}}"
+MS_SINCE_EPOCH: "{{MS_SINCE_EPOCH}}"
+SECONDS_SINCE_EPOCH: "{{SECONDS_SINCE_EPOCH}}"
+RANDOM_CHANNEL_NAME: "{{RANDOM_CHANNEL_NAME}}"
+SIGNED_TOKEN_REQUEST_EXAMPLE: "{{SIGNED_TOKEN_REQUEST_EXAMPLE}}"</code></pre>
 <h3>Isolated language blocks (always present) versus grouped language blocks</h3>
 <p>For both code blocks, if a single language code block appears without another contiguous language block before or after it, then it will always be shown regardless of the current language selected by the viewer.  This is to ensure that should you wish to show a simple HTML block or a Javascript code block with formatting for example, this can be done without worrying it will be hidden.  For example:</p>
 <pre lang="text"><code lang="text">bc[html]. &lt;html&gt;

@@ -52,64 +52,62 @@
     </header>
     <article>
       <h2 id="overview">Overview</h2>
-<p>The Ably Realtime service supports client connections over multiple transports. The Comet transport is a fallback transport for environments that are unable to support WebSockets (eg older browser versions) or for environments for which intervening proxies do not support WebSockets.</p>
-<p>In the Comet protocol, all request and response bodies contain an array of one or more protocol messages. In the binary protocol this is standard thrift binary encoding of a thrift TMessageSet struct. In the text (JSON) protocol request and response bodies are simply JSON-encoded arrays containing the Protocol Message content, again either in binary (thrift) or text (JSON) encoding.</p>
+<p>The Ably Real-time service supports client connections over multiple transports. The Comet transport is a fallback transport for environments that are unable to support WebSockets (eg older browser versions) or for environments for which intervening proxies do not support WebSockets.</p>
+<p>In the Comet protocol, all request and response bodies contain an array of one or more protocol messages. In the binary protocol this is a standard binary <a href="http://msgpack.org/">MessagePack encoding</a>. In the text (JSON) protocol request and response bodies are simply JSON-encoded arrays containing the Protocol Message content, again either in binary (MessagePack) or text (JSON) encoding.</p>
 <p>Comet exchanges messages with the service using two primary mechanisms:</p>
 <ul>
-	<li>operations that are initiated by the client &#8211; publishing messages, and making attach or detach requests &#8211; are performed by making a GET or POST request to a /send endpoint, with the result of that particular operation being returned in the HTTP response.</li>
+	<li>operations that are initiated by the client &#8211; publishing messages, and making attach or detach requests &#8211; are performed by making a <code>GET</code> or <code>POST</code> request to a /send endpoint, with the result of that particular operation being returned in the HTTP response.</li>
 </ul>
 <ul>
-	<li>operations that are initiated by the service &#8211; notably delivery of published messages to the client &#8211; are performed by responding to a long-running HTTP GET request to a /recv endpoint. As soon as such a request completes, the client initiates a new recv request. The service responds to recv requests periodically, even if there is no message to send,<br />
-with a HEARTBEAT message.</li>
+	<li>operations that are initiated by the service &#8211; notably delivery of published messages to the client &#8211; are performed by responding to a long-running HTTP <code>GET</code> request to a /recv endpoint. As soon as such a request completes, the client initiates a new recv request. The service responds to recv requests periodically, even if there is no message to send, with a <code>HEARTBEAT</code> message.</li>
 </ul>
 <p>The service ensures that responses do not occur out of order in cases that send and recv requests are made on the same socket.</p>
-<p>There is at most one request of each type &#8211; send and recv &#8211; pending at any time. For this reason, there will be periods in which there is no pending recv request at the service (after having responded to one request and before the new request is received). Messages destined for the client that arrive during that time are queued until the next inbound<br />
-recv request, and sent as a response as soon as the recv is received. The response body is therefore an array of Protocol Messages in order to support this. Similarly the send request body is an array of messages, to permit queueing of messages at the client whilst waiting for the response from the previous send request.</p>
+<p>There is at most one request of each type &#8211; send and recv &#8211; pending at any time. For this reason, there will be periods in which there is no pending recv request at the service (after having responded to one request and before the new request is received). Messages destined for the client that arrive during that time are queued until the next inbound recv request, and sent as a response as soon as the recv is received. The response body is therefore an array of Protocol Messages in order to support this. Similarly the send request body is an array of messages, to permit queueing of messages at the client whilst waiting for the response from the previous send request.</p>
 <p>The service exposes a /connect endpoint for transport establishment and a /close endpoint for connection disposal.</p>
 <p>The Comet protocol operates most efficiently when TCP sessions are persistent and serial requests for a given connection are handled by the same frontend instance. The Ably load balancer for the Comet host therefore implements sticky sessions based on a session cookie in the initial connect response. Environments that are capable of supporting third party cookies should enable this for the Ably Comet host.</p>
 <p>This section defines details of the protocol in the sections that follow:</p>
 <ul>
-	<li>connection;</li>
-	<li>send;</li>
-	<li>recv;</li>
-	<li>disconnection.</li>
+	<li>connection</li>
+	<li>send</li>
+	<li>recv</li>
+	<li>disconnection</li>
 </ul>
 <h2 id="general">General</h2>
-<p>Comet operations are performed over HTTP or HTTPS to the Ably REST host (rest.ably.io or one of the fallback hosts).</p>
-<p>The client library must allow the client to specify a non-default host, at least to be able to connect to the standbox environment at sandbox-rest.ably.io.</p>
-<p>TLS connections are supported only for accounts that have TLS enabled. Certain apps may be configured to require TLS connections and will reject non-TLS connections.</p>
+<p>Comet operations are performed over HTTP or HTTPS to the Ably REST host (rest.ably.io or one of the <a href="/client-lib-development-guide/connection-fallback">fallback hosts</a>).</p>
+<p>The client library must allow the client to specify a non-default host or environment, at least to be able to connect to the standbox environment at sandbox-rest.ably.io.</p>
+<p>Certain apps may be configured to require TLS connections and will reject non-TLS connections.</p>
 <p>All requests include an Authorization header with the applicable auth params.</p>
-<p>POST requests that contain one or more Protocol Messages in the request body are either JSON-encoded arrays with an &#8220;application/json&#8221; Content-Type, or thrift-encoded TMessageSet structs with an &#8220;x-application//thrift&#8221; Content-Type.</p>
-<p>All requests that expect one or more Protocol Messages in the response body must specify an Accept header with either &#8220;application/json&#8221; or &#8220;x-application/thrift&#8221; depending on whether or not the transport is operating in text or binary mode. Again, response bodies for success responses will be JSON arrays of Protocol Messages or thrift-encoded TMessageSet structs as appropriate.</p>
-<p>All error responses are made with a status code that reflects the nature of the error, and a TError response body.</p>
+<p><code>POST</code> requests that contain one or more Protocol Messages in the request body are either JSON-encoded arrays with an &#8220;application/json&#8221; Content-Type, or binary-encoded MessagePack arrays with &#8220;application/x-msgpack&#8221; Content-Type.</p>
+<p>All requests that expect one or more Protocol Messages in the response body must specify an Accept header with either &#8220;application/json&#8221; or &#8220;application/x-msgpack&#8221; depending on whether or not the transport is operating in text or binary mode. Again, response bodies for success responses will be JSON arrays of Protocol Messages or binary encoded MessagePack arrays as appropriate.</p>
+<p>All error responses are made with a status code that reflects the nature of the error and an Error response body.</p>
 <h2 id="connection">Connection</h2>
-<p>A Comet transport is initiated by making a GET request with the path /comet/connect.</p>
+<p>A Comet transport is initiated by making a <code>GET</code> request with the path /comet/connect.</p>
 <p>The URI must include a valid set of connection params to specify the recovery mode. The connection recovery mode is one of &#8220;clean&#8221;, &#8220;resume&#8221; or &#8220;recover&#8221;. Clean mode is the default, and is assumed if no connection params are specified.</p>
-<p>Resume or recover mode are specified by including a &#8220;resume&#8221; or &#8220;recover&#8221; param respectively. In each case the value of that param is the connectionId string of the connection that is being recovered.</p>
-<p>Resume and recover mode also require a &#8220;connection_serial&#8221; param to be specified whose value is the (decimal representation of the) serial number of the last message received.</p>
-<p>The response to the connect request is a single Protocol Message; the action will be CONNECTED in the success case and ERROR in the failure case. The error member, if present, indicates the failure condition (which can include non-fatal conditions in the CONNECTED case). In each case the library must report that error information to the client.</p>
-<p>A CONNECTED response will include a connectionId member which is the connection path. This must be used in all subsequent requests associated with that connection.</p>
+<p>Resume or recover mode are specified by including a <code>resume</code> or <code>recover</code> param respectively. In each case the value of that param is the private connectionKey string of the connection that is being recovered.</p>
+<p>Resume and recover mode also require a <code>connection_serial</code> param to be specified whose value is the (decimal representation of the) serial number of the last message received.</p>
+<p>The response to the connect request is a single Protocol Message; the action will be <code>CONNECTED</code> in the success case and <code>ERROR</code> in the failure case. The error member, if present, indicates the failure condition (which can include non-fatal conditions in the <code>CONNECTED</code> case). In each case the library must report that error information to the client.</p>
+<p>A <code>CONNECTED</code> response will include a connectionId member which is the connection path. This must be used in all subsequent requests associated with that connection.</p>
 <h2 id="send-operations">Send operations</h2>
-<p>Send operations are made by making either GET or POST requests to the path:</p>
-<p>/comet/<connection-path>/send</p>
-<p>POST requests are formed with an encoded set of Protocol Messages in the request body.</p>
-<p>GET send requests are only supported for very limited environments that are unable to support POST, and the use of GET for send operations is not recommended.</p>
+<p>Send operations are made by making either <code>GET</code> or <code>POST</code> requests to the path:</p>
+<p><code>/comet/&lt;connection-path&gt;/send</code></p>
+<p><code>POST</code> requests are formed with an encoded set of Protocol Messages in the request body.</p>
+<p><code>GET</code> send requests are only supported for very limited environments that are unable to support <code>POST</code>, and the use of <code>GET</code> for send operations is not recommended.</p>
 <p>send operations are used for:</p>
 <ul>
-	<li>ATTACH and DETACH: the response contains the relevant error or the ATTACHED/DETACHED result.</li>
+	<li><code>ATTACH</code> and <code>DETACH</code>: the response contains the relevant error or the <code>ATTACHED</code>/<code>DETACHED</code> result.</li>
 </ul>
 <ul>
-	<li>MESSAGE and PRESENCE: the response is either an empty response with a success status code, signifying success, or an error response with applicable status code and TError response body.</li>
+	<li><code>MESSAGE</code> and <code>PRESENCE</code>: the response is either an empty response with a success status code, signifying success, or an error response with applicable status code and Error response body.</li>
 </ul>
 <h2 id="recv-operations">Recv operations</h2>
-<p>Recv operations are made by making a GET request to the path:</p>
-<p>/comet/<connection-path>/recv</p>
-<p>These requests are expected to remain open until there is a MESSAGE or PRESENCE response, or a HEARTBEAT response.</p>
-<p>At any time after a successful connection, the service may initiate termination of the connection by sending a error response (with appropriate status code and TError response body) to a pending recv.; this might occur for example if the credentials have been revoked, or the account has breached a hard connection limit. If a connection error message is received, the error information must be passed to the client as the failure reason.</p>
+<p>Recv operations are made by making a <code>GET</code> request to the path:</p>
+<p><code>/comet/&lt;connection-path&gt;/recv</code></p>
+<p>These requests are expected to remain open until there is a <code>MESSAGE</code> or <code>PRESENCE</code> response, or a <code>HEARTBEAT</code> response.</p>
+<p>At any time after a successful connection, the service may initiate termination of the connection by sending a error response (with appropriate status code and Error response body) to a pending recv.; this might occur for example if the credentials have been revoked, or the account has breached a hard connection limit. If a connection error message is received, the error information must be passed to the client as the failure reason.</p>
 <h2 id="disconnection">Disconnection</h2>
 <p>Disconnection of the transport, in the case that the client wishes to be able to recover connection state, simply requires the client to cancel any pending recv request and issue no further requests.</p>
-<p>Closing the connection, resulting in disposal of connection state, is achieved by sending a GET request to the path:</p>
-<p>/comet/<connection-path>/close</p>
+<p>Closing the connection, resulting in disposal of connection state, is achieved by sending a <code>GET</code> request to the path:</p>
+<p><code>/comet/&lt;connection-path&gt;/close</code></p>
 <p>Abnormal termination for whatever reason (a transition to the failed connection state) again just requires that any pending requests are cancelled.</p>
     </article>
     <hr class="back">

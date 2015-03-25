@@ -88,6 +88,7 @@ hr.back {
   /* typically an inline language resource shown if the correct global language is selected */
   /* used to simply break up consecutive language tags so that they are not grouped */
   /* div with a language within a dt is used to indicate the language for the dt and dd, so don't treat this as a div */
+  /* Code try it button appears at bottom of pretty printed code block */
   /* in this section navigation at the top of documentation where meta data exists */ }
   #documentation h1 {
     color: #6E7D9A;
@@ -448,6 +449,18 @@ hr.back {
       color: red; }
     #documentation .prettyprint a:hover .typ {
       text-decoration: underline; }
+  #documentation .try-it-button {
+    border: 1px solid #666;
+    border-radius: 5px;
+    padding: 6px;
+    margin-bottom: 10px;
+    background-color: #FFF;
+    display: block;
+    width: 100px;
+    text-align: center; }
+    #documentation .try-it-button:hover {
+      color: #000;
+      background-color: #F9F9F9; }
   #documentation .inline-toc {
     border: 1px solid #FA0;
     background-color: #ffeecc;

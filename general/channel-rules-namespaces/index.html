@@ -25,7 +25,25 @@
     <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
 
   <div id="documentation">
-    <p>http://support.ably.io/solution/articles/3000030057-what-are-channel-rules-and-how-can-i-use-them-in-my-app-</p>
+    
+    <header>
+      
+      
+        <h1 id="title">Channel Rules and Namespaces</h1>
+      
+    </header>
+    <article>
+      <p>Apps can have one or more channel rules with configurable settings that will be applied to matching channels created in the app.  If no channel rule is found when a channel is created, the default channel rule for the app is applied.</p>
+<p>Channel rules allow settings such as whether messages are persisted or TLS required to be configured.  The name in each configured channel rule will match any channel with that name or any channel in that namespace.  For example, a channel rule with the configured namespace of &#8220;rss&#8221; will match the channel name &#8220;rss&#8221; as well as the channel name &#8220;rss:news&#8221; which is a channel within the &#8220;rss&#8221; namespace.</p>
+<p>Each channel rule has the following configurable settings:</p>
+<ul>
+	<li><b>Persisted messages</b> &#8211; If enabled, all messages within this namespace will be persisted. You can access stored messages via the History API. The number of hours a message is stored is configurable, <a href="http://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">find out more about message persistence</a></li>
+	<li><b>Require authentication</b> &#8211; if enabled, only <a href="/general/authorisation">authorized clients</a> with a clientId will be permitted to subscribe to matching channels. Anonymous clients will not be permitted to join the channel.</li>
+	<li><b>Require TLS</b> &#8211; if enabled, only clients who have connected to Ably over TLS will be allowed to join the matching channel.</li>
+</ul>
+    </article>
+    <hr class="back">
+    <a href="#documentation">Back to top</a>
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>

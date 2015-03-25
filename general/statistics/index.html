@@ -25,191 +25,200 @@
     <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
 
   <div id="documentation">
-    <p>The Ably system can be queried to obtain usage statistics for a given application, and results are provided aggregated across all channels in use in the application in the specified period. Stats may be used to track usage against account quotas.  The details on how to retrieve statistics are available in the <a href="/rest-api#stats">REST API documentation</a>, <a href="/realtime/statistics">Real-time client library statistics documentation</a> and <a href="/rest/statistics">REST client-library statistics documentation</a>.</p>
+    
+    <header>
+      
+      
+        <h1 id="title">Application Statistics</h1>
+      
+    </header>
+    <article>
+      <p>The Ably system can be queried to obtain usage statistics for a given application, and results are provided aggregated across all channels in use in the application in the specified period. Stats may be used to track usage against account quotas.  The details on how to retrieve statistics are available in the <a href="/rest-api#stats">REST API documentation</a>, <a href="/realtime/statistics">Real-time client library statistics documentation</a> and <a href="/rest/statistics">REST client-library statistics documentation</a>.</p>
 <p>Example request:</p>
 <pre lang="sh"><code lang="sh">curl https://rest.ably.io/stats?unit=hour \
  -u "{{API_KEY}}"</code></pre>
 <p>Returns statistics as follows:</p>
-<p>```[json]<br />
-[<br />
-  {<br />
-    &#8220;all&#8221;: {          // aggregates inbound and outbound messages<br />
-      &#8220;messages&#8221;: {     // messages published on channels<br />
-        &#8220;count&#8221;: 22,      // count of messages<br />
-        &#8220;data&#8221;: 308       // total data in bytes<br />
-      },<br />
-      &#8220;presence&#8221;: {     // presence events such as enter/leave<br />
-        &#8220;count&#8221;: 41,      // count of presence events<br />
-        &#8220;data&#8221;: 2873      // total data in bytes for presence events<br />
-      },<br />
-      &#8220;all&#8221;: {          // aggregataed messages and presence<br />
-        &#8220;count&#8221;: 63,      // count of all<br />
-        &#8220;data&#8221;: 3181      // total bytes for all<br />
-      }<br />
-    },<br />
-    &#8220;inbound&#8221;: {      // all inbound messages i.e. received by Ably from clients<br />
-      &#8220;realtime&#8221;: {     // received over real-time socket connection<br />
-        &#8220;messages&#8221;: {     // messages published on channels<br />
-          &#8220;count&#8221;: 0,       // count of messages<br />
-          &#8220;data&#8221;: 0         // total data in bytes<br />
-        },<br />
-        &#8220;presence&#8221;: {     // presence events such as enter/leave<br />
-          &#8220;count&#8221;: 4,       // count of presence events<br />
-          &#8220;data&#8221;: 676       // total data in bytes for presence events<br />
-        },<br />
-        &#8220;all&#8221;: {          // aggregated channel messages + presence<br />
-          &#8220;count&#8221;: 4,       // count of all<br />
-          &#8220;data&#8221;: 676       // total bytes for all<br />
-        }<br />
-      },<br />
-      &#8220;rest&#8221;: {         // received via the HTTP REST API<br />
-        &#8220;messages&#8221;: {     // messages published on channels<br />
-          &#8220;count&#8221;: 5,       // count of messages<br />
-          &#8220;data&#8221;: 70        // total data in bytes<br />
-        },<br />
-        &#8220;presence&#8221;: {     // presence events such as enter/leave<br />
-          &#8220;count&#8221;: 0,       // count of presence events<br />
-          &#8220;data&#8221;: 0         // total data in bytes for presence events<br />
-        },<br />
-        &#8220;all&#8221;: {          // channel messages + presence<br />
-          &#8220;count&#8221;: 5,       // count of all<br />
-          &#8220;data&#8221;: 70        // total bytes for all<br />
-        }<br />
-      },<br />
-      &#8220;all&#8221;: {          // aggregates all inbound real-time and REST messages<br />
-        &#8220;messages&#8221;: {     // messages published on channels<br />
-          &#8220;count&#8221;: 5,       // count of messages<br />
-          &#8220;data&#8221;: 70        // total data in bytes<br />
-        },<br />
-        &#8220;presence&#8221;: {   // presence events such as enter/leave<br />
-          &#8220;count&#8221;: 4,     // count of presence events<br />
-          &#8220;data&#8221;: 676     // total data in bytes for presence events<br />
-        },<br />
-        &#8220;all&#8221;: {        // aggregated channel messages + presence<br />
-          &#8220;count&#8221;: 9,     // count of all<br />
-          &#8220;data&#8221;: 746     // total bytes for all<br />
-        }<br />
-      }<br />
-    },<br />
-    &#8220;outbound&#8221;: {     // all outbound messages i.e. sent from Ably to clients<br />
-      &#8220;realtime&#8221;: {     // sent over real-time socket connection<br />
-        &#8220;messages&#8221;: {     // messages published on channels<br />
-          &#8220;count&#8221;: 17,      // count of messages<br />
-          &#8220;data&#8221;: 2873      // total data in bytes<br />
-        },<br />
-        &#8220;presence&#8221;: {     // presence events such as enter/leave<br />
-          &#8220;count&#8221;: 37,      // count of presence events<br />
-          &#8220;data&#8221;: 2197      // total data in bytes for presence events<br />
-        },<br />
-        &#8220;all&#8221;: {          // aggregated channel messages + presence<br />
-          &#8220;count&#8221;: 54,      // count of all<br />
-          &#8220;data&#8221;: 2435      // total bytes for all<br />
-        }<br />
-      },<br />
-      &#8220;rest&#8221;: {         // retrieved using REST history API<br />
-        &#8220;messages&#8221;: {     // messages on channels<br />
-          &#8220;count&#8221;: 0,       // count of messages<br />
-          &#8220;data&#8221;: 0         // total data in bytes<br />
-        },<br />
-        &#8220;presence&#8221;: {     // presence events such as enter/leave<br />
-          &#8220;count&#8221;: 0,       // count of presence events<br />
-          &#8220;data&#8221;: 0         // total data in bytes for presence events<br />
-        },<br />
-        &#8220;all&#8221;: {          // aggregated channel messages + presence<br />
-          &#8220;count&#8221;: 0,       // count of all<br />
-          &#8220;data&#8221;: 0         // total bytes for all<br />
-        }<br />
-      },<br />
-      &#8220;webhook&#8221;: {      // messages pushed to customer&#8217;s servers via WebHooks<br />
-        &#8220;messages&#8221;: {     // messages published on channels<br />
-          &#8220;count&#8221;: 0,       // count of messages<br />
-          &#8220;data&#8221;: 0         // total data in bytes<br />
-        },<br />
-        &#8220;presence&#8221;: {     // presence events such as enter/leave<br />
-          &#8220;count&#8221;: 0,       // count of presence events<br />
-          &#8220;data&#8221;: 0         // total data in bytes for presence events<br />
-        },<br />
-        &#8220;all&#8221;: {          // aggregated channel messages + presence<br />
-          &#8220;count&#8221;: 0,       // count of all<br />
-          &#8220;data&#8221;: 0         // total bytes for all<br />
-        }<br />
-      },<br />
-      &#8220;all&#8221;: {          // aggregates all outbound real-time, REST and WebHook messages<br />
-        &#8220;messages&#8221;: {     // messages published on channels<br />
-          &#8220;count&#8221;: 17,      // count of messages<br />
-          &#8220;data&#8221;: 238       // total data in bytes<br />
-        },<br />
-        &#8220;presence&#8221;: {     // presence events such as enter/leave<br />
-          &#8220;count&#8221;: 37,      // count of presence events<br />
-          &#8220;data&#8221;: 2197      // total data in bytes for presence events<br />
-        },<br />
-        &#8220;all&#8221;: {          // aggregated channel messages + presence<br />
-          &#8220;count&#8221;: 54,      // count of all<br />
-          &#8220;data&#8221;: 2435      // total bytes for all<br />
-        }<br />
-      }<br />
-    },<br />
-    &#8220;persisted&#8221;: {    // all message types persisted based on configured channel rules<br />
-      &#8220;messages&#8221;: {     // messages persisted on channels<br />
-        &#8220;count&#8221;: 5,       // count of messages<br />
-        &#8220;data&#8221;: 70        // total data in bytes<br />
-      },<br />
-      &#8220;presence&#8221;: {     // presence events persisted for states such as enter/leave<br />
-        &#8220;count&#8221;: 8,       // count of presence events<br />
-        &#8220;data&#8221;: 676       // total data in bytes for presence events<br />
-      },<br />
-      &#8220;all&#8221;: {          // aggregated channel messages + presence persisted<br />
-        &#8220;count&#8221;: 13,      // count of all<br />
-        &#8220;data&#8221;: 746       // total bytes for all<br />
-      }<br />
-    },<br />
-    &#8220;connections&#8221;: {  // connection statistics for this time period<br />
-      &#8220;plain&#8221;: {        // non-TLS unencrypted connections<br />
-        &#8220;peak&#8221;: 4,        // peak concurrent connections for this period<br />
-        &#8220;min&#8221;: 0,         // minimum concurrent connections in this period<br />
-        &#8220;mean&#8221;: 2,        // average concurrent connections in this period<br />
-        &#8220;opened&#8221;: 6,      // count of new connections in this period<br />
-        &#8220;refused&#8221;: 0      // count of connections refused by Ably in this period<br />
-      },<br />
-      &#8220;tls&#8221;: {          // TLS encrypted connections<br />
-        &#8220;peak&#8221;: 2,        // peak concurrent connections for this period<br />
-        &#8220;min&#8221;: 2,         // minimum concurrent connections in this period<br />
-        &#8220;mean&#8221;: 2,        // average concurrent connections in this period<br />
-        &#8220;opened&#8221;: 2,      // count of new connections in this period<br />
-        &#8220;refused&#8221;: 0      // count of connections refused by Ably in this period<br />
-      },<br />
-      &#8220;all&#8221;: {          // aggregated summary of all connection types<br />
-        &#8220;peak&#8221;: 6,        // peak concurrent connections for this period<br />
-        &#8220;min&#8221;: 2,         // minimum concurrent connections in this period<br />
-        &#8220;mean&#8221;: 4,        // average concurrent connections in this period<br />
-        &#8220;opened&#8221;: 8,      // count of new connections in this period<br />
-        &#8220;refused&#8221;: 0      // count of connections refused by Ably in this period<br />
-      }<br />
-    },<br />
-    &#8220;channels&#8221;: {     // channel statistics for this time period<br />
-      &#8220;peak&#8221;: 2,        // peak number of channels active for this period<br />
-      &#8220;min&#8221;: 0,         // min number of channels active for this period<br />
-      &#8220;mean&#8221;: 0,        // average number of channels active for this period<br />
-      &#8220;opened&#8221;: 0,      // total number of channels opened in this period<br />
-      &#8220;refused&#8221;: 0      // number of channel attach requests failed because of permissions<br />
-    },<br />
-    &#8220;apiRequests&#8221;: {  // API requests made via the REST API excluding tokens<br />
-      &#8220;succeeded&#8221;: 11,  // successful requests<br />
-      &#8220;failed&#8221;: 0,      // failed requests<br />
-      &#8220;refused&#8221;: 0      // requests refused as a result of exceeding account limits<br />
-    },<br />
-    &#8220;tokenRequests&#8221;: { // token requests via the REST API<br />
-      &#8220;succeeded&#8221;: 9,   // successful tokens issued<br />
-      &#8220;failed&#8221;: 0,      // failed token request<br />
-      &#8220;refused&#8221;: 0      // requests refused due to permissions or rate limiting<br />
-    },<br />
-    &#8220;inProgress&#8221;: &#8220;2015-03-16:10:57&#8221;, // indicates the last sub-interval included in this statistic<br />
-    &#8220;count&#8221;: 116,     // indicates how many lower-level stats were used to aggregate these results<br />
-    &#8220;unit&#8221;: &#8220;hour&#8221;,   // unit of time for these stats from the intervalId forwards<br />
-    &#8220;intervalId&#8221;: &#8220;2015-03-16:10&#8221; // interval these stats apply to in format yyyy-mm-dd:hh:mm:ss<br />
-  }<br />
-]<br />
-```</p>
+<pre lang="json"><code lang="json">[
+  {
+    "all": {          // aggregates inbound and outbound messages
+      "messages": {     // messages published on channels
+        "count": 22,      // count of messages
+        "data": 308       // total data in bytes
+      },
+      "presence": {     // presence events such as enter/leave
+        "count": 41,      // count of presence events
+        "data": 2873      // total data in bytes for presence events
+      },
+      "all": {          // aggregataed messages and presence
+        "count": 63,      // count of all
+        "data": 3181      // total bytes for all
+      }
+    },
+    "inbound": {      // all inbound messages i.e. received by Ably from clients
+      "realtime": {     // received over real-time socket connection
+        "messages": {     // messages published on channels
+          "count": 0,       // count of messages
+          "data": 0         // total data in bytes
+        },
+        "presence": {     // presence events such as enter/leave
+          "count": 4,       // count of presence events
+          "data": 676       // total data in bytes for presence events
+        },
+        "all": {          // aggregated channel messages + presence
+          "count": 4,       // count of all
+          "data": 676       // total bytes for all
+        }
+      },
+      "rest": {         // received via the HTTP REST API
+        "messages": {     // messages published on channels
+          "count": 5,       // count of messages
+          "data": 70        // total data in bytes
+        },
+        "presence": {     // presence events such as enter/leave
+          "count": 0,       // count of presence events
+          "data": 0         // total data in bytes for presence events
+        },
+        "all": {          // channel messages + presence
+          "count": 5,       // count of all
+          "data": 70        // total bytes for all
+        }
+      },
+      "all": {          // aggregates all inbound real-time and REST messages
+        "messages": {     // messages published on channels
+          "count": 5,       // count of messages
+          "data": 70        // total data in bytes
+        },
+        "presence": {   // presence events such as enter/leave
+          "count": 4,     // count of presence events
+          "data": 676     // total data in bytes for presence events
+        },
+        "all": {        // aggregated channel messages + presence
+          "count": 9,     // count of all
+          "data": 746     // total bytes for all
+        }
+      }
+    },
+    "outbound": {     // all outbound messages i.e. sent from Ably to clients
+      "realtime": {     // sent over real-time socket connection
+        "messages": {     // messages published on channels
+          "count": 17,      // count of messages
+          "data": 2873      // total data in bytes
+        },
+        "presence": {     // presence events such as enter/leave
+          "count": 37,      // count of presence events
+          "data": 2197      // total data in bytes for presence events
+        },
+        "all": {          // aggregated channel messages + presence
+          "count": 54,      // count of all
+          "data": 2435      // total bytes for all
+        }
+      },
+      "rest": {         // retrieved using REST history API
+        "messages": {     // messages on channels
+          "count": 0,       // count of messages
+          "data": 0         // total data in bytes
+        },
+        "presence": {     // presence events such as enter/leave
+          "count": 0,       // count of presence events
+          "data": 0         // total data in bytes for presence events
+        },
+        "all": {          // aggregated channel messages + presence
+          "count": 0,       // count of all
+          "data": 0         // total bytes for all
+        }
+      },
+      "webhook": {      // messages pushed to customer's servers via WebHooks
+        "messages": {     // messages published on channels
+          "count": 0,       // count of messages
+          "data": 0         // total data in bytes
+        },
+        "presence": {     // presence events such as enter/leave
+          "count": 0,       // count of presence events
+          "data": 0         // total data in bytes for presence events
+        },
+        "all": {          // aggregated channel messages + presence
+          "count": 0,       // count of all
+          "data": 0         // total bytes for all
+        }
+      },
+      "all": {          // aggregates all outbound real-time, REST and WebHook messages
+        "messages": {     // messages published on channels
+          "count": 17,      // count of messages
+          "data": 238       // total data in bytes
+        },
+        "presence": {     // presence events such as enter/leave
+          "count": 37,      // count of presence events
+          "data": 2197      // total data in bytes for presence events
+        },
+        "all": {          // aggregated channel messages + presence
+          "count": 54,      // count of all
+          "data": 2435      // total bytes for all
+        }
+      }
+    },
+    "persisted": {    // all message types persisted based on configured channel rules
+      "messages": {     // messages persisted on channels
+        "count": 5,       // count of messages
+        "data": 70        // total data in bytes
+      },
+      "presence": {     // presence events persisted for states such as enter/leave
+        "count": 8,       // count of presence events
+        "data": 676       // total data in bytes for presence events
+      },
+      "all": {          // aggregated channel messages + presence persisted
+        "count": 13,      // count of all
+        "data": 746       // total bytes for all
+      }
+    },
+    "connections": {  // connection statistics for this time period
+      "plain": {        // non-TLS unencrypted connections
+        "peak": 4,        // peak concurrent connections for this period
+        "min": 0,         // minimum concurrent connections in this period
+        "mean": 2,        // average concurrent connections in this period
+        "opened": 6,      // count of new connections in this period
+        "refused": 0      // count of connections refused by Ably in this period
+      },
+      "tls": {          // TLS encrypted connections
+        "peak": 2,        // peak concurrent connections for this period
+        "min": 2,         // minimum concurrent connections in this period
+        "mean": 2,        // average concurrent connections in this period
+        "opened": 2,      // count of new connections in this period
+        "refused": 0      // count of connections refused by Ably in this period
+      },
+      "all": {          // aggregated summary of all connection types
+        "peak": 6,        // peak concurrent connections for this period
+        "min": 2,         // minimum concurrent connections in this period
+        "mean": 4,        // average concurrent connections in this period
+        "opened": 8,      // count of new connections in this period
+        "refused": 0      // count of connections refused by Ably in this period
+      }
+    },
+    "channels": {     // channel statistics for this time period
+      "peak": 2,        // peak number of channels active for this period
+      "min": 0,         // min number of channels active for this period
+      "mean": 0,        // average number of channels active for this period
+      "opened": 0,      // total number of channels opened in this period
+      "refused": 0      // number of channel attach requests failed because of permissions
+    },
+    "apiRequests": {  // API requests made via the REST API excluding tokens
+      "succeeded": 11,  // successful requests
+      "failed": 0,      // failed requests
+      "refused": 0      // requests refused as a result of exceeding account limits
+    },
+    "tokenRequests": { // token requests via the REST API
+      "succeeded": 9,   // successful tokens issued
+      "failed": 0,      // failed token request
+      "refused": 0      // requests refused due to permissions or rate limiting
+    },
+    "inProgress": "2015-03-16:10:57", // indicates the last sub-interval included in this statistic
+    "count": 116,     // indicates how many lower-level stats were used to aggregate these results
+    "unit": "hour",   // unit of time for these stats from the intervalId forwards
+    "intervalId": "2015-03-16:10" // interval these stats apply to in format yyyy-mm-dd:hh:mm:ss
+  }
+]</code></pre>
+    </article>
+    <hr class="back">
+    <a href="#documentation">Back to top</a>
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
