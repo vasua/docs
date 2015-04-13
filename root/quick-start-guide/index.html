@@ -22,7 +22,14 @@
     <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
-    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
     
@@ -42,12 +49,12 @@
 <p>To connect to Ably, you need an API key.  In this example we have provided a temporary API key, however if you are signed up and visit your <a href="https://ably.io/dashboard">application dashboard</a>, you will be able to use your own API key.  If you do not have an API key yet, why not <a href="https://ably.io/#signup">sign up now for a free app and API key</a>.</p>
 <pre class="code-editor open-jsbin open-jsbin-eberiq" lang="javascript"><code class="code-editor open-jsbin open-jsbin-eberiq" lang="javascript">var ably = new Ably.Realtime('{{API_KEY}}');
 ably.connection.on('connected', function() {
-  alert("That was simple, you're now connected to Ably in real-time");
+  alert("That was simple, you're now connected to Ably in realtime");
 });</code></pre>
 <p>Messages are broadcasted on channels.  Next we will subscribe to a channel and listen for messages that are sent to us from other connected clients or servers.</p>
 <pre class="code-editor open-jsbin open-jsbin-ehahil" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ehahil" lang="javascript">var channel = ably.channels.get('quickstart');
 channel.subscribe('greeting', function(message) {
-  alert("Received a greeting message in real-time: " + message.data);
+  alert("Received a greeting message in realtime: " + message.data);
 });</code></pre>
 <h3>The basics: Sending a message</h3>
 <p>Publishing a message to a channel is extremely straightforward.  As this is commonly performed by both connected devices and servers, here are examples in multiple languages</p>
@@ -101,7 +108,7 @@ if ('{{API_KEY}}' !== '{{API_' + 'KEY}}') {
 <li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
 <li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
 </ul>
-  <h2><a href="/realtime/">Real-time client lib</a></h2>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
 <li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
 <li class=''><a href='/realtime/connection/'>Connection</a></li>
@@ -135,7 +142,7 @@ if ('{{API_KEY}}' !== '{{API_' + 'KEY}}') {
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>

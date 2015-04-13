@@ -22,7 +22,14 @@
     <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
-    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
     
@@ -50,7 +57,7 @@
     </header>
     <article>
       <h2 id="overview">Overview</h2>
-<p>The Ably Real-time service supports client connections over multiple transports. The WebSocket transport is the primary transport for efficient connection by browser clients that are websocket-capable, and any other client environment that offers direct TCP socket access.</p>
+<p>The Ably Realtime service supports client connections over multiple transports. The WebSocket transport is the primary transport for efficient connection by browser clients that are websocket-capable, and any other client environment that offers direct TCP socket access.</p>
 <p>The WebSocket transport transmits <a href="/client-lib-development-guide/protocol">Protocol Messages</a> in a single WebSocket data frame. In the binary transport, these are sent as binary data frames, with the <a href="/client-lib-development-guide/protocol">Protocol Message</a> being encoded with <a href="http://msgpack.org/">MessagePack encoding</a>.  In the text transport these are sent as text data frames containing JSON-encoded ProtocolMessage objects. The <a href="/client-lib-development-guide/protocol">protocol definition</a> specifies the content and interpretation of the various protocol messages.</p>
 <p>This section defines details that are transport-specific, covering:</p>
 <ul>
@@ -131,7 +138,7 @@
 <li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
 <li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
 </ul>
-  <h2><a href="/realtime/">Real-time client lib</a></h2>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
 <li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
 <li class=''><a href='/realtime/connection/'>Connection</a></li>
@@ -165,7 +172,7 @@
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>

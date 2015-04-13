@@ -22,7 +22,14 @@
     <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
-    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
     
@@ -33,7 +40,7 @@
       
     </header>
     <article>
-      <p>The Ably system can be queried to obtain usage statistics for a given application, and results are provided aggregated across all channels in use in the application in the specified period. Stats may be used to track usage against account quotas.  The details on how to retrieve statistics are available in the <a href="/rest-api#stats">REST API documentation</a>, <a href="/realtime/statistics">Real-time client library statistics documentation</a> and <a href="/rest/statistics">REST client-library statistics documentation</a>.</p>
+      <p>The Ably system can be queried to obtain usage statistics for a given application, and results are provided aggregated across all channels in use in the application in the specified period. Stats may be used to track usage against account quotas.  The details on how to retrieve statistics are available in the <a href="/rest-api#stats">REST API documentation</a>, <a href="/realtime/statistics">Realtime client library statistics documentation</a> and <a href="/rest/statistics">REST client library statistics documentation</a>.</p>
 <p>Statistics returned from the API are sparse; this means that if a metric object such as a message count <code>{ count: [val], data: val }</code> is empty or contains only zero values for all key value pairs, then the metric will be omitted completely from the JSON response.  This reduces the size of the JSON significantly and thus improves performance.</p>
 <h3>Complete stats example containing all possible metrics</h3>
 <p>Example request:</p>
@@ -57,7 +64,7 @@
       }
     },
     "inbound": {      // all inbound messages i.e. received by Ably from clients
-      "realtime": {     // received over real-time socket connection
+      "realtime": {     // received over realtime socket connection
         "messages": {     // messages published on channels
           "count": 0,       // count of messages
           "data": 0         // total data in bytes
@@ -85,7 +92,7 @@
           "data": 70        // total bytes for all
         }
       },
-      "all": {          // aggregates all inbound real-time and REST messages
+      "all": {          // aggregates all inbound realtime and REST messages
         "messages": {     // messages published on channels
           "count": 5,       // count of messages
           "data": 70        // total data in bytes
@@ -101,7 +108,7 @@
       }
     },
     "outbound": {     // all outbound messages i.e. sent from Ably to clients
-      "realtime": {     // sent over real-time socket connection
+      "realtime": {     // sent over realtime socket connection
         "messages": {     // messages published on channels
           "count": 17,      // count of messages
           "data": 2873      // total data in bytes
@@ -143,7 +150,7 @@
           "data": 30         // total bytes for all
         }
       },
-      "all": {          // aggregates all outbound real-time, REST and WebHook messages
+      "all": {          // aggregates all outbound realtime, REST and WebHook messages
         "messages": {     // messages published on channels
           "count": 30,      // count of messages
           "data": 268       // total data in bytes
@@ -273,7 +280,7 @@
 <li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
 <li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
 </ul>
-  <h2><a href="/realtime/">Real-time client lib</a></h2>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
 <li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
 <li class=''><a href='/realtime/connection/'>Connection</a></li>
@@ -307,7 +314,7 @@
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>

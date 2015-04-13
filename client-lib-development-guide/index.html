@@ -22,7 +22,14 @@
     <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
-    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
     
@@ -39,10 +46,10 @@
 <h2>Overview</h2>
 <p>Our client libraries provide REST and/or Realtime functionality.</p>
 <h3>REST library functionality</h3>
-<p>REST libraries provide a convenient way to access the Ably REST API, and are intended to be used by clients that do not need real-time updates from the Ably service, but will instead send requests to Ably to:</p>
+<p>REST libraries provide a convenient way to access the Ably REST API, and are intended to be used by clients that do not need realtime updates from the Ably service, but will instead send requests to Ably to:</p>
 <ul>
 	<li>publish messages on behalf of clients using the stateless REST publish API;</li>
-	<li>issue tokens on behalf of other real-time clients;</li>
+	<li>issue tokens on behalf of other realtime clients;</li>
 	<li>retrieve persisted message history;</li>
 	<li>retrieve presence state and message history;</li>
 	<li>retrieve application usage statistics;</li>
@@ -50,11 +57,11 @@
 </ul>
 <p>The <a href="/rest-api">REST API</a> has a stable interface definition at the <a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a> level &#8211; i.e. the routes, formats and error codes are in principle accessible via any <a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a> library. The Ably REST libraries provide convenience functionality and data center awareness however they are not the exclusive means to interface with the <a href="/rest-api">Ably REST interface</a>.</p>
 <p>See the <a href="https://github.com/ably/ably-ruby-rest/blob/master/SPEC.md">complete REST API specification</a></p>
-<h3>Real-time library functionality</h3>
-<p>Real-time libraries provide access to the messaging service, enabling real-time message publication, channel subscription and presence. The Real-time library typically extends the REST library, so that Realtime clients can access the REST functionality as well.</p>
-<p>While REST is supportable in any environment supporting HTTP, the Real-time API is supportable only in environments that support asynchronous or evented IO. The environments we target for the Real-time library support are those that might realistically be used to implement real-time system backends such as Node.js, Java or Go, and environments that might be used to develop client apps such as a browser Javascript environment, iOS or Android.</p>
-<p>The Real-time interface is implemented using an <a href="protocol">Ably-defined protocol</a> (over WebSockets and other transports) and, although that <a href="protocol">protocol is published</a>, we reserve the right to change the protocol and drop support for superseded protocol versions at any time. Of course, we don&#8217;t want to make life difficult for client library developers, so any incompatible changes will be very carefully considered, but nonetheless developers must regard the protocol definition as being subject to change. Application developers using the Ably Real-time API should use one of the <a href="https://www.ably.io/download">Ably client libraries</a> and can expect that API to be stable and supported even if the protocol changes underneath.</p>
-<p>See the <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">complete Real-time and REST API specification</a></p>
+<h3>Realtime library functionality</h3>
+<p>Realtime libraries provide access to the messaging service, enabling realtime message publication, channel subscription and presence. The Realtime library typically extends the REST library, so that Realtime clients can access the REST functionality as well.</p>
+<p>While REST is supportable in any environment supporting HTTP, the Realtime API is supportable only in environments that support asynchronous or evented IO. The environments we target for the Realtime library support are those that might realistically be used to implement realtime system backends such as Node.js, Java or Go, and environments that might be used to develop client apps such as a browser Javascript environment, iOS or Android.</p>
+<p>The Realtime interface is implemented using an <a href="protocol">Ably-defined protocol</a> (over WebSockets and other transports) and, although that <a href="protocol">protocol is published</a>, we reserve the right to change the protocol and drop support for superseded protocol versions at any time. Of course, we don&#8217;t want to make life difficult for client library developers, so any incompatible changes will be very carefully considered, but nonetheless developers must regard the protocol definition as being subject to change. Application developers using the Ably Realtime API should use one of the <a href="https://www.ably.io/download">Ably client libraries</a> and can expect that API to be stable and supported even if the protocol changes underneath.</p>
+<p>See the <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">complete Realtime and REST API specification</a></p>
 <h2>Developing an Ably client library</h2>
 <p>If you are interested in developing or forking one of our client libraries, please do <a href="https://www.ably.io/contact">get in touch</a> as we&#8217;d love to help.  Equally, if you feel we&#8217;re missing a client library for your platform or language, do <a href="https://www.ably.io/contact">get in touch</a> and we&#8217;ll see what we can do to help.</p>
 <p>The following resources are useful references when developing client libraries for Ably:</p>
@@ -65,20 +72,20 @@
 <p>All of the Ably client libraries have test suites that run the test suite against temporary apps that are created during the test setup. Although Ably does not provide a public provisioning API for account management (in the production system this is available only through the website registration and dashboard) there is a limited API provided via the REST<br />
 interface in the sandbox environment to enable test applications and keys to be provisioned automatically for each test run. Therefore, all tests are set up to run against the sandbox environment.</p>
 <p>See <a href="test-api">Test API</a> for details about the test routes provided in the REST API.</p>
-<h3>Real-time protocol definition</h3>
-<p>See the current version of the <a href="/client-lib-development-guide/protocol">Ably real-time protocol definition</a>.  Please note that this protocol is subject to change, we recommend you use one of the <a href="https://www.ably.io/download">Ably client libraries</a> if you want any API compatiblity guarantees.</p>
+<h3>Realtime protocol definition</h3>
+<p>See the current version of the <a href="/client-lib-development-guide/protocol">Ably realtime protocol definition</a>.  Please note that this protocol is subject to change, we recommend you use one of the <a href="https://www.ably.io/download">Ably client libraries</a> if you want any API compatiblity guarantees.</p>
 <h3>REST API definition</h3>
 <p>See the <a href="/rest-api">Ably REST API definition</a> which can be considered stable and not subject to change without the introduction of a versioning systme.</p>
 <h3>Encryption</h3>
 <p>Ably client libraries support encryption of message content, making it easier to build apps that encrypt content fully end-to-end.  See the <a href="/client-lib-development-guide/encryption">encryption specification</a>.</p>
-<h3>Real-time transports</h3>
+<h3>Realtime transports</h3>
 <p>All Ably client libraries at a minimum support Websockets as our primary transport.  Additionally, libraries may support one or more additional fallback transports such as Comet, XHR streaming, JSONP etc.  The following transports are currently documented:</p>
 <ul>
 	<li><a href="/client-lib-development-guide/websocket">Websocket Transport</a></li>
 	<li><a href="/client-lib-development-guide/comet">Comet Transport</a></li>
 </ul>
 <h3>Connection management &amp; recovery</h3>
-<p>Real-time client libraries are responsible for automatically managing the underlying connection to the Ably service.  This includes recovering and maintaining state following a disconnected connection, automatically reattempting connections and automatically routing around issues connecting to the closest data center if necessary.  Please see the following articles:</p>
+<p>Realtime client libraries are responsible for automatically managing the underlying connection to the Ably service.  This includes recovering and maintaining state following a disconnected connection, automatically reattempting connections and automatically routing around issues connecting to the closest data center if necessary.  Please see the following articles:</p>
 <ul>
 	<li><a href="/client-lib-development-guide/connection-manager">Connection manager</a></li>
 	<li><a href="/client-lib-development-guide/connection-recovery">Connection recovery</a></li>
@@ -99,7 +106,7 @@ interface in the sandbox environment to enable test applications and keys to be 
 <li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
 <li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
 </ul>
-  <h2><a href="/realtime/">Real-time client lib</a></h2>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
 <li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
 <li class=''><a href='/realtime/connection/'>Connection</a></li>
@@ -133,7 +140,7 @@ interface in the sandbox environment to enable test applications and keys to be 
   <h2 class="selected"><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>

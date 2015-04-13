@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Ably API Documentation - REST Client Library</title>
+    <title>Ably API Documentation - REST Client Library API</title>
     <link rel="stylesheet" type="text/css" href="/assets/stylesheet.css" media="screen">
     <link rel="shortcut icon" href="/assets/favicon.ico">
 
@@ -22,23 +22,31 @@
     <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
-    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
     
     <header>
       
       
-        <h1 id="title">REST Client Library</h1>
+        <h1 id="title">REST Client Library API</h1>
       
     </header>
     <article>
-      <p>The Ably REST client library is available in <a href="https://ably.io/download/rest-client-libaries">most popular languages</a> including <a href="https://ably.io/download/rest-client-libraries#javascript">Javascript</a>, <a href="https://ably.io/download/rest-client-libraries#java">Java</a>, <a href="https://ably.io/download/rest-client-libraries#python">Python</a>, <a href="https://ably.io/download/rest-client-libraries#ruby">Ruby</a>, <a href="https://ably.io/download/rest-client-libraries#dotnet">.NET</a>, <a href="https://ably.io/download/rest-client-libraries#php">PHP</a>, <a href="https://ably.io/download/rest-client-libraries#nodejs">Node.js</a>, <a href="https://ably.io/download/rest-client-libraries#iOS">iOS</a> and <a href="https://ably.io/download/rest-client-libraries">more&#8230;</a></p>
-<p>Whilst you can interact directly with our <a href="/rest-api/">REST API</a>, we advocate the use of <a href="https://ably.io/download/rest-client-libaries">our REST client libraries</a> as they strictly follow our REST API specification, they provide convenience, simplicity, and a number of additional features such as encryption and automatic data center fail-over.  In addition, we have ensured that <a href="https://ably.io/download/client-libaries">our client libraries</a> provide a consistent API across all languages.</p>
-<h2>Primary interfaces</h2>
-<p>The client library exposes the Ably service with the following interfaces and methods:</p>
+      <p>The Ably REST client libraries provide a convenient and simple API to interact directly with the <a href="/rest-api/">Ably REST API</a>.  All official client library APIs are consistent across every language, enable publishing and retrieving of messages, handle both basic and token authentication, work around unavailable data centres, include optional symmetrical encryption and provide access to presence and metrics history.</p>
+<p>The Ably REST client library is available in <a href="https://ably.io/download/realtime-client-libraries">most popular languages and platforms</a> including including <a href="https://github.com/ably/ably-js">Javascript browser library</a>, <a href="https://github.com/ably/ably-java">Java</a>, <a href="https://github.com/ably/dot-net">.NET</a>, <a href="https://github.com/ably/ably-js">Node.js</a>, <a href="https://github.com/ably/ably-ios">iOS</a>, <a href="https://github.com/ably/ably-python">Python</a>, <a href="https://github.com/ably/ably-ruby-rest">Ruby</a>, <a href="https://github.com/ably/ably-go">Go</a> and <a href="https://ably.io/download/rest-client-libraries">more&#8230;</a></p>
+<p><a href="https://ably.io/download/rest-client-libraries">Download one of our REST client libraries now »</a></p>
+<h2>Dive into the documentation</h2>
+<p>The REST Client Library documentation API is broken down as follows:</p>
 <ul>
-	<li><a href="usage">Constructor &amp; Usage</a></li>
+	<li><a href="usage">Constructor &amp; usage examples</a></li>
 	<li><a href="channels-messages">Channels &amp; Messages</a></li>
 	<li><a href="presence">Presence</a></li>
 	<li><a href="authentication">Authentication</a></li>
@@ -46,9 +54,10 @@
 	<li><a href="statistics">Statistics</a></li>
 	<li><a href="encryption">Encryption</a></li>
 </ul>
-<h1>REST API Specification</h1>
-<p>The Ably REST API can also be accessed directly over HTTPS.</p>
-<p class="larger">View the complete <a href="/rest-api">Ably REST API specification</a></p>
+<p class="tip">Use the Ably REST client libraries as they provide features that the REST API cannot support such as encryption or automatic fail-over to alternate data centers should the closest data center become unavailable.</p>
+<h2>REST API Specification</h2>
+<p>Whilst we recommend that you use one of the <a href="https://ably.io/download/realtime-client-libraries">officially available Ably REST client libraries</a>, you can accees the Ably REST API directly from any HTTP client.</p>
+<p><a href="/rest-api">View the Ably REST API specification »</a></p>
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>
@@ -60,7 +69,7 @@
 <li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
 <li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
 </ul>
-  <h2><a href="/realtime/">Real-time client lib</a></h2>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
 <li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
 <li class=''><a href='/realtime/connection/'>Connection</a></li>
@@ -94,7 +103,7 @@
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>

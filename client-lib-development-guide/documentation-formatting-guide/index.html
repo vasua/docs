@@ -22,7 +22,14 @@
     <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
-    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
     
@@ -118,15 +125,13 @@ a += 1;</code></pre>
 <pre><code>```[javascript]
   var a = 1;
 <br/>  a = 2; // note this works in spite of the line break
-```
-<br/>```[ruby]
+bc. <br/>```[ruby]
   a = 1
-<br/>  a = 2
-```
-<br/>```[csharp]
-  int a = 1;
-<br/>  a = 2;
-```</code></pre>
+<br/>  a = 2</code></pre>
+<p><br/>```[csharp]<br />
+  int a = 1;<br />
+<br/>  a = 2;<br />
+```</p>
 <p>generates the following where the code shown is governed by the language selected in the floating top nav</p>
 <pre lang="javascript"><code lang="javascript">var a = 1;
 <br/>a = 2; // note this works in spite of the line break</code></pre>
@@ -183,33 +188,50 @@ SIGNED_TOKEN_REQUEST_EXAMPLE: "{{SIGNED_TOKEN_REQUEST_EXAMPLE}}"</code></pre>
 <pre lang="text"><code lang="text">pre. this.code is('mono-spaced')</code></pre>
 <p>will generate a box styled as follows:</p>
 <pre>this.code is('mono-spaced')</pre>
-<h2 id="language-specific-content"><span lang='default'>Language specific content (default selected)</span><span lang='javascript'>Language specific content (Javascript selected)</span><span lang='nodejs'>Language specific content (Node.js selected)</span><span lang='csharp'>Language specific content (C# selected)</span><span lang='ruby'>Language specific content (Ruby selected)</span><span lang='java'>Language specific content (Java selected)</span></h2>
+<h2 id="language-specific-content"><span lang='default'>Language specific (default)</span><span lang='javascript'>Language specific (Javascript)</span><span lang='nodejs'>Language specific (Node.js)</span><span lang='csharp'>Language specific (C#)</span><span lang='ruby'>Language specific (Ruby)</span><span lang='java'>Language specific (Java)</span></h2>
 <p>Within this documentation repository&#8217;s static site, all language specific content is wrapped in light dotted lines for clarity.  However, when imported into the main Ably website, content will not be wrapped in dotted lines.  Unlike code blocks, if you specify a single language specific block of content, it will only be shown if the language matches.  Single language code blocks in contrast will appear regardless of which language is selected.</p>
 <p>You can specify multiple languages per language specific content block such as <code>&lt;span class="ruby,java"&gt;</code>.</p>
 <p>Whenever you need to vary the content based on the language selected by the user in the top language navigation, you have the following options available:</p>
 <h3>Consecutive lines with <code>tag[lang].</code></h3>
 <p>Whenever the front end detects multiple consecutive <code>tag.</code> markup with a language specified, the front end will automatically show the content related to the selected language, and hide all other languages.  Note that the special language <code>default</code> can be used to provide default copy in the absence of any specific language variation existing.  For example:</p>
 <pre lang="text"><code lang="text">p[default]. Default text to appear for all languages not specified
-// line break
-p[ruby]. Text to appear when Ruby is the chosen language</code></pre>
+<br/>p[ruby]. Text to appear when Ruby is the chosen language</code></pre>
 <p>Will result in:</p>
 <p lang="default">Default text to appear for all languages not specified</p>
 <p lang="ruby">Text to appear when Ruby is the chosen language</p>
-<h3>Large blocks using <code>&lt;div lang="[lang]"&gt;</code></h3>
-<p>When you need to vary large content blocks by language which can in turn contain any other HTML or Textile markup, you can use <code>div</code> tags with the <code>lang</code> attribute set.</p>
-<p>If you do not specify a language block for the current selected language, nothing will be shown to the user.</p>
-<pre lang="text"><code lang="text">&lt;div lang="default"&gt;
-p1. This block will be shown by default
-&lt;/div&gt;&lt;div lang="ruby"&gt;
-p1. This block will be shown when Ruby is selected
-&lt;/div&gt;</code></pre>
+<h3>Large blocks using <code>blang[lang].</code></h3>
+<p>When you need to vary large content blocks by language which can in turn contain any other HTML or Textile markup, you can use the custom <code>blank</code> textile markup with the <code>lang</code> attribute set within the square brackets.  Indentation following the markup becomes significant and is used to indicate to the Textile parser that all text with indentation following the <code>blang[lang].</code> markup is part of this large language block.</p>
+<p>If a language block for the user&#8217;s currently selected language does not exist, nothing will be shown to the user.</p>
+<pre lang="text"><code lang="text">blang[default].
+  p. This block will be shown by default
+<br/>  This second line is considered part of the default block because it's still indented.
+<br/>blang[ruby].
+  This block will be shown when Ruby is selected
+<br/>  This second line is considered part of the Ruby block because it's still indented.</code></pre>
+<p>Results in:</p>
+
+
+<div lang="default"> <!-- start default language block -->
+<p>This block will be shown by default</p>
+<p>This second line is considered part of the default block because it&#8217;s still indented.</p>
+
+</div> <!-- /end default language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p>This block will be shown when Ruby is selected</p>
+<p>This second line is considered part of the Ruby block because it&#8217;s still indented.</p>
+
+</div> <!-- /end ruby language block -->
+
 <h3>In-line content with <code>&lt;span lang="[lang]"&gt;</code></h3>
 <p>When you need to vary the content by language inline within a paragraph or another element, you can use <code>span</code> tags with the <code>lang</code> attribute set.  If a language tag is missing, nothing will be shown.  For example:</p>
 <pre lang="html"><code lang="html">The language currently being viewed is:
   &lt;span lang="javascript"&gt;javascript&lt;/span&gt;&lt;span lang="ruby"&gt;ruby&lt;/span&gt;</code></pre>
 <p>Results in:</p>
 <p>The language currently being viewed is: <span lang="javascript">javascript</span><span lang="ruby">ruby</span></p>
-<p>Here is another examples using an additional default language tag in the format <code>&lt;span lang="default"&gt;</code> of all <code>&lt;/span&gt;</code>:</p>
+<p>Here is another examples using an additional default language tag in the format <code>&lt;span lang="default"&gt;&lt;/span&gt;</code>:</p>
 <p>The language <span lang="javascript">javascript</span><span lang="ruby">ruby</span><span lang="default">of all</span> is currently being viewed</p>
 <h3>Method or object reference / definitions with language variations <code>h6(#requesttoken). definition</code></h3>
 <p>When you need to vary the reference or definition of a method or object property by language, you can use <code>h6</code> tags with the language defined on the next line as follows:</p>
@@ -385,7 +407,7 @@ Methods
 <li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
 <li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
 </ul>
-  <h2><a href="/realtime/">Real-time client lib</a></h2>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
 <li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
 <li class=''><a href='/realtime/connection/'>Connection</a></li>
@@ -419,7 +441,7 @@ Methods
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>

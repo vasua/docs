@@ -22,7 +22,14 @@
     <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
-    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
     
@@ -54,20 +61,20 @@
     
     <header>
       
-        <div class="breadcrumb"><a href="/realtime/">Realtime Client API</a><span class="separator">/</span></div>
+        <div class="breadcrumb"><a href="/realtime/">Realtime Client Library API</a><span class="separator">/</span></div>
       
       
         <h1 id="title">Presence</h1>
       
     </header>
     <article>
-      <p>Presence provides awareness of other clients that connected and present on channel. Each member present on a channel has a unique client identifier and an optional payload that can be used to describe the member&#8217;s status or attributes. Presence allows you to quickly build apps such as chat rooms or multiplayer games as Ably will automatically keep track of who is present in real-time across any device.</p>
+      <p>Presence provides awareness of other clients that connected and present on channel. Each member present on a channel has a unique client identifier and an optional payload that can be used to describe the member&#8217;s status or attributes. Presence allows you to quickly build apps such as chat rooms or multiplayer games as Ably will automatically keep track of who is present in realtime across any device.</p>
 <h3>Broadcast your presence &amp; subcribe to presence events</h3>
 <p>Ably Channels support the concept of presence. Each channel may have a presence set associated with it, which is a set of clientIds for those clients that have announced their presence by entering the channel.</p>
 <pre lang="ruby"><code lang="ruby">EventMachine.run do
   client = Ably::Realtime::Client.new(api_key: '', client_id: 'bob')
 <br/>  client.channel('realtime-chat').attach do |channel|
-    channel.presence.subscribe(:enter) do |presence_message|
+    channel.presence.on(:enter) do |presence_message|
       puts "#{presence_message.client_id} entered realtime-chat"
     end
 <br/>    channel.presence.enter
@@ -75,14 +82,14 @@
 end</code></pre>
 <pre lang="javascript"><code lang="javascript">var client = Ably.Realtime.Client({ api_key: '', client_id: 'bob' });
 <br/>client.channel('realtime-chat').attach(function(channel) {
-  channel.presence.subscribe('enter', function(presenceMessage) {
+  channel.presence.on('enter', function(presenceMessage) {
     console.log(presenceMessage.memberKey() + ' entered realtime-chat');
   });
 <br/>  channel.presence.enter();
 });</code></pre>
 <pre lang="nodejs"><code lang="nodejs">var client = Ably.Realtime.Client({ api_key: '', client_id: 'bob' });
 <br/>client.channel('realtime-chat').attach(function(channel) {
-  channel.presence.subscribe('enter', function(presenceMessage) {
+  channel.presence.on('enter', function(presenceMessage) {
     console.log(presenceMessage.memberKey() + ' entered realtime-chat');
   });
 <br/>  channel.presence.enter();
@@ -93,53 +100,53 @@ end</code></pre>
 <p>An Ably client instance might, if on an application server for example, publish messages on behalf of multiple distinct clientIds. The channel&#8217;s <code>presence</code> object therefore also supports methods that enable presence messages to be published for a clientId specified at the time of the call, rather than for a clientId specified when the library was instanced.</p>
 <p>In order to be able to publish presence changes for arbitrary clientIds, the client library must have been instanced either with a key, or with a token bound to the wildcard clientId.</p>
 <pre lang="ruby"><code lang="ruby">channel = client.channel('realtime-chat')
-<br/>channel.presence.subscribe(:enter) do |presence_message|
+<br/>channel.presence.on(:enter) do |presence_message|
   puts "#{presence_message.client_id} entered realtime-chat"
 end
 <br/>channel.presence.enter_client('bob') # bob entered realtime-chat
 channel.presence.enter_client('mary') # mary entered realtime-chat</code></pre>
 <pre lang="javascript"><code lang="javascript">var channel = client.channel('realtime-chat');
-<br/>channel.presence.subscribe('enter', function(presenceMessage) {
+<br/>channel.presence.on('enter', function(presenceMessage) {
   console.log(presenceMessage.client_id + 'entered realtime-chat');
 });
 <br/>channel.presence.enterClient('bob'); // bob entered realtime-chat
 channel.presence.enterClient('mary'); // mary entered realtime-chat</code></pre>
 <pre lang="nodejs"><code lang="nodejs">var channel = client.channel('realtime-chat');
-<br/>channel.presence.subscribe('enter', function(presenceMessage) {
+<br/>channel.presence.on('enter', function(presenceMessage) {
   console.log(presenceMessage.client_id + 'entered realtime-chat');
 });
 <br/>channel.presence.enterClient('bob'); // bob entered realtime-chat
 channel.presence.enterClient('mary'); // mary entered realtime-chat</code></pre>
 <p>In this example, you have to connect with a different client ID. Submitting the same client ID wouldn&#8217;t submit any other <code>ENTER</code> event.</p>
-<pre lang="ruby"><code lang="ruby">channel.presence.subscribe(:enter) do |presence_message|
+<pre lang="ruby"><code lang="ruby">channel.presence.on(:enter) do |presence_message|
   puts "#{presence_message.client_id} entered realtime-chat"
 end
 <br/>channel.presence.enter_client('bob') # bob entered realtime-chat
 channel.presence.enter_client('bob') # (this prints nothing)</code></pre>
-<pre lang="javascript"><code lang="javascript">channel.presence.subscribe('enter', function(presenceMessage) {
+<pre lang="javascript"><code lang="javascript">channel.presence.on('enter', function(presenceMessage) {
   console.log(presenceMessage.clientId + " entered realtime-chat");
 });
 <br/>channel.presence.enterClient('bob'); // bob entered realtime-chat
 channel.presence.enterClient('bob'); // (this prints nothing)</code></pre>
-<pre lang="nodejs"><code lang="nodejs">channel.presence.subscribe('enter', function(presenceMessage) {
+<pre lang="nodejs"><code lang="nodejs">channel.presence.on('enter', function(presenceMessage) {
   console.log(presenceMessage.clientId + " entered realtime-chat");
 });
 <br/>channel.presence.enterClient('bob'); // bob entered realtime-chat
 channel.presence.enterClient('bob'); // (this prints nothing)</code></pre>
 <h3>Payload</h3>
 <p>In addition to the <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span> for members on a channel, it is also possible to include a data payload. Clients can <a href="#update">update</a> their data at any point whilst present on a channel.</p>
-<pre lang="ruby"><code lang="ruby">channel.presence.subscribe(:enter) do |presence_message|
+<pre lang="ruby"><code lang="ruby">channel.presence.on(:enter) do |presence_message|
   puts presence_message.client_id # =&gt; bob
   puts presence_message.data      # =&gt; robert@example.com
 end
 <br/>channel.presence.enter(client_id: 'bob', data: 'robert@example.com')</code></pre>
-<pre lang="javascript"><code lang="javascript">channel.presence.subscribe('enter', function(presenceMessage) {
+<pre lang="javascript"><code lang="javascript">channel.presence.on('enter', function(presenceMessage) {
   console.log(presenceMessage.clientId); // =&gt; bob
   console.log(presenceMessage.data);     // =&gt; robert@example.com
 });
 end
 <br/>channel.presence.enter({ client_id: 'bob', data: 'robert@example.com' })</code></pre>
-<pre lang="nodejs"><code lang="nodejs">channel.presence.subscribe('enter', function(presenceMessage) {
+<pre lang="nodejs"><code lang="nodejs">channel.presence.on('enter', function(presenceMessage) {
   console.log(presenceMessage.clientId); // =&gt; bob
   console.log(presenceMessage.data);     // =&gt; robert@example.com
 });
@@ -473,7 +480,7 @@ h2(#paginated-result). PaginatedResult</p>
 <li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
 <li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
 </ul>
-  <h2><a href="/realtime/">Real-time client lib</a></h2>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
 <li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
 <li class=''><a href='/realtime/connection/'>Connection</a></li>
@@ -507,7 +514,7 @@ h2(#paginated-result). PaginatedResult</p>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>

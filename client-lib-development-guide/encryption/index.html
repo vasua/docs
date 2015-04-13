@@ -22,7 +22,14 @@
     <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
-    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
     
@@ -53,7 +60,7 @@
 <p>The libraries support encryption purely as a convenience; the libraries ensure interoperability between environments by having compatible implementations of encryption algorithms and by making common choices on format, mode, padding etc. However, Ably intentionally does not manage the distribution of keys between clients, and end-to-end encryption is enabled without exposing keys to the Ably service at all. This has the advantage that Ably demonstrably has no access to the unencrypted contents of your messages, but also means that each app is responsible for enabling the distribution of keys to clients independently of Ably.</p>
 <p>The client library support for encryption supports symmetric encryption only, and requires each participating client to each specify the correct secret key when creating a <code>Channel</code> instance. Clients that do not specify a key will be delivered the still-encrypted message payloads that they may then still wish to decrypt offline.</p>
 <p>The client libraries are designed to be extensible, but initially only support the AES algorithm (with a default key length of 128 bits) and CBC mode. These defaults are intended to ensure that encryption support can be provided in all target environments and platforms.</p>
-<p>Encryption is supported for both REST and Real-time publish operations and presence data payloads. Decryption is supported in Real-time message subscriptions amd presence events and in REST and Realtime history operations.</p>
+<p>Encryption is supported for both REST and Realtime publish operations and presence data payloads. Decryption is supported in Realtime message subscriptions amd presence events and in REST and Realtime history operations.</p>
 <p>The key in use at any given time is known by the client library, but the Ably service has no visibility of the key; it knows only that a given message payload was encrypted. When accessing messages via the history API, it is the caller&#8217;s responsibility to ensure that the correct key is used for the requested interval.</p>
 <p>Only message data payloads are encrypted, all other message data and metadata is not encrypted; for example the <code>clientId</code> and event <code>name</code>. This means that messages with a specific event name can still be routed by the library to the correct handler even if the recipient does not have the key; the encrypted payload data is delivered instead. Furthermore, the message encoding attribute is simply regarded as metadata just like other message metadata.</p>
 <p>Encryption options (algorithm, key, etc) are specified on a per-channel basis; it is expected that apps will wish to have both unencrypted and encrypted channels on a single connection.</p>
@@ -109,7 +116,7 @@
 <li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
 <li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
 </ul>
-  <h2><a href="/realtime/">Real-time client lib</a></h2>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
 <li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
 <li class=''><a href='/realtime/connection/'>Connection</a></li>
@@ -143,7 +150,7 @@
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class='selected'><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>

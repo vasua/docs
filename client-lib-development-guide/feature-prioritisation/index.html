@@ -22,7 +22,14 @@
     <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
-    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
     
@@ -36,7 +43,7 @@
     </header>
     <article>
       <p>Whilst all <a href="https://www.ably.io/download">officially supported Ably client libraries</a> support all features defined in the <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">specification</a>, we recommend an approach that focuses on the most commonly used features first.</p>
-<p>Real-time client libraries typically depend on REST client library features so our recommendation for Real-time client library development is to develop the REST client library first.</p>
+<p>Realtime client libraries typically depend on REST client library features so our recommendation for Realtime client library development is to develop the REST client library first.</p>
 <h2>REST client library feature prioritisation</h2>
 <ul>
 	<li>Basic authentication &#8211; see basic auth within <a href="https://github.com/ably/ably-ruby-rest/blob/master/SPEC.md#ablyauth">Auth spec</a></li>
@@ -53,12 +60,12 @@
 	<li>Update the <a href="/client-lib-development-guide#doc-steps">client library API documentation</a></li>
 </ul>
 <p>The complete feature specification for REST libraries is available at <a href="https://github.com/ably/ably-ruby-rest/blob/master/SPEC.md">specification</a>.</p>
-<h2>Real-time client library feature prioritisation</h2>
+<h2>Realtime client library feature prioritisation</h2>
 <ul>
-	<li>REST client library &#8211; assumes that <a href="https://github.com/ably/ably-ruby-rest/blob/master/SPEC.md">complete feature specification for REST libraries</a> has been implemented and is available to this new real-time client library.</li>
-	<li>Simple real-time connection over WebSockets with JSON &amp; MessagePack support &#8211; see <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md#ablyrealtimeconnection">#initialization, #connect and #close within connection spec</a> and <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md#ablymodelsprotocolmessage">ProtocolMessage object spec</a></li>
+	<li>REST client library &#8211; assumes that <a href="https://github.com/ably/ably-ruby-rest/blob/master/SPEC.md">complete feature specification for REST libraries</a> has been implemented and is available to this new realtime client library.</li>
+	<li>Simple realtime connection over WebSockets with JSON &amp; MessagePack support &#8211; see <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md#ablyrealtimeconnection">#initialization, #connect and #close within connection spec</a> and <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md#ablymodelsprotocolmessage">ProtocolMessage object spec</a></li>
 	<li>Attach, detach, publish and subscribe for channels &#8211; see <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md#ablyrealtimechannel">Channel spec</a> and <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md#ablyrealtimechannels">channels object spec</a></li>
-	<li>Message encoding and encryption on real-time channels &#8211; see <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md#ablyrealtimechannel-message">Message spec</a></li>
+	<li>Message encoding and encryption on realtime channels &#8211; see <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md#ablyrealtimechannel-message">Message spec</a></li>
 	<li>Presence subscriptions, enter, update and leave &#8211; see <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md#ablyrealtimepresence">#enter, #update, #leave, #subscribe and #unsubcribe of Presence spec</a></li>
 	<li>Presence member map &#8211; see <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md#ablyrealtimepresence">get and sync specs within the Presence spec</a></li>
 	<li>Connection management &#8211; see <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md#ablyrealtimeconnection-failures">connection failure section of the Connection failure spec</a></li>
@@ -81,7 +88,7 @@
 <li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
 <li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
 </ul>
-  <h2><a href="/realtime/">Real-time client lib</a></h2>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
 <li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
 <li class=''><a href='/realtime/connection/'>Connection</a></li>
@@ -115,7 +122,7 @@
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
 <li class='selected'><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>

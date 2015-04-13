@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Ably API Documentation - Real-time Protocol Definition</title>
+    <title>Ably API Documentation - Realtime Protocol Definition</title>
     <link rel="stylesheet" type="text/css" href="/assets/stylesheet.css" media="screen">
     <link rel="shortcut icon" href="/assets/favicon.ico">
 
@@ -22,7 +22,14 @@
     <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
-    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
     
@@ -47,13 +54,13 @@
         <div class="breadcrumb"><a href="/client-lib-development-guide/">Client Library Development Guide</a><span class="separator">/</span></div>
       
       
-        <h1 id="title">Real-time Protocol Definition</h1>
+        <h1 id="title">Realtime Protocol Definition</h1>
       
     </header>
     <article>
       <h2 id="overview">Overview</h2>
-<p>The Ably Real-time protocol operates over a connection-oriented, framed, transport. It supports a single connection (and thus a single application) at a time, and enables traffic belonging to multiple channels to be sent over that single connection.</p>
-<p>In the current Ably service the backend supports the Real-time protocol over a WebSocket transport and over a Comet transport. Other transports are possible and this document aims to define the protocol in a transport-independent manner.</p>
+<p>The Ably Realtime protocol operates over a connection-oriented, framed, transport. It supports a single connection (and thus a single application) at a time, and enables traffic belonging to multiple channels to be sent over that single connection.</p>
+<p>In the current Ably service the backend supports the Realtime protocol over a WebSocket transport and over a Comet transport. Other transports are possible and this document aims to define the protocol in a transport-independent manner.</p>
 <p>The protocol supports both a text-based format using <a href="http://json.org/">JSON</a> and a binary format using <a href="http://msgpack.org/">MessagePack</a>. All structures passed on the wire are defined in a JSON-like format. Other encodings may be considered in the future.</p>
 <h2 id="formats">Formats</h2>
 <p>The unit of any protocol transmission is a <code>ProtocolMessage</code> key value Hash object, referred to in this description as a Protocol Message.</p>
@@ -64,7 +71,7 @@
 <p>Each Protocol Message has an <code>action</code> that indicates the nature of the message.</p>
 <dl>
 	<dt>HEARTBEAT (0)</dt>
-	<dd>A heartbeat message is sent periodically by the service over a connection in order to keep the connection alive (anticipating that proxies or other gateways may close the connection if it is idle indefinitely) and, in the Comet case, to prevent HTTP request timeout errors. The heartbeat interval is a configurable property of the real-time service and is not selectable by the client.<br><br>
+	<dd>A heartbeat message is sent periodically by the service over a connection in order to keep the connection alive (anticipating that proxies or other gateways may close the connection if it is idle indefinitely) and, in the Comet case, to prevent HTTP request timeout errors. The heartbeat interval is a configurable property of the realtime service and is not selectable by the client.<br><br>
 Heartbeat messages are not exposed to the client app, and are silently consumed in the transport layer of the client library. However, client library unit tests will typically wish to check for the presence of a heartbeat to confirm that a connection is intact, and therefore client libraries should expose some means for tests to observe the occurrence of heartbeats.<br><br>
 No other message fields are populated in a heartbeat message.</dd>
 </dl>
@@ -312,7 +319,7 @@ If the connectionId of an already-entered member changes (eg in the situation th
 <li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
 <li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
 </ul>
-  <h2><a href="/realtime/">Real-time client lib</a></h2>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
 <li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
 <li class=''><a href='/realtime/connection/'>Connection</a></li>
@@ -346,7 +353,7 @@ If the connectionId of an already-entered member changes (eg in the situation th
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
-<li class='selected'><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class='selected'><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>

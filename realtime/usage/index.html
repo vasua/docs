@@ -22,7 +22,14 @@
     <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
-    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
     
@@ -35,7 +42,11 @@
 </optgroup>
 <optgroup label='Realtime API reference'>
 <option id="anchor-constructor">constructor</option>
+<option id="anchor-channels">channels</option>
+<option id="anchor-connection">connection</option>
 <option id="anchor-close">close</option>
+<option id="anchor-stats">stats</option>
+<option id="anchor-time">time</option>
 </optgroup>
 <optgroup label='Related types'>
 <option id="anchor-options">Options</option>
@@ -46,72 +57,101 @@
     
     <header>
       
-        <div class="breadcrumb"><a href="/realtime/">Realtime Client API</a><span class="separator">/</span></div>
+        <div class="breadcrumb"><a href="/realtime/">Realtime Client Library API</a><span class="separator">/</span></div>
       
       
         <h1 id="title">Using the Realtime library</h1>
       
     </header>
     <article>
-      <p>The Realtime library attempts to establish, and maintain, a single connection to the Ably realtime service. The library extends, and depends on, the <a href="/rest/usage">REST library</a>, which provides access to the <a href="/rest-api">REST-based Ably APIs</a>, and the <a href="/rest/authentication">Auth API</a> in particular.</p>
-<p>Whereas the REST API is stateless, the Realtime API maintains connection and channel state.</p>
-<p>The Realtime client library is available for <a href="https://ably.io/download/realtime-client-libraries">several popular environments</a>, with the same functionality and similar API supported across all languages. You can view this documentation in each of the supported languages using the language selector navigation.</p>
-<div lang="javascript">The Realtime library for browser Javascript environments is loaded from the Ably CDN.<br />
-<br />
-<pre lang="javascript"><code lang="javascript">&lt;script lang="text/javascript" src="http://cdn.ably.io/ably-min.js"&gt;</code></pre><br />
-<br />
-The script contains both Realtime library and all its dependencies. To instance the Realtime library:<br />
-<br />
-<pre lang="javascript"><code lang="javascript">var realtime = new Ably.Realtime(options);</code></pre></div><div lang="nodejs">The Realtime library for nodejs targets clients and servers and is obtainable as a module <a href="https://npmjs.org/package/ably-js">directly from npm</a>. Install with<br />
-<br />
-<pre lang="sh"><code lang="sh">npm install ably-js</code></pre><br />
-<br />
-The ably-js module contains both the REST and Realtime libraries; each is exported separately by the module. To instance the Realtime library:<br />
-<br />
-<pre lang="javascript"><code lang="javascript">var Ably = require('ably-js');
-var realtime = new Ably.Realtime(options);</code></pre></div><div lang="ruby">The Realtime library for Ruby is obtainable as a RubyGem direcly using<br />
-<br />
-<pre lang="sh"><code lang="sh">gem install ably-realtime</code></pre><br />
-<br />
-If using bundler, simply add the following to your Gemfile and run <code>bundle install</code>:<br />
-<br />
-<pre lang="ruby"><code lang="ruby">gem 'ably-realtime'</code></pre></div><div lang="java">The Realtime library for Java is downloadable as a JAR from<br />
-<a href="https://github.com/ably/ably-java/releases">https://github.com/ably/ably-java/releases</a>.<br />
-<br />
-Ensure this JAR is included in your classpath.<br />
-<br />
+      <p>The Realtime library when initialized attempts to establish and maintain a single connection to the Ably realtime service. The library extends the <a href="/rest/usage">REST library</a> to provide all REST API functionality including the <a href="/rest/authentication">authentication API</a>.   Whereas the REST API is stateless, the Realtime API maintains connection and channel state.</p>
+<p>The Ably Realtime client library is available for <a href="https://ably.io/download/realtime-client-libraries">most popular languages and platforms</a> with a consistent API across all platforms. You can view this documentation with your preferred language API and code examples using the language selector navigation above.</p>
+
+
+<div lang="javascript"> <!-- start javascript language block -->
+<p>The Realtime library for browser Javascript environments should be loaded from the Ably CDN as follows:</p>
+<pre lang="javascript"><code lang="javascript">&lt;script lang="text/javascript" src="//cdn.ably.io/lib/ably.min.js" /&gt;</code></pre>
+<p>The script contains both the Realtime and REST libraries as well as all their dependencies. To instance the Realtime library:</p>
+<pre lang="javascript"><code lang="javascript">var realtime = new Ably.Realtime({ key: "{{API_KEY}}" });</code></pre>
+
+</div> <!-- /end javascript language block -->
+
+
+
+<div lang="nodejs"> <!-- start nodejs language block -->
+<p>The Realtime library for nodejs targets clients and servers and is obtainable as a module <a href="https://npmjs.org/package/ably">directly from npm</a>. Install with:</p>
+<pre lang="sh"><code lang="sh">npm install ably-js</code></pre>
+<p>The Ably Node.js module contains both the REST and Realtime libraries; each is exported separately by the module. To instance the Realtime library:</p>
+<pre lang="nodejs"><code lang="nodejs">var Ably = require('ably-js');
+var realtime = new Ably.Realtime({ key: apiKey });</code></pre>
+
+</div> <!-- /end nodejs language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p>The Realtime library for Ruby is obtainable as a RubyGem direcly using:</p>
+<pre lang="sh"><code lang="sh">gem install ably</code></pre>
+<p>If using bundler, simply add the following to your Gemfile and run <code>bundle install</code>:</p>
+<pre lang="ruby"><code lang="ruby">gem 'ably'</code></pre>
+<p>The Ably Ruby gem contians both the REST and Realtime libraries; each is namespaced separately by the gem. To instance the Realtime library:</p>
+<pre lang="ruby"><code lang="ruby">ably = Ably::Realtime.new(key: api_key)</code></pre>
+
+</div> <!-- /end ruby language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<p>The Realtime library for Java is downloadable as a JAR from <a href="https://github.com/ably/ably-java/releases">https://github.com/ably/ably-java/releases</a>.</p>
+<p>Ensure this JAR is included in your classpath.</p>
 <pre lang="java"><code lang="java">import io.ably.rest.AblyRealtime;
-AblyRealtime realtime = new AblyRealtime(options);</code></pre></div>
+AblyRealtime realtime = new AblyRealtime(options);</code></pre>
+
+</div> <!-- /end java language block -->
+
 <p>The required and supported <a href="#options">options</a> are described below.</p>
 <h1>Realtime API Reference</h1>
 <h2 id="constructor">Constructor</h2>
-<h6 lang="javascript">AblyRealtime(keyStr)</h6>
-<h6 lang="nodejs">AblyRealtime(keyStr)</h6>
-<h6 lang="ruby">Ably::Realtime.new(keyStr)</h6>
-<h6 lang="java">AblyRealtime(String keyStr)</h6>
-<p>Instance the library passing only a key string. All other options assume default values.</p>
-<h6 lang="javascript">AblyRealtime(options)</h6>
-<h6 lang="nodejs">AblyRealtime(options)</h6>
-<h6 lang="ruby">Ably::Realtime.new(options)</h6>
-<h6 lang="java">AblyRealtime(Options options)</h6>
-<p>Instance the library specifying an <a href="#options">Options</a> instance.</p>
-<p>The Realtime constructor is used to instance the library.The Realtime library may be instanced multiple times with different <code>options</code> in any given context. Except where specified otherwise, instances operate independently of one another.</p>
-<p>The Realtime library needs to know the application identifier, or <code>appId</code>, and also requires credentials or other information required to be able to authenticate to the Ably service. The application id can be specified explicitly with an <code>appId</code> option, or is more typically given implicitly by passing a <code>key</code> or <code>token</code> option when constructing the library.</p>
-<p>The <code>key</code> option takes a key string, as obtained from the <a href="https://ably.io/dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or if you want to be able to request tokens without needing to defer to<br />
-a separate entity to sign token requests. Note that initialising the library with a <code>key</code> does not necessarily mean that the library will use Basic auth; but knowing the key it is able to create and sign token requests and use token authentication when necessary.</p>
-<p>The <code>token</code> option takes a token string, and assumes the token has been obtained from some other instance that requested the token. Use the token option if you are provided with a token to use and you do not have a key (or do not have a key with the capabilities that you require).</p>
-<p>Since tokens are short-lived, it is rarely sufficient to start with a token, without the means for refreshing it. The <code>authUrl</code> and <code>authCallback</code> options are provided to allow a user of the library to issue new token requests as required; these options even permit the library to be instanced without either <code>key</code> or <code>token</code>, and an initial token<br />
-will be obtained when required.</p>
+<p>The Ably Realtime library constructor is overloaded allowing it to be instanced using either a string API key or Token ID, or a set of <a href="#options">Realtime Options</a></p>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>Ably.Realtime(keyOrTokenIdString)</span><span lang='ruby'>Ably::Realtime.new(keyOrTokenIdString)</span><span lang='java'>AblyRealtime(String keyOrTokenIdString)</span></p>
+</blockquote>
+<p>This will instance the Realtime library with the provided API key or Token ID string.</p>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>AblyRealtime(options)</span><span lang='ruby'>Ably::Realtime.new(options)</span><span lang='java'>AblyRealtime(Options options)</span></p>
+</blockquote>
+
+
+<div lang="default"> <!-- start default language block -->
+<p>This will instance the library using the specified <a href="#options">options</a>.</p>
+
+</div> <!-- /end default language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p>This will instance the library and create a new <code>Ably::Realtime::Client</code> using the specified <a href="#options">options</a>.</p>
+
+</div> <!-- /end ruby language block -->
+
+<p>The Realtime constructor is used to instance the library.  The Realtime library may be instanced multiple times with the same or different <a href="#options"><code>options</code></a> in any given context. Except where specified otherwise, instances operate independently of one another.</p>
+<h3 id="authentication">Authentication</h3>
+<p>The Realtime library needs to have credentials to be able to authenticate with the Ably service:</p>
+<p>The <code>key</code> option takes a key string, as obtained from the <a href="https://ably.io/dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or if you want to be able to request tokens without needing to defer to a separate entity to sign token requests. Note that initialising the library with a <code>key</code> does not necessarily mean that the library will use Basic auth; but knowing the key it is able to create and sign token requests and use token authentication when necessary.</p>
+<p>The <code>token</code> option takes a token ID string, and assumes the token has been obtained from some other instance that requested the token. Use the token option if you are provided with a token to use and you do not have a key (or do not have a key with the capabilities that you require).</p>
+<p>Since tokens are short-lived, it is rarely sufficient to start with a token without the means for refreshing it. The <span lang="default"><code>authUrl</code> and <code>authCallback</code> options</span><span lang="ruby"><code>:auth_url</code> option and constructor <code>&amp;token_request_block</code></span> are provided to allow a user of the library to provide new tokens or token requests to the library as required; these options even permit the library to be instanced without a <code>key</code> or <code>token</code>, and an initial token will be obtained when required.</p>
 <p>See <a href="#options">Options</a> for the full set of initialisation options.</p>
-<h2 id="methods">Methods</h2>
-<h6 lang="default" id="close">close()</h6>
-<h6 lang="java" id="close">public void close()</h6>
-<p>This simply calls <a href="/realtime/connection#close" title="">connection.close</a>. Causes the connection to close, entering the <code>closed</code> state. Once closed, the library will not attempt to re-establish the connection without a call to <code>connect()</code>.</p>
+<h2 id="methods"><span lang='default'>Realtime Methods</span><span lang='ruby'>Realtime::Client Methods</span></h2>
+<h6 id="close">close</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>close()</span><span lang='ruby'>close(&amp;block)</span><span lang='java'>public void close()</span></p>
+</blockquote>
+<p>This simply calls <a href="/realtime/connection#close" title="">connection.close</a> and causes the connection to close, entering the <code>closed</code> state. Once closed, the library will not attempt to re-establish the connection without an explicit call to <span lang="default"><a href="/realtime/connection#connect"><code>connect()</code></a></span><span lang="ruby"><a href="/realtime/connection#connect"><code>connect</code></a></span>.</p>
 <h6 id="stats">stats</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='nodejs'>rest.stats(options, callback)</span><span lang='ruby'>rest.stats(options) → json_result</span><span lang='java'>public PaginatedResult&lt;Stats&gt; stats(Param[] params)</span></p>
+<p class="definition"><span lang='default'>stats(options, callback)</span><span lang='ruby'>stats(options Hash) → EventMachine::Deferrable → yields PaginatedResource&lt;Stat&gt;</span><span lang='java'>public PaginatedResult&lt;Stats&gt; stats(Param[] params)</span></p>
 </blockquote>
-<p>This call queries the REST <a href="/rest-api#stats"><code>/stats</code></a> API.</p>
+<p>This call queries the REST <a href="/rest-api#stats"><code>/stats</code></a> API and retrieves application statistics.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>params</dt>
@@ -126,49 +166,44 @@ where:<br />
 </ul></dd>
 </dl>
 <p>Further details of the supported query params are in the <a href="/rest/stats">stats API</a> documentation.</p>
-<div lang="java">
+
+
+<div lang="default"> <!-- start default language block -->
 <h4>Returns</h4>
-<p>On success, the returned <a href="#paginated-result">PaginatedResult</a> encapsulates a collection of <code>Stats</code> objects corresponding to the current page of results, and also provides query parameters for any applicable related (eg <code>first</code> or <code>next</code> result pages).</p>
+<p>On success, the returned <a href="#paginated-result">PaginatedResult</a> encapsulates a collection of <code>Stats</code> objects corresponding to the current page of results, and also provides query parameters for any applicable related (e.g. <code>first</code> or <code>next</code> result pages).</p>
+<p>Failure to retrieve the stats will call the callback with the err argument populated.</p>
+
+</div> <!-- /end default language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<h4>Returns</h4>
+<p>On success, the returned <a href="#paginated-result">PaginatedResult</a> encapsulates a collection of <code>Stats</code> objects corresponding to the current page of results, and also provides query parameters for any applicable related (e.g. <code>first</code> or <code>next</code> result pages).</p>
 <p>Failure to retrieve the stats will raise an <code>AblyException</code>.</p>
-<p></div><div lang="ruby"><br />
-h4. Returns</p>
-<p>On success, <span lang="ruby"><code>json_result</code></span> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api/#stats">REST API</a>.</p>
-<p>Example <span lang="ruby"><code>json_result</code></span>:</p>
-<pre lang="json"><code lang="json">[{
-  "name": "&lt;event name&gt;",
-  "channel": "&lt;channel id&gt;",
-  "data": "&lt;message payload&gt;",
-  "timestamp": "&lt;message timestamp&gt;"
-}]</code></pre>
-<p>Failure to retrieve the history will raise an exception &#8211; typical exceptions include:<br />
-  <div lang="ruby"></p>
-<ul>
-	<li><code>Ably::NetworkUnavailableException</code></li>
-	<li><code>Ably::QuotaExceededException</code></li>
-	<li><code>Ably::AuthenticationFailureException</code><br />
-  </div></li>
-</ul>
-<p></div><div lang="nodejs,javascript"></p>
-<h4>Pagination</h4>
-<p>A paginated result is indicated in the <code>relParams</code> callback argument. For each available link, <code>relParams</code> contains a map of params to pass to a subsequent <code>stats()</code> call.<br />
-  Example <code>relParams</code>:<br />
-  <pre lang="json"><code>[{
-    "first": {"start": 1380794880000, "end": 138079488105, ...},
-    "current": {"start": 1380794880000, "end": 138079488105, ...},
-    "next": {"start": 1380794880000, "end": 138079488105, ...}
-  }]</code></pre></p>
-<p>Further details of the paginated response are in the <a href="/rest/statistics">stats API</a> documentation.</p>
-</div>
-<h2 id="members">Public members</h2>
-<p>The Realtime object exposes the following public <span lang="default">properties</span><span lang="java">fields</span>.</p>
-<dl>
-	<dt><span lang="java">public final</span>connection</dt>
-	<dd>A reference to the <a href="/realtime/connection">connection</a> object for this library instance.</dd>
-</dl>
-<dl>
-	<dt><span lang="java">public final</span>channels</dt>
-	<dd>The collection of channels instanced, indexed by channel name. See <a href="/realtime/channels-messages/">channels and messages</a> for more information.</dd>
-</dl>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>On success, the returned <a href="#paginated-result">PaginatedResult</a> encapsulates a collection of <code>Stat</code> objects corresponding to the current page of results, and also provides methods to navigate through paged results (e.g. <code>first</code> or <code>next</code>).</p>
+<p>Failure to retrieve the history will trigger the errback callback of the Deferrable.</p>
+
+</div> <!-- /end ruby language block -->
+
+<h6 id="time">time</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>time(callback)</span><span lang='ruby'>time → EventMachine::Deferrable → yields Time</span><span lang='java'>public long time</span></p>
+</blockquote>
+<p>Obtains the time from the Ably service.  This may be required on clients that do not have access to a sufficiently well maintained time source, to provide timestamps for use in token requests.</p>
+<h2 id="members"><span lang='default'>Public members</span><span lang='ruby'>Public attributes</span></h2>
+<p>The Realtime object exposes the following public <span lang="default">properties</span><span lang="java">fields</span><span lang="ruby">attributes</span>.</p>
+<h6 id="connection">connection</h6>
+<p>A reference to the <a href="/realtime/connection">connection</a> object for this library instance.</p>
+<h6 id="channels">channels</h6>
+<p>A reference to the <a href="/realtime/channels-messages">channels collection</a> instance for this library indexed by the channel name. See <a href="/realtime/channels-messages/">channels and messages</a> for more information.</p>
 <h2 id="options">Options</h2>
 <div lang="java">
 <p>The Ably constructor&#8217;s <code>Options</code> argument is an instance of <code>io.ably.types.Options</code>, constructed either with the default no-argument constructor or with a key string. The following options may be specified.</p>
@@ -274,7 +309,7 @@ Note that the log level and log handler have global scope in the library and wil
 <li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
 <li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
 </ul>
-  <h2><a href="/realtime/">Real-time client lib</a></h2>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
 <li class='selected'><a href='/realtime/usage/'>Using the Realtime library</a></li>
 <li class=''><a href='/realtime/connection/'>Connection</a></li>
@@ -308,7 +343,7 @@ Note that the log level and log handler have global scope in the library and wil
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>

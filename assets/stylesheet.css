@@ -29,6 +29,8 @@ a:hover {
   top: 50px;
   left: 280px;
   width: 650px; }
+  #documentation.with-langauage-selector {
+    top: 75px; }
 
 #sidebar {
   position: absolute;
@@ -72,6 +74,41 @@ hr.back {
     margin-bottom: 15px;
     display: block; }
 
+/* Github fork banner fixed top right */
+.fork-banner {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 2; }
+  .fork-banner img {
+    border: 0; }
+
+/* Notice for people who arrive here and don't realise this is not the canonical source of documentation */
+.canonical-notice {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 2;
+  font-size: 13px;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #ffa54c;
+  text-align: center;
+  height: 25px; }
+  .canonical-notice .canonical-notice-text {
+    position: relative;
+    top: -5px; }
+    .canonical-notice .canonical-notice-text a {
+      color: #fffccc; }
+      .canonical-notice .canonical-notice-text a:hover {
+        text-decoration: underline; }
+  .canonical-notice img {
+    margin-top: 4px;
+    height: 18px;
+    width: 18px;
+    position: relative;
+    padding: 0;
+    border: 0; }
+
 #documentation {
   font-family: Lucida Sans Unicode, sans-serif;
   font-size: 12px;
@@ -80,6 +117,8 @@ hr.back {
   /* H2s indicate sections such as Methods / Attributes of an object */
   /* H4s indicate sections within a method or attribute */
   /* H6s indicate methods or attribute */
+  /* provide sufficient space after h6 tags and following text */
+  /* h6 that follow paragraphs need less space above */
   /* indent all copy under a heading */
   /* block quotes are used for function definitions as code, but are changed at runtime with code blocks as they can be colour coded */
   /* more space for method definition unless after a H6 definition anchor */
@@ -177,8 +216,13 @@ hr.back {
     #documentation h6 code {
       background-color: transparent;
       color: #FBB; }
-  #documentation h6 + code, #documentation h6 + code.prettyprint {
+  #documentation p ~ code.prettyprint, #documentation h6 + code, #documentation h6 + code.prettyprint {
     margin-top: 20px; }
+  #documentation h6 ~ p {
+    margin-top: 5px; }
+  #documentation p ~ h6 {
+    line-height: 25px;
+    top: 0; }
   #documentation h2, #documentation h3, #documentation h6[lang] {
     /* code definition heading is following a section heading yet is inline, so needs to be positioned carefully
        also include support for ul in case a language selector is added, or another h6[lang] tag */ }
@@ -495,19 +539,18 @@ hr.back {
 div.global-lang-container {
   font-family: Georgia, Palatino, Times, 'Times New Roman', sans-serif;
   position: fixed;
-  top: 0;
+  top: 40px;
   left: 280px;
   width: 650px;
   display: block;
   background-color: #FEC;
   border: 1px solid #ffb84d;
   border-top: 0;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border-radius: 5px;
   z-index: 5;
   box-shadow: 0 0 7px #F90; }
   div.global-lang-container:before {
-    top: -3px;
+    top: 38px;
     content: "View documentation in:";
     display: block;
     position: fixed;
@@ -537,7 +580,7 @@ nav.jump-to-nav {
   position: fixed;
   left: 0px;
   width: 930px;
-  top: 50px;
+  top: 70px;
   z-index: 100; }
   nav.jump-to-nav .form {
     float: right;

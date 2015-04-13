@@ -121,7 +121,10 @@ $(function() {
   for (langID in langList) {
     if ((langID !== 'default') && !friendlyLanguageFromId(langID)) if (console.warn) console.warn('Language ' + langID + ' is not supported and not shown');
   }
-  if (langList.find('li').length) $('body').append(globalLangContainer);
+  if (langList.find('li').length) {
+    $('body').append(globalLangContainer);
+    $('#documentation').addClass('with-langauage-selector');
+  }
 
   // event callback for the global language navigation selection
   function selectGlobalLanguage(cookieStrategy) {
@@ -174,9 +177,4 @@ $(function() {
 
   // remove language breakers <span class="breaker"></span> as they are only there to stop consecutive blocks being linked unintentionally
   $('p:has(span.breaker),span.breaker').remove();
-
-  // div language blocks often commence with breaks and empty P tags because of incorrect Textile interpretation
-  $('div[lang] > br, div[lang] > p').each(function() {
-    if (!$(this).text()) $(this).remove()
-  });
 });

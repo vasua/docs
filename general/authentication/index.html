@@ -22,7 +22,14 @@
     <meta name="generator" content="nanoc 3.7.5">
   </head>
   <body>
-    <a href="https://github.com/ably/docs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/assets/forkme.png" alt="Fork me on GitHub"></a>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
     
@@ -55,7 +62,7 @@
 <p>The simplest method for authentication with Ably is to use the API key string when instancing the client library Basic Authentication passing the key string to the client library</p>
 <p>This method is simple, but suffers from a number of problems that might make it unsuitable for certain use cases:</p>
 <ul>
-	<li>the secret is passed directly by the client to Ably, so it is not suitable for connections that are not over TLS (HTTPS or non-encrypted real-time connections)</li>
+	<li>the secret is passed directly by the client to Ably, so it is not suitable for connections that are not over TLS (HTTPS or non-encrypted realtime connections)</li>
 	<li>the secret may be required to be embedded in a script on a public site</li>
 	<li>all of the configured capabilities of the key are implicitly possible in any request, and clients that legitimately obtain the secret may then abuse the rights conferred by that key</li>
 </ul>
@@ -66,7 +73,7 @@
 <p>Basic authentication is appropriate where:</p>
 <ul>
 	<li>the script, program or system holding the key is not exposed; for example, a key should not be embedded in a script in a public-facing web page</li>
-	<li>a secure, unmediated connection exists between the client and the Ably service. Keys should only really be sent over a TLS conection (that&#8217;s either an HTTPS connection, or an encrypted real-time connection). A key should not be used over a proxied connection unless the proxy is trusted</li>
+	<li>a secure, unmediated connection exists between the client and the Ably service. Keys should only really be sent over a TLS conection (that&#8217;s either an HTTPS connection, or an encrypted realtime connection). A key should not be used over a proxied connection unless the proxy is trusted</li>
 	<li>access needs to be granted selectively to groups of clients to specific channels or channel namespaces, but only a small number of such access control groups need to be established</li>
 </ul>
 <p>Token authentication is appropriate when:</p>
@@ -108,7 +115,7 @@
 <p>The receiving Ably server verifies the signature if present, the timestamp (which must be within 2 minutes of the current time), verifies that the nonce/timestamp combination has not been used previously, verifies that the requested validity period is permitted, and verifies that the requested capabilities are permitted for that token based on the key capabilities.</p>
 <p>The server may choose to subset the capabilities based on the capabilities of the key.</p>
 <p>The server replies with an access token, which is essentially a signed version of the resolved set of capabilities, plus other metadata associated with the token (such as expiry time).</p>
-<p>This access token can then be used for subsequent REST requests or Real-time connections. If a clientId was included in the request, then the token is associated with that clientId, and may be used to authenticate that clientId in operations that require authentication (eg joining a channel that requires authentication).</p>
+<p>This access token can then be used for subsequent REST requests or Realtime connections. If a clientId was included in the request, then the token is associated with that clientId, and may be used to authenticate that clientId in operations that require authentication (eg joining a channel that requires authentication).</p>
 <h3>Parameter canonicalisation</h3>
 <p>The parameters of the token request are normalised/canonicalised as follows:</p>
 <dl>
@@ -252,7 +259,7 @@ Note that a newline character is added for each field, including any empty clien
 <li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
 <li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
 </ul>
-  <h2><a href="/realtime/">Real-time client lib</a></h2>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
 <li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
 <li class=''><a href='/realtime/connection/'>Connection</a></li>
@@ -286,7 +293,7 @@ Note that a newline character is added for each field, including any empty clien
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
-<li class=''><a href='/client-lib-development-guide/protocol/'>Real-time Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
