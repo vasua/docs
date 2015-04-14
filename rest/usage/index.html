@@ -56,7 +56,7 @@
       
     </header>
     <article>
-      <p>The REST client library provides access to the Ably REST API. The library is available is available for <a href="https://ably.io/download/rest-client-libraries">several popular environments</a>, with the same functionality and similar API supported across all languages. You can view this documentation in each of the supported languages using the language selector navigation.</p>
+      <p>The REST client library provides access to the Ably REST API. The library is available is available for <a href="https://www.ably.io/download/rest-client-libraries">several popular environments</a>, with the same functionality and similar API supported across all languages. You can view this documentation in each of the supported languages using the language selector navigation.</p>
 <div lang="nodejs">
 <p>The REST library for Javascript targets node.js clients and servers. It is obtainable as a module direcly from npm using</p>
 <pre lang="sh"><code lang="sh">npm install ably-js</code></pre>
@@ -87,7 +87,7 @@
 <p>Instance the library specifying an <a href="#options">Options</a> instance.</p>
 <p>The Rest constructor is used to instance the library.The Rest library may be instanced multiple times with different <code>options</code> in any given context. Except where specified otherwise, instances operate independently of one another.</p>
 <p>The Rest library needs to know the application identifier, or <code>appId</code>, and also requires credentials or other information required to be able to authenticate to the Ably service. The application id can be specified explicitly with an <code>appId</code> option, or is more typically given implicitly by passing a <code>key</code> or <code>token</code> option when constructing the library.</p>
-<p>The <code>key</code> option takes a key string, as obtained from the <a href="https://ably.io/dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or if you want to be able to request tokens without needing to defer to<br />
+<p>The <code>key</code> option takes a key string, as obtained from the <a href="https://www.ably.io/dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or if you want to be able to request tokens without needing to defer to<br />
 a separate entity to sign token requests. Note that initialising the library with a <code>key</code> does not necessarily mean that the library will use Basic auth; but knowing the key it is able to create and sign token requests and use token authentication when necessary.</p>
 <p>The <code>token</code> option takes a token string, and assumes the token has been obtained from some other instance that requested the token. Use the token option if you are provided with a token to use and you do not have a key (or do not have a key with the capabilities that you require).</p>
 <p>Since tokens are short-lived, it is rarely sufficient to start with a token, without the means for refreshing it. The <code>authUrl</code> and <code>authCallback</code> options are provided to allow a user of the library to issue new token requests as required; these options even permit the library to be instanced without either <code>key</code> or <code>token</code>, and an initial token<br />
@@ -160,11 +160,11 @@ The Ably constructor&#8217;s <code>Options</code> argument is an object with one
 </div>
 <dl>
 	<dt>appId</dt>
-	<dd>The application id. This option is only required if the application id cannot be inferred either from a <code>key</code> or <code>token</code> option. If given, it is the application id as indicated on the <a href="https://ably.io/dashboard">application dashboard</a>.</dd>
+	<dd>The application id. This option is only required if the application id cannot be inferred either from a <code>key</code> or <code>token</code> option. If given, it is the application id as indicated on the <a href="https://www.ably.io/dashboard">application dashboard</a>.</dd>
 </dl>
 <dl>
 	<dt>key</dt>
-	<dd>The full key string, as obtained from the <a href="https://ably.io/dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or wish to be able to issue tokens without needing to defer to a separate entity to sign token requests.</dd>
+	<dd>The full key string, as obtained from the <a href="https://www.ably.io/dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or wish to be able to issue tokens without needing to defer to a separate entity to sign token requests.</dd>
 </dl>
 <dl>
 	<dt>token</dt>
@@ -286,7 +286,7 @@ Note that the log level and log handler have global scope in the library and wil
 <li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
 </ul>
   <ul>
-<li><a href="https://ably.io">Visit Ably.io</a></li>
+<li><a href="https://www.ably.io">Visit Ably.io</a></li>
 </ul>
 </div>
 
