@@ -1,0 +1,444 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ably API Documentation - Features Overview</title>
+    <link rel="stylesheet" type="text/css" href="/assets/stylesheet.css" media="screen">
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+
+    <script src="/assets/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
+    <script src="/assets/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
+    <script src="/assets/vendor/javascripts/base64.js" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/prettify/prettify.css" media="screen">
+    <script src="/assets/vendor/prettify/prettify-lib.js" type="text/javascript"></script>
+
+    <script src="//cdn.ably.io/lib/ably.min.js" type="text/javascript"></script>
+
+    <script src="/assets/javascripts/application.js" type="text/javascript"></script>
+    <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.7.5">
+  </head>
+  <body>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
+
+  <div id="documentation">
+    
+    <header>
+      
+        <div class="breadcrumb"><a href="/client-lib-development-guide/">Client Library Development Guide</a><span class="separator">/</span></div>
+      
+      
+        <h1 id="title">Features Overview</h1>
+      
+    </header>
+    <article>
+      <p>A detailed <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> that applies to all client libraries is generated from the Ably Ruby client library&#8217;s acceptance and test suites.  Whilst every official Ably client library has test coverage, the amount of test coverage varies, and as such our recommendation is to refer to the official <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> when developing a client library.</p>
+<p>However, we have found the <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> can be difficult as a reference because of both its breadth and the fact that it applies to the Ruby client library which may be unfamiliar as a language for a lot of developers.</p>
+<p>As a result, this document outlines the complete feature set of both the REST and Realtime client libraries.  It is expected that every client library developer refers to this document to ensure that their client library provides the same API and features as the existing Ably client libraries. In addition to this, it is essential that there is test coverage over all of the features described below. We recommend you use the <a href="https://github.com/ably/ably-java">Ably Java</a> as a reference when reviewing how the API has been implemented as the implementation is straightforward and Java is a language most people are familiar with.</p>
+<h2 id="rest">REST client library features</h2>
+<ul>
+	<li><code>RestClient</code>
+	<ul>
+		<li>The constructor accepts either an API key, a token string, or a set of <a href="#options"><code>ClientOptions</code></a>.  An exception is raised if invalid arguments are provided such as no API key, token and no means to create a token</li>
+		<li>The logger by default outputs to <code>STDOUT</code> and the log level is set to warning</li>
+		<li>The log level can be changed</li>
+		<li>A custom logger can be provided in the constructor</li>
+		<li><code>RestClient#auth</code> attribute provides access to the <code>Auth</code> object that was instanced with the <code>ClientOptions</code> provided in the <code>RestClient</code> constructor</li>
+		<li><code>RestClient#stats</code> function:
+		<ul>
+			<li>Returns a <code>PaginatedResource</code> page containing <code>Stats</code> objects in the <code>PaginatedResource#items</code> attribute returned from the stats request</li>
+			<li>Supports the following params:
+			<ul>
+				<li><code>start</code> and <code>end</code> are timestamp fields represented as milliseconds since epoch, or where suitable to the language, Time objects. <code>start</code> must be equal to or less than <code>end</code> and is unaffected by the request direction</li>
+				<li><code>direction</code> backwards or forwards, must explicitly default to backwards</li>
+				<li><code>limit</code> supports up to 1,000 items, must explicitly default to 100</li>
+				<li><code>unit</code> is the period for which the stats will be aggregated by, values supported are <code>minute</code>, <code>hour</code>, <code>day</code> or <code>month</code>, must explicitly default to <code>minute</code></li>
+			</ul></li>
+		</ul></li>
+		<li><code>RestClient#time</code> function sends a get request to <code>rest.ably.io/time</code> and returns the server time in milliseconds since epoch or as a Time object where suitable</li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>Connection</code> (this is not a public object but an internal class used by <code>RestClient</code>, this pattern or approach is not required so long as the features below are met)
+	<ul>
+		<li>Sends REST requests over HTTP and HTTPS to the REST end-point <code>rest.ably.io</code></li>
+		<li>Supports two protocols:
+		<ul>
+			<li><a href="http://msgpack.org/">MessagePack</a> binary protocol (this is the default)</li>
+			<li>JSON text protocol (used when <code>useBinaryProtocol</code> option is false)</li>
+		</ul></li>
+		<li>REST endpoint is configurable in the Client constructor</li>
+		<li>Uses <code>Auth</code> to establish what authentication scheme to use, how to authenticate, and automatic issuing of tokens when necessary</li>
+		<li>If a REST request responds with 401 with code 40140, then the server is indicating the token is no longer valid.  Using the <code>Auth</code> class a token should be automatically issued if possible, otherwise an exception should be raised.</li>
+		<li>Requests are sent to the default end point <code>rest.ably.io</code>. However, if the <code>host</code> option is configured, the client will send requests to the specified host. If <code>environment</code> option is configured, the environment name is prefixed to the default host end point and the <code>host</code> is reconfigured. For example, if the <code>environment</code> is set to sandbox, then the <code>host</code> end point will become <code>sandbox-rest.ably.io</code></li>
+		<li>The client library must use <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/rest/client.rb#L24-L30">default connection and request timeouts</a>. Ideally these default timeouts should be configurable by the developer.</li>
+		<li>Authentication
+		<ul>
+			<li>Supports basic authenticate when an API key is provided with the <code>key</code> option.  The API key follows the format <code>"KEY_NAME:KEY_SECRET"</code> so when authenticating using basic auth, the key name can be used as the username and the key secret as the password.</li>
+			<li>Supports token authentication if a <code>token</code>, <code>tokenDetails</code>, <code>authCallback</code> or <code>authUrl</code> is provided.  If <code>useTokenAuth</code> is true or a <code>clientId</code> is provided when the library is instanced, then token authentication is always used.</li>
+			<li>When a <code>token</code> or <code>tokenDetails</code> is used to instance the library, and no means to renew the token is provided (either an API key, <code>authCallback</code> or <code>authUrl</code>), if the server responds with 40140 (token expired) to a request, the client library should raise an exception and not retry the request.</li>
+			<li>When the client does have a means to renew the token automatically, and the token has expired or the server has responded with 40140 (token expired), then the client should automatically renew the token and resend the request.</li>
+		</ul></li>
+		<li>Host Fallback
+		<ul>
+			<li>All HTTP requests sent to Ably are fault tolerant and will fallback to an alternative host name if the default host end point fails to service the request and the <code>host</code> and <code>environment</code> options are not configured. This ensures that a client library is able to work around routing or other problems with the user&#8217;s closest data center.  For example, if a <code>POST</code> request to <code>rest.ably.io</code> results in a connection failure at the transport level or an unsuccessful HTTP status code, then the <code>POST</code> request should be retried again against all the fallback hosts <code>[a-e].ably-realtime.com</code>.  See the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/transport/Defaults.java#L7">default fallback hosts</a> and the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/http/Http.java#L204-L224">fallback mechanism implemented in Java for POST requests</a> as an example.</li>
+			<li>Automatic retries to fallback hosts will not occur for all unsuccessful HTTP status codes. For example, if the credentials are invalid or the maxmimum message length has been exceeded, then resending the request to an alternative data center will not fix the problem and will only increase the load on other data centers. See the <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json#L11">complete list of Ably error codes</a> and a <a href="https://github.com/ably/ably-java/issues/14">discussion in the Java library about this</a></li>
+		</ul></li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>Auth</code>
+	<ul>
+		<li>Basic auth over HTTPS, will raise an exception over HTTP as insecure</li>
+		<li>Basic auth is the default authentication scheme if an API key exists</li>
+		<li>Token auth over HTTP or HTTPs using the token string</li>
+		<li>Token auth is the default if option <code>useTokenAuth</code> is set to true, a <code>clientId</code> is specified, <code>authUrl</code> or <code>authCallback</code> is configured, or a an explicit <code>token</code> is provided</li>
+		<li>TTL for new tokens defaults to 1 hour represented in milliseconds, and the <code>capability</code> defaults to allow all operations on all channels</li>
+		<li>If a <code>clientId</code> is provided in the options, then the string will be encoded in UTF-8 format before it is sent to Ably</li>
+		<li><code>Auth#authorise</code> function:
+		<ul>
+			<li>Instructs the library to create a token if needed and use Token auth for all future requests</li>
+			<li>Supports all <code>AuthOptions</code> and <code>TokenParams</code> in the function arguments</li>
+			<li>Will not create a new token unless no previous token exists or current token has expired</li>
+			<li>Providing the option <code>force</code> set to true will force <code>authorise</code> to issue a new token even if an existing token exists.</li>
+			<li>Adheres to the implementation of <code>requestToken</code> when issuing new tokens</li>
+			<li>Returns a <code>TokenDetails</code> object that contains the token string + token meta data</li>
+		</ul></li>
+		<li><code>Auth#requestToken</code> function:
+		<ul>
+			<li>Supports all <code>TokenParams</code> in the function arguments, which override defaults for <code>Client</code> <code>Auth</code>. If a <code>clientId</code> option is used, clients using that token will be restricted to using that <code>clientId</code>.</li>
+			<li>Returns a signed <code>TokenRequest</code> object that can be used to obtain a token from Ably</li>
+			<li>When <code>authUrl</code> option is set, it will retrieve the token from the provided URL using the HTTP <code>authHeaders</code>, query string <code>authParams</code> and <code>authMethod</code> (<code>GET</code> or <code>POST</code>) HTTP verb.  The token retrieved can simply be a token string if the response is <code>"text/html"</code>, or it can be a <code>TokenDetails</code> object in JSON format</li>
+			<li>When <code>authCallback</code> option is set, it will execute the callback and will expect either a token string, a <code>TokenDetails</code> object or a <code>TokenRequest</code> object which will in turn be used to request a token from Ably.</li>
+		</ul></li>
+		<li><code>Auth#createTokenRequest</code> function:
+		<ul>
+			<li>Supports all <code>AuthOptions</code></li>
+			<li>Generates a unique 16+ character <code>nonce</code> if none is provided, nonce is used to prevent replays</li>
+			<li>Generates a <code>timestamp</code> from current time if not provided, will retrieve the server time if <code>queryTime</code> is true</li>
+			<li>TTL is configurable in milliseconds</li>
+			<li>Capability JSON or Stringified JSON can be provided that specifies the channel(s) and privileges for each channel that the token will be authorised for</li>
+			<li>A valid HMAC is created using the private API key to sign the <code>TokenRequest</code> so that it can be used by any client to request a token without having or exchanging any secrets</li>
+		</ul></li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>Channels</code>
+	<ul>
+		<li><code>Channels</code> is a collection of <code>Channel</code> objects accessible through <code>Rest#channels</code>.</li>
+		<li>Methods should exist to check if a channel exists or iterate through the existing channels</li>
+		<li><code>Channels#get</code> function:
+		<ul>
+			<li>Creates a new <code>Channel</code> object for the specified channel if none exists, or returns the existing channel. <code>ChannelOptions</code> can be specified when instancing a new <code>Channel</code>.</li>
+		</ul></li>
+		<li><code>Channels#release</code> function:
+		<ul>
+			<li>Detaches the channel and then releases the channel resource i.e. it&#8217;s deleted and can then be garbage collected</li>
+		</ul></li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>Channel</code>
+	<ul>
+		<li><code>Channels#publish</code> function:
+		<ul>
+			<li>Expects either an array of <code>Message</code> objects or a <code>name</code> UTF-8 string and <code>data</code> payload.</li>
+			<li>When <code>name</code> and <code>data</code> is provided, a single message is published to Ably</li>
+			<li>When an array of <code>Message</code> objects is provided, a single request is made to Ably. When publishing multiple messages, this approach is more efficient</li>
+			<li>Raises an exception if the message was not successfully published to Ably</li>
+		</ul></li>
+		<li><code>Channel#history</code> function:
+		<ul>
+			<li>Returns a <code>PaginatedResource</code> page containing the first page of messages in the <code>PaginatedResource#items</code> attribute returned from the history request</li>
+			<li>Supports the following params:
+			<ul>
+				<li><code>start</code> and <code>end</code> are timestamp fields represented as milliseconds since epoch, or where suitable to the language, Time objects. <code>start</code> must be equal to or less than <code>end</code> and is unaffected by the request direction.</li>
+				<li><code>direction</code> backwards or forwards, must explicitly default to backwards</li>
+				<li><code>limit</code> supports up to 1,000 items, must explicitly default to 100</li>
+			</ul></li>
+		</ul></li>
+		<li><code>Channel#presence</code> attribute returns a <code>Presence</code> object for this channel</li>
+		<li>Message encoding
+		<ul>
+			<li>Payloads must be binary, strings, or JSON objects. Any other data type should not be permitted and an exception should be raised</li>
+			<li>If a message is encoded, the <code>encoding</code> attribute represents the encoding(s) applied in right to left format i.e. &#8220;utf-8/base64&#8221; indicates that the original payload has &#8220;utf-8&#8221; encoding and has subsequently been encoded in Base64 format.</li>
+			<li>When using MessagePack
+			<ul>
+				<li>Messages sent with binary payloads are not encoded as MessagePack supports binary</li>
+				<li>Messages sent with string payloads are sent unchanged</li>
+				<li>Messages sent with JSON payloads are not encoded as MessagePack supports JSON objects</li>
+				<li>All messages received will deliver payloads in the format they were sent in i.e. binary, string, or JSON</li>
+			</ul></li>
+			<li>When using JSON
+			<ul>
+				<li>Messages sent with binary payloads are encoded as Base64 and the <code>encoding</code> attribute is set to &#8220;base64&#8221;</li>
+				<li>Messages sent with string payloads are sent unchanged</li>
+				<li>Messages sent with JSON payloads are stringified and the <code>encoding</code> attribute is set to &#8220;utf-8/json&#8221;</li>
+				<li>All messages received will be decoded based on the <code>encoding</code> field and deliver payloads in the format they were sent in i.e. binary, string, or JSON</li>
+			</ul></li>
+		</ul></li>
+		<li>Message cryptography
+		<ul>
+			<li>When a <code>Channel</code> is instanced with the option <code>encrypted</code> true, messages will be automtically encrypted when sent to Ably and decrypted when received on this channel. The cipher configuration is set with the <code>cipherParams</code></li>
+			<li>AES 256 and 128 CBC encryption must be supported</li>
+			<li>Tests must exist that encrypt and decrypt the following fixture data for <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-128.json">AES 128</a> and <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-256.json">AES 256</a> to ensure the client library encryption is compatible across libraries</li>
+		</ul></li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>Presence</code>
+	<ul>
+		<li>Presence object is associated with a single channel and is accessible through <code>Channel#presence</code></li>
+		<li>There is no way to register a member as present on a channel via the REST API</li>
+		<li><code>Channels#get</code> function:
+		<ul>
+			<li>Returns a <code>PaginatedResource</code> page containing the first page of members present in the <code>PaginatedResource#items</code> attribute returned from the history request. Each member is represented as a <code>PresenceMessage</code>
+			<ul>
+				<li><code>limit</code> supports up to 1,000 items, must explicitly default to 100</li>
+			</ul></li>
+		</ul></li>
+		<li><code>Channel#history</code> function:
+		<ul>
+			<li>Returns a <code>PaginatedResource</code> page containing the first page of messages in the <code>PaginatedResource#items</code> attribute returned from the history request</li>
+			<li>Supports the following params:
+			<ul>
+				<li><code>start</code> and <code>end</code> are timestamp fields represented as milliseconds since epoch, or where suitable to the language, Time objects. <code>start</code> must be equal to or less than <code>end</code> and is unaffected by the request direction.</li>
+				<li><code>direction</code> backwards or forwards, must explicitly default to backwards</li>
+				<li><code>limit</code> supports up to 1,000 items, must explicitly default to 100</li>
+			</ul></li>
+		</ul></li>
+		<li>Presence Messages retrieved are decoded in the same way that messages are decoded</li>
+	</ul></li>
+</ul>
+<ul>
+	<li>General
+	<ul>
+		<li>Every test should be executed using all supported protocols such as JSON and <a href="http://msgpack.org/">MessagePack</a>.  This includes both sending &amp; receiving data.</li>
+		<li>All tests by default are run against a special Ably sandbox environment.  This environment allows apps to be provisioned without any authentication that can then be used for client library testing. Bear in mind that all apps created in the sandbox environment are automatically deleted within 60 minutes and have low limits to prevent abuse. Apps are configured by sending a <code>POST</code> request to <code>https://sandbox-rest.ably.io/apps</code> with a JSON body that specifies the keys and their associated capabilities, channel namespace rules and any presence fixture data that is required, see <a href="https://github.com/ably/ably-common/blob/master/test-resources/test-app-setup.json">ably-common test-app-setup.json</a>.  See the <a href="https://github.com/ably/ably-java/blob/master/test/io/ably/test/rest/RestSetup.java">Java test setup</a>. Presence fixture data is necessary for the REST library presence tests as there is no way to register presence on a channel in the REST library.</li>
+		<li>Testing statistics can be tricky due to timing issues and slow test suites as a result of sending requests to generate statistics.  As such, we provide a special stats end point in our sandbox environment that allows stats to be injected into our metrics system so that stats tests can make predictable assertions.  To create stats you must send an authenticated <code>POST</code> request to the stats JSON to <code>https://sandbox-rest.ably.io/stats</code> with the stats data you wish to create. See the <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/rest/stats.test.js#L8-L51">Javascript stats fixture</a> and <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/common/modules/testapp_manager.js#L158-L182">setup helper</a> as an example.</li>
+	</ul></li>
+</ul>
+<h2 id="realtime">Realtime client library features (WIP, not complete)</h2>
+<ul>
+	<li><code>Connection</code>
+	<ul>
+		<li>Supports</li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>Channel</code>
+	<ul>
+		<li><code>Channel#subscribe</code> function:</li>
+		<li>Subscribe with no arguments subscribes a listener to all messages</li>
+		<li>Subscribe with a single name argument subscribes a listener to only messages matching the string name</li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>EventEmitter mixin / interface</code>
+	<ul>
+		<li><code>EventEmitter</code> is not an object or class but a mixin that defines behaviour where included in other objects.  For example, the <code>Connection</code> object emits events for connection state and mixes in <code>EventEmitter</code> behaviour<br />
+**</li>
+		<li><code>EventEmitter#on</code> registers a listener for the specified event if provided, else it is registered for all events</li>
+		<li><code>EventEmitter#once</code> registers a listener that is called only once for the specified event if provided, else it is registered for all events</li>
+		<li><code>EventEmitter#off</code> deregisters a listener for the specified event if provided, else it is deregisters that listener for all events</li>
+		<li><code>EventEmitter#emit</code> emits event with the event name any arguments that get passed to the listeners.  If an error is raised in any of the listeners, the error is caught by the <code>EventEmitter</code> and an the error is logged to the Ably logger</li>
+	</ul></li>
+</ul>
+<h2>Types</h2>
+<h3 id="types">Data types</h3>
+<ul>
+	<li><code>Message</code>
+	<ul>
+		<li>A <code>Message</code> represents an individual presence message to be sent or received via the Ably Realtime service.  See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Message">Ruby Message documentation</a>, but bear in mind the attributes following underscore naming in Ruby.</li>
+		<li><code>Message</code> <code>Action</code> enum has the following values in order from zero: <code>ABSENT</code>, <code>PRESENT</code>, <code>ENTER</code>, <code>LEAVE</code>, <code>UPDATE</code></li>
+		<li>Attributes available in a <code>Message</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Message">Ruby Message documentation</a> for an explanation of each attribute:
+		<ul>
+			<li><code>id</code> string &#8211; unique ID for this message</li>
+			<li><code>clientId</code> string. If a non UTF-8 string is passed to the message, it must be encoded using UTF-8 before being passed to Ably</li>
+			<li><code>connectionId</code> string</li>
+			<li><code>data</code> string or Hash</li>
+			<li><code>encoding</code> string</li>
+			<li><code>timestamp</code> time in milliseconds since epoch</li>
+		</ul></li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>PresenceMessage</code>
+	<ul>
+		<li>A <code>PresenceMessage</code> represents an individual presence message to be sent or received via the Ably Realtime service.  See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/PresenceMessage">Ruby PresenceMessage documentation</a>, but bear in mind the attributes following underscore naming in Ruby.</li>
+		<li><code>PresenceMessage</code> <code>Action</code> enum has the following values in order from zero: <code>ABSENT</code>, <code>PRESENT</code>, <code>ENTER</code>, <code>LEAVE</code>, <code>UPDATE</code></li>
+		<li>Attributes available in a <code>PresenceMessage</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/PresenceMessage">Ruby PresenceMessage documentation</a> for an explanation of each attribute:
+		<ul>
+			<li><code>id</code> string &#8211; unique ID for this message</li>
+			<li><code>action</code> enum</li>
+			<li><code>clientId</code> string. If a non UTF-8 string is passed to the message, it must be encoded using UTF-8 before being passed to Ably</li>
+			<li><code>connectionId</code> string</li>
+			<li><code>data</code> string or Hash</li>
+			<li><code>encoding</code> string</li>
+			<li><code>timestamp</code> time in milliseconds since epoch</li>
+			<li><code>memberKey</code> string function that combines the <code>connectionId</code> and <code>clientId</code> ensuring multiple connected clients with the same clientId are unique</li>
+		</ul></li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>ProtocolMessage</code>
+	<ul>
+		<li>A <code>ProtocolMessage</code> represents the type used to send and receive messages over the Realtime protocol.  A ProtocolMessage always relates to a single channel only, but can contain multiple individual Messages or PresenceMessages.  See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/ProtocolMessage">Ruby ProtocolMessage documentation</a>, but bear in mind the attributes following underscore naming in Ruby.</li>
+		<li><code>ProtocolMessage</code> <code>Action</code> enum has the following values in order from zero: <code>HEARTBEAT</code>, <code>ACK</code>, <code>NACK</code>, <code>CONNECT</code>, <code>CONNECTED</code>, <code>DISCONNECT</code>, <code>DISCONNECTED</code>, <code>CLOSE</code>, <code>CLOSED</code>, <code>ERROR</code>, <code>ATTACH</code>, <code>ATTACHED</code>, <code>DETACH</code>, <code>DETACHED</code>, <code>PRESENCE</code>, <code>MESSAGE</code>, <code>SYNC</code></li>
+		<li><code>ProtocolMessage</code> <code>Flag</code> enum has the following values in order from zero: <code>HAS_PRESENCE</code>, <code>HAS_BACKLOG</code></li>
+		<li>Attributes available in a <code>ProtocolMessage</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/ProtocolMessage">Ruby ProtocolMessage documentation</a> for an explanation of each attribute:
+		<ul>
+			<li><code>action</code> enum</li>
+			<li><code>channel</code> string</li>
+			<li><code>channelSerial</code> string</li>
+			<li><code>connectionId</code> string</li>
+			<li><code>connectionKey</code> string</li>
+			<li><code>connectionSerial</code> long</li>
+			<li><code>count</code> integer</li>
+			<li><code>errorInfo</code> <code>ErrorInfo</code> object</li>
+			<li><code>flags</code> integer</li>
+			<li><code>messageSerial</code> long</li>
+			<li><code>messages</code> Array of <code>Message</code> objects</li>
+			<li><code>presence</code> Array of <code>PresenceMessage</code> objects</li>
+			<li><code>timestamp</code> time in milliseconds since epoch</li>
+		</ul></li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>PaginatedResource</code>
+	<ul>
+		<li>A <code>PaginatedResource</code> is a type that represents a page of results from a <a href="/rest-api/#pagination">paginated query</a>. The response is accompanied by metadata that indicates the relative queries available.</li>
+		<li><code>PaginatedResource</code> wraps all message and presence history, stats and REST presence requests.  The type must not raise an exception if paging headers are not returned from the REST API.</li>
+		<li><code>PaginatedResource#items</code> attribute contains an Array of resources for the query such as <code>Message</code> objects for a channel history request.</li>
+		<li><code>PaginatedResource#nextPage</code> function returns a new <code>PaginatedResource</code> loaded with the next page of results. If there are no further pages, then <code>null</code> is returned.</li>
+		<li><code>PaginatedResource#firstPage</code> function returns a new <code>PaginatedResource</code> for the first page of results. If paging is not supported, then <code>null</code> is returned.</li>
+		<li><code>PaginatedResource#isFirst</code> function returns <code>true</code> if this page is the first page</li>
+		<li><code>PaginatedResource#isLast</code> function returns <code>true</code> if this page is the last page or paging is not supported</li>
+		<li><code>PaginatedResource#hasNext</code> function returns <code>true</code> if there are further pages and paging is supported</li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>TokenRequest</code>
+	<ul>
+		<li><code>TokenRequest</code> is a type containing the token request details sent to the <a href="/rest-api/#requesttoken">REST requestToken end point</a></li>
+		<li>String attributes <code>keyName</code>, <code>clientId</code>, <code>nonce</code> and <code>mac</code></li>
+		<li><code>capability</code> is a string attribute containing capabilities JSON stringified</li>
+		<li><code>ttl</code> attribute represents time to live (expiry) of this token in milliseconds</li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>TokenDetails</code>
+	<ul>
+		<li><code>TokenDetails</code> is a type containing the token request response from the <a href="/rest-api/#requesttoken">REST requestToken end point</a></li>
+		<li><code>TokenDetails#token</code> attribute contains the token string</li>
+		<li><code>TokenDetails#expires</code> attribute contains the expiry time in milliseconds.  Where idiomatic in the language, this can be a Time object</li>
+		<li><code>TokenDetails#issuedAt</code> attribute contains the time the token was issued in milliseconds.  Where idiomatic in the language, this can be a Time object</li>
+		<li><code>TokenDetails#capability</code> attribute contains the capability JSON stringified</li>
+		<li><code>TokenDetails#clientId</code> attribute contains the clientId assigned to the token if provided</li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>Stats</code>
+	<ul>
+		<li><code>Stats</code> is a type encapsulating a statistics datapoint retrieved from the <a href="/rest-api/#stats">REST stats end point</a>.  See <a href="/general/statistics/">example statistics in JSON format</a>.</li>
+		<li>All stat values default to zero when no underlying JSON value exists.  We send sparse JSON to stat requests omitting fields where the value is zero to reduce bandwidth and optimise JSON parsing.</li>
+		<li>See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats">Ruby Stats type documentation</a></li>
+		<li><code>Stats.ConnectionTypes</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ConnectionTypes">Ruby ConnectionTypes documentation</a></li>
+		<li><code>Stats.MessageCount</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageCount">Ruby MessageCount documentation</a></li>
+		<li><code>Stats.MessageTypes</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">Ruby MessageTypes documentation</a></li>
+		<li><code>Stats.MessageTraffic</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTraffic">Ruby MessageTraffic documentation</a></li>
+		<li><code>Stats.RequestCount</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">Ruby RequestCount documentation</a></li>
+		<li><code>Stats.ResourceCount</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ResourceCount">Ruby ResourceCount documentation</a></li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>ErrorInfo</code>
+	<ul>
+		<li>Provides a generic Ably <code>ErrorInfo</code> object that contains Ably <code>code</code>, <code>statusCode</code> (similar to HTTP code) and <code>message</code> attributes.</li>
+		<li>Errors returned from the Ably server are compatible with the <code>ErrorInfo</code> structure and should raise exceptions that inherit from <code>ErrorInfo</code></li>
+		<li>[Ably-common](https://github.com/ably/ably-common) should be included as a submodule so that <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">consistent error codes</a> can be used</li>
+	</ul></li>
+</ul>
+<ul>
+	<li><code>Capability</code> &#8211; <strong>API not agreed yet</strong>, this type represents a capability for a key or token</li>
+</ul>
+<h3 id="options">Option types used when</h3>
+<ul>
+	<li><code>ClientOptions</code> &#8211; Ably library options used when instancing a REST or Realtime client library, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/types/Options.java">Java Options</a></li>
+	<li><code>ChannelOptions</code> &#8211; options provided when instancing a channel, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/types/ChannelOptions.java">Java ChannelOptions</a></li>
+	<li><code>CipherParams</code> &#8211; params to configure encryption for a channel, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/util/Crypto.java#L52">Java CipherParams class</a></li>
+</ul>
+    </article>
+    <hr class="back">
+    <a href="#documentation">Back to top</a>
+  </div>
+  <div id="sidebar">
+  <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
+  <ul>
+<li class=''><a href='/root/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
+<li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
+</ul>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
+<ul>
+<li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
+<li class=''><a href='/realtime/connection/'>Connection</a></li>
+<li class=''><a href='/realtime/channels-messages/'>Channels and Messages</a></li>
+<li class=''><a href='/realtime/presence/'>Presence</a></li>
+<li class=''><a href='/realtime/authentication/'>Authentication</a></li>
+<li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/statistics/'>Statistics</a></li>
+</ul>
+  <h2><a href="/rest/">REST client lib</a></h2>
+<ul>
+<li class=''><a href='/rest/usage/'>Using the REST library</a></li>
+<li class=''><a href='/rest/channels-messages/'>Channels and Messages</a></li>
+<li class=''><a href='/rest/presence/'>Presence</a></li>
+<li class=''><a href='/rest/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest/history/'>History</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+</ul>
+  <h2><a href="/rest-api/">REST API</a></h2>
+<ul>
+</ul>
+  <h2>General</h2>
+<ul>
+<li class=''><a href='/general/authentication/'>Authentication</a></li>
+<li class=''><a href='/general/channel-rules-namespaces/'>Channel Rules and Namespaces</a></li>
+<li class=''><a href='/general/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/general/statistics/'>Application Statistics</a></li>
+<li class=''><a href='/general/migrating/'>Migrating to Ably</a></li>
+</ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class='selected'><a href='/client-lib-development-guide/features/'>Features Overview</a></li>
+<li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
+<li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-fallback/'>Connection host fallback</a></li>
+<li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+</ul>
+  <ul>
+<li><a href="https://www.ably.io">Visit Ably.io</a></li>
+</ul>
+</div>
+
+</body>
+</html>

@@ -40,11 +40,11 @@
       
     </header>
     <article>
-      <p>Ably has invested in the development of comprehensive and consistent client libraries for all widely used platforms and languages.  Comprehensive in that all client libraries are feature complete, consistent in that where possible, the API is as consistent as possible between all languages and platforms.</p>
+      <p>Ably has invested in the development of comprehensive and consistent client libraries for all widely used platforms and languages.  Comprehensive, in that all client libraries are feature complete, consistent, in that, where possible, the exposed API is the same in all languages and platforms.</p>
 <p>The reference material in this section is intended to support developers in creating and extending new libraries.</p>
 <p>See the <a href="https://www.ably.io/download/">Ably client libraries available »</a></p>
 <h2>Overview</h2>
-<p>Our client libraries provide REST and/or Realtime functionality.</p>
+<p>Ably client libraries provide REST and/or Realtime functionality.</p>
 <h3>REST library functionality</h3>
 <p>REST libraries provide a convenient way to access the Ably REST API, and are intended to be used by clients that do not need realtime updates from the Ably service, but will instead send requests to Ably to:</p>
 <ul>
@@ -63,11 +63,11 @@
 <p>The Realtime interface is implemented using an <a href="protocol">Ably-defined protocol</a> (over WebSockets and other transports) and, although that <a href="protocol">protocol is published</a>, we reserve the right to change the protocol and drop support for superseded protocol versions at any time. Of course, we don&#8217;t want to make life difficult for client library developers, so any incompatible changes will be very carefully considered, but nonetheless developers must regard the protocol definition as being subject to change. Application developers using the Ably Realtime API should use one of the <a href="https://www.ably.io/download">Ably client libraries</a> and can expect that API to be stable and supported even if the protocol changes underneath.</p>
 <p>See the <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">complete Realtime and REST API specification</a></p>
 <h2>Developing an Ably client library</h2>
-<p>If you are interested in developing or forking one of our client libraries, please do <a href="https://www.ably.io/contact">get in touch</a> as we&#8217;d love to help.  Equally, if you feel we&#8217;re missing a client library for your platform or language, do <a href="https://www.ably.io/contact">get in touch</a> and we&#8217;ll see what we can do to help.</p>
+<p>If you are interested in developing or forking one of our client libraries, please do <a href="https://www.ably.io/contact">get in touch</a> as we&#8217;d love to help.  Equally, if you feel we&#8217;re missing a client library for your platform or language, <a href="https://www.ably.io/contact">please do contact us</a>.</p>
 <p>The following resources are useful references when developing client libraries for Ably:</p>
-<h3>Client library feature prioritisation</h3>
-<p>Whilst all <a href="https://www.ably.io/download">officially supported Ably client libraries</a> support all features defined in the <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">specification</a>, we recommend an approach that focuses on the most commonly used features first.</p>
-<p>See our <a href="/client-lib-development-guide/feature-prioritisation">recommended client library development feature prioritisation</a></p>
+<h3>Client library features and prioritisation</h3>
+<p>Whilst all <a href="https://www.ably.io/download">officially supported Ably client libraries</a> support all features defined in the <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a>, we recommend an approach that focuses on the most commonly used features first.</p>
+<p>First, read the <a href="/client-lib-development-guide/features">Ably client library feature overview</a> that will provide you with a good high level view of all functionality and features available in the client libraries.  Afterwards, we advise that you read the <a href="/client-lib-development-guide/feature-prioritisation">recommended client library development feature prioritisation</a> document as it will help you, as a client library developer, to understand which features are most important and logical to start with.</p>
 <h3>Sandbox environment for client library testing</h3>
 <p>All of the Ably client libraries have test suites that run the test suite against temporary apps that are created during the test setup. Although Ably does not provide a public provisioning API for account management (in the production system this is available only through the website registration and dashboard) there is a limited API provided via the REST<br />
 interface in the sandbox environment to enable test applications and keys to be provisioned automatically for each test run. Therefore, all tests are set up to run against the sandbox environment.</p>
@@ -139,6 +139,7 @@ interface in the sandbox environment to enable test applications and keys to be 
 </ul>
   <h2 class="selected"><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
+<li class=''><a href='/client-lib-development-guide/features/'>Features Overview</a></li>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
 <li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>

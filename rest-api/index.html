@@ -157,7 +157,7 @@
 </dl>
 <p>Wherever possible, success response bodies contain links, in <a href="http://en.wikipedia.org/wiki/HATEOAS">HATEOS</a> style, to other resources relevant to the response; where these are present these are included as <code>href</code> attributes on the applicable part of the response object.</p>
 <p><code>GET</code>, <code>PUT</code>, <code>POST</code> and <code>DELETE</code> are available in all contexts where they make sense. <code>GET</code> is always idempotent.</p>
-<h3>Pagination</h3>
+<h3 id="pagination">Pagination</h3>
 <p>REST APIs whose responses may have unbounded size have paginated responses; that is, if a full response to the query could exceed a limit (a default or a <code>limit</code> given as a parameter to the call) the first response contains a subset of the results, and further &#8220;pages&#8221; of the result are available on subsequent requests. Each response (the initial response and responses to each subsequent request) is accompanied by one or more relative links relating to the current query.</p>
 <p>Responses contain one or more of the following relative links:</p>
 <dl>
@@ -274,7 +274,7 @@
 	<dt>end</dt>
 	<dd><em>now</em> The end of the query interval as a time in milliseconds since the epoch. A message qualifies as a member of the result set if it was received at or before this time.</dd>
 	<dt>limit</dt>
-	<dd><em>100</em> The maximum number of records to return. A limit greater than 10000 is invalid.</dd>
+	<dd><em>100</em> The maximum number of records to return. A limit greater than 1,000 is invalid.</dd>
 	<dt>direction</dt>
 	<dd><em>backwards</em> The direction of this query. The direction determines the order of the returned result array, but also determines which end of the query interval is the start point for the search.  For example, a forwards query uses <code>start</code> as the start point, whereas a backwards query uses <code>end</code> as the start point.</dd>
 </dl>
@@ -335,7 +335,7 @@
 	<dt>end</dt>
 	<dd><em>now</em> The end of the query interval as a time in milliseconds since the epoch. A message qualifies as a member of the result set if it was received at or before this time.</dd>
 	<dt>limit</dt>
-	<dd><em>100</em> The maximum number of records to return. A limit greater than 10000 is invalid.</dd>
+	<dd><em>100</em> The maximum number of records to return. A limit greater than 1,000 is invalid.</dd>
 	<dt>direction</dt>
 	<dd><em>backwards</em> The direction of this query. The direction determines the order of the returned result array, but also determines which end of the query interval is the start point for the search.  For example, a forwards query uses <code>start</code> as the start point, whereas a backwards query uses <code>end</code> as the start point.</dd>
 </dl>
@@ -407,7 +407,7 @@
 	<dt>end</dt>
 	<dd><em>now</em> The end of the query interval as a time in milliseconds since the epoch.</dd>
 	<dt>limit</dt>
-	<dd><em>100</em> The maximum number of records to return. A limit greater than 10000 is invalid.</dd>
+	<dd><em>100</em> The maximum number of records to return. A limit greater than 1,000 is invalid.</dd>
 	<dt>direction</dt>
 	<dd><em>backwards</em> The direction of this query. The direction determines the order of the returned result array, but also determines which end of the query interval is the start point for the search.</dd>
 	<dt>unit</dt>
@@ -489,6 +489,7 @@
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
+<li class=''><a href='/client-lib-development-guide/features/'>Features Overview</a></li>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
 <li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>

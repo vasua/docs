@@ -162,6 +162,8 @@ hr.back {
       margin-top: -5px; }
   #documentation ul, #documentation ol {
     margin: 20px; }
+    #documentation ul li > ul, #documentation ol li > ul {
+      margin-bottom: 0; }
   #documentation div[lang] ul, #documentation div[lang] ol {
     margin: 0 20px 20px 20px; }
     #documentation div[lang] ul.linenums, #documentation div[lang] ol.linenums {
