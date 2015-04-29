@@ -245,12 +245,12 @@ Options specified in this way will supplement or override the corresponding opti
 	<dd>A URL to query to obtain a signed token request. This enables a client to obtain token requests from another entity, so tokens can be renewed without the client requiring access to keys.</dd>
 </dl>
 <dl>
-	<dt><span lang="java">public String</span> keyId</dt>
-	<dd>A keyId. This is used in instances where a full key or token are not provided at initialisation.</dd>
+	<dt><span lang="java">public String</span> keyName</dt>
+	<dd>A key name. This is used in instances where a full key or token are not provided at initialisation.</dd>
 </dl>
 <dl>
-	<dt><span lang="java">public String</span> keyValue</dt>
-	<dd>The secret keyValue for an Ably key associated with this client.</dd>
+	<dt><span lang="java">public String</span> keySecret</dt>
+	<dd>The secret key value for an Ably key associated with this client.</dd>
 </dl>
 <dl>
 	<dt><span lang="java">public String</span> authToken</dt>
@@ -272,24 +272,24 @@ Options specified in this way will supplement or override the corresponding opti
 <p>A <code>TokenParams</code> object is associated with a token request and contains the parameters of the request, corresponding to the desired attributes of the token. Methods on the Auth object that may trigger a token request take <span lang="java">a TokenParams argument</span><span lang="default">one or more TokenParams options</span>.</p>
 <p>TokenParams <span lang="java">fields</span><span lang="default">options</span> are as follows.</p>
 <dl>
-	<dt><span lang="java">public String</span> id</dt>
-	<dd>The id of the key against which this request is made.</dd>
+	<dt><span lang="java">public String</span> keyName</dt>
+	<dd>The key name against which this request is made. The key name is the public part of the API key before the colon <code>:</code> character</dd>
 </dl>
 <dl>
 	<dt><span lang="java">public long</span> ttl</dt>
-	<dd>[default = 3600 (1 hour)] Requested time to live for the token in seconds. If none is specified a default of 1 hour is provided. The maximum lifetime is 24 hours or less depending on application settings and the attributes of the issuing key; any request exceeding that lifetime will be rejected with an error.</dd>
+	<dd>[default = 3,600,000 (1 hour)] Requested time to live for the token in milliseconds. If none is specified a default of 1 hour is provided. The maximum lifetime is 24 hours or less depending on application settings and the attributes of the issuing key; any request exceeding that lifetime will be rejected with an error.</dd>
 </dl>
 <dl>
 	<dt><span lang="java">public String</span> capability</dt>
 	<dd>[default = &#8220;{\&#8221;<strong>\&#8220;: [&#8221;</strong>&#8220;]}&#8221; (JSON string)] The capability to associate with the access token. If none is specified, a token will be requested with all of the capabilities of the specified key. If the token request is successful, the capability of the returned token will be the intersection of this capability with the capability of the issuing key.</dd>
 </dl>
 <dl>
-	<dt><span lang="java">public String</span> client_id</dt>
+	<dt><span lang="java">public String</span> clientId</dt>
 	<dd>A clientId to associate with this token. The generated token may be used to authenticate as this clientId.</dd>
 </dl>
 <dl>
 	<dt><span lang="java">public long</span> timestamp</dt>
-	<dd>The timestamp (in seconds since the epoch) of this request. Timestamps, in conjunction with the nonce, are used to prevent token requests from being replayed.</dd>
+	<dd>The timestamp (in milliseconds since the epoch) of this request. Timestamps, in conjunction with the nonce, are used to prevent token requests from being replayed.</dd>
 </dl>
 <dl>
 	<dt><span lang="java">public String</span> nonce</dt>
@@ -303,16 +303,16 @@ Options specified in this way will supplement or override the corresponding opti
 <p>A <code>TokenDetails</code> object contains the parameters of a response from a successful token request the service. This contains the token string itself plus various items of metadata relating to that token.</p>
 <p>TokenDetails <span lang="java">fields</span><span lang="default">properties</span> are as follows.</p>
 <dl>
-	<dt><span lang="java">public String</span> id</dt>
+	<dt><span lang="java">public String</span> token</dt>
 	<dd>The token itself.</dd>
 </dl>
 <dl>
 	<dt><span lang="java">public long</span> expires</dt>
-	<dd>The time (in seconds since the epoch) at which this token expires.</dd>
+	<dd>The time (in milliseconds since the epoch) at which this token expires.</dd>
 </dl>
 <dl>
-	<dt><span lang="java">public long</span> issuedAt</dt>
-	<dd>The time (in seconds since the epoch) at which this token was issued.</dd>
+	<dt><span lang="java">public long</span> issued</dt>
+	<dd>The time (in milliseconds since the epoch) at which this token was issued.</dd>
 </dl>
 <dl>
 	<dt><span lang="java">public String</span> capability</dt>
@@ -366,7 +366,7 @@ Options specified in this way will supplement or override the corresponding opti
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
-<li class=''><a href='/client-lib-development-guide/features/'>Features Overview</a></li>
+<li class=''><a href='/client-lib-development-guide/features/'>Features spec v0.8</a></li>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
 <li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>

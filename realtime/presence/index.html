@@ -80,14 +80,14 @@
 <br/>    channel.presence.enter
   end
 end</code></pre>
-<pre lang="javascript"><code lang="javascript">var client = Ably.Realtime.Client({ api_key: '', client_id: 'bob' });
+<pre lang="javascript"><code lang="javascript">var client = Ably.Realtime.Client({ key: '', clientId: 'bob' });
 <br/>client.channel('realtime-chat').attach(function(channel) {
   channel.presence.on('enter', function(presenceMessage) {
     console.log(presenceMessage.memberKey() + ' entered realtime-chat');
   });
 <br/>  channel.presence.enter();
 });</code></pre>
-<pre lang="nodejs"><code lang="nodejs">var client = Ably.Realtime.Client({ api_key: '', client_id: 'bob' });
+<pre lang="nodejs"><code lang="nodejs">var client = Ably.Realtime.Client({ key: '', clientId: 'bob' });
 <br/>client.channel('realtime-chat').attach(function(channel) {
   channel.presence.on('enter', function(presenceMessage) {
     console.log(presenceMessage.memberKey() + ' entered realtime-chat');
@@ -145,13 +145,13 @@ end
   console.log(presenceMessage.data);     // =&gt; robert@example.com
 });
 end
-<br/>channel.presence.enter({ client_id: 'bob', data: 'robert@example.com' })</code></pre>
+<br/>channel.presence.enter({ clientId: 'bob', data: 'robert@example.com' })</code></pre>
 <pre lang="nodejs"><code lang="nodejs">channel.presence.on('enter', function(presenceMessage) {
   console.log(presenceMessage.clientId); // =&gt; bob
   console.log(presenceMessage.data);     // =&gt; robert@example.com
 });
 end
-<br/>channel.presence.enter({ client_id: 'bob', data: 'robert@example.com' })</code></pre>
+<br/>channel.presence.enter({ clientId: 'bob', data: 'robert@example.com' })</code></pre>
 <p>A number of presence actions are therefore defined.</p>
 <dl>
 	<dt>enter</dt>
@@ -513,7 +513,7 @@ h2(#paginated-result). PaginatedResult</p>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
-<li class=''><a href='/client-lib-development-guide/features/'>Features Overview</a></li>
+<li class=''><a href='/client-lib-development-guide/features/'>Features spec v0.8</a></li>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
 <li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>

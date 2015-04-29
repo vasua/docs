@@ -73,10 +73,8 @@
 <p>Authorisation params must be either basic authorisation params or token authorisation params.</p>
 <p>Basic auth params:</p>
 <ul>
-	<li><code>key_id</code> (mandatory API app &amp; key id appearing before the <code>:</code> symbol)</li>
-	<li><code>key_value</code> (mandatory API key secret)</li>
+	<li><code>key</code> (mandatory API key string with name and secret in format <code>NAME:SECRET</code>)</li>
 </ul>
-<p>The <code>key_id</code> and <code>key_value</code> are obtained from the library initialisation options.</p>
 <p>Token auth params:</p>
 <ul>
 	<li><code>access_token</code> (mandatory token ID)</li>
@@ -171,7 +169,7 @@
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
-<li class=''><a href='/client-lib-development-guide/features/'>Features Overview</a></li>
+<li class=''><a href='/client-lib-development-guide/features/'>Features spec v0.8</a></li>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
 <li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>

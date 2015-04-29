@@ -178,9 +178,9 @@ Note that a newline character is added for each field, including any empty clien
 <p>In the case of a signed token request, the request body is the JSON stringified representation of the object with the form:</p>
 <pre lang="json"><code lang="json">{
   id: "&lt;key id&gt;",
-  ttl: &lt;expiry in seconds&gt;,
+  ttl: &lt;expiry in milliseconds&gt;,
   capability: "&lt;capability string&gt;",
-  client_id: "&lt;client id optional&gt;",
+  clientId: "&lt;client id optional&gt;",
   timestamp: &lt;timestamp&gt;,
   nonce: "&lt;nonce&gt;",
   mac: "&lt;base 64-encoded HMAC value&gt;"
@@ -189,63 +189,57 @@ Note that a newline character is added for each field, including any empty clien
 <h3>Response body format</h3>
 <p>If successful, the authorisation request returns the JSON stringified representation of an object containing the token:</p>
 <pre lang="json"><code lang="json">{
-  access_token: {
-    id: "&lt;token value&gt;",
-    issued_at: &lt;timestamp&gt;,
-    expires: &lt;timestamp&gt;,
-    capability: "&lt;canonical capability text&gt;",
-    client_id: "&lt;client id optional&gt;"
-  }
+  token: "&lt;token value&gt;",
+  issued: &lt;timestamp as ms since epoch&gt;,
+  expires: &lt;timestamp as ms since epoch&gt;,
+  capability: "&lt;canonical capability text&gt;",
+  clientId: "&lt;client id optional&gt;"
 }</code></pre>
 <h3>Example token requests</h3>
 <h4>Unsigned token request example</h4>
-<pre lang="sh"><code lang="sh">curl -X POST "https://rest.ably.io/keys/{{API_KEY_ID}}/requestToken" \
+<pre lang="sh"><code lang="sh">curl -X POST "https://rest.ably.io/keys/{{API_KEY_NAME}}/requestToken" \
  -u "{{API_KEY}}" \
  -H "Content-Type: application/json" \
  --data '{
-   "id": "{{API_KEY_ID}}",
-   "ttl": "600",
+   "keyName": "{{API_KEY_NAME}}",
+   "ttl": "600000",
    "capability":
      "{\"private\":[\"subscribe\",\"publish\",\"presence\"],\"*\":[\"subscribe\"]}",
-   "client_id": "John",
+   "clientId": "John",
    "timestamp": {{SECONDS_SINCE_EPOCH}},
    "nonce": "95e543b88299f6bae83df9b12fbd1ecd"
 }'</code></pre>
 <p>Responds with JSON token:</p>
 <pre lang="json"><code lang="json">{
-  "access_token": {
-    "id": "xVLyHw.GdFXtlosUQgfHaU...eUMQgCfFY77fKSUQM0u8vmxJy",
-    "key": "xVLyHw.zKkAHQ",
-    "issued_at": 1427233520,
-    "expires": 1427234120,
-    "capability": {
-      "*": [
-        "subscribe"
-      ],
-      "private": [
-        "presence",
-        "publish",
-        "subscribe"
-      ]
-    }
+  "token": "xVLyHw.GdFXtlosUQgfHaU...eUMQgCfFY77fKSUQM0u8vmxJy",
+  "keyName": "xVLyHw.zKkAHQ",
+  "issued": 1427233520,
+  "expires": 1427234120,
+  "capability": {
+    "*": [
+      "subscribe"
+    ],
+    "private": [
+      "presence",
+      "publish",
+      "subscribe"
+    ]
   }
 }</code></pre>
 <h4>Signed token request example</h4>
-<pre lang="sh"><code lang="sh">curl -X POST "https://rest.ably.io/keys/{{API_KEY_ID}}/requestToken" \
+<pre lang="sh"><code lang="sh">curl -X POST "https://rest.ably.io/keys/{{API_KEY_NAME}}/requestToken" \
  -H "Content-Type: application/json" \
  --data '{{SIGNED_TOKEN_REQUEST_EXAMPLE}}'</code></pre>
 <p>Responds with JSON token:</p>
 <pre lang="json"><code lang="json">{
-  "access_token": {
-    "id": "xVLyHw.DTSukCRj1lis1sJltr...rhLRBcZgmXLf1FP8wKGrPYkkIs",
-    "key": "xVLyHw.lwnKYQ",
-    "issued_at": 1427235604,
-    "expires": 1427236204,
-    "capability": {
-      "*": [
-        "*"
-      ]
-    }
+  "token": "xVLyHw.DTSukCRj1lis1sJltr...rhLRBcZgmXLf1FP8wKGrPYkkIs",
+  "keyName": "xVLyHw.lwnKYQ",
+  "issued": 1427235604,
+  "expires": 1427236204,
+  "capability": {
+    "*": [
+      "*"
+    ]
   }
 }</code></pre>
     </article>
@@ -292,7 +286,7 @@ Note that a newline character is added for each field, including any empty clien
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
-<li class=''><a href='/client-lib-development-guide/features/'>Features Overview</a></li>
+<li class=''><a href='/client-lib-development-guide/features/'>Features spec v0.8</a></li>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
 <li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>

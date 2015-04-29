@@ -363,10 +363,10 @@
 <h6>POST rest.ably.io/keys/<code>key id</code>/requestToken</h6>
 <p>This is the means by which clients obtain access tokens to use the service. The construction of a token request is described in the <a href="/general/authentication">Authentication</a> page. The resulting <code>token response</code> object contains the token properties as defined in <a href="/general/authentication">Authentication</a>.</p>
 <p>Example request:</p>
-<pre lang="sh"><code lang="sh">curl -X POST "https://rest.ably.io/keys/{{API_KEY_ID}}/requestToken" \
+<pre lang="sh"><code lang="sh">curl -X POST "https://rest.ably.io/keys/{{API_KEY_NAME}}/requestToken" \
  -u "{{API_KEY}}" \
  -H "Content-Type: application/json" \
- --data '{ "id": "{{API_KEY_ID}}", "timestamp": {{SECONDS_SINCE_EPOCH}} }'</code></pre>
+ --data '{ "keyName": "{{API_KEY_NAME}}", "timestamp": {{MS_SINCE_EPOCH}} }'</code></pre>
 <h5>Parameters</h5>
 <p>None</p>
 <h5>Options</h5>
@@ -383,13 +383,11 @@
 <h5>Returns</h5>
 <p>A successful request will return a token.</p>
 <pre lang="json"><code lang="json">{
-  "access_token": {
-    "id": "xVLyHw.CLchevH3hF....MDh9ZC_Q",
-    "key": "xVLyHw.mDYnFA",
-    "issued_at": 1428356667,
-    "expires": 1428360267,
-    "capability": "{\"*\":[\"*\"]}"
-  }
+  "token": "xVLyHw.CLchevH3hF....MDh9ZC_Q",
+  "keyName": "xVLyHw.mDYnFA",
+  "issued": 1428356667,
+  "expires": 1428360267,
+  "capability": "{\"*\":[\"*\"]}"
 }</code></pre>
 <h2 id="application">Application routes</h2>
 <p>Routes providing access to the messaging service within an application scope.</p>
@@ -489,7 +487,7 @@
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
-<li class=''><a href='/client-lib-development-guide/features/'>Features Overview</a></li>
+<li class=''><a href='/client-lib-development-guide/features/'>Features spec v0.8</a></li>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
 <li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
