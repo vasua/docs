@@ -207,7 +207,7 @@ interface in the sandbox environment to enable test applications and keys to be 
 }</code></pre>
 <h3 id="stats-data">Creating stats fixture data</h3>
 <h6>POST sandbox-rest.ably.io/stats</h6>
-<p>In order to streamline the development of client libraries, Ably provides a mechanism to inject stats fixture data into an application set up within the sandbox environment. Without this end point, to test statistics you have to generate real events and wait or the stats to become available (they are aggregrated in one minute intervals globally).</p>
+<p>In order to streamline the development of client libraries, Ably provides a mechanism to inject stats fixture data into an application set up within the sandbox environment. Without this endpoint, to test statistics you have to generate real events and wait or the stats to become available (they are aggregrated in one minute intervals globally).</p>
 <p>See <a href="/general/statistics">application statistics</a> for more information on the metrics available for each app.</p>
 <p>Example request:</p>
 <pre lang="sh"><code lang="sh">curl https://sandbox-rest.ably.io/stats \

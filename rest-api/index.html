@@ -263,7 +263,7 @@
 <p>Nothing</p>
 <h3 id="message-history">Retrieve message history for a channel</h3>
 <h6>GET rest.ably.io/channels/<code>&lt;channel id&gt;</code>/messages</h6>
-<p>If a channel is <a href="http://support.ably.io/support/solutions/articles/3000030057-what-are-channel-rules-and-how-can-i-use-them-in-my-app">configured to persist messages</a>, then all messages on that channel, within <a href="http://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">your account retention period</a>, are available via this API end point.  If persistence is not configured, then there are no guarantees as to how many historical messages will be available for the chanenl.  <a href="http://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">Find out more about message persistence</a>.</p>
+<p>If a channel is <a href="http://support.ably.io/support/solutions/articles/3000030057-what-are-channel-rules-and-how-can-i-use-them-in-my-app">configured to persist messages</a>, then all messages on that channel, within <a href="http://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">your account retention period</a>, are available via this API endpoint.  If persistence is not configured, then there are no guarantees as to how many historical messages will be available for the chanenl.  <a href="http://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">Find out more about message persistence</a>.</p>
 <p>Example request:</p>
 <pre lang="sh"><code lang="sh">curl https://rest.ably.io/channels/rest-example/messages \
  -u "{{API_KEY}}"</code></pre>

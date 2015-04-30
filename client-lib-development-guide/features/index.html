@@ -102,7 +102,7 @@
 	</ul></li>
 	<li>Uses <code>Auth</code> to establish what authentication scheme to use, how to authenticate, and automatic issuing of tokens when necessary</li>
 	<li>If a REST request responds with 401 with code 40140, then the server is indicating the token is no longer valid. Using the <code>Auth</code> class a token should be automatically issued if possible, otherwise an error should be indicated (e.g. exception raised or an error passed in callback as appropriate to the language).</li>
-	<li>Requests are sent to the default end point <code>rest.ably.io</code>. However, if the <code>host</code> option is set, the client will send requests to the specified host. If <code>environment</code> option is configured, the environment name is prefixed to the default host end point and the <code>host</code> is set accordingly. For example, if the <code>environment</code> is set to sandbox, then the <code>host</code> end point will become <code>sandbox-rest.ably.io</code></li>
+	<li>Requests are sent to the default endpoint <code>rest.ably.io</code>. However, if the <code>host</code> option is set, the client will send requests to the specified host. If <code>environment</code> option is configured, the environment name is prefixed to the default host endpoint and the <code>host</code> is set accordingly. For example, if the <code>environment</code> is set to sandbox, then the <code>host</code> endpoint will become <code>sandbox-rest.ably.io</code></li>
 	<li>REST endpoint host is configurable in the Client constructor with the option <code>restHost</code></li>
 	<li>The client library must use <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/rest/client.rb#L24-L30">default connection and request timeouts</a>. Ideally these default timeouts should be configurable by the developer.</li>
 	<li>Authentication
@@ -114,7 +114,7 @@
 	</ul></li>
 	<li>Host Fallback
 	<ul>
-		<li>All HTTP requests sent to Ably are fault-tolerant and will fallback to an alternative host name if the default host end point is unreachable, or indicates that it is unserviceable with a 500 to 504 status code. This ensures that a client library is able to work around routing or other problems with the user&#8217;s closest data center.  For example, if a <code>POST</code> request to <code>rest.ably.io</code> fails because the default endpoint is unreachable or unserviceable, then the <code>POST</code> request should be retried again against all the fallback hosts <code>[a-e].ably-realtime.com</code>.</li>
+		<li>All HTTP requests sent to Ably are fault-tolerant and will fallback to an alternative host name if the default host endpoint is unreachable, or indicates that it is unserviceable with a 500 to 504 status code. This ensures that a client library is able to work around routing or other problems with the user&#8217;s closest data center.  For example, if a <code>POST</code> request to <code>rest.ably.io</code> fails because the default endpoint is unreachable or unserviceable, then the <code>POST</code> request should be retried again against all the fallback hosts <code>[a-e].ably-realtime.com</code>.</li>
 		<li>This fallback behaviour only applies to the default <code>rest.ably.io</code> endpoint; if either <code>host</code> or <code>environment</code> options are set, no fallback host is used.</li>
 		<li>See the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/transport/Defaults.java#L7">default fallback hosts</a> and the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/http/Http.java#L204-L224">fallback mechanism implemented in Java for POST requests</a> as an example.</li>
 		<li>Automatic retries to fallback hosts will not occur for any other HTTP status codes. For example, if the credentials are invalid or the maxmimum message length has been exceeded, then resending the request to an alternative data center will not fix the problem and will only increase the load on other data centers. See the <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json#L11">complete list of Ably error codes</a> and a <a href="https://github.com/ably/ably-java/issues/14">discussion in the Java library about this</a></li>
@@ -248,7 +248,7 @@
 <ul>
 	<li>Every test should be executed using all supported protocols (i.e. JSON and <a href="http://msgpack.org/">MessagePack</a> if supported).  This includes both sending &amp; receiving data.</li>
 	<li>All tests by default are run against a special Ably sandbox environment.  This environment allows apps to be provisioned without any authentication that can then be used for client library testing. Bear in mind that all apps created in the sandbox environment are automatically deleted after 60 minutes and have low limits to prevent abuse. Apps are configured by sending a <code>POST</code> request to <code>https://sandbox-rest.ably.io/apps</code> with a JSON body that specifies the keys and their associated capabilities, channel namespace rules and any presence fixture data that is required; see <a href="https://github.com/ably/ably-common/blob/master/test-resources/test-app-setup.json">ably-common test-app-setup.json</a>.  See the <a href="https://github.com/ably/ably-java/blob/master/test/io/ably/test/rest/RestSetup.java">Java test setup</a>. Presence fixture data is necessary for the REST library presence tests as there is no way to register presence on a channel in the REST library.</li>
-	<li>Testing statistics can be tricky due to timing issues and slow test suites as a result of sending requests to generate statistics.  As such, we provide a special stats end point in our sandbox environment that allows stats to be injected into our metrics system so that stats tests can make predictable assertions.  To create stats you must send an authenticated <code>POST</code> request to the stats JSON to <code>https://sandbox-rest.ably.io/stats</code> with the stats data you wish to create. See the <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/rest/stats.test.js#L8-L51">Javascript stats fixture</a> and <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/common/modules/testapp_manager.js#L158-L182">setup helper</a> as an example.</li>
+	<li>Testing statistics can be tricky due to timing issues and slow test suites as a result of sending requests to generate statistics.  As such, we provide a special stats endpoint in our sandbox environment that allows stats to be injected into our metrics system so that stats tests can make predictable assertions.  To create stats you must send an authenticated <code>POST</code> request to the stats JSON to <code>https://sandbox-rest.ably.io/stats</code> with the stats data you wish to create. See the <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/rest/stats.test.js#L8-L51">Javascript stats fixture</a> and <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/common/modules/testapp_manager.js#L158-L182">setup helper</a> as an example.</li>
 </ul>
 <h2 id="realtime">Realtime client library features</h2>
 <p>The Ably Realtime client libraries establish and maintain a persistent connection to Ably and provide methods to publish and subscribe to messages over a low latency realtime connection.</p>
@@ -259,10 +259,10 @@
 	<li>Supports all the same <code>ClientOptions</code> as the <code>RestClient</code> in addition to:
 	<ul>
 		<li><code>echoMessages</code> boolean is true by default. If false, it prevents messages originating from this connection being echoed back on the same connection</li>
-		<li><code>connectAutomatically</code> boolean is true by default. If true, as soon as the client library is instanced, it will connect to Ably. If false, the client library will wait for an explicit <code>Connection#connect</code> to be called before connecting</li>
+		<li><code>autoConnect</code> boolean is true by default. If true, as soon as the client library is instanced, it will connect to Ably. If false, the client library will wait for an explicit <code>Connection#connect</code> to be called before connecting</li>
 		<li><code>recover</code> string, when set, will attempt to recover the connection state of a previous connection</li>
-		<li><code>realtimeHost</code> string, when set, will modify the realtime end point used by this client library</li>
-		<li><code>environment</code> string, when set, will modify both the REST and realtime end points by prefixing the environment to the default end points with a hypen delimiter. For example, a <code>RealtimClient</code> with an <code>environment</code> of &#8220;sandbox&#8221;, would use &#8220;sandbox-rest.ably.io&#8221; as the <code>restHost</code> and <code>sandbox-realtime.ably.io</code> as the <code>realtimeHost</code></li>
+		<li><code>realtimeHost</code> string, when set, will modify the realtime endpoint used by this client library</li>
+		<li><code>environment</code> string, when set, will modify both the REST and realtime endpoints by prefixing the environment to the default endpoints with a hypen delimiter. For example, a <code>RealtimClient</code> with an <code>environment</code> of &#8220;sandbox&#8221;, would use &#8220;sandbox-rest.ably.io&#8221; as the <code>restHost</code> and <code>sandbox-realtime.ably.io</code> as the <code>realtimeHost</code></li>
 	</ul></li>
 	<li><code>RealtimeClient#connection</code> attribute provides access to the underlying <code>Connection</code> object</li>
 	<li><code>RealtimeClient#channels</code> attribute provides access to the underlying <code>Channels</code> object</li>
@@ -280,13 +280,13 @@
 <h3 id="realtime-connection">Connection</h3>
 <ul>
 	<li><code>Connection</code> connects to the Ably service using WebSockets. The <a href="https://github.ably.io/ably/ably-js">ably-js library</a> supports additional transports such as Comet and XHR streaming, however non-browser client libraries typically use only a WebSockets transport</li>
-	<li>The default end point used for realtime websocket connections is <code>realtime.ably.io</code>, and the following query string params should be used when opening a new connection:
+	<li>The default endpoint used for realtime websocket connections is <code>realtime.ably.io</code>, and the following query string params should be used when opening a new connection:
 	<ul>
 		<li><code>timestamp</code> current time in milliseconds since epoch</li>
 		<li><code>format</code> should be <code>msgpack</code> (default) or <code>json</code></li>
 		<li><code>echo</code> shoudl be <code>true</code> by default, <code>false</code> will prevent messages published by the client being echoed back</li>
 	</ul></li>
-	<li>If connection option <code>connectAutomatically</code> is true, any action that would implicitly or explicitly attach a channel will trigger the connection to be opened automatically.</li>
+	<li>If connection option <code>autoConnect</code> is true, any action that would implicitly or explicitly attach a channel will trigger the connection to be opened automatically.</li>
 	<li>EventEmitter and states:
 	<ul>
 		<li>Implements <code>EventEmitter</code> and emits events for state changes <code>INITIALIZED</code>, <code>CONNECTING</code>, <code>CONNECTED</code>, <code>DISCONNECTED</code>, <code>SUSPENDED</code>, <code>CLOSING</code>, <code>CLOSED</code>, <code>FAILED</code></li>
@@ -348,7 +348,7 @@
 	<li><code>Connection</code> failures once <code>CONNECTED</code>:
 	<ul>
 		<li>If a <code>Connection</code> transport is disconnected unexpectedly or if a token expires, then the <code>Connection</code> manager will immediately attempt to reconnect and restore the connection state. Connection state recovery is provided by the Ably service and ensures that whilst the client is disconnected, all events are queued and channel state is retained on the Ably servers. When a new connection is made with the correct connection recovery key, the client is able to catch up by receiving the queued <code>ProtocolMessages</code> from Ably. Connection state is only maintained for a brief period, up to a minute, so if a client is disconnected for a longer period connection state cannot be resumed</li>
-		<li>In order for a connection to be resumed and connection state to be recovered, the client library reconnects to the websocket end point with two additional querystring params:
+		<li>In order for a connection to be resumed and connection state to be recovered, the client library reconnects to the websocket endpoint with two additional querystring params:
 		<ul>
 			<li><code>resume</code> is the private connection key assigned to the connection when the first <code>CONNECTED</code> <code>ProtocolMessage</code> was received</li>
 			<li><code>connection_serial</code> is the most recent <code>ProtocolMessage#connectionSerial</code> received from Ably or <code>Connection#serial</code> which should be identical</li>
@@ -366,7 +366,7 @@
 	</ul></li>
 	<li>Host Fallback
 	<ul>
-		<li>All HTTP requests sent to Ably are fault-tolerant and will fallback to an alternative host name if the default host end point is unreachable, or indicates that it is unserviceable with a 500 to 504 status code. This ensures that a client library is able to work around routing or other problems with the user&#8217;s closest data center. For example, if a connection attempt to <code>realtime.ably.io</code> fails because the default endpoint is unreachable or unserviceable, then the <code>Connection</code> manager should check if an internet connection is available by sending a request to our CDN <code>internet-up.ably-realtime.com/is-the-internet-up.txt</code> and looking for the text &#8220;yes&#8221; in the response.  If the text &#8220;yes&#8221; is included in the response, then the the client library can assume it has a valid internet connection and should then automatically retry the connection against all the fallback hosts <code>[a-e].ably-realtime.com</code> in attempt to find an alternate healthy data center.</li>
+		<li>All HTTP requests sent to Ably are fault-tolerant and will fallback to an alternative host name if the default host endpoint is unreachable, or indicates that it is unserviceable with a 500 to 504 status code. This ensures that a client library is able to work around routing or other problems with the user&#8217;s closest data center. For example, if a connection attempt to <code>realtime.ably.io</code> fails because the default endpoint is unreachable or unserviceable, then the <code>Connection</code> manager should check if an internet connection is available by sending a request to our CDN <code>internet-up.ably-realtime.com/is-the-internet-up.txt</code> and looking for the text &#8220;yes&#8221; in the response.  If the text &#8220;yes&#8221; is included in the response, then the the client library can assume it has a valid internet connection and should then automatically retry the connection against all the fallback hosts <code>[a-e].ably-realtime.com</code> in attempt to find an alternate healthy data center.</li>
 		<li>The fallback behaviour only applies to the default <code>realtime.ably.io</code> endpoint; if either <code>host</code> or <code>environment</code> options are set, no fallback host is used.</li>
 		<li>See the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/transport/Defaults.java#L7">default fallback hosts</a> and the <a href="https://github.com/ably/ably-java/blob/39f3f0226bd995bd6baffa1df47a0a4957d29c43/src/io/ably/transport/ConnectionManager.java#L428-L455">fallback mechanism implemented in the Java ConnectionManager</a> as an example.</li>
 	</ul></li>
@@ -633,14 +633,14 @@
 </ul>
 <h4>TokenRequest</h4>
 <ul>
-	<li><code>TokenRequest</code> is a type containing the token request details sent to the <a href="/rest-api/#requesttoken">REST requestToken end point</a></li>
+	<li><code>TokenRequest</code> is a type containing the token request details sent to the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a></li>
 	<li>String attributes <code>keyName</code>, <code>clientId</code>, <code>nonce</code> and <code>mac</code></li>
 	<li><code>capability</code> is a string attribute containing capabilities JSON stringified</li>
 	<li><code>ttl</code> attribute represents time to live (expiry) of this token in milliseconds</li>
 </ul>
 <h4>TokenDetails</h4>
 <ul>
-	<li><code>TokenDetails</code> is a type containing the token request response from the <a href="/rest-api/#requesttoken">REST requestToken end point</a></li>
+	<li><code>TokenDetails</code> is a type containing the token request response from the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a></li>
 	<li><code>TokenDetails#token</code> attribute contains the token string</li>
 	<li><code>TokenDetails#expires</code> attribute contains the expiry time in milliseconds.  Where idiomatic in the language, this can be a Time object</li>
 	<li><code>TokenDetails#issued</code> attribute contains the time the token was issued in milliseconds.  Where idiomatic in the language, this can be a Time object</li>
@@ -649,7 +649,7 @@
 </ul>
 <h4>Stats</h4>
 <ul>
-	<li><code>Stats</code> is a type encapsulating a statistics datapoint retrieved from the <a href="/rest-api/#stats">REST stats end point</a>.  See <a href="/general/statistics/">example statistics in JSON format</a>.</li>
+	<li><code>Stats</code> is a type encapsulating a statistics datapoint retrieved from the <a href="/rest-api/#stats">REST stats endpoint</a>.  See <a href="/general/statistics/">example statistics in JSON format</a>.</li>
 	<li>All stat values default to zero when no underlying JSON value exists.  We send sparse JSON to stat requests omitting fields where the value is zero to reduce bandwidth and optimise JSON parsing.</li>
 	<li>See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats">Ruby Stats type documentation</a></li>
 	<li><code>Stats.ConnectionTypes</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ConnectionTypes">Ruby ConnectionTypes documentation</a></li>
