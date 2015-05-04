@@ -134,14 +134,14 @@
 	<ul>
 		<li>Implicitly creates a <code>TokenRequest</code> if required, and requests a token from Ably if required. Returns a <code>TokenDetails</code> object</li>
 		<li>Supports all <code>TokenParams</code> in the function arguments, which override defaults for <code>Client</code> <code>Auth</code>. If a <code>clientId</code> option is used, clients using that token will be restricted to using that <code>clientId</code></li>
-		<li>When <code>authUrl</code> option is set, it will retrieve the token from the provided URL using the HTTP <code>authHeaders</code>, query string <code>authParams</code> and <code>authMethod</code> (<code>GET</code> or <code>POST</code>) HTTP verb.  The token retrieved is assumed by the library to be a token string if the response is <code>"text/plain"</code>, or taken to be a <code>TokenRequest</code> or <code>TokenDetails</code> object if the response has type <code>"application/json"</code></li>
+		<li>When <code>authUrl</code> option is set, it will retrieve the token from the provided URL using the HTTP <code>authHeaders</code>, query string <code>authParams</code> and <code>authMethod</code> (<code>GET</code> or <code>POST</code>) HTTP verb.  The token retrieved is assumed by the library to be a token string if the response has <code>Content-Type</code> <code>"text/plain"</code>, or taken to be a <code>TokenRequest</code> or <code>TokenDetails</code> object if the response has <code>Content-Type</code> <code>"application/json"</code></li>
 		<li>When <code>authCallback</code> option is set, it will execute the callback and will expect either a token string, a <code>TokenDetails</code> object or a <code>TokenRequest</code> object which will in turn be used to request a token from Ably.</li>
 	</ul></li>
 	<li><code>Auth#createTokenRequest</code> function:
 	<ul>
-		<li>Returns a signed <code>TokenRequest</code> object that can be used to obtain a token from Ably. This is extremely useful for servers that can create a <code>TokenRequest</code> signed with the API key without communicating with Ably directly. The <code>TokenRequest</code> can then be passed to a designated client that is then responsible for communicating with Ably and requesting a token for authentication from that <code>TokenRequest</code></li>
+		<li>Returns a signed <code>TokenRequest</code> object that can be used to obtain a token from Ably. This is useful for servers that can create a <code>TokenRequest</code> signed with the API key without communicating with Ably directly. The <code>TokenRequest</code> can then be passed to a designated client that is then responsible for communicating with Ably and requesting a token for authentication from that <code>TokenRequest</code></li>
 		<li>Supports all <code>AuthOptions</code></li>
-		<li>Generates a unique 16+ character <code>nonce</code> if none is provided, nonce is used to prevent replays</li>
+		<li>Generates a unique 16+ character <code>nonce</code> if none is provided; the nonce is used to protect against replay attacks</li>
 		<li>Generates a <code>timestamp</code> from current time if not provided, will retrieve the server time if <code>queryTime</code> is true</li>
 		<li>TTL is optional and specified in milliseconds</li>
 		<li>Capability JSON text can be provided that specifies the rights of the token in terms of the channel(s) authorised and the permitted operations on each</li>
@@ -252,8 +252,8 @@
 </ul>
 <h2 id="realtime">Realtime client library features</h2>
 <p>The Ably Realtime client libraries establish and maintain a persistent connection to Ably and provide methods to publish and subscribe to messages over a low latency realtime connection.</p>
-<p>The REST library is a subset of the Realtime library and as such all Realtime libaries provide the functionality available in the REST library in addition to Realtime specific features.</p>
-<p>The threading and/or asynchronous model for each realtime library will vary by language and it is therefore up to the developer to decide on the best approach for each given client library. For example, Node.js and Ruby (EventMachine) use a similar callback single threaded evented approach that ensures all public methods are non-blocking. Java and .NET use a threaded model whereby the <code>Connection</code> runs in its own thread. Go makes extensive use of go routines and channels.</p>
+<p>The Realtime library is a superset of the REST library and as such all Realtime libaries provide the functionality available in the REST library in addition to Realtime-specific features.</p>
+<p>The threading and/or asynchronous model for each realtime library will vary by language and it is therefore up to the developer to decide on the best approach for each given client library. For example, Node.js and Ruby (EventMachine) use a similar callback single threaded evented approach that ensures all public methods are non-blocking. Java and .NET use a threaded model whereby the <code>Connection</code> runs in its own thread. Go makes extensive use of goroutines and channels.</p>
 <h3 id="realtimeclient">RealtimeClient</h3>
 <ul>
 	<li>Supports all the same <code>ClientOptions</code> as the <code>RestClient</code> in addition to:
@@ -261,8 +261,8 @@
 		<li><code>echoMessages</code> boolean is true by default. If false, it prevents messages originating from this connection being echoed back on the same connection</li>
 		<li><code>autoConnect</code> boolean is true by default. If true, as soon as the client library is instanced, it will connect to Ably. If false, the client library will wait for an explicit <code>Connection#connect</code> to be called before connecting</li>
 		<li><code>recover</code> string, when set, will attempt to recover the connection state of a previous connection</li>
-		<li><code>realtimeHost</code> string, when set, will modify the realtime endpoint used by this client library</li>
-		<li><code>environment</code> string, when set, will modify both the REST and realtime endpoints by prefixing the environment to the default endpoints with a hypen delimiter. For example, a <code>RealtimClient</code> with an <code>environment</code> of &#8220;sandbox&#8221;, would use &#8220;sandbox-rest.ably.io&#8221; as the <code>restHost</code> and <code>sandbox-realtime.ably.io</code> as the <code>realtimeHost</code></li>
+		<li><code>realtimeHost</code> string, when set, will modify the realtime endpoint host used by this client library</li>
+		<li><code>environment</code> string, when set, will modify both the REST and realtime endpoint hosts by prefixing the environment to the default endpoint host with a hypen delimiter. For example, a <code>RealtimeClient</code> with an <code>environment</code> of &#8220;sandbox&#8221;, would use &#8220;sandbox-rest.ably.io&#8221; as the <code>restHost</code> and <code>sandbox-realtime.ably.io</code> as the <code>realtimeHost</code></li>
 	</ul></li>
 	<li><code>RealtimeClient#connection</code> attribute provides access to the underlying <code>Connection</code> object</li>
 	<li><code>RealtimeClient#channels</code> attribute provides access to the underlying <code>Channels</code> object</li>
@@ -279,14 +279,13 @@
 </ul>
 <h3 id="realtime-connection">Connection</h3>
 <ul>
-	<li><code>Connection</code> connects to the Ably service using WebSockets. The <a href="https://github.ably.io/ably/ably-js">ably-js library</a> supports additional transports such as Comet and XHR streaming, however non-browser client libraries typically use only a WebSockets transport</li>
-	<li>The default endpoint used for realtime websocket connections is <code>realtime.ably.io</code>, and the following query string params should be used when opening a new connection:
+	<li><code>Connection</code> connects to the Ably service using a websocket connection. The <a href="https://github.ably.io/ably/ably-js">ably-js library</a> supports additional transports such as Comet and XHR streaming; however non-browser client libraries typically use only a websocket transport</li>
+	<li>The default host used for realtime websocket connections is <code>realtime.ably.io</code>, and the following query string params should be used when opening a new connection:
 	<ul>
-		<li><code>timestamp</code> current time in milliseconds since epoch</li>
 		<li><code>format</code> should be <code>msgpack</code> (default) or <code>json</code></li>
-		<li><code>echo</code> shoudl be <code>true</code> by default, <code>false</code> will prevent messages published by the client being echoed back</li>
+		<li><code>echo</code> should be <code>true</code> by default; <code>false</code> will prevent messages published by the client being echoed back</li>
 	</ul></li>
-	<li>If connection option <code>autoConnect</code> is true, any action that would implicitly or explicitly attach a channel will trigger the connection to be opened automatically.</li>
+	<li>If connection option <code>autoConnect</code> is true, a connection is initiated immediately; otherwise a connection is only initiated following an explicit call to <code>connect()</code>.</li>
 	<li>EventEmitter and states:
 	<ul>
 		<li>Implements <code>EventEmitter</code> and emits events for state changes <code>INITIALIZED</code>, <code>CONNECTING</code>, <code>CONNECTED</code>, <code>DISCONNECTED</code>, <code>SUSPENDED</code>, <code>CLOSING</code>, <code>CLOSED</code>, <code>FAILED</code></li>
@@ -296,7 +295,7 @@
 		<li>Additionally, an <code>ERROR</code> event can be emitted that contains an <code>ErrorInfo</code> object with details on an error that has occurred for the <code>Connection</code></li>
 	</ul></li>
 	<li>A test should exist that instances many (50+) clients simultaneously and performs a few basic operations such as attaching to a channel, publishing a message, and expecting all of those messages to arrive on all clients to ensure that there are no concurrency issues with the client library</li>
-	<li>A <code>Connection</code> is successful and considered <code>CONNECTED</code> once the WebSocket connection is open and the intial <code>CONNECTED</code> <code>ProtocolMessage</code> has been received</li>
+	<li>A <code>Connection</code> is successful and considered <code>CONNECTED</code> once the websocket connection is open and the intial <code>CONNECTED</code> <code>ProtocolMessage</code> has been received</li>
 	<li><code>ACK</code> and <code>NACK</code>:
 	<ul>
 		<li>All <code>ProtocolMessage</code> <code>Presence</code> and <code>Message</code> objects sent to Ably expect either an <code>ACK</code> or <code>NACK</code> from Ably to confirm successful receipt and acceptance or failure respectively</li>
@@ -311,7 +310,7 @@
 	<li><code>Connection#key</code> attribute:
 	<ul>
 		<li>Is Null until connected</li>
-		<li>Is a unique private connection key provided by Ably that is used to reconnect and retain connection state following an abrupt disconnection. You should have a test to ensure multiple connected clients have unique connection keys</li>
+		<li>Is a unique private connection key provided by Ably that is used to reconnect and retain connection state following an unexpected disconnection. You should have a test to ensure multiple connected clients have unique connection keys</li>
 	</ul></li>
 	<li><code>Connection#serial</code> attribute:
 	<ul>
@@ -322,7 +321,7 @@
 	<li><code>Connection#connect</code> function:
 	<ul>
 		<li>Explicitly connects to the Ably service if not already connected.</li>
-		<li>An exception will be raised if the state is <code>CLOSING</code> as the connection must complete the close request before reconnecting</li>
+		<li>An error will be indicated if the state is <code>CLOSING</code> as the connection must complete the close request before reconnecting</li>
 		<li>Where the language permits, a callback with a success and failure state can be provided</li>
 	</ul></li>
 	<li><code>Connection#close</code> function:
@@ -333,7 +332,7 @@
 	</ul></li>
 	<li><code>Connection#ping</code> function:
 	<ul>
-		<li>Will ping the Ably service when connected and return the time it took to send a ping and receive a pong back from the server. If the client library language supports callbacks, then the callback will be called with the response time or error</li>
+		<li>Will send a <code>ProtocolMessage</code> with action <code>HEARTBEAT</code> the Ably service when connected and expects a <code>HEARTBEAT</code> message in response. If the client library language supports callbacks, then the callback will be called with the response time or error</li>
 		<li>Will immediately raise an exception if in the <code>CLOSED</code> or <code>FAILED</code> state</li>
 	</ul></li>
 	<li><code>Connection</code> opening failures:
@@ -341,7 +340,7 @@
 		<li>If an API key is invalid, then the connection will enter the <code>FAILED</code> state and the <code>errorReason</code> will be set</li>
 		<li>If a connection request fails because the token has expired, and the token is renewable, then a new token will be created and subsequent requests will be made without changing the state or emitting an error. If the token is not renewable, the connection will transition to the <code>FAILED</code> state</li>
 		<li>A new connection attempt will fail if not connected within the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">configured open timeout</a>.</li>
-		<li>If a connection attempt fails for any recoverable reason (i.e. not an authentication failure), the <code>Connection#state</code> will change to <code>DISCONNECTED</code>, the <code>Connection#errorReason</code> will be updated, and new connection attempts will periodically be made until the max time in that state threshold is reached. See <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected retry config</a>. Each time a new connection attempt is made the state will change to <code>CONNECTING</code> and then to <code>CONNECTED</code> if successful, or <code>DISCONNECTED</code> if unsuccessful and the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected state threshold</a> has not been exceeded.</li>
+		<li>If a connection attempt fails for any recoverable reason (i.e. not an authentication failure), the <code>Connection#state</code> will change to <code>DISCONNECTED</code>, the <code>Connection#errorReason</code> will be updated, and new connection attempts will periodically be made until the maximum time in that state threshold is reached. See <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected retry config</a>. Each time a new connection attempt is made the state will change to <code>CONNECTING</code> and then to <code>CONNECTED</code> if successful, or <code>DISCONNECTED</code> if unsuccessful and the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected state threshold</a> has not been exceeded.</li>
 		<li>Once the connection state has been in the <code>DISCONNECTED</code> state for more than the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected state threshold</a>, the state will change to <code>SUSPENDED</code> and the <code>Connection#errorReason</code> will be updated. In this state, a new connection attempt will be made periodically as defined in the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">suspended state threshold</a></li>
 		<li>The connection will remain in the <code>SUSPENDED</code> state indefinitely</li>
 	</ul></li>
@@ -353,8 +352,8 @@
 			<li><code>resume</code> is the private connection key assigned to the connection when the first <code>CONNECTED</code> <code>ProtocolMessage</code> was received</li>
 			<li><code>connection_serial</code> is the most recent <code>ProtocolMessage#connectionSerial</code> received from Ably or <code>Connection#serial</code> which should be identical</li>
 		</ul></li>
-		<li>When a new connection is made using the <code>resume</code> and <code>connection_serial</code> params, the client library must consider the resume failed if the <code>CONNECTED</code> <code>ProtocolMessage</code> contains an error or if the <code>Connection#id</code> or <code>Connection#key</code> has changed. When a <code>Connection</code> resume has failed, all channels should be detach with a suitable error reason</li>
-		<li>Client libraries should have test coverage to ensure connection state recovery is working as expected by forcefully disconnecting a client and checking that messages published on channels are delivered once the connection is resumed</li>
+		<li>When a new connection is made using the <code>resume</code> and <code>connection_serial</code> params, the client library must consider the resume to have failed if the <code>CONNECTED</code> <code>ProtocolMessage</code> contains an error or if the <code>Connection#id</code> or <code>Connection#key</code> has changed. When a <code>Connection</code> resume has failed, all channels should be detach with a suitable error reason</li>
+		<li>Client libraries should have test coverage to ensure connection state recovery is working as expected by forciby disconnecting a client and checking that messages published on channels are delivered once the connection is resumed</li>
 	</ul></li>
 	<li><code>Connection</code> recovery:
 	<ul>
@@ -366,14 +365,14 @@
 	</ul></li>
 	<li>Host Fallback
 	<ul>
-		<li>All HTTP requests sent to Ably are fault-tolerant and will fallback to an alternative host name if the default host endpoint is unreachable, or indicates that it is unserviceable with a 500 to 504 status code. This ensures that a client library is able to work around routing or other problems with the user&#8217;s closest data center. For example, if a connection attempt to <code>realtime.ably.io</code> fails because the default endpoint is unreachable or unserviceable, then the <code>Connection</code> manager should check if an internet connection is available by sending a request to our CDN <code>internet-up.ably-realtime.com/is-the-internet-up.txt</code> and looking for the text &#8220;yes&#8221; in the response.  If the text &#8220;yes&#8221; is included in the response, then the the client library can assume it has a valid internet connection and should then automatically retry the connection against all the fallback hosts <code>[a-e].ably-realtime.com</code> in attempt to find an alternate healthy data center.</li>
+		<li>All HTTP requests sent to Ably are fault-tolerant and will fallback to an alternative host if the default host is unreachable, or indicates that it is unserviceable with a 500 to 504 status code. This ensures that a client library is able to work around routing or other problems with the user&#8217;s closest datacenter. For example, if a connection attempt to <code>realtime.ably.io</code> fails because the default endpoint is unreachable or unserviceable, then the <code>Connection</code> manager should check if an internet connection is available by sending a request to our CDN <code>internet-up.ably-realtime.com/is-the-internet-up.txt</code> and looking for the text &#8220;yes&#8221; in the response.  If the text &#8220;yes&#8221; is included in the response, then the the client library can assume it has a viable internet connection and should then automatically retry the connection against all the fallback hosts <code>[a-e].ably-realtime.com</code> in attempt to find an alternate healthy datacenter.</li>
 		<li>The fallback behaviour only applies to the default <code>realtime.ably.io</code> endpoint; if either <code>host</code> or <code>environment</code> options are set, no fallback host is used.</li>
 		<li>See the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/transport/Defaults.java#L7">default fallback hosts</a> and the <a href="https://github.com/ably/ably-java/blob/39f3f0226bd995bd6baffa1df47a0a4957d29c43/src/io/ably/transport/ConnectionManager.java#L428-L455">fallback mechanism implemented in the Java ConnectionManager</a> as an example.</li>
 	</ul></li>
 	<li>Connection state change side effects:
 	<ul>
-		<li>When a channel enters the <code>DISCONNECTED</code> state, it will have no effect on the the channel states. Channels in the <code>ATTACHED</code> state will queue messages that are sent as soon as the connection is resumed</li>
-		<li>When a channel enters the <code>SUSPENDED</code> state, all channels will move to the <code>DETACHED</code> state. Channels in the <code>DETACHED</code> state should reject publishing of messages</li>
+		<li>When a connection enters the <code>DISCONNECTED</code> state, it will have no effect on the the channel states. Channels in the <code>ATTACHED</code> state will queue messages that are sent as soon as the connection is resumed</li>
+		<li>When a connection enters the <code>SUSPENDED</code> state, all channels will move to the <code>DETACHED</code> state. Channels in the <code>DETACHED</code> state should reject publishing of messages</li>
 		<li>When a channel enters the <code>FAILED</code> state, all channels will move to the <code>FAILED</code> state. Channels in the <code>FAILED</code> state should reject publishing of messages</li>
 	</ul></li>
 </ul>
@@ -437,26 +436,24 @@
 	<li><code>Channel#subscribe</code> function:
 	<ul>
 		<li>Subscribe with no arguments subscribes a listener to all messages</li>
-		<li>Subscribe with a single name argument subscribes a listener to only messages matching the string name</li>
+		<li>Subscribe with a single name argument subscribes a listener to only messages whose <code>name</code> member matches the string name</li>
 		<li>Implicitly attaches the channel if not attached</li>
-		<li>Messages delivered are automatically decoded based on the <code>encoding</code> attribute, see REST <code>Channel</code> encoding features. If there is an error decoding a message, the message is still delivered, but in addition to sending an error message to the logger, an <code>ErrorInfo</code> error object is emitted as an error on the <code>Channel</code>. Tests should exist to publish and subscribe to encoded messages using the <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-128.json">AES 128</a> and <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-256.json">AES 256</a> fixture test data</li>
-		<li>If a message cannot be decoded or decrypted successfully, it should be delivered to the listener with the <code>encoding</code> attribute set to the last successful decoding state, and an error should be emitted ont he channel</li>
-		<li>If <code>Connection#echoMessages</code> was set to false when the library was instanced, messages published by this client should not be echoed back to the subscribe listener</li>
+		<li>Messages delivered are automatically decoded based on the <code>encoding</code> attribute; see REST <code>Channel</code> encoding features. If there is an error decoding a message, the message is still delivered, but in addition to sending an error message to the logger, an <code>ErrorInfo</code> error object is emitted as an error on the <code>Channel</code>. Tests should exist to publish and subscribe to encoded messages using the <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-128.json">AES 128</a> and <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-256.json">AES 256</a> fixture test data</li>
+		<li>If a message cannot be decoded or decrypted successfully, it should be delivered to the listener with the <code>encoding</code> attribute set indicating the residual encoding state, and an error should be emitted on the channel</li>
 	</ul></li>
 	<li><code>Channel#unsubscribe</code> function:
 	<ul>
 		<li>Unsubscribe with no arguments unsubscribes the provided listener to all messages if subscribed</li>
-		<li>Unsubscribe with a single name argument unsubscribes the provided listener to all messages matching the string name</li>
+		<li>Unsubscribe with a single name argument unsubscribes the provided listener if previously subscribed with a name-specific subscription</li>
 	</ul></li>
 	<li><code>Channel#presence</code> attribute:
 	<ul>
 		<li>Returns the <code>Presence</code> object for this channel</li>
-		<li>Implicitly attaches the channel when accessed if not already connected</li>
 	</ul></li>
 	<li><code>Channel#history</code> function:
 	<ul>
 		<li>Supports all the same params as REST <code>Channel#history</code></li>
-		<li>Additionally supports the param <code>untilAttach</code>, which if true, will only retrive messages since the channel was attached. Limiting messages to messages published before the channel was attached is done by passing the querystring param <code>from_serial</code> with the serial number assigned to the channel when it received the <code>ATTACHED</code> <code>ProtocolMessage</code>. If the <code>untilAttach</code> param is specified when the channel is not attached an exception should be raised.</li>
+		<li>Additionally supports the param <code>untilAttach</code>, which if true, will only retrive messages prior to the moment that the channel was attached. This bound is specified by passing the querystring param <code>from_serial</code> with the serial number assigned to the channel in the <code>ATTACHED</code> <code>ProtocolMessage</code>. If the <code>untilAttach</code> param is specified when the channel is not attached an exception should be raised.</li>
 		<li>Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the history request.</li>
 		<li>A test should exist that publishes messages from one client, and upon confirmation of message delivery, a history request should be made on another client to ensure all messages are available</li>
 	</ul></li>
@@ -471,17 +468,17 @@
 	<li>Channel state change side effects:
 	<ul>
 		<li>If the channel enters the <code>DETACHED</code> or <code>FAILED</code> state then all queued presence messages will fail immediately and the presence state, unless <code>INITIALIZED</code> or <code>FAILED</code> will changed to <code>LEFT</code></li>
-		<li>If a channel enters the <code>ATTACHED</code> state then all queued presence messages will be sent immediately and a presence <code>SYNC</code> will be started</li>
+		<li>If a channel enters the <code>ATTACHED</code> state then all queued presence messages will be sent immediately and a presence <code>SYNC</code> will be initiated implicitly</li>
 	</ul></li>
 	<li><code>Presence#subscribe</code> function:
 	<ul>
 		<li>Subscribe with no arguments subscribes a listener to all presence messages</li>
-		<li>Subscribe with a single action argument subscribes a listener to only presence messages for that action type such as <code>ENTER</code>, <code>LEAVE</code>, <code>UPDATE</code> or <code>PRESENT</code></li>
+		<li>Subscribe with a single action argument &#8211; such as <code>ENTER</code>, <code>LEAVE</code>, <code>UPDATE</code> or <code>PRESENT</code> &#8211; subscribes a listener to receive only presence messages with that action</li>
 		<li>Implicitly attaches the channel if not attached</li>
 	</ul></li>
 	<li><code>Presence#unsubscribe</code> function:
 	<ul>
-		<li>Unsubscribe with no arguments unsubscribes the provided listener to all presence messages if subscribed</li>
+		<li>Unsubscribe with no arguments unsubscribes the listener if previously subscribed with an action-specific subscription</li>
 		<li>Unsubscribe with a single action argument unsubscribes the provided listener to all presence messages for that action</li>
 	</ul></li>
 	<li><code>Presence#enter</code> function:
@@ -489,10 +486,10 @@
 		<li>Enters this client into this channel</li>
 		<li>Optionally a callback can be provided that is called for both success or failure to enter</li>
 		<li>A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>ENTER</code> is sent to the Ably service</li>
-		<li>Presence state changes to <code>ENTERING</code> until confirmation from Ably is received, at which point the state becomes <code>ENTERED</code></li>
+		<li>Presence state changes to <code>ENTER</code> when acknowledgement of the <code>ENTER</code> is received from Ably</li>
 		<li>Implicitly attaches to the channel if not attached</li>
 		<li>Optional data can be included when entering a channel that will be encoded / decoded as with normal messages. A test should exist to ensure data used with enter is encoded &amp; decoded correctly. Also, when data is provided when entering, but no data is provided when leaving, the data attribute should be emitted in the <code>LEAVE</code> event for this client</li>
-		<li>Raises an exception of the client library has not <code>clientID</code> configured</li>
+		<li>Raises an exception of the client library has not <code>clientId</code> configured</li>
 		<li>Raises an execptiokn if the channel is <code>DETACHED</code> or <code>FAILED</code></li>
 		<li>Fails and emits an error if the client does not have required presence permissions</li>
 	</ul></li>
@@ -516,14 +513,11 @@
 	<ul>
 		<li>Returns the current list of all members on the channel in a callback</li>
 		<li>Raises an exception if the channel is <code>DETACHED</code> or <code>FAILED</code></li>
-		<li>Will filter by <code>connectionId</code> or <code>clientId</code> if provided as an option</li>
-		<li>Will not wait for the <code>SYNC</code> operation to complete if <code>waitForSync</code> option is set to false, and will instead return the list of members currently known regardless of <code>SYNC</code> status</li>
-		<li>By default, it will wait for <code>SYNC</code> to complete before calling the callback with the array of members</li>
 	</ul></li>
 	<li><code>Presence#history</code> function:
 	<ul>
 		<li>Supports all the same params as REST <code>Presence#history</code></li>
-		<li>Additionally supports the param <code>untilAttach</code>, which if true, will only retrive messages since the channel was attached. Limiting messages to messages published before the channel was attached is done by passing the querystring param <code>from_serial</code> with the serial number assigned to the channel when it received the <code>ATTACHED</code> <code>ProtocolMessage</code>. If the <code>untilAttach</code> param is specified when the channel is not attached an exception should be raised.</li>
+		<li>Additionally supports the param <code>untilAttach</code>, which if true, will only retrive messages up to the moment that the channel was attached. This bound is specified by passing the querystring param <code>from_serial</code> with the serial number assigned to the channel in the <code>ATTACHED</code> <code>ProtocolMessage</code>. If the <code>untilAttach</code> param is specified when the channel is not attached an exception should be raised.</li>
 		<li>Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the history request.</li>
 		<li>A test should exist that registers presence with a few clients, and upon confirmation of entering the channel for all clients, a presence history request should be made using another client to ensure all presence events are available</li>
 	</ul></li>
@@ -534,37 +528,21 @@
 		<li>Optionally a callback can be provided that is called for both success or failure to enter</li>
 		<li>Data can optionally be provided when entering and will follow the normal encoding &amp; decoding rules</li>
 		<li>A test should exist that registers a number of members each with different @clientId@s on a presence channel, and then a <code>Presence#get</code> should be used to verify that all members are present as expected</li>
-		<li><code>enterClient</code> should have no effect on the current client&#8217;s presence state on the channel whether <code>ENTERED</code> or not</li>
-		<li>An exception should be raised if the channel is <code>DETACHED</code> or <code>FAILED</code></li>
-		<li>An error should be emitted if the channel is <code>DETACHED</code> or <code>FAILED</code></li>
 	</ul></li>
-	<li><code>Presence#updateClient</code> function:
+	<li><code>Presence#enterClient</code> <code>Presence#updateClient</code> and <code>Presence#leaveClient</code> function:
 	<ul>
-		<li>Updates or enters into presence on a channel on behalf of another <code>clientId</code>. This allows a single client with suitable permissions to update presence on behalf of any number of clients using a single connection</li>
-		<li>Optionally a callback can be provided that is called for both success or failure to update</li>
-		<li>Data is provided when update and will follow the normal encoding &amp; decoding rules</li>
-		<li>A test should exist that registers a number of members each with different @clientId@s on a presence channel, then udpates their data, and then a <code>Presence#get</code> should be used to verify that all members are present with the correct updated data as expected</li>
-		<li><code>updateClient</code> should have no effect on the current client&#8217;s presence state on the channel whether <code>ENTERED</code> or not</li>
-		<li>In all other ways this is similar to <code>Presence#enterClient</code></li>
-	</ul></li>
-	<li><code>Presence#leaveClient</code> function:
-	<ul>
-		<li>Leaves this client from the channel on behalf of another <code>clientId</code>. This allows a single client with suitable permissions to remove a member for any number of clients using a single connection</li>
-		<li>Optionally a callback can be provided that is called for both success or failure to leave</li>
-		<li>Data is optioinally provided when leave and will follow the normal encoding &amp; decoding rules</li>
-		<li>A test should exist that registers a number of members each with different @clientId@s on a presence channel, then leaves, and then a <code>Presence#get</code> should be used to verify that all members are gone along with a <code>Presence#subscribe</code> should expect all the <code>LEAVE</code> events with the correct data</li>
-		<li><code>leaveClient</code> should have no effect on the current client&#8217;s presence state on the channel whether <code>ENTERED</code> or not</li>
-		<li>In all other ways this is similar to <code>Presence#enterClient</code></li>
+		<li>Performs an enter, update or leave for given <code>clientId</code>. These methods apply if the Realtime library was not initialised with a specific <code>clientId</code>. This allows a single client with suitable permissions to update presence on behalf of any number of clients using a single connection. Otherwise these are functionality equivalent to the corresponding <code>enter</code>, <code>update</code> and <code>leave</code> methods, and equivalent test coverage should be provided</li>
+		<li>Additionally a test should exist that registers a number of members each with different @clientId@s on a presence channel, then udpates their data, and then a <code>Presence#get</code> should be used to verify that all members are present with the correct updated data as expected</li>
 	</ul></li>
 </ul>
 <h3 id="eventemitter">EventEmitter mixin / interface</h3>
 <ul>
-	<li><code>EventEmitter</code> is not an object or class but a mixin that defines behaviour where included in other objects.  For example, the <code>Connection</code> object emits events for connection state and mixes in <code>EventEmitter</code> behaviour</li>
+	<li><code>EventEmitter</code> is a generic interface for event registration and delivery used in a number of the types in the Realtime client library.  For example, the <code>Connection</code> object emits events for connection state using the <code>EventEmitter</code> pattern</li>
 	<li>Where objects provide <code>subscribe</code> or <code>unsubscribe</code> methods, they should follow the specification for the <code>EventEmitter#on</code> and <code>EventEmitter#off</code> methods respectively.</li>
 	<li><code>EventEmitter#on</code> registers a listener for the specified event if provided, else it is registered for all events</li>
-	<li><code>EventEmitter#once</code> registers a listener that is called only once for the specified event if provided, else it is registered for all events</li>
-	<li><code>EventEmitter#off</code> deregisters a listener for the specified event if provided, else it is deregisters that listener for all events</li>
-	<li><code>EventEmitter#emit</code> emits event with the event name any arguments that get passed to the listeners. If an exception is raised in any of the listeners, the exception is caught by the <code>EventEmitter</code> and the exception is logged to the Ably logger, and emitted where applicable. This is critical functionality and a test must exist to ensure exceptions raised by 3rd party code does not break the client library</li>
+	<li><code>EventEmitter#once</code> registers a listener that is called only once when the first of the applicable events occurs (ie the specified event if given, or the first event if it is registered for all events)</li>
+	<li><code>EventEmitter#off</code> deregisters a listener for the specified event if given, else it is deregisters that listener for all registrations (global and event-specific)</li>
+	<li><code>EventEmitter#emit</code> emits an event, calling registered listeners with the given event name any other given arguments. If an exception is raised in any of the listeners, the exception is caught by the <code>EventEmitter</code> and the exception is logged to the Ably logger. Tests must exist to ensure exceptions raised in client code do not propagate and inhibit other event processing within the client library</li>
 </ul>
 <h2>Types</h2>
 <h3 id="types">Data types</h3>
@@ -575,9 +553,9 @@
 	<li>Attributes available in a <code>Message</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Message">Ruby Message documentation</a> for an explanation of each attribute:
 	<ul>
 		<li><code>id</code> string &#8211; unique ID for this message</li>
-		<li><code>clientId</code> string. If a non UTF-8 string is passed to the message, it must be encoded using UTF-8 before being passed to Ably</li>
+		<li><code>clientId</code> string</li>
 		<li><code>connectionId</code> string</li>
-		<li><code>data</code> string or Hash</li>
+		<li><code>data</code> string, buffer or JSON-encodable object or array</li>
 		<li><code>encoding</code> string</li>
 		<li><code>timestamp</code> time in milliseconds since epoch</li>
 	</ul></li>
@@ -590,17 +568,17 @@
 	<ul>
 		<li><code>id</code> string &#8211; unique ID for this message</li>
 		<li><code>action</code> enum</li>
-		<li><code>clientId</code> string. If a non UTF-8 string is passed to the message, it must be encoded using UTF-8 before being passed to Ably</li>
+		<li><code>clientId</code> string</li>
 		<li><code>connectionId</code> string</li>
-		<li><code>data</code> string or Hash</li>
+		<li><code>data</code> string, buffer or JSON-encodable object or array</li>
 		<li><code>encoding</code> string</li>
 		<li><code>timestamp</code> time in milliseconds since epoch</li>
-		<li><code>memberKey</code> string function that combines the <code>connectionId</code> and <code>clientId</code> ensuring multiple connected clients with the same clientId are unique</li>
+		<li><code>memberKey</code> string function that combines the <code>connectionId</code> and <code>clientId</code> ensuring multiple connected clients with the same clientId are uniquely identifiable</li>
 	</ul></li>
 </ul>
 <h4>ProtocolMessage</h4>
 <ul>
-	<li>A <code>ProtocolMessage</code> represents the type used to send and receive messages over the Realtime protocol.  A ProtocolMessage always relates to a single channel only, but can contain multiple individual Messages or PresenceMessages.  See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/ProtocolMessage">Ruby ProtocolMessage documentation</a>, but bear in mind the attributes following underscore naming in Ruby.</li>
+	<li>A <code>ProtocolMessage</code> represents the type used to send and receive messages over the Realtime protocol.  A ProtocolMessage always relates either to the connection or to a single channel only, but can contain multiple individual Messages or PresenceMessages.  See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/ProtocolMessage">Ruby ProtocolMessage documentation</a>, but bear in mind the attributes following underscore naming in Ruby.</li>
 	<li><code>ProtocolMessage</code> <code>Action</code> enum has the following values in order from zero: <code>HEARTBEAT</code>, <code>ACK</code>, <code>NACK</code>, <code>CONNECT</code>, <code>CONNECTED</code>, <code>DISCONNECT</code>, <code>DISCONNECTED</code>, <code>CLOSE</code>, <code>CLOSED</code>, <code>ERROR</code>, <code>ATTACH</code>, <code>ATTACHED</code>, <code>DETACH</code>, <code>DETACHED</code>, <code>PRESENCE</code>, <code>MESSAGE</code>, <code>SYNC</code></li>
 	<li><code>ProtocolMessage</code> <code>Flag</code> enum has the following values in order from zero: <code>HAS_PRESENCE</code>, <code>HAS_BACKLOG</code></li>
 	<li>Attributes available in a <code>ProtocolMessage</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/ProtocolMessage">Ruby ProtocolMessage documentation</a> for an explanation of each attribute:
@@ -624,12 +602,11 @@
 <ul>
 	<li>A <code>PaginatedResult</code> is a type that represents a page of results from a <a href="/rest-api/#pagination">paginated query</a>. The response is accompanied by metadata that indicates the relative queries available.</li>
 	<li><code>PaginatedResult</code> wraps all message and presence history, stats and REST presence requests.  The type must not raise an exception if paging headers are not returned from the REST API.</li>
-	<li><code>PaginatedResult#items</code> attribute contains an Array of resources for the query such as <code>Message</code> objects for a channel history request.</li>
-	<li><code>PaginatedResult#nextPage</code> function returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <code>null</code> is returned.</li>
-	<li><code>PaginatedResult#firstPage</code> function returns a new <code>PaginatedResult</code> for the first page of results. If paging is not supported, then <code>null</code> is returned.</li>
+	<li><code>PaginatedResult#items</code> attribute contains a page of results (for example an Array of <code>Message</code> objects for a channel history request).</li>
+	<li><code>PaginatedResult#next</code> function returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <code>null</code> is returned.</li>
+	<li><code>PaginatedResult#first</code> function returns a new <code>PaginatedResult</code> for the first page of results.</li>
 	<li><code>PaginatedResult#isFirst</code> function returns <code>true</code> if this page is the first page</li>
-	<li><code>PaginatedResult#isLast</code> function returns <code>true</code> if this page is the last page or paging is not supported</li>
-	<li><code>PaginatedResult#hasNext</code> function returns <code>true</code> if there are further pages and paging is supported</li>
+	<li><code>PaginatedResult#hasNext</code> function returns <code>true</code> if there are further pages</li>
 </ul>
 <h4>TokenRequest</h4>
 <ul>
@@ -642,15 +619,15 @@
 <ul>
 	<li><code>TokenDetails</code> is a type containing the token request response from the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a></li>
 	<li><code>TokenDetails#token</code> attribute contains the token string</li>
-	<li><code>TokenDetails#expires</code> attribute contains the expiry time in milliseconds.  Where idiomatic in the language, this can be a Time object</li>
-	<li><code>TokenDetails#issued</code> attribute contains the time the token was issued in milliseconds.  Where idiomatic in the language, this can be a Time object</li>
+	<li><code>TokenDetails#expires</code> attribute contains the expiry time in milliseconds.  Where idiomatic in the language, this can be a Date/Time object</li>
+	<li><code>TokenDetails#issued</code> attribute contains the time the token was issued in milliseconds.  Where idiomatic in the language, this can be a Date/Time object</li>
 	<li><code>TokenDetails#capability</code> attribute contains the capability JSON stringified</li>
 	<li><code>TokenDetails#clientId</code> attribute contains the clientId assigned to the token if provided</li>
 </ul>
 <h4>Stats</h4>
 <ul>
 	<li><code>Stats</code> is a type encapsulating a statistics datapoint retrieved from the <a href="/rest-api/#stats">REST stats endpoint</a>.  See <a href="/general/statistics/">example statistics in JSON format</a>.</li>
-	<li>All stat values default to zero when no underlying JSON value exists.  We send sparse JSON to stat requests omitting fields where the value is zero to reduce bandwidth and optimise JSON parsing.</li>
+	<li>All stats values default to zero when no underlying JSON value exists.  We send sparse JSON to stats requests omitting fields where the value is zero to reduce bandwidth and optimise JSON parsing.</li>
 	<li>See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats">Ruby Stats type documentation</a></li>
 	<li><code>Stats.ConnectionTypes</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ConnectionTypes">Ruby ConnectionTypes documentation</a></li>
 	<li><code>Stats.MessageCount</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageCount">Ruby MessageCount documentation</a></li>
@@ -661,7 +638,7 @@
 </ul>
 <h4>ErrorInfo</h4>
 <ul>
-	<li>Provides a generic Ably <code>ErrorInfo</code> object that contains Ably <code>code</code>, <code>statusCode</code> (similar to HTTP code) and <code>message</code> attributes.</li>
+	<li>Provides a generic Ably <code>ErrorInfo</code> object that contains Ably <code>code</code>, <code>statusCode</code> (analogous to HTTP status code) and <code>message</code> attributes.</li>
 	<li>Errors returned from the Ably server are compatible with the <code>ErrorInfo</code> structure and should raise exceptions that inherit from <code>ErrorInfo</code></li>
 	<li>[Ably-common](https://github.com/ably/ably-common) should be included as a submodule so that <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">consistent error codes</a> can be used</li>
 </ul>
