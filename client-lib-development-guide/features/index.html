@@ -164,6 +164,7 @@
 	<li><code>Channels#get</code> function:
 	<ul>
 		<li>Creates a new <code>Channel</code> object for the specified channel if none exists, or returns the existing channel. <code>ChannelOptions</code> can be specified when instancing a new <code>Channel</code>.</li>
+		<li>If options are provided, the options are set on the <code>Channel</code>. Accessing an existing <code>Channel</code> with options in the form <code>Channels#get(channel, options)</code> will therefore update the options on the channel and then return the existing <code>Channel</code></li>
 	</ul></li>
 	<li><code>Channels#release</code> function:
 	<ul>
@@ -385,6 +386,7 @@
 	<li><code>Channels#get</code> function:
 	<ul>
 		<li>Creates a new <code>Channel</code> object for the specified channel if none exists, or returns the existing channel. <code>ChannelOptions</code> can be specified when instancing a new <code>Channel</code>.</li>
+		<li>If options are provided, the options are set on the <code>Channel</code>. Accessing an existing <code>Channel</code> with options in the form <code>Channels#get(channel, options)</code> will therefore update the options on the channel and then return the existing <code>Channel</code></li>
 	</ul></li>
 	<li><code>Channels#release</code> function:
 	<ul>
