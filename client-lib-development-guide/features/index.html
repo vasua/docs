@@ -230,6 +230,8 @@
 		<li>Returns a <code>PaginatedResult</code> page containing the first page of members present in the <code>PaginatedResult#items</code> attribute returned from the presence request. Each member is represented as a <code>PresenceMessage</code>
 		<ul>
 			<li><code>limit</code> supports up to 1,000 items; if unspecified it defaults to the REST API default (100)</li>
+			<li><code>clientId</code> filters members by the provided <code>clientId</code></li>
+			<li><code>connectionId</code> filters members by the provided <code>connectionId</code></li>
 		</ul></li>
 	</ul></li>
 	<li><code>Channel#history</code> function:
@@ -440,6 +442,7 @@
 		<li>Implicitly attaches the channel if not attached</li>
 		<li>Messages delivered are automatically decoded based on the <code>encoding</code> attribute; see REST <code>Channel</code> encoding features. If there is an error decoding a message, the message is still delivered, but in addition to sending an error message to the logger, an <code>ErrorInfo</code> error object is emitted as an error on the <code>Channel</code>. Tests should exist to publish and subscribe to encoded messages using the <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-128.json">AES 128</a> and <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-256.json">AES 256</a> fixture test data</li>
 		<li>If a message cannot be decoded or decrypted successfully, it should be delivered to the listener with the <code>encoding</code> attribute set indicating the residual encoding state, and an error should be emitted on the channel</li>
+		<li>A test should exist ensuring published messages are not echoed back to the subscriber when <code>echoMessages</code> is set to false in the <code>Realtime</code> library constructor</li>
 	</ul></li>
 	<li><code>Channel#unsubscribe</code> function:
 	<ul>
@@ -460,14 +463,13 @@
 </ul>
 <h3 id="realtime-presence">Presence</h3>
 <ul>
-	<li>Implements <code>EventEmitter</code> and emits events for state changes <code>INITIALIZED</code>, <code>ENTERING</code>, <code>ENTERED</code>, <code>LEAVING</code>, <code>LEFT</code>, <code>FAILED</code></li>
 	<li>When a channel <code>ATTACHED</code> <code>ProtocolMessage</code> is received, the <code>ProtocolMessage</code> may contain a bit flag with value 1 indicating that there are currently members present on the channel. If members are present, subsequent <code>ProtocolMessage SYNC</code> messages will be delivered with presence members (messages) until the <code>SYNC</code> operation is complete. If there is no flag or the right most bit is zero, then the presence map should be considered in sync immediately as there are no members present on the channel at the time of attach</li>
 	<li>A <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L384-L529">PresenceMap</a> should be used to maintain a list of members present on a channel. As there are no guarantees that during the <code>SYNC</code> phase presence events will arrive in order i.e. a leave event for a member can arrive before that member is later registered as as present as part of the initial <code>SYNC</code> operation. As such, until the <code>SYNC</code> operation is complete, timestamps must be recorded for all members to ensure the most recent present state is used, see the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L418-L431">Java implementation</a>.  Once a <code>SYNC</code> event is complete, the members that are now considered <code>ABSENT</code> can be removed from the map, see the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L504-L509">Java implementation</a>.</li>
 	<li>If a <code>SYNC</code> operation is underway but not yet complete, and the connection is disconnected unexpectedly, then if the connection is resumed successfully, it is the responsibility of the client library to complete the <code>SYNC</code> operation. The client library requests a <code>SYNC</code> resume by sending a <code>SYNC</code> <code>ProtocolMessage</code> with the last received sync serial number. See the <a href="https://github.com/ably/ably-ruby/blob/7b18a20/lib/ably/realtime/presence/members_map.rb#L169-L176">Ruby implementation</a> and the <a href="https://github.com/ably/ably-ruby/blob/7b18a20/spec/acceptance/realtime/presence_spec.rb#L1338-L1357">Ruby test</a></li>
 	<li>Ensure a test exists that enters 250 members using <code>Presence#enterClient</code> on a single connection, and checks for <code>PRESENT</code> events to be emitted on another connection for each member, and once sync is complete, all 250 members should be present in a <code>Presence#get</code> request</li>
 	<li>Channel state change side effects:
 	<ul>
-		<li>If the channel enters the <code>DETACHED</code> or <code>FAILED</code> state then all queued presence messages will fail immediately and the presence state, unless <code>INITIALIZED</code> or <code>FAILED</code> will changed to <code>LEFT</code></li>
+		<li>If the channel enters the <code>DETACHED</code> or <code>FAILED</code> state then all queued presence messages will fail immediately</li>
 		<li>If a channel enters the <code>ATTACHED</code> state then all queued presence messages will be sent immediately and a presence <code>SYNC</code> will be initiated implicitly</li>
 	</ul></li>
 	<li><code>Presence#subscribe</code> function:
@@ -486,11 +488,10 @@
 		<li>Enters this client into this channel</li>
 		<li>Optionally a callback can be provided that is called for both success or failure to enter</li>
 		<li>A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>ENTER</code> is sent to the Ably service</li>
-		<li>Presence state changes to <code>ENTER</code> when acknowledgement of the <code>ENTER</code> is received from Ably</li>
 		<li>Implicitly attaches to the channel if not attached</li>
 		<li>Optional data can be included when entering a channel that will be encoded / decoded as with normal messages. A test should exist to ensure data used with enter is encoded &amp; decoded correctly. Also, when data is provided when entering, but no data is provided when leaving, the data attribute should be emitted in the <code>LEAVE</code> event for this client</li>
 		<li>Raises an exception of the client library has not <code>clientId</code> configured</li>
-		<li>Raises an execptiokn if the channel is <code>DETACHED</code> or <code>FAILED</code></li>
+		<li>Raises an execption if the channel is <code>DETACHED</code> or <code>FAILED</code></li>
 		<li>Fails and emits an error if the client does not have required presence permissions</li>
 	</ul></li>
 	<li><code>Presence#update</code> function:
@@ -511,8 +512,14 @@
 	</ul></li>
 	<li><code>Presence#get</code> function:
 	<ul>
-		<li>Returns the current list of all members on the channel in a callback</li>
+		<li>Returns the list of current members on the channel in a callback and, by default, will not wait for the <code>SYNC</code> to be completed</li>
 		<li>Raises an exception if the channel is <code>DETACHED</code> or <code>FAILED</code></li>
+		<li>An optional set of params can be provided:
+		<ul>
+			<li><code>waitForSync</code> when true, will wait until <code>SYNC</code> is complete before returning a list of members</li>
+			<li><code>clientId</code> filters members by the provided <code>clientId</code></li>
+			<li><code>connectionId</code> filters members by the provided <code>connectionId</code></li>
+		</ul></li>
 	</ul></li>
 	<li><code>Presence#history</code> function:
 	<ul>
@@ -532,7 +539,10 @@
 	<li><code>Presence#enterClient</code> <code>Presence#updateClient</code> and <code>Presence#leaveClient</code> function:
 	<ul>
 		<li>Performs an enter, update or leave for given <code>clientId</code>. These methods apply if the Realtime library was not initialised with a specific <code>clientId</code>. This allows a single client with suitable permissions to update presence on behalf of any number of clients using a single connection. Otherwise these are functionality equivalent to the corresponding <code>enter</code>, <code>update</code> and <code>leave</code> methods, and equivalent test coverage should be provided</li>
-		<li>Additionally a test should exist that registers a number of members each with different @clientId@s on a presence channel, then udpates their data, and then a <code>Presence#get</code> should be used to verify that all members are present with the correct updated data as expected</li>
+		<li>Tests should use <code>enterClient</code>, <code>updateClient</code> and <code>leaveClient</code> for many members from one <code>Realtime</code> client and check that the operations are reflected in the presence map and the expected events are emitted on a separate client.</li>
+		<li>Tests should also ensure that using these methods has no side effects on a client that has entered normally using <code>Presence#enter</code></li>
+		<li>A callback can be provided that will be callde upon success or failure</li>
+		<li>A channel will be implicitly attached when these methods are called</li>
 	</ul></li>
 </ul>
 <h3 id="eventemitter">EventEmitter mixin / interface</h3>
@@ -607,6 +617,7 @@
 	<li><code>PaginatedResult#first</code> function returns a new <code>PaginatedResult</code> for the first page of results.</li>
 	<li><code>PaginatedResult#isFirst</code> function returns <code>true</code> if this page is the first page</li>
 	<li><code>PaginatedResult#hasNext</code> function returns <code>true</code> if there are further pages</li>
+	<li><code>PaginatedResult#isLast</code> function returns <code>true</code> if this page is not the last page i.e. <code>!hasNext</code></li>
 </ul>
 <h4>TokenRequest</h4>
 <ul>
@@ -645,6 +656,7 @@
 <h4>Capability &#8211; <strong>API not agreed yet</strong></h4>
 <ul>
 	<li>This type represents a capability for a key or token</li>
+	<li>For now a string representation of the JSON will suffice wherever <code>capability</code> is used</li>
 </ul>
 <h3 id="options">Option types</h3>
 <h4>ClientOptions</h4>
