@@ -493,7 +493,7 @@
 		<li>Implicitly attaches to the channel if not attached</li>
 		<li>Optional data can be included when entering a channel that will be encoded / decoded as with normal messages. A test should exist to ensure data used with enter is encoded &amp; decoded correctly. Also, when data is provided when entering, but no data is provided when leaving, the data attribute should be emitted in the <code>LEAVE</code> event for this client</li>
 		<li>Raises an exception of the client library has not <code>clientId</code> configured</li>
-		<li>Raises an execption if the channel is <code>DETACHED</code> or <code>FAILED</code></li>
+		<li>Raises an exception if the channel is <code>DETACHED</code> or <code>FAILED</code></li>
 		<li>Fails and emits an error if the client does not have required presence permissions</li>
 	</ul></li>
 	<li><code>Presence#update</code> function:
@@ -543,7 +543,7 @@
 		<li>Performs an enter, update or leave for given <code>clientId</code>. These methods apply if the Realtime library was not initialised with a specific <code>clientId</code>. This allows a single client with suitable permissions to update presence on behalf of any number of clients using a single connection. Otherwise these are functionality equivalent to the corresponding <code>enter</code>, <code>update</code> and <code>leave</code> methods, and equivalent test coverage should be provided</li>
 		<li>Tests should use <code>enterClient</code>, <code>updateClient</code> and <code>leaveClient</code> for many members from one <code>Realtime</code> client and check that the operations are reflected in the presence map and the expected events are emitted on a separate client.</li>
 		<li>Tests should also ensure that using these methods has no side effects on a client that has entered normally using <code>Presence#enter</code></li>
-		<li>A callback can be provided that will be callde upon success or failure</li>
+		<li>A callback can be provided that will be called upon success or failure</li>
 		<li>A channel will be implicitly attached when these methods are called</li>
 	</ul></li>
 </ul>
