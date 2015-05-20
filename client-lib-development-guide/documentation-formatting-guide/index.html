@@ -126,23 +126,34 @@ a += 1;</code></pre>
 <p>As an alternative, you can use Github styled code blocks using triple backticks however the language(s) must be specified comma separated after the backticks in square brackets, for consistency with normal textile language blocks.  The advantage of Github blocks over traditional Textile blocks is that line breaks are supported.  Please note that lowest level indentation is stripped from the code.</p>
 <pre><code>```[javascript]
   var a = 1;
-<br/>  a = 2; // note this works in spite of the line break
-bc. <br/>```[ruby]
+
+  a = 2; // note this works in spite of the line break
+```
+
+```[ruby]
   a = 1
-<br/>  a = 2</code></pre>
-<p><br/>```[csharp]<br />
-  int a = 1;<br />
-<br/>  a = 2;<br />
-```</p>
+
+  a = 2
+```
+
+```[csharp]
+  int a = 1;
+
+  a = 2;
+```</code></pre>
 <p>generates the following where the code shown is governed by the language selected in the floating top nav</p>
 <pre lang="javascript"><code lang="javascript">var a = 1;
-<br/>a = 2; // note this works in spite of the line break</code></pre>
+
+a = 2; // note this works in spite of the line break</code></pre>
 <pre lang="default"><code lang="default">var a = 1;
-<br/>a = 2; // note this works in spite of the line break</code></pre>
+
+a = 2; // note this works in spite of the line break</code></pre>
 <pre lang="ruby"><code lang="ruby">a = 1
-<br/>a = 2</code></pre>
+
+a = 2</code></pre>
 <pre lang="csharp"><code lang="csharp">int a = 1;
-<br/>a = 2;</code></pre>
+
+a = 2;</code></pre>
 <h3 id="code-editor">Try it now code editor</h3>
 <p class="tip">In order to publish code examples to JSBin, your <a href="https://github.com/ably/docs/blob/source/config/jsbin_config.example.yaml">/config/jsbin_config.yaml</a> must be set up with a valid JSBin API key.</p>
 <p>Code examples that run in your browser can be included in this documentation repo within the <a href="https://github.com/ably/docs/tree/source/content/code">/content/code folder</a>.  Every code example must contain Javascript, HTML and CSS that will be launched in our <a href="https://jsbin.ably.io">custom Ably JSBin</a>.</p>
@@ -197,20 +208,40 @@ SIGNED_TOKEN_REQUEST_EXAMPLE: "{{SIGNED_TOKEN_REQUEST_EXAMPLE}}"</code></pre>
 <h3>Consecutive lines with <code>tag[lang].</code></h3>
 <p>Whenever the front end detects multiple consecutive <code>tag.</code> markup with a language specified, the front end will automatically show the content related to the selected language, and hide all other languages.  Note that the special language <code>default</code> can be used to provide default copy in the absence of any specific language variation existing.  For example:</p>
 <pre lang="text"><code lang="text">p[default]. Default text to appear for all languages not specified
-<br/>p[ruby]. Text to appear when Ruby is the chosen language</code></pre>
+
+p[ruby]. Text to appear when Ruby is the chosen language</code></pre>
 <p>Will result in:</p>
 <p lang="default">Default text to appear for all languages not specified</p>
 <p lang="ruby">Text to appear when Ruby is the chosen language</p>
 <h3>Large blocks using <code>blang[lang].</code></h3>
 <p>When you need to vary large content blocks by language which can in turn contain any other HTML or Textile markup, you can use the custom <code>blank</code> textile markup with the <code>lang</code> attribute set within the square brackets.  Indentation following the markup becomes significant and is used to indicate to the Textile parser that all text with indentation following the <code>blang[lang].</code> markup is part of this large language block.</p>
 <p>If a language block for the user&#8217;s currently selected language does not exist, nothing will be shown to the user.</p>
-<pre lang="text"><code lang="text">blang[default].
-  p(#conditional-nav). This block will be shown by default and the nav will be visible
-<br/>  This second line is considered part of the default block because it's still indented.
-<br/>blang[ruby].
-  This block will be shown when Ruby is selected and the conditional nav is not visible
-<br/>  This second line is considered part of the Ruby block because it's still indented.</code></pre>
-<p>Results in:</p>
+<pre lang="text"><code lang="text">
+
+<div lang="default"> <!-- start default language block -->
+
+p(#conditional-nav). This block will be shown by default and the nav will be visible
+
+This second line is considered part of the default block because it's still indented.
+
+
+</div> <!-- /end default language block -->
+
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+
+This block will be shown when Ruby is selected and the conditional nav is not visible
+
+This second line is considered part of the Ruby block because it's still indented.
+
+
+</div> <!-- /end ruby language block -->
+
+
+
+Results in:</code></pre>
 
 
 <div lang="default"> <!-- start default language block -->
@@ -338,7 +369,8 @@ SIGNED_TOKEN_REQUEST_EXAMPLE: "{{SIGNED_TOKEN_REQUEST_EXAMPLE}}"</code></pre>
 <pre lang="html"><code lang="html">- value := definition
 - &lt;div lang="ruby"&gt;ruby&lt;/div&gt; := a Ruby specific definition
 - &lt;div lang="default"&gt;default&lt;/div&gt; := a generic definition
-<br/>- &lt;div lang="ruby"&gt;ruby second&lt;/div&gt; := a Ruby specific definition
+
+- &lt;div lang="ruby"&gt;ruby second&lt;/div&gt; := a Ruby specific definition
 - &lt;div lang="javascript"&gt;javascript second&lt;/div&gt; := a Javascript specific definition</code></pre>
 <p>will render as:</p>
 <dl>

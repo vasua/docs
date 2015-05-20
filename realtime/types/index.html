@@ -194,7 +194,8 @@ if first_page.has_next?
   next_page = first_page.next
   puts "Page 1 item 1: #{next_page.items[1].data}"
 end
-<br/># When using the Realtime EventMachine library
+
+# When using the Realtime EventMachine library
 channel.history do |first_page|
   puts "Page 0 item 0: #{first_page.items[0].data}"
   if first_page.has_next?

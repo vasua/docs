@@ -594,15 +594,15 @@ nav.jump-to-nav {
 
 /* Prettify color coding custom scheme */
 .str {
-  color: #800000; }
+  color: #AB0000; }
 
 /* string content */
 .kwd {
-  color: #00008b; }
+  color: #0000AB; }
 
 /* a keyword */
 .com {
-  color: #808080; }
+  color: #909090; }
 
 /* a comment */
 .typ {
@@ -643,3 +643,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9 {
 .prettyprint ol.linenums li {
   list-style-type: decimal;
   color: #AAA; }
+
+/* remove all styling from text only blocks */
+pre.prettyprint[lang=text] .str, pre.prettyprint[lang=text] .kwd, pre.prettyprint[lang=text] .com, pre.prettyprint[lang=text] .typ, pre.prettyprint[lang=text] .lit, pre.prettyprint[lang=text] .pun, pre.prettyprint[lang=text] .pln, pre.prettyprint[lang=text] .tag, pre.prettyprint[lang=text] .atn, pre.prettyprint[lang=text] .atv, pre.prettyprint[lang=text] .dec {
+  color: #000000; }
