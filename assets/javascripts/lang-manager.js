@@ -37,15 +37,23 @@ $(function() {
       var selectedLang = $this.attr('lang'),
         langSelector = $this.parent('ul'),
         $first = langSelector.next(),
-        $languageElements = $first.nextUntil(':not(' + equalTags($first[0].nodeName) + '),:not([lang])').addBack();
+        $languageElements = $first.nextUntil(':not(' + equalTags($first[0].nodeName) + '),:not([lang])').addBack(),
+        languageMatched = false,
+        defaultLangDivs = $languageElements.find("*[lang*='default']");
 
       langSelector.find('li').removeClass('selected');
       $(this).addClass('selected'); // select the navigation tab
       $languageElements.removeClass('selected');
       $languageElements.each(function() {
         var langs = splitLangs($(this).attr('lang'));
-        if (langs.indexOf(selectedLang) !== -1) $(this).addClass('selected');
+        if (langs.indexOf(selectedLang) !== -1) {
+          $(this).addClass('selected');
+          languageMatched = true;
+        }
       });
+      if (!languageMatched && defaultLangDivs.length > 0) {
+        defaultLangDivs.addClass('selected');
+      }
     }
   }
 
@@ -130,8 +138,12 @@ $(function() {
   function selectGlobalLanguage(cookieStrategy) {
     var lang = $(this).data('lang'),
         friendlyLang = $(this).text();
+
+    // Update the navigation with the chosen language
     $(this).siblings('li').removeClass('selected');
     $(this).addClass('selected');
+
+    // Save the preferred language for next visit
     if (cookieStrategy !== 'do-not-save') $.cookie("preferred_lang", lang, { expires : 31, path: '/' });
 
     $('ul.lang-selector').each(function() {
@@ -139,6 +151,7 @@ $(function() {
           inline = langSelector.next().hasClass('lang-resource'),
           languageTab = langSelector.find('li:not(.warning):langcontains("' + lang + '")'),
           allOtherLanguagesTab = langSelector.find('li:not(.warning):langcontains(default)'); // special tab that allows content to be dispayed as default
+
       if (languageTab.length) {
         selectLang.apply(languageTab);
         langSelector.hide();

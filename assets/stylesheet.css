@@ -221,8 +221,8 @@ hr.back {
   #documentation p ~ code.prettyprint, #documentation h6 + code, #documentation h6 + code.prettyprint {
     margin-top: 20px; }
   #documentation h6 ~ p {
-    margin-top: 5px; }
-  #documentation p ~ h6 {
+    margin-top: 1px; }
+  #documentation p ~ h6, #documentation p ~ div[lang] h6 {
     line-height: 25px;
     top: 0; }
   #documentation h2, #documentation h3, #documentation h6[lang] {
@@ -235,7 +235,7 @@ hr.back {
         margin-top: 15px; }
       #documentation h2 + h6 + p, #documentation h2 + ul + h6 + p, #documentation h3 + h6 + p, #documentation h3 + ul + h6 + p, #documentation h6[lang] + h6 + p, #documentation h6[lang] + ul + h6 + p {
         margin-top: 20px; }
-  #documentation h3 ~ p {
+  #documentation h3 ~ p, #documentation h3 ~ div[lang] p {
     margin-left: 10px; }
   #documentation em {
     color: #888; }
@@ -243,7 +243,7 @@ hr.back {
     margin-top: 0; }
   #documentation code.prettyprint {
     border: 1px solid #999;
-    background-color: #EEE;
+    background-color: #F6F6F6;
     border-radius: 10px;
     padding: 10px;
     margin: 10px 0;
@@ -253,7 +253,7 @@ hr.back {
   #documentation blockquote {
     margin: 0 0 20px 10px;
     font-family: monospace, serif;
-    background-color: #EEE;
+    background-color: #F6F6F6;
     border-radius: 10px;
     padding: 5px 10px; }
     #documentation blockquote p:last-child {
@@ -361,7 +361,7 @@ hr.back {
   #documentation pre {
     border: 1px solid #999;
     border-radius: 5px;
-    background-color: #EEE;
+    background-color: #F6F6F6;
     padding: 5px 5px 0 10px;
     font-family: monospace, serif;
     font-size: 11px; }
@@ -449,16 +449,15 @@ hr.back {
     #documentation .with-lang-nav.selected {
       display: block; }
   #documentation .lang-resource {
-    border: 1px dashed rgba(0, 0, 0, 0.075);
-    padding: 3px;
-    border-radius: 5px;
-    display: none; }
+    outline: 1px dashed rgba(0, 0, 0, 0.075);
+    display: none;
+    /* hide by default and let language selector show the correct resource */ }
     #documentation .lang-resource p {
       clear: both; }
     #documentation .lang-resource.selected {
       display: block; }
     #documentation .lang-resource:hover {
-      background-color: rgba(0, 0, 0, 0.05);
+      background-color: rgba(0, 0, 0, 0.03);
       border-color: #CCC; }
   #documentation span.lang-resource.selected {
     display: inline; }
@@ -592,3 +591,55 @@ nav.jump-to-nav {
     border-radius: 10px; }
     nav.jump-to-nav .form select {
       background-color: white; }
+
+/* Prettify color coding custom scheme */
+.str {
+  color: #800000; }
+
+/* string content */
+.kwd {
+  color: #00008b; }
+
+/* a keyword */
+.com {
+  color: #808080; }
+
+/* a comment */
+.typ {
+  color: #2b91af; }
+
+/* a type name */
+.lit {
+  color: #800000; }
+
+/* a literal value */
+.pun {
+  color: #000; }
+
+/* punctuation */
+.pln {
+  color: #000; }
+
+/* plain text */
+.tag {
+  color: #800000; }
+
+/* a markup tag name */
+.atn {
+  color: #f00; }
+
+/* a markup attribute name */
+.atv {
+  color: #00f; }
+
+/* a markup attribute value */
+.dec {
+  color: #800080; }
+
+/* a declaration */
+li.L1, li.L3, li.L5, li.L7, li.L9 {
+  background: #F0F0F0; }
+
+.prettyprint ol.linenums li {
+  list-style-type: decimal;
+  color: #AAA; }

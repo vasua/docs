@@ -1,10 +1,11 @@
 $(function() {
   var jumpToNav = $('select#jump-to-nav'),
+      stickNavHeight = 80,
       navIsScrolling = false,
       inlineTOCs = $('.inline-toc ul')
 
   function findAnchorTag(anchorId) {
-    var tags = 'a,h1,h2,h3,h4,h5,h6',
+    var tags = 'a,p,h1,h2,h3,h4,h5,h6',
         matchers = [];
     $.each(tags.split(','), function(index, tag) {
       matchers.push(tag + "[id='" + anchorId + "']");
@@ -19,7 +20,7 @@ $(function() {
     if (!idTag.length) {
       if (console.error) { console.error('Hash tag target #' + aid + ' is missing.  Could not scroll'); }
     } else {
-      $('body').animate({ scrollTop: idTag.offset().top - 50 }, 'fast', function() {
+      $('body').animate({ scrollTop: idTag.offset().top - stickNavHeight }, 'fast', function() {
         setTimeout(function() { navIsScrolling = false; }, 750);
       });
       var newUrl = document.location.href.replace(/#[^#]*$/,'') + '#' + aid;
@@ -42,6 +43,13 @@ $(function() {
         var anchorId = $(this).attr(matcher.attribute).replace(/^(#|anchor-)/,''),
             anchorTag = findAnchorTag(anchorId),
             languageContentWithinTag = anchorTag.find('span[lang].lang-resource.selected');
+
+        // If there is no matching anchor tag, hide this navigation item
+        if (anchorTag.is(':visible')) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
 
         if (languageContentWithinTag.length) {
           $(this).text(languageContentWithinTag.text());
@@ -167,4 +175,21 @@ $(function() {
       this.innerHTML = this.innerHTML.replace(/\d{6,}/, newValue);
     });
   }
+
+  // Account for sticky header that overlaps the anchored link
+  var adjustAnchor = function() {
+    var $anchor = $(':target');
+
+    if ($anchor.length > 0) {
+      $('html, body')
+        .stop()
+        .animate({
+            scrollTop: $anchor.offset().top - stickNavHeight
+        }, 100);
+    }
+  };
+
+  $(window).on('hashchange load', function() {
+    adjustAnchor();
+  });
 });
