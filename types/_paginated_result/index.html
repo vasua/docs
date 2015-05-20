@@ -72,7 +72,7 @@
   java:     public PaginatedResult next()</p>
 <p>Returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <span lang="default"><code>null</code></span><span lang="java"><code>Null</code></span><span lang="ruby"><code>nil</code></span> is returned</p>
 <h4>Example</h4>
-<p>```[javascript]<br />
+<p>```[javascript,nodejs]<br />
 channel.history(function(err, paginatedResult) {<br />
   console.log(&#8220;Page 0 item 0:&#8221; + paginatedResult.items<sup class="footnote" id="fnr0"><a href="#fn0">0</a></sup>.data);<br />
   paginatedResult.next(function(err, nextPage) {<br />

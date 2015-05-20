@@ -181,6 +181,12 @@
     console.log("Page 1 item 1:" + nextPage.items[1].data);
   });
 });</code></pre>
+<pre lang="nodejs"><code lang="nodejs">channel.history(function(err, paginatedResult) {
+  console.log("Page 0 item 0:" + paginatedResult.items[0].data);
+  paginatedResult.next(function(err, nextPage) {
+    console.log("Page 1 item 1:" + nextPage.items[1].data);
+  });
+});</code></pre>
 <pre lang="java"><code lang="java">PaginatedResult firstPage = channel.history();
 System.out.println("Page 0 item 0:" + firstPage.items[0].data);
 if (firstPage.hasNext) {
