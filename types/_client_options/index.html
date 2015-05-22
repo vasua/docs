@@ -41,11 +41,11 @@
   <code>ClientOptions</code> is used in the the <code>AblyRealtime</code> constructor&#8217;s <code>options</code> argument</p>
 <dl>
 	<dt><span lang="default"><code>key</code></span><span lang="ruby"><code>:key</code></span></dt>
-	<dd>The full key string, as obtained from the <a href="http://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or wish to be able to issue tokens without needing to defer to a separate entity to sign token requests. Read more about <a href="http://localhost:4000/realtime/authentication">Basic authentication</a><br><i>Type: String</i></dd>
+	<dd>The full key string, as obtained from the <a href="http://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or wish to be able to issue tokens without needing to defer to a separate entity to sign token requests. Read more about <a href="/realtime/authentication">Basic authentication</a><br><i>Type: String</i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>token</code></span><span lang="ruby"><code>:token</code></span></dt>
-	<dd>An authenticated token string, that is most commonly obtained from the <code>token</code> property of a <a href="/realtime/types#token-details"><code>TokenDetails</code></a> component of a token response. Use this option if you wish to use Token authentication. Read more about <a href="http://localhost:4000/realtime/authentication">Token authentication</a><br><i>Type: String</i></dd>
+	<dd>An authenticated token string, that is most commonly obtained from the <code>token</code> property of a <a href="/realtime/types#token-details"><code>TokenDetails</code></a> component of a token response. Use this option if you wish to use Token authentication. Read more about <a href="/realtime/authentication">Token authentication</a><br><i>Type: String</i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>tls</code></span><span lang="ruby"><code>:tls</code></span></dt>
@@ -53,15 +53,15 @@
 </dl>
 <dl>
 	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>:client_id</code></span></dt>
-	<dd>A client ID, used for identifying this client for presence purposes. The <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> can be any string. This option is primarily intended to be used in situations where the library is instanced with a key; note that a <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> may also be implicit in a token used to instance the library; an error will be raised if a <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> specified here conflicts with the <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> implicit in the token.<br><i>Type: Boolean</i></dd>
+	<dd>A client ID, used for identifying this client for presence purposes. The <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> can be any string. This option is primarily intended to be used in situations where the library is instanced with a key; note that a <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> may also be implicit in a token used to instance the library; an error will be raised if a <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> specified here conflicts with the <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> implicit in the token.<br><i>Type: String</i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>useTokenAuth</code></span><span lang="ruby"><code>:use_token_auth</code></span></dt>
-	<dd>When true, Token auth will be used.<br><i>Type: Boolean</i></dd>
+	<dd>When true, forces Token auth to be used.<br><i>Type: Boolean</i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>authCallback</code></span><span lang="ruby"><code>:auth_callback</code></span></dt>
-	<dd>A <span lang="default">function</span><span lang="java"><code>TokenCallback</code> instance</span><span lang="ruby">proc / lambda</span> to call when a new token is required.</span>. The role of the callback is to either generate a signed <a href="/realtime/types#token-request"><code>TokenRequest</code></a> which may then be submitted by the library to the <a href="/rest-api#requesttoken"><code>requestToken</code> REST API</a>; or to provide a valid token in as a <a href="/realtime/types#token-details"><code>TokenDetails</code></a> object. See <a href="/rest/authentication">authentication</a> for details of the token request format and associated API calls.<br><i>Type: <span lang="default">Function</span><span lang="java"><code>TokenCallback</code></span><span lang="ruby">Proc / Lamda</span></i></dd>
+	<dd>A <span lang="default">function</span><span lang="java"><code>TokenCallback</code> instance</span><span lang="ruby">proc / lambda</span> to call when a new token is required. The role of the callback is to either generate a signed <a href="/realtime/types#token-request"><code>TokenRequest</code></a> which may then be submitted by the library to the <a href="/rest-api#requesttoken"><code>requestToken</code> REST API</a>; or to provide a valid token in as a <a href="/realtime/types#token-details"><code>TokenDetails</code></a> object. See <a href="/rest/authentication">authentication</a> for details of the token request format and associated API calls.<br><i>Type: <span lang="default">Function</span><span lang="java"><code>TokenCallback</code></span><span lang="ruby">Proc / Lamda</span></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>authUrl</code></span><span lang="ruby"><code>:auth_url</code></span></dt>
@@ -69,7 +69,7 @@
 </dl>
 <dl>
 	<dt><span lang="default"><code>authMethod</code></span><span lang="ruby"><code>:auth_method</code></span></dt>
-	<dd><em><span lang="default"><code>GET</code></span><span lang="ruby"><code>:get</code></span></em> The HTTP verb to use for the request, either <span lang="default"><code>GET</code></span><span lang="ruby"><code>:get</code></span> or <span lang="default"><code>POST</code></span><span lang="ruby"><code>:post</code></span><br><i>Type: <span lang="default">String</span></i></dd>
+	<dd><em><span lang="default"><code>GET</code></span><span lang="ruby"><code>:get</code></span></em> The HTTP verb to use for the request, either <span lang="default"><code>GET</code></span><span lang="ruby"><code>:get</code></span> or <span lang="default"><code>POST</code></span><span lang="ruby"><code>:post</code></span><br><i>Type: <span lang="default">String</span><span lang="default">Symbol</span></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>authHeaders</code></span><span lang="ruby"><code>:auth_headers</code></span></dt>
@@ -86,16 +86,16 @@
     <li><code>handler</code>: a function to handle each line of log output. If <code>handler</code> is not specified, <code>console.log</code> is used.</li></p>
 </ul>
 Note that the log level and log handler have global scope in the library and will thus not act independently between library instances when multiple library instances exist concurrently.<br><i>Type: Object</i>
-- <code>transports</code> := An optional array of transports to use, in descending order of preference. <span lang="javascript">In the browser environment the available transports are: <code>web_socket</code>, <code>xhr</code>, <code>comet</code>, <code>jsonp</code>, <code>iframe</code>.</span>
+- <code>transports</code> := An optional array of transports to use, in descending order of preference. <span lang="javascript">In the browser environment the available transports are: <code>web_socket</code>, <code>xhr</code>, <code>comet</code>, <code>jsonp</code>, <code>iframe</code>.</span><span lang="nodejs">The transports available in the Node.js client library are: <code>web_socket</code>, <code>xhr</code>, <code>comet</code>, <code>jsonp</code>, <code>iframe</code>.</span>
 <p>blang[java].<br />
   &#8211; <code>logLevel</code> := <em>99</em> A number controlling the verbosity of the output from 2 (maximum, verbose) to 6 (errors only). A special value of 99 will silence all logging. Note that the <code>logLevel</code> is a static variable in the library and will thus not act independently between library instances when multiple library instances exist concurrently.<br><i>Type: Object</i></p>
 - <code>logHandler</code> := <em><code>System.out PrintStream</code></em> A <code>PrintStream</code> to handle each line of log output. If <code>logHandler</code> is not specified, <code>System.out</code> is used. Note that the <code>logHandler</code> is a static variable in the library and will thus not act independently between library instances when multiple library instances exist concurrently.<br><i>Type: PrintStream</i>
 <p>blang[ruby].<br />
-  &#8211; <code>:log_level</code> :=<em><code>Logger::ERROR</code></em> Log level for the standard Logger that outputs to <code>STDOUT</code>. Can be set to <code>:fatal</code> (<code>Logger::FATAL</code>), <code>:error</code> (<code>Logger::ERROR</code>), <code>:warn</code> (<code>Logger::WARN</code>), <code>:info</code> (<code>Logger::INFO</code>), <code>:debug</code> (<code>Logger::DEBUG</code>) or <code>:none</code><br><i>Type: Logger::SEVERITY</i></p>
+  &#8211; <code>:log_level</code> :=<em><code>:error</code></em> Log level for the standard Logger that outputs to <code>STDOUT</code>. Can be set to <code>:fatal</code>, <code>:error</code>, <code>:warn</code>, <code>:info</code>, <code>:debug</code> or <code>:none</code> or any <a href="http://ruby-doc.org/stdlib-2.2.0/libdoc/logger/rdoc/Logger.html#class-Logger-label-Description"><code>Logger</code> severity constant</a><br><i>Type: Symbol, <a href="http://ruby-doc.org/stdlib-2.2.0/libdoc/logger/rdoc/Logger.html#class-Logger-label-Description">Logger::SEVERITY</a></i></p>
 - <code>:logger</code> := <em><code>STDOUT Logger</code></em> A <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/logger/rdoc/Logger.html">Ruby <code>Logger</code></a> compatible object to handle each line of log output. If <code>loggger</code> is not specified, <code>STDOUT</code> is used.<br><i>Type: Ruby Logger</i>
 <dl>
 	<dt><span lang="default"><code>useBinaryProtocol</code></span><span lang="ruby"><code>:use_binary_protocol</code></span></dt>
-	<dd><em>true</em> The client library detects whether or not it has the capability to use the binary protocol, and disables this option if the binary protocol is not supported.<br><i>Type: Boolean</i></dd>
+	<dd><em>true</em> If set to false, will forcibly disable the binary protocol. The binary protocol is used by default unless it is not supported.<br><i>Type: Boolean</i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>queueMessages</code></span><span lang="ruby"><code>:queue_messages</code></span></dt>

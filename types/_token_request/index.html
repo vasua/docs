@@ -41,7 +41,7 @@
 	<dt><code>ttl</code></dt>
 	<dd>Requested time to live for the token in <span lang="default">milliseconds</span><span lang="ruby">seconds</span>. If the token request is successful, the TTL of the returned token will be less than or equal to this value depending on application settings and the attributes of the issuing key.<br><i>Type: Integer</i></dd>
 	<dt><code>timestamp</code></dt>
-	<dd>The timestamp of this request in milliseconds<br><i>Type: <span lang="java">Long Integer</span><span lang="javascript">Integer</span><span lang="ruby">Time</span></i></dd>
+	<dd>The timestamp of this request in milliseconds<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
 	<dt><code>capability</code></dt>
 	<dd>Capability of the token. If the token request is successful, the capability of the returned token will be the intersection of this capability with the capability of the issuing key. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/realtime/authentication">Read more about authentication and capabilities</a><br><i>Type: String</i></dd>
 	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span></dt>
