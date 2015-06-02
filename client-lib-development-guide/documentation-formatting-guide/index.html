@@ -216,32 +216,16 @@ p[ruby]. Text to appear when Ruby is the chosen language</code></pre>
 <h3>Large blocks using <code>blang[lang].</code></h3>
 <p>When you need to vary large content blocks by language which can in turn contain any other HTML or Textile markup, you can use the custom <code>blank</code> textile markup with the <code>lang</code> attribute set within the square brackets.  Indentation following the markup becomes significant and is used to indicate to the Textile parser that all text with indentation following the <code>blang[lang].</code> markup is part of this large language block.</p>
 <p>If a language block for the user&#8217;s currently selected language does not exist, nothing will be shown to the user.</p>
-<pre lang="text"><code lang="text">
+<pre lang="text"><code lang="text">blang[default].
+  p(#conditional-nav). This block will be shown by default and the nav will be visible
 
-<div lang="default"> <!-- start default language block -->
+  This second line is considered part of the default block because it's still indented.
 
-p(#conditional-nav). This block will be shown by default and the nav will be visible
+blang[ruby].
+  This block will be shown when Ruby is selected and the conditional nav is not visible
 
-This second line is considered part of the default block because it's still indented.
-
-
-</div> <!-- /end default language block -->
-
-
-
-
-<div lang="ruby"> <!-- start ruby language block -->
-
-This block will be shown when Ruby is selected and the conditional nav is not visible
-
-This second line is considered part of the Ruby block because it's still indented.
-
-
-</div> <!-- /end ruby language block -->
-
-
-
-Results in:</code></pre>
+  This second line is considered part of the Ruby block because it's still indented.</code></pre>
+<p>Results in:</p>
 
 
 <div lang="default"> <!-- start default language block -->
