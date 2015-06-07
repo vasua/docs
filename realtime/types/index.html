@@ -44,9 +44,14 @@
 <option id="anchor-paginated-result">Paginated Result</option>
 <option id="anchor-token-request">Token Request</option>
 <option id="anchor-token-details">Token Details</option>
+<option id="anchor-error-info">Error Info</option>
+<option id="anchor-ably-exception">AblyException</option>
 </optgroup>
 <optgroup label='Other Types'>
 <option id="anchor-client-options">Client Options</option>
+<option id="anchor-completion-listener">Completion Listener</option>
+<option id="anchor-connection-state">Connection State enum</option>
+<option id="anchor-connection-state-change">Connection State Change</option>
 <option id="anchor-deferrable">Deferrable</option>
 </optgroup>
           </select>
@@ -66,7 +71,7 @@
 <h2>Data types</h2>
 <h3 id="message"><span lang='default'>Message</span><span lang='java'>io.ably.types.Message</span><span lang='ruby'>Ably::Models::Message</span></h3>
 <p>A <code>Message</code> represents an individual message that is sent to or received from Ably</p>
-<h4>Attributes</h4>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>name</code></dt>
 	<dd>Event name, if provided<br><i>Type: String</i></dd>
@@ -101,7 +106,7 @@
 </dl>
 <h3 id="presence-message"><span lang='default'>PresenceMessage</span><span lang='java'>io.ably.types.PresenceMessage</span><span lang='ruby'>Ably::Models::PresenceMessage</span></h3>
 <p>A <code>PresenceMessage</code> represents an individual presence update that is sent to or received from Ably</p>
-<h4>Attributes</h4>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><div lang="java"><code>action</code></div></dt>
 	<dd>the event signified by a PresenceMessage<br><i>Type: enum Action { ABSENT, PRESENT, ENTER, LEAVE, UPDATE }</i></dd>
@@ -140,7 +145,7 @@
 </dl>
 <h3 id="paginated-result"><span lang='default'>PaginatedResult</span><span lang='java'>io.ably.types.PaginatedResult</span><span lang='ruby'>Ably::Models::PaginatedResult</span></h3>
 <p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">paginated REST API query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object</p>
-<h4>Attributes</h4>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>items</code></dt>
 	<dd>contains a page of results (for example an Array of <a href="#message"><code>Message</code></a> or <a href="#presence-message"><code>PresenceMessage</code></a> objects for a channel history request)<br><i>Type: Array &lt;Message, Presence, Stats&gt;</i></dd>
@@ -212,7 +217,7 @@ channel.history do |first_page|
 end</code></pre>
 <h3 id="token-request"><span lang='default'>TokenRequest</span><span lang='java'>io.ably.types.TokenRequest</span><span lang='ruby'>Ably::Models::TokenRequest</span></h3>
 <p><code>TokenRequest</code> is a type containing parameters for a token request. Tokens are requested using the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a></p>
-<h3>Attributes</h3>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><span lang="default"><code>keyName</code></span><span lang="ruby"><code>key_name</code></span></dt>
 	<dd>The key name of the key against which this request is made. The key name is public, whereas the key secret is private<br><i>Type: String</i></dd>
@@ -231,7 +236,7 @@ end</code></pre>
 </dl>
 <h3 id="token-details"><span lang='default'>TokenDetails</span><span lang='java'>io.ably.types.TokenDetails</span><span lang='ruby'>Ably::Models::TokenDetails</span></h3>
 <p><code>TokenDetails</code> is a type providing details of a token and its associated metadata, provided when the system successfully requests a token from the system</p>
-<h3>Attributes</h3>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>token</code></dt>
 	<dd>The token itself<br><i>Type: String</i></dd>
@@ -253,7 +258,7 @@ end</code></pre>
 </dl>
 <h3 id="error-info"><span lang='default'>ErrorInfo</span><span lang='java'>io.ably.types.ErrorInfo</span><span lang='ruby'>Ably::Models::ErrorInfo</span></h3>
 <p>An <code>ErrorInfo</code> is a type encapsulating error information containing an Ably-specific error code and generic status code.</p>
-<h4>Attributes</h4>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>code</code></dt>
 	<dd>Ably error code (see <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">ably-common/protocol/errors.json</a>)<br><i>Type: Integer</i></dd>
@@ -266,12 +271,12 @@ end</code></pre>
 	<dt><code>message</code></dt>
 	<dd>Additional message information, where available<br><i>Type: String</i></dd>
 </dl>
+<h3 id="ably-exception"><span lang='java'>io.ably.types.AblyException</span><span lang='ruby'>Ably::Exceptions::BaseAblyException</span></h3>
 
 
 <div lang="java"> <!-- start java language block -->
-<h3 id="ably-exception">io.ably.types.AblyException</h3>
 <p>An <code>AblyException</code> is an exception encapsulating error information containing an Ably-specific error code and generic status code, where applicable.</p>
-<h4>Attributes</h4>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>errorInfo</code></dt>
 	<dd><a href="/realtime/types#error-info">@ErrorInfo</a> corresponding to this exception, where applicable<br><i>Type: ErrorInfo</i></dd>
@@ -282,9 +287,8 @@ end</code></pre>
 
 
 <div lang="ruby"> <!-- start ruby language block -->
-<h3 id="ably-exception">Ably::Exceptions::BaseAblyException</h3>
 <p>An <code>BaseAblyException</code> is an exception encapsulating error information containing an Ably-specific error code and generic status code, where applicable.</p>
-<h4>Attributes</h4>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>code</code></dt>
 	<dd>Ably error code (see <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">ably-common/protocol/errors.json</a>)<br><i>Type: Integer</i></dd>
@@ -323,6 +327,7 @@ end</code></pre>
 
 </div> <!-- /end java language block -->
 
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><span lang="default"><code>key</code></span><span lang="ruby"><code>:key</code></span></dt>
 	<dd>The full key string, as obtained from the <a href="http://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or wish to be able to issue tokens without needing to defer to a separate entity to sign token requests. Read more about <a href="/realtime/authentication">Basic authentication</a><br><i>Type: String</i></dd>
@@ -430,6 +435,90 @@ Note that the log level and log handler have global scope in the library and wil
 	<dt><span lang="default"><code>recover</code></span><span lang="ruby"><code>:recover</code></span></dt>
 	<dd>This option allows a connection to inherit the state of a previous connection that may have existed under a different instance of the Realtime library. This might typically be used by clients of the browser library to ensure connection state can be preserved when the user refreshes the page. See <a href="/realtime/connection/#connection-state-recovery">connection state recovery</a> for further information on this option.<br><i>Type: String</i></dd>
 </dl>
+<h3 id="completion-listener"><span lang='java'>io.ably.realtime.CompletionListener</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p>A <span lang="java"><code>io.ably.realtime.CompletionListener</code></span> is an interface allowing a client to be notified of the outcome of an asynchronous operation.</p>
+<pre lang="java"><code lang="java">public interface CompletionListener {
+  // Called when the associated operation completes successfully,
+  public void onSuccess();
+
+  // Called when the associated operation completes with an error.
+  public void onError(ErrorInfo reason);
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+<h3 id="connection-state"><span lang='ruby'>Connection::STATE enum</span><span lang='java'>io.ably.realtime.ConnectionState enum</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>io.ably.realtime.ConnectionState</code> is an enum representing all the <a href="/realtime/connection#connection-states"><code>Realtime Connection</code> states</a>.</p>
+<pre lang="java"><code lang="java">public enum ConnectionState {
+  initialized,   // 0
+  connecting,    // 1
+  connected,     // 2
+  disconnected,  // 3
+  suspended,     // 4
+  closing,       // 5
+  closed,        // 6
+  failed         // 7
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p><code>Ably::Realtime::Connection::STATE</code> is an enum-like value representing all the <a href="/realtime/connection#connection-states"><code>Realtime Connection</code> states</a>. @STATE@s can be represented interchangeably as either symbols or constants.</p>
+<h4>Symbol states</h4>
+<pre lang="ruby"><code lang="ruby">:initialized # =&gt;  0
+:connecting # =&gt;   1
+:connected # =&gt;    2
+:disconnected # =&gt; 3
+:suspended # =&gt;    4
+:closing # =&gt;      5
+:closed # =&gt;       6
+:failed # =&gt;       7</code></pre>
+<h4>Constant states</h4>
+<pre lang="ruby"><code lang="ruby">Connection::STATE.Initialized # =&gt;  0
+Connection::STATE.Connecting # =&gt;   1
+Connection::STATE.Connected # =&gt;    2
+Connection::STATE.Disconnected # =&gt; 3
+Connection::STATE.Suspended # =&gt;    4
+Connection::STATE.Closing # =&gt;      5
+Connection::STATE.Closed # =&gt;       6
+Connection::STATE.Failed # =&gt;       7</code></pre>
+<h4>Example usage</h4>
+<pre lang="ruby"><code lang="ruby"># Example with symbols
+client.connection.on(:connected) { ... }
+
+# Example with constants
+client.connection.on(Ably::Realtime::Connection::STATE.Connected) { ... }</code></pre>
+
+</div> <!-- /end ruby language block -->
+
+<h3 id="connection-state-change"><span lang='javascript,nodejs'>ConnectionStateChange Object</span><span lang='java'>ConnectionStateChange</span></h3>
+
+
+<div lang="java,javascript,nodejs"> <!-- start java,javascript,nodejs language block -->
+<p>A <span lang="java"><code>io.ably.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by an object that implements an <code>EventEmitter</code></p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><code>previous</code></dt>
+	<dd>the previous state<br><i>Type: <span lang="default">String</span><span lang="java">ConnectionState</span></i></dd>
+	<dt><code>current</code></dt>
+	<dd>the new state<br><i>Type: <span lang="default">String</span><span lang="java">ConnectionState</span></i></dd>
+	<dt><code>reason</code></dt>
+	<dd>an <a href="#error-info"><code>ErrorInfo</code></a> containing any information relating to the transition<br><i>Type: <a href="#error-info"><code>ErrorInfo</code></a></i></dd>
+	<dt><span lang="default"><code>retryIn</code></span><span lang="ruby"><code>retry_in</code></span></dt>
+	<dd>Timestamp at which the library will retry a connection where applicable, as milliseconds since the epoch<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+</dl>
+
+</div> <!-- /end java,javascript,nodejs language block -->
+
+<p>&nbsp;</p>
 
 
 <div lang="ruby"> <!-- start ruby language block -->
@@ -518,6 +607,7 @@ Note that the log level and log handler have global scope in the library and wil
 <li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-fallback/'>Connection host fallback</a></li>
 <li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+<li class=''><a href='/code-index/'>Code Examples List</a></li>
 </ul>
   <ul>
 <li><a href="https://www.ably.io">Visit Ably.io</a></li>

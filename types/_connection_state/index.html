@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Ably API Documentation - Ably API Documentation</title>
+    <title>Ably API Documentation - </title>
     <link rel="shortcut icon" href="/assets/favicon.ico">
 
     <link rel="stylesheet" type="text/css" href="/assets/vendor/prettify/prettify.css" media="screen">
@@ -33,25 +33,55 @@
     <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
-    <h1>Ably Github Documentation (Bleeding edge)</h1>
-<p>The definitive stable version of the <a href="https://www.ably.io/documentation">Ably realtime messaging documentation</a> can be found at <a href="https://www.ably.io/documentation">https://www.ably.io/documentation</a>.</p>
-<p>This documentation is a static site generated from the Github repository at <a href="https://github.com/ably/docs">https://github.com/ably/docs</a>. Anyone can fork this documentation and contributions can be made via pull requests.  All changes in this repository will be merged into the definitive <a href="https://www.ably.io/documentation">Ably documentation</a> periodically.</p>
-<ul>
-	<li><a href="https://github.com/ably/docs">Fork this documentation now »</a></li>
-	<li><a href="https://github.com/ably/docs/issues">Notify of us of an issue with this documentation »</a></li>
-</ul>
-<h2>What&#8217;s covered</h2>
-<p>The Ably documentation is broken down as follows:</p>
-<ul>
-	<li>Getting started &amp; key concepts: <a href="/root/quick-start-guide">Quick start guide</a>, <a href="/root/how-ably-works">How Ably works</a>, and <a href="/root/usage-limits-billing/">Usage Limits &amp; Billing</a></li>
-	<li><a href="/realtime/">Realtime client library API documentation</a></li>
-	<li><a href="/rest/">REST client library API documentation</a></li>
-	<li><a href="/rest-api/">REST API documentation</a>.  Note, we recommend you use one of our REST client libraries instead of accessing the Ably REST API directly as the client libraries abstract away underlying complexity and provide a rich convenient feature set to developers.</li>
-	<li>More detail behind some of Ably&#8217;s key features: <a href="/general/authentication">Authentication</a>, <a href="/general/channel-rules-namespaces/">Channel Rules &amp; Namespaces</a>, <a href="/general/webhooks">Receiving WebHooks</a>, and <a href="/general/statistics/">Application statistics</a></li>
-	<li>Documentation targeted at client library developers including <a href="/client-lib-development-guide/protocol/">Protocol documentation</a>, details on <a href="/client-lib-development-guide/encryption/">Encryption</a>, and <a href="/client-lib-development-guide/connection-fallback/">our fallback mechanisms to ensure we can deliver on our 100% uptime guarantee</a>.  Unless you are developing or extending an existing Ably client library, this documentation is most likely more low level than is needed for you to use the Ably realtime message service.</li>
-</ul>
-<hr />
-<p><a href="https://www.ably.io/contact">Contact us</a> if you have any questions or suggestions.</p>
+    <p>blang[java].<br />
+  <code>io.ably.realtime.ConnectionState</code> is an enum representing all the <a href="/realtime/connection#connection-states"><code>Realtime Connection</code> states</a>.</p>
+```[java]
+public enum ConnectionState {
+initialized,   // 0
+connecting,    // 1
+connected,     // 2
+disconnected,  // 3
+suspended,     // 4
+closing,       // 5
+closed,        // 6
+failed         // 7
+}
+```
+<p>blang[ruby].<br />
+  <code>Ably::Realtime::Connection::STATE</code> is an enum-like value representing all the <a href="/realtime/connection#connection-states"><code>Realtime Connection</code> states</a>. @STATE@s can be represented interchangeably as either symbols or constants.</p>
+h4. Symbol states
+```[ruby]
+:initialized # =&gt;  0
+:connecting # =&gt;   1
+:connected # =&gt;    2
+:disconnected # =&gt; 3
+:suspended # =&gt;    4
+:closing # =&gt;      5
+:closed # =&gt;       6
+:failed # =&gt;       7
+```
+h4. Constant states
+```[ruby]
+Connection::STATE.Initialized # =&gt;  0
+Connection::STATE.Connecting # =&gt;   1
+Connection::STATE.Connected # =&gt;    2
+Connection::STATE.Disconnected # =&gt; 3
+Connection::STATE.Suspended # =&gt;    4
+Connection::STATE.Closing # =&gt;      5
+Connection::STATE.Closed # =&gt;       6
+Connection::STATE.Failed # =&gt;       7
+```
+h4. Example usage
+```[ruby]
+<ol>
+	<li>Example with symbols<br />
+    client.connection.on(:connected) { &#8230; }</li>
+</ol>
+<ol>
+	<li>Example with constants<br />
+    client.connection.on(Ably::Realtime::Connection::STATE.Connected) { &#8230; }<br />
+  ```</li>
+</ol>
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>

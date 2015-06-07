@@ -178,21 +178,41 @@ AblyRealtime realtime = new AblyRealtime(options);</code></pre>
 
 <div lang="ruby"> <!-- start ruby language block -->
 <h6 id="rest-client">rest_client</h6>
-<p>A reference to the <a href="/rest/usage">REST Client</a> configured with the same <a href="#client-options"><code>ClientOptions</code></a>.  The Realtime library is a superset of the REST library, however accessing methods in the REST library, unlike the Realtime library, are blocking operations.</p>
+<p>A reference to the <a href="/rest/usage">REST Client</a> configured with the same <a href="#client-options"><code>ClientOptions</code></a>. The Realtime library is a superset of the REST library, however accessing methods in the REST library, unlike the Realtime library, are blocking operations.</p>
 
 </div> <!-- /end ruby language block -->
 
 <h2 id="methods"><span lang='default'>AblyRealtime Methods</span><span lang='ruby'>Realtime::Client Methods</span><span lang='java'>io.ably.AblyRealtime Methods</span></h2>
 <h6 id="close">close</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>close()</span><span lang='ruby'>close(&amp;block)</span><span lang='java'>public void close()</span></p>
+<p class="definition"><span lang='default'>close()</span><span lang='ruby'>close &#8594; <a href="/realtime/types#deferrable">EventMachine::Deferrable</a> &#8594; yields <a href="/realtime/connection"><code>Connection</code></a></span><span lang='java'>public void close()</span></p>
 </blockquote>
-<p>This simply calls <span lang="default"><a href="/realtime/connection#close"><code>connection.close()</code></a></span><span lang="ruby"><a href="/realtime/connection#close"><code>connection.close</code></a></span> and causes the connection to close, entering the <code>closing</code> state. Once closed, the library will not attempt to re-establish the connection without an explicit call to <span lang="default"><a href="/realtime/connection#connect"><code>connect()</code></a></span><span lang="ruby"><a href="/realtime/connection#connect"><code>connect</code></a></span>.</p>
+<p>This calls <span lang="default"><a href="/realtime/connection#close"><code>connection.close()</code></a></span><span lang="ruby"><a href="/realtime/connection#close"><code>connection.close</code></a></span> and causes the connection to close, entering the <code>closing</code> state. Once <code>closed</code>, the library will not attempt to re-establish the connection without an explicit call to <span lang="default"><a href="/realtime/connection#connect"><code>connect()</code></a></span><span lang="ruby"><a href="/realtime/connection#connect"><code>connect</code></a></span>.</p>
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from this method.</p>
+<p>On successfully closing the connection, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields a <a href="/realtime/connection"><code>Connection</code></a> object.</p>
+<p>Failure to close the connection will trigger the errback callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object containing an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
+
+</div> <!-- /end ruby language block -->
+
 <h6 id="connect">connect</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>connect()</span><span lang='ruby'>connect(&amp;block)</span><span lang='java'>public void connect()</span></p>
+<p class="definition"><span lang='default'>connect()</span><span lang='ruby'>connect &#8594; <a href="/realtime/types#deferrable">EventMachine::Deferrable</a> &#8594; yields <a href="/realtime/connection"><code>Connection</code></a></span><span lang='java'>public void connect()</span></p>
 </blockquote>
-<p>Explicitly calling <code>connect</code> is unnecessary unless the <a href="#client-option"><code>ClientOption</code></a> <span lang="default"><code>connectAutomatically</code></span><span lang="ruby"><code>connect_automatically</code></span> is disabled. This method simply calls <span lang="default"><a href="/realtime/connection#connect"><code>connection.connect()</code></a></span><span lang="ruby"><a href="/realtime/connection#connect"><code>connection.connect</code></a></span> and causes the connection to open, entering the <code>connecting</code> state.</p>
+<p>Explicitly calling <code>connect</code> is unnecessary unless the <a href="#client-option"><code>ClientOption</code></a> <span lang="default"><code>connectAutomatically</code></span><span lang="ruby"><code>connect_automatically</code></span> is disabled. This method calls <span lang="default"><a href="/realtime/connection#connect"><code>connection.connect()</code></a></span><span lang="ruby"><a href="/realtime/connection#connect"><code>connection.connect</code></a></span> and causes the connection to open, entering the <code>connecting</code> state.</p>
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from this method.</p>
+<p>On successfully connecting to Ably, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields a <a href="/realtime/connection"><code>Connection</code></a> object.</p>
+<p>Failure to connect will trigger the errback callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object containing an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
+
+</div> <!-- /end ruby language block -->
+
 <h6 id="stats">stats</h6>
 <blockquote class="definition">
 <p class="definition"><span lang='default'>stats(params, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt; result))</span><span lang='ruby'>stats(Hash options) &#8594; <a href="/realtime/types#deferrable">EventMachine::Deferrable</a> &#8594; yields <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt;</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt; stats(Param[] params)</span></p>
@@ -310,6 +330,7 @@ AblyRealtime realtime = new AblyRealtime(options);</code></pre>
 
 </div> <!-- /end java language block -->
 
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><span lang="default"><code>key</code></span><span lang="ruby"><code>:key</code></span></dt>
 	<dd>The full key string, as obtained from the <a href="http://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or wish to be able to issue tokens without needing to defer to a separate entity to sign token requests. Read more about <a href="/realtime/authentication">Basic authentication</a><br><i>Type: String</i></dd>
@@ -474,6 +495,7 @@ Note that the log level and log handler have global scope in the library and wil
 <li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-fallback/'>Connection host fallback</a></li>
 <li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+<li class=''><a href='/code-index/'>Code Examples List</a></li>
 </ul>
   <ul>
 <li><a href="https://www.ably.io">Visit Ably.io</a></li>

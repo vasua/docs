@@ -48,18 +48,18 @@
 <pre lang="html"><code lang="html">&lt;script src="http://cdn.ably.io/lib/ably.min.js"&gt;&lt;/script&gt;</code></pre>
 <h3>The basics: Receiving a message</h3>
 <p>To connect to Ably, you need an API key.  In this example we have provided a temporary API key, however if you are signed up and visit your <a href="https://www.ably.io/dashboard">application dashboard</a>, you will be able to use your own API key.  If you do not have an API key yet, why not <a href="https://www.ably.io/#signup">sign up now for a free app and API key</a>.</p>
-<pre class="code-editor open-jsbin open-jsbin-eberiq" lang="javascript"><code class="code-editor open-jsbin open-jsbin-eberiq" lang="javascript">var ably = new Ably.Realtime('{{API_KEY}}');
+<pre class="code-editor open-jsbin open-jsbin-iyiset" lang="javascript"><code class="code-editor open-jsbin open-jsbin-iyiset" lang="javascript">var ably = new Ably.Realtime('{{API_KEY}}');
 ably.connection.on('connected', function() {
   alert("That was simple, you're now connected to Ably in realtime");
 });</code></pre>
 <p>Messages are broadcasted on channels.  Next we will subscribe to a channel and listen for messages that are sent to us from other connected clients or servers.</p>
-<pre class="code-editor open-jsbin open-jsbin-ehahil" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ehahil" lang="javascript">var channel = ably.channels.get('quickstart');
+<pre class="code-editor open-jsbin open-jsbin-aqadar" lang="javascript"><code class="code-editor open-jsbin open-jsbin-aqadar" lang="javascript">var channel = ably.channels.get('quickstart');
 channel.subscribe('greeting', function(message) {
   alert("Received a greeting message in realtime: " + message.data);
 });</code></pre>
 <h3>The basics: Sending a message</h3>
 <p>Publishing a message to a channel is extremely straightforward.  As this is commonly performed by both connected devices and servers, here are examples in multiple languages</p>
-<pre class="code-editor open-jsbin open-jsbin-ehahil" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ehahil" lang="javascript">var channel = ably.channels.get('quickstart');
+<pre class="code-editor open-jsbin open-jsbin-aqadar" lang="javascript"><code class="code-editor open-jsbin open-jsbin-aqadar" lang="javascript">var channel = ably.channels.get('quickstart');
 channel.publish('greeting', 'hello!');</code></pre>
 <pre lang="csharp"><code lang="csharp">Channel channel = ably.channel('quickstart');
 channel.publish('greeting', 'hello!');</code></pre>
@@ -155,6 +155,7 @@ if ('{{API_KEY}}' !== '{{API_' + 'KEY}}') {
 <li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-fallback/'>Connection host fallback</a></li>
 <li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+<li class=''><a href='/code-index/'>Code Examples List</a></li>
 </ul>
   <ul>
 <li><a href="https://www.ably.io">Visit Ably.io</a></li>

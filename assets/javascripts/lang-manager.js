@@ -9,7 +9,7 @@ $(function() {
     "javascript": "Javascript","java": "Java","python": "Python","ruby": "Ruby","nodejs": "Node.js","ios": "iOS","csharp": "C# .Net","cplusplus": "C++","c": "C","appcelerator": "Appcelerator","phonegap": "PhoneGap","json": "JSON"
   };
   var languageExtensions = {
-    "javascript": "js","java": "java","python": "java","ruby": "java","nodejs": "java","ios": "java","csharp": "cs","cplusplus": "cpp","c": "c","appcelerator": "js","phonegap": "js","html": "html","json": "json","sh": "sh","yaml": "yaml"
+    "javascript": "js","java": "java","python": "java","ruby": "ruby","nodejs": "js","ios": "java","csharp": "cs","cplusplus": "cpp","c": "c","appcelerator": "js","phonegap": "js","html": "html","json": "json","sh": "sh","yaml": "yaml"
   };
 
   function friendlyLanguageFromId(languageId) {
