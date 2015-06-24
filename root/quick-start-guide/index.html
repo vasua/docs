@@ -53,13 +53,13 @@ ably.connection.on('connected', function() {
   alert("That was simple, you're now connected to Ably in realtime");
 });</code></pre>
 <p>Messages are broadcasted on channels.  Next we will subscribe to a channel and listen for messages that are sent to us from other connected clients or servers.</p>
-<pre class="code-editor open-jsbin open-jsbin-aqadar" lang="javascript"><code class="code-editor open-jsbin open-jsbin-aqadar" lang="javascript">var channel = ably.channels.get('quickstart');
+<pre class="code-editor open-jsbin open-jsbin-ipilet" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ipilet" lang="javascript">var channel = ably.channels.get('quickstart');
 channel.subscribe('greeting', function(message) {
   alert("Received a greeting message in realtime: " + message.data);
 });</code></pre>
 <h3>The basics: Sending a message</h3>
 <p>Publishing a message to a channel is extremely straightforward.  As this is commonly performed by both connected devices and servers, here are examples in multiple languages</p>
-<pre class="code-editor open-jsbin open-jsbin-aqadar" lang="javascript"><code class="code-editor open-jsbin open-jsbin-aqadar" lang="javascript">var channel = ably.channels.get('quickstart');
+<pre class="code-editor open-jsbin open-jsbin-ipilet" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ipilet" lang="javascript">var channel = ably.channels.get('quickstart');
 channel.publish('greeting', 'hello!');</code></pre>
 <pre lang="csharp"><code lang="csharp">Channel channel = ably.channel('quickstart');
 channel.publish('greeting', 'hello!');</code></pre>

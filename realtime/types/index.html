@@ -70,7 +70,7 @@
       <p>The Ably client library defines both data types and option types.  Data types are used to represent object such as messages; Option types are used in method arguments.</p>
 <h2>Data types</h2>
 <h3 id="message"><span lang='default'>Message</span><span lang='java'>io.ably.types.Message</span><span lang='ruby'>Ably::Models::Message</span></h3>
-<p>A <code>Message</code> represents an individual message that is sent to or received from Ably</p>
+<p>A <code>Message</code> represents an individual message that is sent to or received from Ably.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>name</code></dt>
@@ -105,7 +105,7 @@
 	<dd>This will typically be empty as all messages received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: String</i></dd>
 </dl>
 <h3 id="presence-message"><span lang='default'>PresenceMessage</span><span lang='java'>io.ably.types.PresenceMessage</span><span lang='ruby'>Ably::Models::PresenceMessage</span></h3>
-<p>A <code>PresenceMessage</code> represents an individual presence update that is sent to or received from Ably</p>
+<p>A <code>PresenceMessage</code> represents an individual presence update that is sent to or received from Ably.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><div lang="java"><code>action</code></div></dt>
@@ -144,7 +144,7 @@
 	<dd>This will typically be empty as all presence updates received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: String</i></dd>
 </dl>
 <h3 id="paginated-result"><span lang='default'>PaginatedResult</span><span lang='java'>io.ably.types.PaginatedResult</span><span lang='ruby'>Ably::Models::PaginatedResult</span></h3>
-<p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">paginated REST API query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object</p>
+<p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">paginated REST API query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>items</code></dt>
@@ -216,7 +216,7 @@ channel.history do |first_page|
   end
 end</code></pre>
 <h3 id="token-request"><span lang='default'>TokenRequest</span><span lang='java'>io.ably.types.TokenRequest</span><span lang='ruby'>Ably::Models::TokenRequest</span></h3>
-<p><code>TokenRequest</code> is a type containing parameters for a token request. Tokens are requested using the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a></p>
+<p><code>TokenRequest</code> is a type containing parameters for a token request. Tokens are requested using the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a>.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><span lang="default"><code>keyName</code></span><span lang="ruby"><code>key_name</code></span></dt>
@@ -235,7 +235,7 @@ end</code></pre>
 	<dd>The Message Authentication Code for this request<br><i>Type: String</i></dd>
 </dl>
 <h3 id="token-details"><span lang='default'>TokenDetails</span><span lang='java'>io.ably.types.TokenDetails</span><span lang='ruby'>Ably::Models::TokenDetails</span></h3>
-<p><code>TokenDetails</code> is a type providing details of a token and its associated metadata, provided when the system successfully requests a token from the system</p>
+<p><code>TokenDetails</code> is a type providing details of a token and its associated metadata, provided when the system successfully requests a token from the system.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>token</code></dt>
@@ -323,7 +323,7 @@ end</code></pre>
 
 
 <div lang="java"> <!-- start java language block -->
-<p><code>ClientOptions</code> is used in the the <code>AblyRealtime</code> constructor&#8217;s <code>options</code> argument</p>
+<p><code>ClientOptions</code> is used in the the <code>AblyRealtime</code> constructor&#8217;s <code>options</code> argument.</p>
 
 </div> <!-- /end java language block -->
 
@@ -503,7 +503,7 @@ client.connection.on(Ably::Realtime::Connection::STATE.Connected) { ... }</code>
 
 
 <div lang="java,javascript,nodejs"> <!-- start java,javascript,nodejs language block -->
-<p>A <span lang="java"><code>io.ably.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by an object that implements an <code>EventEmitter</code></p>
+<p>A <span lang="java"><code>io.ably.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by an object that implements an <code>EventEmitter</code>.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>previous</code></dt>

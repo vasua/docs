@@ -78,7 +78,7 @@
 <p>Although connection state is temporary, the Ably protocol provides continuity of message delivery between the client and the service, provided that a dropped connection is reestablished by the client within a limited interval (typically around 1 minute). Beyond that, the connection becomes stale and the system will not attempt to recover the connection state. The lifecycle of a connection, and the strategy for reconnecting on failure, reflect the transient nature of the connection state.</p>
 <p>The client library is responsible for managing the connection; this includes selecting a transport (in those environments supporting multiple transports), selecting a host to connect to (automatically falling back to an alternate data centre host if the closest data centre is unreachable), and managing continuity of operation when the connection drops.</p>
 <p>When the library is instanced, if connectivity to the service is available, the library will establish a connection immediately, and if the connection drops at any time it will attempt to re-establish it by making repeated connection attempts every 15 seconds for up to two minutes.</p>
-<p>If, after that time, there has been no connection, the library falls back to a lower level of activity, still periodically attempting reconnection at two minute intervals. This reflects the assumption that there will no longer be recoverable connection state and the client may be offline for a period of time. As soon as a reconnection attempt has been successful, the system reverts to the more active connection behaviour. Further, one can explicitly trigger a reconnection attempt at any time if there is desire to implement a different reconnection strategy.</p>
+<p>If, after that time, there has been no connection, the library falls back to a lower level of activity, still periodically attempting reconnection at two minute intervals. This reflects the assumption that there will no longer be recoverable connection state and the client may be offline for a period of time. As soon as a reconnection attempt has been successful, the system reverts to the more active connection behaviour. Further, you can explicitly trigger a reconnection attempt at any time if you wish to implement a different reconnection strategy.</p>
 <p>The connection object provides methods to observe the lifecycle of the connection and to trigger state transitions.</p>
 <h3 id="connection-states">Connection states</h3>
 <p>A series of connection states is defined as follows:</p>
@@ -221,7 +221,7 @@ realtime.connection.off</code></pre>
 </div> <!-- /end ruby language block -->
 
 <h3 id="connection-state-recovery">Connection state recovery</h3>
-<p>The Ably system preserves connection state to allow connections to continue transparently across brief disconnections. The connection state that is tracked includes the messages sent to the client on the connection, members presenton a channel and the set of channels that the client is attached to.</p>
+<p>The Ably system preserves connection state to allow connections to continue transparently across brief disconnections. The connection state that is tracked includes the messages sent to the client on the connection, members present on a channel and the set of channels that the client is attached to.</p>
 <p>There are two modes of connection state recovery:</p>
 <ul>
 	<li><code>resume</code>: this is transparent recovery of a live client instance across disconnections. Upon disconnection, the library will automatically re-attempt connection and, once connection is re-established, any missed messages will be sent to the client. The developer does not need to do anything to trigger this behaviour; all client channel event listeners remain attached and are called when the backlog of messages is received.</li>
@@ -256,7 +256,7 @@ realtime.connection.off</code></pre>
 <h6 id="serial">serial</h6>
 <p>The serial number <code>Integer</code> of the last message to be received on this connection, used to recover or resume a connection. When recovering a connection explicitly, the <span lang="default"><code>recoveryKey</code></span><span lang="ruby"><code>recovery_key</code></span> is used in the <code>recover</code> <a href="/realtime/usage#client-options">client options</a> as it contains both the <code>key</code> and the last message <code>serial</code>.</p>
 <h6 id="state">state</h6>
-<p>The current <span lang="java"><a href="#connection-state">@io.ably.realtime.ConnectionState</a> state@</span><span lang="ruby"><a href="#connection-state">@Ably::Realtime::Connection::STATE</a> state@</span><span lang="default"><code>state String</code></span> of this Connection. See the <a href="#connection-states"><code>Connection</code> states</a> for more information.</p>
+<p>The current <span lang="java"><a href="#connection-state"><code>io.ably.realtime.ConnectionState</code></a> <code>state</code></span><span lang="ruby"><a href="#connection-state"><code>Ably::Realtime::Connection::STATE</code></a> <code>state</code></span><span lang="default"><code>state String</code></span> of this Connection. See the <a href="#connection-states"><code>Connection</code> states</a> for more information.</p>
 <h2 id="methods"><span lang='default'>Connection Methods</span><span lang='ruby'>Ably::Realtime::Connection Methods</span><span lang='java'>io.ably.realtime.Connection Methods</span></h2>
 <h6 id="close">close</h6>
 <blockquote class="definition">
@@ -298,7 +298,7 @@ realtime.connection.off</code></pre>
 <div lang="ruby"> <!-- start ruby language block -->
 <h4>Returns</h4>
 <p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from this method.</p>
-<p>On successfully echoing a hearbeat from Ably, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields an Integer representing the time in milliseconds for the hearbeat ping request to be echoed.</p>
+<p>On successfully echoing a heartbeat from Ably, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields an Integer representing the time in milliseconds for the heartbeat ping request to be echoed.</p>
 <p>Failure to receive a heartbeat ping will trigger the errback callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object containing an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
 
 </div> <!-- /end ruby language block -->
@@ -372,7 +372,7 @@ client.connection.on(Ably::Realtime::Connection::STATE.Connected) { ... }</code>
 
 
 <div lang="java,javascript,nodejs"> <!-- start java,javascript,nodejs language block -->
-<p>A <span lang="java"><code>io.ably.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by an object that implements an <code>EventEmitter</code></p>
+<p>A <span lang="java"><code>io.ably.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by an object that implements an <code>EventEmitter</code>.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>previous</code></dt>
