@@ -1,0 +1,435 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Ably API Documentation - Statistics</title>
+    <link rel="shortcut icon" href="/assets/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/prettify/prettify.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="/assets/stylesheet.css" media="screen">
+
+    <script src="/assets/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
+    <script src="/assets/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
+    <script src="/assets/vendor/javascripts/base64.js" type="text/javascript"></script>
+
+    <script src="/assets/vendor/prettify/prettify-lib.js" type="text/javascript"></script>
+
+    <script src="//cdn.ably.io/lib/ably.min.js" type="text/javascript"></script>
+
+    <script src="/assets/javascripts/application.js" type="text/javascript"></script>
+    <script src="/assets/javascripts/lang-manager.js" type="text/javascript"></script>
+
+    <!-- you don't need to keep this, but it's cool for stats! -->
+    <meta name="generator" content="nanoc 3.7.5">
+  </head>
+  <body>
+    <div class="canonical-notice">
+      <img src="/assets/icon-alert.png">
+      <span class="canonical-notice-text">
+        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+      </span>
+      <img src="/assets/icon-alert.png">
+    </div>
+    <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/assets/forkme.png" alt="Fork me on GitHub"></a></div>
+
+  <div id="documentation">
+    
+      <nav class="jump-to-nav">
+        <div class="form">
+          <select id="jump-to-nav">
+            <option>Jump to ...</option>
+            <optgroup label='Help with'>
+<option id="anchor-title">Statistics</option>
+</optgroup>
+<optgroup label='API reference'>
+<option id="anchor-stats">stats</option>
+</optgroup>
+<optgroup label='Related types'>
+<option id="anchor-stats-type">Stats</option>
+<option id="anchor-message-count">MessageCount</option>
+<option id="anchor-message-types">MessageTypes</option>
+<option id="anchor-message-traffic">MessageTraffic</option>
+<option id="anchor-resource-count">ResourceCount</option>
+<option id="anchor-connection-types">ConnectionTypes</option>
+<option id="anchor-request-count">RequestCount</option>
+</optgroup>
+          </select>
+        </div>
+      </nav>
+    
+    <header>
+      
+        <div class="breadcrumb"><a href="/rest/">REST Client Library API</a><span class="separator">/</span></div>
+      
+      
+        <h1 id="title">Statistics</h1>
+      
+    </header>
+    <article>
+      <p>The REST client library provides application-level usage statistics, covering messages sent and received, API requests and connections.</p>
+<p>Metrics are recorded as raw data at a minute-by-minute level, and then aggregated into a number of aggregates of varying granularities: hour, day and month.</p>
+<p>A single data point is a <code>Stats</code> instance, which gives the usage statistics for a given interval.</p>
+<p>An interval is either a minute, for a raw datapoint, or an interval of an hour, day or month for an aggregate datapoint. Hour aggregates always cover an hour in UTC (ie from the start of one hour to the start of the next). Day and month aggregates cover an interval that starts on a given UTC hour of day, and a given day of the month, according to the configured renewal offsets in the associated account.</p>
+<h3>intervalIds</h3>
+<p>An <code>intervalId</code> is a string that identifies an interval. It is a formatted date/time string representing the interval start time in UTC. <code>intervalIds</code> have a format according to their duration, example:</p>
+<blockquote>
+<p>yyyy-mm-dd:hh:mm (minute)<br />
+yyyy-mm-dd:hh (hour, day or month)</p>
+</blockquote>
+<p>For day and month intervals, the hour of day and day of the month are included since these represent the start time of the interval.</p>
+<h3>Stats granularity and aggregation</h3>
+<p>The Ably system enters stats records with minute-level resolution and each minute entry is updated every few seconds for active apps.</p>
+<p>Aggregate entries (for hour, day or month) are an aggregate of the low-level (&#8220;sub-interval&#8221;) records within the relevant time period. Hour aggregates have a sub-interval of minutes whereas day and month aggregates have a sub-interval of hours.</p>
+<p>Any stats item whose <code>inProgress</code> member is non-empty is incomplete &#8211; that is, the interval is not yet complete and that record might be updated on an subsequent query. The value of the <code>inProgress</code> member is an <code>intervalId</code> indicating how current the item is &#8211; specifically, the <code>inProgress</code> value is the <code>intervalId</code> of the earliest sub-interval that has not yet been aggregated into the result; in the case of a day or month item, the <code>inProgress</code> <code>intervalId</code> might be an hour or a minute <code>intervalId</code>.</p>
+<p>An aggregate stats item also has a <code>count</code> member which indicates the number of non-empty sub-intervals contained in that aggregate.</p>
+<h3>Stats records</h3>
+<p>Stats records contain a hierarchy of elements relating to messages, connections and other resources consumed in an interval. An example of a full stats record is given below. Any single record may contain a subset of the elements, omitting empty sections.</p>
+<pre>
+{
+	"all": {
+		"all": { "count": 354, "data": 27200 },
+		"messages": { "count": 354, "data": 27200 },
+		"presence": { "count": 0, "data": 0 }
+	},
+	"inbound": {
+		"all": {
+			"all": { "count": 130, "data": 10318 },
+			"messages": { "count": 130, "data": 10318 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"realtime": {
+			"all": { "count": 130, "data": 10318 },
+			"messages": { "count": 130, "data": 10318 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"rest": {
+			"all": { "count": 0, "data": 0 },
+			"messages": { "count": 0, "data": 0 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"push": {
+			"all": { "count": 0, "data": 0 },
+			"messages": { "count": 0, "data": 0 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"httpStream": {
+			"all": { "count": 0, "data": 0 },
+			"messages": { "count": 0, "data": 0 },
+			"presence": { "count": 0, "data": 0 }
+		}
+	},
+	"outbound": {
+		"all": {
+			"all": { "count": 224, "data": 16882 },
+			"messages": { "count": 224, "data": 16882 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"realtime": {
+			"all": { "count": 206, "data": 16074 },
+			"messages": { "count": 206, "data": 16074 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"rest": {
+			"all": { "count": 18, "data": 808 },
+			"messages": { "count": 18, "data": 808 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"push": {
+			"all": { "count": 0, "data": 0 },
+			"messages": { "count": 0, "data": 0 },
+			"presence": { "count": 0, "data": 0 }
+		},
+		"httpStream": {
+			"all": { "count": 0, "data": 0 },
+			"messages": { "count": 0, "data": 0 },
+			"presence": { "count": 0, "data": 0 }
+		}
+	},
+	"persisted": {
+		"all": { "count": 473, "data": 37914 },
+		"messages": { "count": 473, "data": 37914 },
+		"presence": { "count": 0, "data": 0 }
+	},
+	"connections": {
+		"all": { "opened": 0, "peak": 0, "mean": 0, "min": 0, "refused": 0 },
+		"plain": { "opened": 0, "peak": 0, "mean": 0, "min": 0, "refused": 0 },
+		"tls": { "opened": 0, "peak": 0, "mean": 0, "min": 0, "refused": 0 }
+	},
+	"channels": { "opened": 22, "peak": 0, "mean": 0, "min": 0, "refused": 0 },
+	"apiRequests": { "succeeded": 6, "failed": 0, "refused": 0 },
+	"tokenRequests": { "succeeded": 0, "failed": 0, "refused": 0 },
+	"count": 0,
+	"intervalId": "2013-10-31:22:10",
+}
+
+</pre>
+<p>Each of the types and fields is explained below. These are defined in <code>clientmessage.thrift</code> in the <a href="tbd">ably-common</a> repo.</p>
+<h3>Stats queries</h3>
+<p>The REST API, provides a <code>/stats</code> route on an app, which performs a stats query against the database. These queries may be scoped by <code>start</code> and <code>end</code> time, may be queried in a given <code>direction</code> and may include a <code>limit</code> on the number of records returned.</p>
+<p>Stats results are paginated and therefore accompanied with one or more relative links relating to the current query. Where the number of results returned exceeds the query limit &#8211; which is either the value of the <code>limit</code> param or the default limit of 100 &#8211; the query result contains pages with the limited number of records, and a relative link to the next page.</p>
+<p>Responses contain one or more of the following relative links:</p>
+<dl>
+	<dt><code>first</code></dt>
+	<dd>a link to the first page of results for this query. This link also makes the query stable; where params are resolved at query time (particularly <code>end</code> which is resolved to the current time if not specified explicitly) then the <code>first</code> link contains the resolved values of those params so that it will repeatably resolve to the same param values each time. (This does not necessarily mean that the query results will be identical, if they include an in-progress interval which is itself updated between queries.)</dd>
+</dl>
+<dl>
+	<dt>current</dt>
+	<dd>a stable link to the current page of results.</dd>
+</dl>
+<dl>
+	<dt>next</dt>
+	<dd>on each page except the last in a paginated result, the next link is a link to the next page of results.</dd>
+</dl>
+<p>It is not possible to navigate backwards through a result set, but each page can be obtained by navigating to it by going back to <code>first</code> and then <code>next</code>. Of course, if the intention is to display results in the opposite order, the <code>direction</code> param should be used in the initial query to specify the intended direction of pagination.</p>
+<p>Relative links are presented by default as an <a href="http://tools.ietf.org/html/rfc5988">RFC 5988 Link HTTP response header</a>; there is a separate Link header for each relative link accompanying the response. The rel types used are <code>first</code>, <code>next</code> and <code>current</code> as specified in the RFC. A Link header has the format:</p>
+<p>bq.<br />
+Link: &lt;&lt;url&gt;&gt;; rel=&#8220;&lt;rel&gt;&#8221;</p>
+<p>where <code>&lt;url&gt;</code> is the URL of the link and <code>&lt;rel&gt;</code> is the relation type.</p>
+<p>For example:</p>
+<p>bq.<br />
+Link: &lt;./stats?start=1380794880000&amp;end=1380794881058&amp;limit=100&amp;by=minute<br />
+&amp;direction=forwards&amp;format=json&amp;first_start=1380794880000&gt;; rel=&#8220;first&#8221;</p>
+<p>In principle the URL might be any valid URL but in practice it will always be a relative URL, and it must be interpreted relative to the query URL. Clients should treat the URL opaquely; in particular, params (such as <code>first_start</code> in the example above) are undocumented and unsupported except where a client uses the link URL in its entirety.</p>
+<p>In the case of a JSON response body format it is also possible to request that the rel response metadata is inline in the response body by specifying <code>rel_format=inline</code> in the request URL. (The <code>rel_format</code> param also takes the value <code>rel_format=link</code> to request Link header metadata explicitly.) In the inline case the response body then has the format:</p>
+<pre>
+{
+    "data": [ ... stats ... ],
+    "rel": {
+        "first": &lt;URL&gt;,
+        ...
+    }
+}
+
+</pre>
+<p>where the <code>data</code> member references the stats result in the usual format and each of the rel links associated with the response is present in the <code>rel</code> member, with the link URL in the same format as above.</p>
+<h1>API reference</h1>
+<div class="inline-toc">
+<ul><li>Statistics
+<ul>
+<li>
+Methods
+<ul>
+<li><a href='#stats'>stats</a></li>
+</ul>
+</li>
+</ul>
+</li></ul>
+</div><h2>Statistics</h2>
+<p>With the REST client library, the REST object must be created in order to retrieve history the required application:</p>
+<pre lang="javascript"><code lang="javascript">var Rest = new Ably.Rest(options);</code></pre>
+<pre lang="ruby"><code lang="ruby">rest = Ably::Rest.new(options)</code></pre>
+<h3>Methods</h3>
+<h6 id="stats">stats</h6>
+<blockquote class="definition">
+<p class="definition">Rest.stats(options, callback)</p>
+</blockquote>
+<p>This call queries the REST <a href="/rest-api#stats"><code>/stats</code></a> API. Responses are arrays of stats records.</p>
+<p>The stats records themselves are documented in the thrift IDL (the SStats type defines individual records, and SStatsArray is the thrift type of responses when <code>format=binary</code>).</p>
+<h4>Parameters</h4>
+<dl>
+	<dt>options</dt>
+	<dd>is an optional object containing the query parameters, as specified in the <a href="/rest-api#stats">REST API</a> documentation.</dd>
+	<dt>callback</dt>
+	<dd>is a function of the form: <code>callback(err, result)</code><br />
+where:<br />
+<ul><br />
+<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
+<li>On success, <code>result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api#stats">REST API</a></li><br />
+</ul></dd>
+</dl>
+<h4>Request options</h4>
+<p>The following options are supported.</p>
+<dl>
+	<dt>start</dt>
+	<dd>Specifies the start of interval covered by the query. Defaults to the beginning of time.<br><br>
+The value is either a number (milliseconds since the epoch) or a date/time string that can be parsed by JS Date (eg 2012-12-09:16:38).<br><br>
+The given start time is rounded down to the start of the relevant interval depending on the granularity of the query (see below). So, for example, if the query is for stats by minute (which is the default), then the given time will be rounded down to the nearest minute.</dd>
+</dl>
+<dl>
+	<dt>end</dt>
+	<dd>Specifies the end of interval covered by the query. Defaults to the current time.<br><br>
+The value is either a number (milliseconds since the epoch) or a date/time string that can be parsed by JS Date (eg 2012-12-09:16:38).<br><br>
+The interval covered by the query always includes the end time, and covers the entire interval at the requested granularity that includes the end time. (In a sense it is &#8220;rounded up&#8221;, except that the end of the query interval is not a &#8220;round&#8221; time; it&#8217;s the last second of the interval containing the given end time.)</dd>
+</dl>
+<dl>
+	<dt>direction</dt>
+	<dd>Specifies the direction that results are to be returned, either backwards (ie most recent interval first) or forwards (ie oldest interval first).<br><br>
+The start time and end time are always that &#8211; ie start is earlier than first, even if the direction is backwards. Therefore, when querying backwards, the first returned result will cover the end time.<br><br>
+Default is backwards.</dd>
+</dl>
+<dl>
+	<dt>by</dt>
+	<dd>Specifies the granularity of the returned results. Valid options are:<br><br>
+<ul><br />
+<li>minute (default)</li><br />
+<li>hour</li><br />
+<li>day</li><br />
+<li>month</li></ul><br />
+Each record returned is an aggregated stats record for an interval with the given granularity. The specified granularity also affects how start and end times are rounded (see above).</dd>
+</dl>
+<dl>
+	<dt>limit</dt>
+	<dd>Specifies the maximum number of records to return.</dd>
+</dl>
+<dl>
+	<dt>format</dt>
+	<dd>Specifies a format for the response, which can be:<br><br>
+<ul><br />
+<li>json</li><br />
+<li>html</li><br />
+<li>binary (returns records encoded as Thrift. Note that this feature is at risk for the stats API)</li><br />
+If a format is not specified, it is inferred from an Accept or Content-Type header. The header takes precedence.<br><br>
+Similarly, in the special case of json only, the request path may include the extension .json which makes a json request.</dd>
+</dl>
+<h2 id="stats-type">Stats</h2>
+<p>This is a stats element that makes up stats responses providing an overview of all resource usage.</p>
+<dl>
+	<dt><span lang="java">public MessageTypes</span> all</dt>
+	<dd>MessageTypes representing the total of all inbound and outbound message traffic. This is the aggregate number that is considered in applying account message limits.</dd>
+	<dt><span lang="java">public MessageTraffic</span> inbound</dt>
+	<dd>MessageTraffic representing inbound messages (ie published by clients and sent inbound to the Ably service) by all transport types;</dd>
+	<dt><span lang="java">public MessageTraffic</span> outbound</dt>
+	<dd>MessageTraffic representing outbound messages (ie delivered by the Ably service to connected and subscribed clients);</dd>
+	<dt><span lang="java">public MessageTypes</span> persisted</dt>
+	<dd>MessageTypes representing the aggregate volume of messages persisted;</dd>
+	<dt><span lang="java">public ConnectionTypes</span> connections</dt>
+	<dd>ConnectionTypes representing the usage of connections;</dd>
+	<dt><span lang="java">public ResourceCount</span> channels</dt>
+	<dd>ResourceCount representing the number of channels activated and used;</dd>
+	<dt><span lang="java">public RequestCount</span> apiRequests</dt>
+	<dd>RequestCount representing the number of requests made to the REST API;</dd>
+	<dt><span lang="java">public RequestCount</span> tokenRequests</dt>
+	<dd>RequestCount representing the number of requests made to issue access tokens.</dd>
+</dl>
+<h2 id="message-count">MessageCount</h2>
+<p>A MessageCount entry defines the number and volume of messages within a category, comprising:</p>
+<dl>
+	<dt><span lang="java">public double</span> count</dt>
+	<dd>the number of messages;</dd>
+	<dt><span lang="java">public double</span> data</dt>
+	<dd>the aggregate of the size of the payload and other user-specified members of those messages.</dd>
+</dl>
+<h2 id="message-types">MessageTypes</h2>
+<p>A MessageTypes entry provides a breakdown of MessageCounts by message type.</p>
+<dl>
+	<dt><span lang="java">public MessageCount</span> all</dt>
+	<dd>MessageCount representing the total volume of messages and presence messages;</dd>
+	<dt><span lang="java">public MessageCount</span> messages</dt>
+	<dd>MessageCount representing the volume of normal channel messages;</dd>
+	<dt><span lang="java">public MessageCount</span> presence</dt>
+	<dd>MessageCount representing the volume of presence messages.</dd>
+</dl>
+<h2 id="message-traffic">MessageTraffic</h2>
+<p>A MessageTraffic entry provides a breakdown of message volume, as MessageType elements, by transport type.</p>
+<dl>
+	<dt><span lang="java">public MessageTypes</span> all</dt>
+	<dd>MessageTypes representing the total of all transport types;</dd>
+	<dt><span lang="java">public MessageTypes</span> realtime</dt>
+	<dd>MessageTypes representing the message volume via realtime connections;</dd>
+	<dt><span lang="java">public MessageTypes</span> rest</dt>
+	<dd>MessageTypes representing the message volume via the REST API;</dd>
+	<dt><span lang="java">public MessageTypes</span> push</dt>
+	<dd>MessageTypes representing the message volume via WebHooks;</dd>
+	<dt><span lang="java">public MessageTypes</span> httpStream</dt>
+	<dd>MessageTypes representing the message volume via HTTP streaming (currently unsupported);</dd>
+</dl>
+<h2 id="resource-count">ResourceCount</h2>
+<p>A ResourceCount element provides a breakdown of usage of a particular resource.</p>
+<dl>
+	<dt><span lang="java">public double</span> opened</dt>
+	<dd>the number of resources created or allocated;</dd>
+	<dt><span lang="java">public double</span> peak</dt>
+	<dd>the maximum number of resources concurrently in use;</dd>
+	<dt><span lang="java">public double</span> mean</dt>
+	<dd>the time-averaged mean of the number of resources concurrently in use;</dd>
+	<dt><span lang="java">public double</span> min</dt>
+	<dd>the minimum number of resources concurrently in use;</dd>
+	<dt><span lang="java">public double</span> refused</dt>
+	<dd>the number of resource requests that were declined.</dd>
+</dl>
+<h2 id="connection-types">ConnectionTypes</h2>
+<p>A ConnectionTypes element provides a breakdown of connection numbers as ResourceCount elements.</p>
+<dl>
+	<dt><span lang="java">public ResourceCount</span> all</dt>
+	<dd>ResourceCount representing the aggregate of plain and TLS connections;</dd>
+	<dt><span lang="java">public ResourceCount</span> plain</dt>
+	<dd>ResourceCount representing the usage of non-TLS connections;</dd>
+	<dt><span lang="java">public ResourceCount</span> tls</dt>
+	<dd>ResourceCount representing the usage of TLS (secure WebSocket or HTTPS) connections.</dd>
+</dl>
+<h2 id="request-count">RequestCount</h2>
+<p>A RequestCount element contains a breakdown of API and other requests.</p>
+<dl>
+	<dt><span lang="java">public double</span> succeeded</dt>
+	<dd>the number of successful requests;</dd>
+	<dt><span lang="java">public double</span> failed</dt>
+	<dd>the number of requests that were attempted but failed for a reason other that an access denial, such as invalid request parameters;</dd>
+	<dt><span lang="java">public double</span> refused</dt>
+	<dd>the number of requests that were attempted but were denied, either because the caller did not have permission or because an account limit was reached.</dd>
+</dl>
+    </article>
+    <hr class="back">
+    <a href="#documentation">Back to top</a>
+  </div>
+  <div id="sidebar">
+  <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
+  <ul>
+<li class=''><a href='/root/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
+<li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
+</ul>
+  <h2><a href="/realtime/">Realtime client lib</a></h2>
+<ul>
+<li class=''><a href='/realtime/usage/'>Using the Realtime library</a></li>
+<li class=''><a href='/realtime/connection/'>Connection</a></li>
+<li class=''><a href='/realtime/channels-messages/'>Channels and Messages</a></li>
+<li class=''><a href='/realtime/presence/'>Presence</a></li>
+<li class=''><a href='/realtime/authentication/'>Authentication</a></li>
+<li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/statistics/'>Statistics</a></li>
+<li class=''><a href='/realtime/types/'>Types</a></li>
+</ul>
+  <h2><a href="/rest/">REST client lib</a></h2>
+<ul>
+<li class=''><a href='/rest/usage/'>Using the REST library</a></li>
+<li class=''><a href='/rest/channels-messages/'>Channels and Messages</a></li>
+<li class=''><a href='/rest/presence/'>Presence</a></li>
+<li class=''><a href='/rest/authentication/'>Authentication</a></li>
+<li class=''><a href='/rest/history/'>History</a></li>
+<li class='selected'><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/encryption/'>Encryption</a></li>
+</ul>
+  <h2><a href="/rest-api/">REST API</a></h2>
+<ul>
+</ul>
+  <h2>General</h2>
+<ul>
+<li class=''><a href='/general/authentication/'>Authentication</a></li>
+<li class=''><a href='/general/channel-rules-namespaces/'>Channel Rules and Namespaces</a></li>
+<li class=''><a href='/general/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/general/statistics/'>Application Statistics</a></li>
+<li class=''><a href='/general/migrating/'>Migrating to Ably</a></li>
+</ul>
+  <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
+<ul>
+<li class=''><a href='/client-lib-development-guide/features/'>Features spec v0.8</a></li>
+<li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
+<li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
+<li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
+<li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
+<li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-fallback/'>Connection host fallback</a></li>
+<li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>
+<li class=''><a href='/code-index/'>Code Examples List</a></li>
+</ul>
+  <ul>
+<li><a href="https://www.ably.io">Visit Ably.io</a></li>
+</ul>
+</div>
+
+</body>
+</html>

@@ -296,7 +296,8 @@
 		<li>A new connection will emit the following events in order when connecting: <code>CONNECTING</code>, then <code>CONNECTED</code></li>
 		<li>A connection will emit the following events when closing the connection: <code>CLOSING</code>, then <code>CLOSED</code></li>
 		<li><code>Connection#state</code> attribute is the current state of the connection</li>
-		<li>Additionally, an <code>ERROR</code> event can be emitted that contains an <code>ErrorInfo</code> object with details on an error that has occurred for the <code>Connection</code></li>
+		<li>A <code>ConnectionStateChange</code> object is emitted as the first argument for every connection state change</li>
+		<li>Additionally, a <code>ConnectionStateChange</code> can be emitted that contains an <code>errorReason</code> which contains an <code>ErrorInfo</code> object with details of the error that has occurred for the <code>Connection</code>.</li>
 	</ul></li>
 	<li>A test should exist that instances many (50+) clients simultaneously and performs a few basic operations such as attaching to a channel, publishing a message, and expecting all of those messages to arrive on all clients to ensure that there are no concurrency issues with the client library</li>
 	<li>A <code>Connection</code> is successful and considered <code>CONNECTED</code> once the websocket connection is open and the intial <code>CONNECTED</code> <code>ProtocolMessage</code> has been received</li>
@@ -341,12 +342,12 @@
 	</ul></li>
 	<li><code>Connection</code> opening failures:
 	<ul>
-		<li>If an API key is invalid, then the connection will enter the <code>FAILED</code> state and the <code>errorReason</code> will be set</li>
+		<li>If an API key is invalid, then the connection will enter the <code>FAILED</code> state and the <code>errorReason</code> will be set on the <code>Connection</code> object as well as the emitted <code>ConnectionStateChange</code></li>
 		<li>If a connection request fails because the token has expired, and the token is renewable, then a new token will be created and subsequent requests will be made without changing the state or emitting an error. If the token is not renewable, the connection will transition to the <code>FAILED</code> state</li>
 		<li>A new connection attempt will fail if not connected within the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">configured open timeout</a>.</li>
-		<li>If a connection attempt fails for any recoverable reason (i.e. not an authentication failure), the <code>Connection#state</code> will change to <code>DISCONNECTED</code>, the <code>Connection#errorReason</code> will be updated, and new connection attempts will periodically be made until the maximum time in that state threshold is reached. See <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected retry config</a>. Each time a new connection attempt is made the state will change to <code>CONNECTING</code> and then to <code>CONNECTED</code> if successful, or <code>DISCONNECTED</code> if unsuccessful and the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected state threshold</a> has not been exceeded.</li>
-		<li>Once the connection state has been in the <code>DISCONNECTED</code> state for more than the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected state threshold</a>, the state will change to <code>SUSPENDED</code> and the <code>Connection#errorReason</code> will be updated. In this state, a new connection attempt will be made periodically as defined in the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">suspended state threshold</a></li>
-		<li>The connection will remain in the <code>SUSPENDED</code> state indefinitely</li>
+		<li>If a connection attempt fails for any recoverable reason (i.e. not an authentication failure), the <code>Connection#state</code> will change to <code>DISCONNECTED</code>, the <code>Connection#errorReason</code> will be updated, a <code>ConnectionStateChange</code> with the <code>errorReason</code> will be emitted, and new connection attempts will periodically be made until the maximum time in that state threshold is reached.  The <code>retryIn</code> attribute of the <code>ConnectionStateChange</code> object will contain the time in milliseconds until the next connection attempt. See <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected retry config</a>. Each time a new connection attempt is made the state will change to <code>CONNECTING</code> and then to <code>CONNECTED</code> if successful, or <code>DISCONNECTED</code> if unsuccessful and the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected state threshold</a> has not been exceeded.</li>
+		<li>Once the connection state has been in the <code>DISCONNECTED</code> state for more than the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected state threshold</a>, the state will change to <code>SUSPENDED</code> and be emitted with the <code>errorReason</code>, and the <code>Connection#errorReason</code> will be updated. In this state, a new connection attempt will be made periodically as defined in the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">suspended state threshold</a></li>
+		<li>The connection will remain in the <code>SUSPENDED</code> state indefinitely, whilst periodically attempting to reestablish a connection</li>
 	</ul></li>
 	<li><code>Connection</code> failures once <code>CONNECTED</code>:
 	<ul>
@@ -365,7 +366,7 @@
 		<li><code>Connection#recoveryKey</code> is an attribute composed of the connection key and latest serial received on the connection</li>
 		<li><code>Connection#recoveryKey</code> is <code>Null</code> when a connection is explicitly <code>CLOSED</code> as connection state is not retained for connections closed at the request of the client</li>
 		<li>When a connection is successfully recovered, the <code>Connection#id</code> and <code>Connection#key</code> will be identical to the <code>id</code> &amp; <code>key</code> of the connection that was recovered</li>
-		<li>If the <code>recover</code> option is missing or no longer valid when connecting to Ably, the client will connect anyway but emit an error the connection object and set the <code>Connection#errorReason</code></li>
+		<li>If the <code>recover</code> option is missing or no longer valid when connecting to Ably, the client will connect anyway, but emit a <code>ConnectionStateChange</code> with an <code>errorReason</code>, and will additionally set the <code>Connection#errorReason</code> with an <code>ErrorInfo</code> object describing the failure</li>
 	</ul></li>
 	<li>Host Fallback
 	<ul>
@@ -653,6 +654,13 @@
 	<li>Provides a generic Ably <code>ErrorInfo</code> object that contains Ably <code>code</code>, <code>statusCode</code> (analogous to HTTP status code) and <code>message</code> attributes.</li>
 	<li>Errors returned from the Ably server are compatible with the <code>ErrorInfo</code> structure and should raise exceptions that inherit from <code>ErrorInfo</code></li>
 	<li>[Ably-common](https://github.com/ably/ably-common) should be included as a submodule so that <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">consistent error codes</a> can be used</li>
+</ul>
+<h4>ConnectionStateChange</h4>
+<ul>
+	<li>Whenever the connection state changes, a <code>ConnectionStateChange</code> object is emitted on the <code>Connection</code> object</li>
+	<li>The <code>ConnectionStateChange</code> object contains the current state in attribute <code>current</code>, the previous state in attribute <code>previous</code>, and when the client is not connected and a connection attempt will be made automatically by the library, the amount of time in milliseconds until the next retry in the attribute <code>retryIn</code></li>
+	<li>If the connection state change includes error information, then the <code>errorReason</code> attribute will contain an <code>ErrorInfo</code> object describing the reason for the error</li>
+	<li>See the [Java library implementation](https://github.com/ably/ably-java/blob/245a3f20a6dce0d34413ddfed19c5da8ea647422/src/io/ably/realtime/ConnectionStateListener.java#L15-L20) of this object.  Note that <code>reason</code> will be changed in a future release to <code>errorReason</code> in line with this specification</li>
 </ul>
 <h4>Capability &#8211; <strong>API not agreed yet</strong></h4>
 <ul>
