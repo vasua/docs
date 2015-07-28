@@ -38,13 +38,15 @@
         <div class="form">
           <select id="jump-to-nav">
             <option>Jump to ...</option>
-            <optgroup label='REST client library'>
+            <optgroup label='General'>
+<option id="anchor-general">Test requirements</option>
+</optgroup>
+<optgroup label='REST client library'>
 <option id="anchor-restclient">RestClient</option>
 <option id="anchor-rest-auth">Auth</option>
 <option id="anchor-rest-channels">Channels</option>
 <option id="anchor-rest-channel">Channel</option>
 <option id="anchor-rest-presence">Presence</option>
-<option id="anchor-rest-general">General</option>
 </optgroup>
 <optgroup label='Realtime client library'>
 <option id="anchor-realtimeclient">RealtimeClient</option>
@@ -74,185 +76,185 @@
       <p>A detailed <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> that applies to all client libraries is generated from the Ably Ruby client library&#8217;s acceptance and test suites.  Whilst every official Ably client library has test coverage, the amount of test coverage varies, and as such our recommendation is to refer to the official <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> when developing a client library.</p>
 <p>However, we have found the <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> can be difficult as a reference because of both its breadth and the fact that it applies to the Ruby client library which may be unfamiliar as a language for a lot of developers.</p>
 <p>As a result, this document outlines the complete feature set of both the REST and Realtime client libraries.  It is expected that every client library developer refers to this document to ensure that their client library provides the same API and features as the existing Ably client libraries. In addition to this, it is essential that there is test coverage over all of the features described below. We recommend you use the <a href="https://github.com/ably/ably-java">Ably Java</a> library as a reference when reviewing how the API has been implemented as the implementation is straightforward and Java is a language most people are familiar with.</p>
+<h2 id="general">General guidelines</h2>
+<ul>
+	<li><code>(G1)</code> Every test should be executed using all supported protocols (i.e. JSON and <a href="http://msgpack.org/">MessagePack</a> if supported).  This includes both sending &amp; receiving data.</li>
+	<li><code>(G2)</code> All tests by default are run against a special Ably sandbox environment.  This environment allows apps to be provisioned without any authentication that can then be used for client library testing. Bear in mind that all apps created in the sandbox environment are automatically deleted after 60 minutes and have low limits to prevent abuse. Apps are configured by sending a <code>POST</code> request to <code>https://sandbox-rest.ably.io/apps</code> with a JSON body that specifies the keys and their associated capabilities, channel namespace rules and any presence fixture data that is required; see <a href="https://github.com/ably/ably-common/blob/master/test-resources/test-app-setup.json">ably-common test-app-setup.json</a>.  See the <a href="https://github.com/ably/ably-java/blob/master/test/io/ably/test/rest/RestSetup.java">Java test setup</a>. Presence fixture data is necessary for the REST library presence tests as there is no way to register presence on a channel in the REST library.</li>
+	<li><code>(G3)</code> Testing statistics can be tricky due to timing issues and slow test suites as a result of sending requests to generate statistics.  As such, we provide a special stats endpoint in our sandbox environment that allows stats to be injected into our metrics system so that stats tests can make predictable assertions.  To create stats you must send an authenticated <code>POST</code> request to the stats JSON to <code>https://sandbox-rest.ably.io/stats</code> with the stats data you wish to create. See the <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/rest/stats.test.js#L8-L51">Javascript stats fixture</a> and <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/common/modules/testapp_manager.js#L158-L182">setup helper</a> as an example.</li>
+</ul>
 <h2 id="rest">REST client library</h2>
 <h3 id="restclient">RestClient</h3>
 <ul>
-	<li>The constructor accepts either an API key, a token string, or a set of <a href="#options"><code>ClientOptions</code></a>.  An exception is raised if invalid arguments are provided such as no API key, token and no means to create a token</li>
-	<li>The logger by default outputs to <code>STDOUT</code> (or other logging medium as appropriate to the platform) and the log level is set to warning</li>
-	<li>The log level can be changed</li>
-	<li>A custom logger can be provided in the constructor</li>
-	<li><code>RestClient#auth</code> attribute provides access to the <code>Auth</code> object that was instanced with the <code>ClientOptions</code> provided in the <code>RestClient</code> constructor</li>
-	<li><code>RestClient#stats</code> function:
+	<li><code>(RSC1)</code> The constructor accepts either an API key, a token string, or a set of <a href="#options"><code>ClientOptions</code></a>.  An exception is raised if invalid arguments are provided such as no API key, token and no means to create a token</li>
+	<li><code>(RSC2)</code> The logger by default outputs to <code>STDOUT</code> (or other logging medium as appropriate to the platform) and the log level is set to warning</li>
+	<li><code>(RSC3)</code> The log level can be changed</li>
+	<li><code>(RSC4)</code> A custom logger can be provided in the constructor</li>
+	<li><code>(RSC5)</code> <code>RestClient#auth</code> attribute provides access to the <code>Auth</code> object that was instanced with the <code>ClientOptions</code> provided in the <code>RestClient</code> constructor</li>
+	<li><code>(RSC6)</code> <code>RestClient#stats</code> function:
 	<ul>
-		<li>Returns a <code>PaginatedResult</code> page containing <code>Stats</code> objects in the <code>PaginatedResult#items</code> attribute returned from the stats request</li>
-		<li>Supports the following params:
+		<li><code>(RSC6a)</code> Returns a <code>PaginatedResult</code> page containing <code>Stats</code> objects in the <code>PaginatedResult#items</code> attribute returned from the stats request</li>
+		<li><code>(RSC6b)</code> Supports the following params:
 		<ul>
-			<li><code>start</code> and <code>end</code> are timestamp fields represented as milliseconds since epoch, or where suitable to the language, Date or Time objects. <code>start</code> must be equal to or less than <code>end</code> and is unaffected by the request direction</li>
-			<li><code>direction</code> backwards or forwards; if omitted the direction defaults to the REST API default (backwards)</li>
-			<li><code>limit</code> supports up to 1,000 items; if omitted the limit defaults to the REST API default (100)</li>
-			<li><code>unit</code> is the period for which the stats will be aggregated by, values supported are <code>minute</code>, <code>hour</code>, <code>day</code> or <code>month</code>; if omitted the unit defaults to the REST API default (<code>minute</code>)</li>
+			<li><code>(RSC6b1)</code> <code>start</code> and <code>end</code> are timestamp fields represented as milliseconds since epoch, or where suitable to the language, Date or Time objects. <code>start</code> must be equal to or less than <code>end</code> and is unaffected by the request direction</li>
+			<li><code>(RSC6b2)</code> <code>direction</code> backwards or forwards; if omitted the direction defaults to the REST API default (backwards)</li>
+			<li><code>(RSC6b3)</code> <code>limit</code> supports up to 1,000 items; if omitted the limit defaults to the REST API default (100)</li>
+			<li><code>(RSC6b4)</code> <code>unit</code> is the period for which the stats will be aggregated by, values supported are <code>minute</code>, <code>hour</code>, <code>day</code> or <code>month</code>; if omitted the unit defaults to the REST API default (<code>minute</code>)</li>
 		</ul></li>
 	</ul></li>
-	<li><code>RestClient#time</code> function sends a get request to <code>rest.ably.io/time</code> and returns the server time in milliseconds since epoch or as a Date/Time object where suitable</li>
-	<li>Sends REST requests over HTTP and HTTPS to the REST end-point <code>rest.ably.io</code></li>
-	<li>If <code>ClientOptions#tls</code> is true, then all communication is over HTTPS. If false, all communication is over HTTP however Basic Auth over HTTP will raise an exception as private keys cannot be submitted over an insecure connection. See <code>Auth</code> below</li>
-	<li>Supports two protocols:
+	<li><code>(RSC6)</code> <code>RestClient#time</code> function sends a get request to <code>rest.ably.io/time</code> and returns the server time in milliseconds since epoch or as a Date/Time object where suitable</li>
+	<li><code>(RSC7)</code> Sends REST requests over HTTP and HTTPS to the REST end-point <code>rest.ably.io</code></li>
+	<li><code>(RSC8)</code> If <code>ClientOptions#tls</code> is true, then all communication is over HTTPS. If false, all communication is over HTTP however Basic Auth over HTTP will raise an exception as private keys cannot be submitted over an insecure connection. See <code>Auth</code> below</li>
+	<li><code>(RSC8)</code> Supports two protocols:
 	<ul>
-		<li><a href="http://msgpack.org/">MessagePack</a> binary protocol (this is the default for environments having a suitable level or support for binary data)</li>
-		<li>JSON text protocol (used when <code>useBinaryProtocol</code> option is false)</li>
+		<li><code>(RSC8a)</code> <a href="http://msgpack.org/">MessagePack</a> binary protocol (this is the default for environments having a suitable level or support for binary data)</li>
+		<li><code>(RSC8b)</code> JSON text protocol (used when <code>useBinaryProtocol</code> option is false)</li>
 	</ul></li>
-	<li>Uses <code>Auth</code> to establish what authentication scheme to use, how to authenticate, and automatic issuing of tokens when necessary</li>
-	<li>If a REST request responds with 401 with code 40140, then the server is indicating the token is no longer valid. Using the <code>Auth</code> class a token should be automatically issued if possible, otherwise an error should be indicated (e.g. exception raised or an error passed in callback as appropriate to the language).</li>
-	<li>Requests are sent to the default endpoint <code>rest.ably.io</code>. However, if the <code>host</code> option is set, the client will send requests to the specified host. If <code>environment</code> option is configured, the environment name is prefixed to the default host endpoint and the <code>host</code> is set accordingly. For example, if the <code>environment</code> is set to sandbox, then the <code>host</code> endpoint will become <code>sandbox-rest.ably.io</code></li>
-	<li>REST endpoint host is configurable in the Client constructor with the option <code>restHost</code></li>
-	<li>The client library must use <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/rest/client.rb#L24-L30">default connection and request timeouts</a>. Ideally these default timeouts should be configurable by the developer.</li>
-	<li>Authentication
+	<li><code>(RSC9)</code> Uses <code>Auth</code> to establish what authentication scheme to use, how to authenticate, and automatic issuing of tokens when necessary</li>
+	<li><code>(RSC10)</code> If a REST request responds with 401 with code 40140, then the server is indicating the token is no longer valid. Using the <code>Auth</code> class a token should be automatically issued if possible, otherwise an error should be indicated (e.g. exception raised or an error passed in callback as appropriate to the language).</li>
+	<li><code>(RSC11)</code> Requests are sent to the default endpoint <code>rest.ably.io</code>. However, if the <code>host</code> option is set, the client will send requests to the specified host. If <code>environment</code> option is configured, the environment name is prefixed to the default host endpoint and the <code>host</code> is set accordingly. For example, if the <code>environment</code> is set to sandbox, then the <code>host</code> endpoint will become <code>sandbox-rest.ably.io</code></li>
+	<li><code>(RSC12)</code> REST endpoint host is configurable in the Client constructor with the option <code>restHost</code></li>
+	<li><code>(RSC13)</code> The client library must use <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/rest/client.rb#L24-L30">default connection and request timeouts</a>. Ideally these default timeouts should be configurable by the developer.</li>
+	<li><code>(RSC14)</code> Authentication
 	<ul>
-		<li>Supports basic authentication when an API key is provided with the <code>key</code> option.  The API key follows the format <code>"KEY_NAME:KEY_SECRET"</code> so when authenticating using basic auth, the key name can be used as the username and the key secret as the password.</li>
-		<li>Supports token authentication if one or more of <code>token</code>, <code>tokenDetails</code>, <code>authCallback</code> or <code>authUrl</code> are provided.  If <code>useTokenAuth</code> is true or a <code>clientId</code> is provided when the library is instanced, then token authentication is always used.</li>
-		<li>When a <code>token</code> or <code>tokenDetails</code> is used to instance the library, and no means to renew the token is provided (either an API key, <code>authCallback</code> or <code>authUrl</code>), if the server responds with 40140 (token expired) to a request, the client library should indicate an error and not retry the request.</li>
-		<li>When the client does have a means to renew the token automatically, and the token has expired or the server has responded with 40140 (token expired), then the client should automatically renew the token and resend the request.</li>
+		<li><code>(RSC14a)</code> Supports basic authentication when an API key is provided with the <code>key</code> option.  The API key follows the format <code>"KEY_NAME:KEY_SECRET"</code> so when authenticating using basic auth, the key name can be used as the username and the key secret as the password.</li>
+		<li><code>(RSC14b)</code> Supports token authentication if one or more of <code>token</code>, <code>tokenDetails</code>, <code>authCallback</code> or <code>authUrl</code> are provided.  If <code>useTokenAuth</code> is true or a <code>clientId</code> is provided when the library is instanced, then token authentication is always used.</li>
+		<li><code>(RSC14c)</code> When a <code>token</code> or <code>tokenDetails</code> is used to instance the library, and no means to renew the token is provided (either an API key, <code>authCallback</code> or <code>authUrl</code>), if the server responds with 40140 (token expired) to a request, the client library should indicate an error and not retry the request.</li>
+		<li><code>(RSC14d)</code> When the client does have a means to renew the token automatically, and the token has expired or the server has responded with 40140 (token expired), then the client should automatically renew the token and resend the request.</li>
 	</ul></li>
-	<li>Host Fallback
+	<li><code>(RSC15)</code> Host Fallback
 	<ul>
-		<li>All HTTP requests sent to Ably are fault-tolerant and will fallback to an alternative host name if the default host endpoint is unreachable, or indicates that it is unserviceable with a 500 to 504 status code. This ensures that a client library is able to work around routing or other problems with the user&#8217;s closest data center.  For example, if a <code>POST</code> request to <code>rest.ably.io</code> fails because the default endpoint is unreachable or unserviceable, then the <code>POST</code> request should be retried again against all the fallback hosts <code>[a-e].ably-realtime.com</code>.</li>
-		<li>This fallback behaviour only applies to the default <code>rest.ably.io</code> endpoint; if either <code>host</code> or <code>environment</code> options are set, no fallback host is used.</li>
-		<li>See the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/transport/Defaults.java#L7">default fallback hosts</a> and the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/http/Http.java#L204-L224">fallback mechanism implemented in Java for POST requests</a> as an example.</li>
-		<li>Automatic retries to fallback hosts will not occur for any other HTTP status codes. For example, if the credentials are invalid or the maxmimum message length has been exceeded, then resending the request to an alternative data center will not fix the problem and will only increase the load on other data centers. See the <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json#L11">complete list of Ably error codes</a> and a <a href="https://github.com/ably/ably-java/issues/14">discussion in the Java library about this</a></li>
+		<li><code>(RSC15a)</code> All HTTP requests sent to Ably are fault-tolerant and will fallback to an alternative host name if the default host endpoint is unreachable, or indicates that it is unserviceable with a 500 to 504 status code. This ensures that a client library is able to work around routing or other problems with the user&#8217;s closest data center.  For example, if a <code>POST</code> request to <code>rest.ably.io</code> fails because the default endpoint is unreachable or unserviceable, then the <code>POST</code> request should be retried again against all the fallback hosts <code>[a-e].ably-realtime.com</code>.</li>
+		<li><code>(RSC15b)</code> This fallback behaviour only applies to the default <code>rest.ably.io</code> endpoint; if either <code>host</code> or <code>environment</code> options are set, no fallback host is used.</li>
+		<li><code>(RSC15c)</code> See the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/transport/Defaults.java#L7">default fallback hosts</a> and the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/http/Http.java#L204-L224">fallback mechanism implemented in Java for POST requests</a> as an example.</li>
+		<li><code>(RSC15d)</code> Automatic retries to fallback hosts will not occur for any other HTTP status codes. For example, if the credentials are invalid or the maxmimum message length has been exceeded, then resending the request to an alternative data center will not fix the problem and will only increase the load on other data centers. See the <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json#L11">complete list of Ably error codes</a> and a <a href="https://github.com/ably/ably-java/issues/14">discussion in the Java library about this</a></li>
 	</ul></li>
 </ul>
 <h3 id="rest-auth">Auth</h3>
 <ul>
-	<li>Basic Auth connects over HTTPS by default.  If HTTP and Basic Auth are used, an exception will be raised</li>
-	<li>Basic Auth is the default authentication scheme if an API key exists</li>
-	<li>Token Auth can be used over HTTP or HTTPs using the token string in the header over HTTP or with the querystring param <code>access_token</code> over WebSockets</li>
-	<li>Token Auth is the default if option <code>useTokenAuth</code> is set to true, a <code>clientId</code> is specified, <code>authUrl</code> or <code>authCallback</code> is configured, or a an explicit <code>token</code> is provided</li>
-	<li>If Token Auth is the default authentication, an exception will be raised if a token is not provided or there is no means to generate a token. For example, if only the option <code>useTokenAuth</code> is specified, and thus a <code>key</code> is not provided, then the client library is unable to authenticate or issue a token</li>
-	<li>TTL for new tokens is specified in milliseconds and defaults to the REST API default (1 hour)</li>
-	<li>The <code>capability</code>, if not specified, defaults to allow all operations permitted for the key associated with the token</li>
-	<li>If a <code>clientId</code> is provided in the options, then the string will be encoded in UTF-8 format before it is sent to Ably</li>
-	<li><code>Auth#requestToken</code> function:
+	<li><code>(RSA1)</code> Basic Auth connects over HTTPS by default.  If HTTP and Basic Auth are used, an exception will be raised</li>
+	<li><code>(RSA2)</code> Basic Auth is the default authentication scheme if an API key exists</li>
+	<li><code>(RSA3)</code> Token Auth can be used over HTTP or HTTPs using the token string in the header over HTTP or with the querystring param <code>access_token</code> over WebSockets</li>
+	<li><code>(RSA4)</code> Token Auth is the default if option <code>useTokenAuth</code> is set to true, a <code>clientId</code> is specified, <code>authUrl</code> or <code>authCallback</code> is configured, or a an explicit <code>token</code> is provided</li>
+	<li><code>(RSA4)</code> If Token Auth is the default authentication, an exception will be raised if a token is not provided or there is no means to generate a token. For example, if only the option <code>useTokenAuth</code> is specified, and thus a <code>key</code> is not provided, then the client library is unable to authenticate or issue a token</li>
+	<li><code>(RSA5)</code> TTL for new tokens is specified in milliseconds and defaults to the REST API default (1 hour)</li>
+	<li><code>(RSA6)</code> The <code>capability</code>, if not specified, defaults to allow all operations permitted for the key associated with the token</li>
+	<li><code>(RSA7)</code> If a <code>clientId</code> is provided in the options, then the string will be encoded in UTF-8 format before it is sent to Ably</li>
+	<li><code>(RSA8)</code> <code>Auth#requestToken</code> function:
 	<ul>
-		<li>Implicitly creates a <code>TokenRequest</code> if required, and requests a token from Ably if required. Returns a <code>TokenDetails</code> object</li>
-		<li>Supports all <code>TokenParams</code> in the function arguments, which override defaults for <code>Client</code> <code>Auth</code>. If a <code>clientId</code> option is used, clients using that token will be restricted to using that <code>clientId</code></li>
-		<li>When <code>authUrl</code> option is set, it will retrieve the token from the provided URL using the HTTP <code>authHeaders</code>, query string <code>authParams</code> and <code>authMethod</code> (<code>GET</code> or <code>POST</code>) HTTP verb.  The token retrieved is assumed by the library to be a token string if the response has <code>Content-Type</code> <code>"text/plain"</code>, or taken to be a <code>TokenRequest</code> or <code>TokenDetails</code> object if the response has <code>Content-Type</code> <code>"application/json"</code></li>
-		<li>When <code>authCallback</code> option is set, it will execute the callback and will expect either a token string, a <code>TokenDetails</code> object or a <code>TokenRequest</code> object which will in turn be used to request a token from Ably.</li>
+		<li><code>(RSA8a)</code> Implicitly creates a <code>TokenRequest</code> if required, and requests a token from Ably if required. Returns a <code>TokenDetails</code> object</li>
+		<li><code>(RSA8b)</code> Supports all <code>TokenParams</code> in the function arguments, which override defaults for <code>Client</code> <code>Auth</code>. If a <code>clientId</code> option is used, clients using that token will be restricted to using that <code>clientId</code></li>
+		<li><code>(RSA8c)</code> When <code>authUrl</code> option is set, it will retrieve the token from the provided URL using the HTTP <code>authHeaders</code>, query string <code>authParams</code> and <code>authMethod</code> (<code>GET</code> or <code>POST</code>) HTTP verb.  The token retrieved is assumed by the library to be a token string if the response has <code>Content-Type</code> <code>"text/plain"</code>, or taken to be a <code>TokenRequest</code> or <code>TokenDetails</code> object if the response has <code>Content-Type</code> <code>"application/json"</code></li>
+		<li><code>(RSA8d)</code> When <code>authCallback</code> option is set, it will execute the callback and will expect either a token string, a <code>TokenDetails</code> object or a <code>TokenRequest</code> object which will in turn be used to request a token from Ably.</li>
 	</ul></li>
-	<li><code>Auth#createTokenRequest</code> function:
+	<li><code>(RSA9)</code> <code>Auth#createTokenRequest</code> function:
 	<ul>
-		<li>Returns a signed <code>TokenRequest</code> object that can be used to obtain a token from Ably. This is useful for servers that can create a <code>TokenRequest</code> signed with the API key without communicating with Ably directly. The <code>TokenRequest</code> can then be passed to a designated client that is then responsible for communicating with Ably and requesting a token for authentication from that <code>TokenRequest</code></li>
-		<li>Supports all <code>AuthOptions</code></li>
-		<li>Generates a unique 16+ character <code>nonce</code> if none is provided; the nonce is used to protect against replay attacks</li>
-		<li>Generates a <code>timestamp</code> from current time if not provided, will retrieve the server time if <code>queryTime</code> is true</li>
-		<li>TTL is optional and specified in milliseconds</li>
-		<li>Capability JSON text can be provided that specifies the rights of the token in terms of the channel(s) authorised and the permitted operations on each</li>
-		<li>A valid HMAC is created using the key secret  to sign the <code>TokenRequest</code> so that it can be used by any client to request a token without having or exchanging any secrets</li>
+		<li><code>(RSA9a)</code> Returns a signed <code>TokenRequest</code> object that can be used to obtain a token from Ably. This is useful for servers that can create a <code>TokenRequest</code> signed with the API key without communicating with Ably directly. The <code>TokenRequest</code> can then be passed to a designated client that is then responsible for communicating with Ably and requesting a token for authentication from that <code>TokenRequest</code></li>
+		<li><code>(RSA9b)</code> Supports all <code>AuthOptions</code></li>
+		<li><code>(RSA9c)</code> Generates a unique 16+ character <code>nonce</code> if none is provided; the nonce is used to protect against replay attacks</li>
+		<li><code>(RSA9d)</code> Generates a <code>timestamp</code> from current time if not provided, will retrieve the server time if <code>queryTime</code> is true</li>
+		<li><code>(RSA9e)</code> TTL is optional and specified in milliseconds</li>
+		<li><code>(RSA9f)</code> Capability JSON text can be provided that specifies the rights of the token in terms of the channel(s) authorised and the permitted operations on each</li>
+		<li><code>(RSA9g)</code> A valid HMAC is created using the key secret  to sign the <code>TokenRequest</code> so that it can be used by any client to request a token without having or exchanging any secrets</li>
 	</ul></li>
-	<li><code>Auth#authorise</code> function:
+	<li><code>(RSA10)</code> <code>Auth#authorise</code> function:
 	<ul>
-		<li>Instructs the library to create a token if needed and use Token Auth for all future requests</li>
-		<li>Supports all <code>AuthOptions</code> and <code>TokenParams</code> in the function arguments</li>
-		<li>Will not create a new token unless no previous token exists or current token has expired</li>
-		<li>Providing the option <code>force</code> set to true will force <code>authorise</code> to issue a new token even if an existing token exists.</li>
-		<li>Adheres to the implementation of <code>requestToken</code> when issuing new tokens</li>
-		<li>Returns a <code>TokenDetails</code> object that contains the token string + token meta data</li>
+		<li><code>(RSA10a)</code> Instructs the library to create a token if needed and use Token Auth for all future requests</li>
+		<li><code>(RSA10b)</code> Supports all <code>AuthOptions</code> and <code>TokenParams</code> in the function arguments</li>
+		<li><code>(RSA10c)</code> Will not create a new token unless no previous token exists or current token has expired</li>
+		<li><code>(RSA10d)</code> Providing the option <code>force</code> set to true will force <code>authorise</code> to issue a new token even if an existing token exists.</li>
+		<li><code>(RSA10e)</code> Adheres to the implementation of <code>requestToken</code> when issuing new tokens</li>
+		<li><code>(RSA10f)</code> Returns a <code>TokenDetails</code> object that contains the token string + token meta data</li>
 	</ul></li>
 </ul>
 <h3 id="rest-channels">Channels</h3>
 <ul>
-	<li><code>Channels</code> is a collection of <code>Channel</code> objects accessible through <code>Rest#channels</code>.</li>
-	<li>Methods should exist to check if a channel exists or iterate through the existing channels</li>
-	<li><code>Channels#get</code> function:
+	<li><code>(RSN1)</code> <code>Channels</code> is a collection of <code>Channel</code> objects accessible through <code>Rest#channels</code>.</li>
+	<li><code>(RSN2)</code> Methods should exist to check if a channel exists or iterate through the existing channels</li>
+	<li><code>(RSN3)</code> <code>Channels#get</code> function:
 	<ul>
-		<li>Creates a new <code>Channel</code> object for the specified channel if none exists, or returns the existing channel. <code>ChannelOptions</code> can be specified when instancing a new <code>Channel</code>.</li>
-		<li>If options are provided, the options are set on the <code>Channel</code>. Accessing an existing <code>Channel</code> with options in the form <code>Channels#get(channel, options)</code> will therefore update the options on the channel and then return the existing <code>Channel</code></li>
+		<li><code>(RSN3a)</code> Creates a new <code>Channel</code> object for the specified channel if none exists, or returns the existing channel. <code>ChannelOptions</code> can be specified when instancing a new <code>Channel</code>.</li>
+		<li><code>(RSN3b)</code> If options are provided, the options are set on the <code>Channel</code>. Accessing an existing <code>Channel</code> with options in the form <code>Channels#get(channel, options)</code> will therefore update the options on the channel and then return the existing <code>Channel</code></li>
 	</ul></li>
-	<li><code>Channels#release</code> function:
+	<li><code>(RSN4)</code> <code>Channels#release</code> function:
 	<ul>
-		<li>Releases the channel resource i.e. it&#8217;s deleted and can then be garbage collected</li>
+		<li><code>(RSN4a)</code> Releases the channel resource i.e. it&#8217;s deleted and can then be garbage collected</li>
 	</ul></li>
 </ul>
 <h3 id="rest-channel">Channel</h3>
 <ul>
-	<li><code>Channels#publish</code> function:
+	<li><code>(RSC1)</code> <code>Channels#publish</code> function:
 	<ul>
-		<li>Expects either an array of <code>Message</code> objects or a <code>name</code> string and <code>data</code> payload.</li>
-		<li>When <code>name</code> and <code>data</code> is provided, a single message is published to Ably</li>
-		<li>When an array of <code>Message</code> objects is provided, a single request is made to Ably. When publishing multiple messages, this approach is more efficient. However, a yet to be implemented feature should limit the total number of messages bundled in a single POST based on the default max request size, and would raise an exception if any single message exceeds that limit.</li>
-		<li>Indicates an error if the message was not successfully published to Ably</li>
+		<li><code>(RSC1a)</code> Expects either an array of <code>Message</code> objects or a <code>name</code> string and <code>data</code> payload.</li>
+		<li><code>(RSC1b)</code> When <code>name</code> and <code>data</code> is provided, a single message is published to Ably</li>
+		<li><code>(RSC1c)</code> When an array of <code>Message</code> objects is provided, a single request is made to Ably. When publishing multiple messages, this approach is more efficient. However, a yet to be implemented feature should limit the total number of messages bundled in a single POST based on the default max request size, and would raise an exception if any single message exceeds that limit.</li>
+		<li><code>(RSC1d)</code> Indicates an error if the message was not successfully published to Ably</li>
 	</ul></li>
-	<li><code>Channel#history</code> function:
+	<li><code>(RSC2)</code> <code>Channel#history</code> function:
 	<ul>
-		<li>Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the history request</li>
-		<li>Supports the following params:
+		<li><code>(RSC2a)</code> Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the history request</li>
+		<li><code>(RSC2b)</code> Supports the following params:
 		<ul>
-			<li><code>start</code> and <code>end</code> are timestamp fields represented as milliseconds since epoch, or where suitable to the language, Time objects. <code>start</code> must be equal to or less than <code>end</code> and is unaffected by the request direction.</li>
-			<li><code>direction</code> backwards or forwards; if omitted the direction defaults to the REST API default (backwards)</li>
-			<li><code>limit</code> supports up to 1,000 items; if omitted the direction defaults to the REST API default (100)</li>
+			<li><code>(RSC2b1)</code> <code>start</code> and <code>end</code> are timestamp fields represented as milliseconds since epoch, or where suitable to the language, Time objects. <code>start</code> must be equal to or less than <code>end</code> and is unaffected by the request direction.</li>
+			<li><code>(RSC2b2)</code> <code>direction</code> backwards or forwards; if omitted the direction defaults to the REST API default (backwards)</li>
+			<li><code>(RSC2b3)</code> <code>limit</code> supports up to 1,000 items; if omitted the direction defaults to the REST API default (100)</li>
 		</ul></li>
 	</ul></li>
-	<li><code>Channel#presence</code> attribute returns a <code>Presence</code> object for this channel</li>
-	<li>Message encoding
+	<li><code>(RSC3)</code> <code>Channel#presence</code> attribute returns a <code>Presence</code> object for this channel</li>
+	<li><code>(RSC4)</code> Message encoding
 	<ul>
-		<li>Payloads must be binary, strings, or objects capable of JSON representation. Any other data type should not be permitted and an exception should be raised</li>
-		<li>If a message is encoded, the <code>encoding</code> attribute represents the encoding(s) applied in right to left format i.e. &#8220;utf-8/base64&#8221; indicates that the original payload has &#8220;utf-8&#8221; encoding and has subsequently been encoded in Base64 format.</li>
-		<li>When using MessagePack Message encoding
+		<li><code>(RSC4a)</code> Payloads must be binary, strings, or objects capable of JSON representation. Any other data type should not be permitted and an exception should be raised</li>
+		<li><code>(RSC4b)</code> If a message is encoded, the <code>encoding</code> attribute represents the encoding(s) applied in right to left format i.e. &#8220;utf-8/base64&#8221; indicates that the original payload has &#8220;utf-8&#8221; encoding and has subsequently been encoded in Base64 format.</li>
+		<li><code>(RSC4c)</code> When using MessagePack Message encoding
 		<ul>
-			<li>a binary Message payload is encoded as MessagePack binary type</li>
-			<li>a string Message payload is encoded as MessagePack string type</li>
-			<li>a JSON Message payload is stringified either as a JSON Object or Array and encoded as MessagePack string type and the <code>encoding</code> attribute is set to &#8220;json&#8221;</li>
-			<li>All messages received will deliver payloads in the format they were sent in i.e. binary, string, or a structured type containing the parsed JSON</li>
+			<li><code>(RSC4c1)</code> a binary Message payload is encoded as MessagePack binary type</li>
+			<li><code>(RSC4c2)</code> a string Message payload is encoded as MessagePack string type</li>
+			<li><code>(RSC4c3)</code> a JSON Message payload is stringified either as a JSON Object or Array and encoded as MessagePack string type and the <code>encoding</code> attribute is set to &#8220;json&#8221;</li>
+			<li><code>(RSC4c4)</code> All messages received will deliver payloads in the format they were sent in i.e. binary, string, or a structured type containing the parsed JSON</li>
 		</ul></li>
-		<li>When using JSON Message encoding
+		<li><code>(RSC4d)</code> When using JSON Message encoding
 		<ul>
-			<li>a binary Message payload is encoded as Base64 and represented as a JSON string the <code>encoding</code> attribute is set to &#8220;base64&#8221;</li>
-			<li>a string Message payload is represented as a JSON string</li>
-			<li>a JSON Message payload is stringified either as a JSON Object or Array and represented as a JSON string and the <code>encoding</code> attribute is set to &#8220;json&#8221;</li>
-			<li>All messages received will be decoded based on the <code>encoding</code> field and deliver payloads in the format they were sent in i.e. binary, string, or a structured type containing the parsed JSON</li>
+			<li><code>(RSC4d1)</code> a binary Message payload is encoded as Base64 and represented as a JSON string the <code>encoding</code> attribute is set to &#8220;base64&#8221;</li>
+			<li><code>(RSC4d2)</code> a string Message payload is represented as a JSON string</li>
+			<li><code>(RSC4d3)</code> a JSON Message payload is stringified either as a JSON Object or Array and represented as a JSON string and the <code>encoding</code> attribute is set to &#8220;json&#8221;</li>
+			<li><code>(RSC4d4)</code> All messages received will be decoded based on the <code>encoding</code> field and deliver payloads in the format they were sent in i.e. binary, string, or a structured type containing the parsed JSON</li>
 		</ul></li>
 	</ul></li>
-	<li>Message payload encryption
+	<li><code>(RSC5)</code> Message payload encryption
 	<ul>
-		<li>When a <code>Channel</code> is instanced with the option <code>encrypted</code> true, message payloads will be automtically encrypted when sent to Ably and decrypted when received on this channel. The cipher configuration is set with the <code>cipherParams</code></li>
-		<li>AES 256 and 128 CBC encryption must be supported</li>
-		<li>Tests must exist that encrypt and decrypt the following fixture data for <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-128.json">AES 128</a> and <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-256.json">AES 256</a> to ensure the client library encryption is compatible across libraries</li>
+		<li><code>(RSC5a)</code> When a <code>Channel</code> is instanced with the option <code>encrypted</code> true, message payloads will be automtically encrypted when sent to Ably and decrypted when received on this channel. The cipher configuration is set with the <code>cipherParams</code></li>
+		<li><code>(RSC5b)</code> AES 256 and 128 CBC encryption must be supported</li>
+		<li><code>(RSC5c)</code> Tests must exist that encrypt and decrypt the following fixture data for <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-128.json">AES 128</a> and <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-256.json">AES 256</a> to ensure the client library encryption is compatible across libraries</li>
 	</ul></li>
-	<li>Message decoding
+	<li><code>(RSC6)</code> Message decoding
 	<ul>
-		<li>All messages received will be decoded automatically based on the <code>encoding</code> field and the payloads will be converted into the format they were originally sent using i.e. binary, string, or JSON</li>
-		<li>If, for example, incompatible encryption details are provided or invalid Base64 is detected in the message payload, an error message will be sent to the logger, but the message will still be delivered with last successful decoding and the <code>encoding</code> field. For example, if a message had a decoding of &#8220;utf-8/cipher+aes-128-cbc/base64&#8221;, and the payload was successfully Base64 decoded but the payload could not be encrypted because the <code>CipherParam</code> details were not configured, the message would be delivered with a binary payload and an <code>encoding</code> with the value &#8220;utf-8/cipher+aes-128-cbc&#8221;</li>
+		<li><code>(RSC6a)</code> All messages received will be decoded automatically based on the <code>encoding</code> field and the payloads will be converted into the format they were originally sent using i.e. binary, string, or JSON</li>
+		<li><code>(RSC6b)</code> If, for example, incompatible encryption details are provided or invalid Base64 is detected in the message payload, an error message will be sent to the logger, but the message will still be delivered with last successful decoding and the <code>encoding</code> field. For example, if a message had a decoding of &#8220;utf-8/cipher+aes-128-cbc/base64&#8221;, and the payload was successfully Base64 decoded but the payload could not be encrypted because the <code>CipherParam</code> details were not configured, the message would be delivered with a binary payload and an <code>encoding</code> with the value &#8220;utf-8/cipher+aes-128-cbc&#8221;</li>
 	</ul></li>
 </ul>
 <h3 id="rest-presence">Presence</h3>
 <ul>
-	<li>Presence object is associated with a single channel and is accessible through <code>Channel#presence</code></li>
-	<li>There is no way to register a member as present on a channel via the REST API</li>
-	<li><code>Presence#get</code> function:
+	<li><code>(RSP1)</code> Presence object is associated with a single channel and is accessible through <code>Channel#presence</code></li>
+	<li><code>(RSP2)</code> There is no way to register a member as present on a channel via the REST API</li>
+	<li><code>(RSP3)</code> <code>Presence#get</code> function:
 	<ul>
-		<li>Returns a <code>PaginatedResult</code> page containing the first page of members present in the <code>PaginatedResult#items</code> attribute returned from the presence request. Each member is represented as a <code>PresenceMessage</code>
+		<li><code>(RSP3a)</code> Returns a <code>PaginatedResult</code> page containing the first page of members present in the <code>PaginatedResult#items</code> attribute returned from the presence request. Each member is represented as a <code>PresenceMessage</code>
 		<ul>
-			<li><code>limit</code> supports up to 1,000 items; if unspecified it defaults to the REST API default (100)</li>
-			<li><code>clientId</code> filters members by the provided <code>clientId</code></li>
-			<li><code>connectionId</code> filters members by the provided <code>connectionId</code></li>
+			<li><code>(RSP3a1)</code> <code>limit</code> supports up to 1,000 items; if unspecified it defaults to the REST API default (100)</li>
+			<li><code>(RSP3a2)</code> <code>clientId</code> filters members by the provided <code>clientId</code></li>
+			<li><code>(RSP3a3)</code> <code>connectionId</code> filters members by the provided <code>connectionId</code></li>
 		</ul></li>
 	</ul></li>
-	<li><code>Presence#history</code> function:
+	<li><code>(RSP4)</code> <code>Presence#history</code> function:
 	<ul>
-		<li>Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the presence request</li>
-		<li>Supports the following params:
+		<li><code>(RSP4a)</code> Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the presence request</li>
+		<li><code>(RSP4b)</code> Supports the following params:
 		<ul>
-			<li><code>start</code> and <code>end</code> are timestamp fields represented as milliseconds since epoch, or where appropriate to the language, Date/Time objects. <code>start</code> must be equal to or less than <code>end</code> and is unaffected by the request direction.</li>
-			<li><code>direction</code> backwards or forwards; if unspecified defaults to the REST API default (backwards)</li>
-			<li><code>limit</code> supports up to 1,000 items; if unspecified defaults to the REST API default (100)</li>
+			<li><code>(RSP4b1)</code> <code>start</code> and <code>end</code> are timestamp fields represented as milliseconds since epoch, or where appropriate to the language, Date/Time objects. <code>start</code> must be equal to or less than <code>end</code> and is unaffected by the request direction.</li>
+			<li><code>(RSP4b2)</code> <code>direction</code> backwards or forwards; if unspecified defaults to the REST API default (backwards)</li>
+			<li><code>(RSP4b3)</code> <code>limit</code> supports up to 1,000 items; if unspecified defaults to the REST API default (100)</li>
 		</ul></li>
 	</ul></li>
-	<li>Presence Messages retrieved are decoded in the same way that messages are decoded</li>
-</ul>
-<h3 id="rest-general">General</h3>
-<ul>
-	<li>Every test should be executed using all supported protocols (i.e. JSON and <a href="http://msgpack.org/">MessagePack</a> if supported).  This includes both sending &amp; receiving data.</li>
-	<li>All tests by default are run against a special Ably sandbox environment.  This environment allows apps to be provisioned without any authentication that can then be used for client library testing. Bear in mind that all apps created in the sandbox environment are automatically deleted after 60 minutes and have low limits to prevent abuse. Apps are configured by sending a <code>POST</code> request to <code>https://sandbox-rest.ably.io/apps</code> with a JSON body that specifies the keys and their associated capabilities, channel namespace rules and any presence fixture data that is required; see <a href="https://github.com/ably/ably-common/blob/master/test-resources/test-app-setup.json">ably-common test-app-setup.json</a>.  See the <a href="https://github.com/ably/ably-java/blob/master/test/io/ably/test/rest/RestSetup.java">Java test setup</a>. Presence fixture data is necessary for the REST library presence tests as there is no way to register presence on a channel in the REST library.</li>
-	<li>Testing statistics can be tricky due to timing issues and slow test suites as a result of sending requests to generate statistics.  As such, we provide a special stats endpoint in our sandbox environment that allows stats to be injected into our metrics system so that stats tests can make predictable assertions.  To create stats you must send an authenticated <code>POST</code> request to the stats JSON to <code>https://sandbox-rest.ably.io/stats</code> with the stats data you wish to create. See the <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/rest/stats.test.js#L8-L51">Javascript stats fixture</a> and <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/common/modules/testapp_manager.js#L158-L182">setup helper</a> as an example.</li>
+	<li><code>(RSP5)</code> Presence Messages retrieved are decoded in the same way that messages are decoded</li>
 </ul>
 <h2 id="realtime">Realtime client library features</h2>
 <p>The Ably Realtime client libraries establish and maintain a persistent connection to Ably and provide methods to publish and subscribe to messages over a low latency realtime connection.</p>
