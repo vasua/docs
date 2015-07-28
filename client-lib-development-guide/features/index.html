@@ -83,6 +83,7 @@
 	<li><code>(G3)</code> Testing statistics can be tricky due to timing issues and slow test suites as a result of sending requests to generate statistics.  As such, we provide a special stats endpoint in our sandbox environment that allows stats to be injected into our metrics system so that stats tests can make predictable assertions.  To create stats you must send an authenticated <code>POST</code> request to the stats JSON to <code>https://sandbox-rest.ably.io/stats</code> with the stats data you wish to create. See the <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/rest/stats.test.js#L8-L51">Javascript stats fixture</a> and <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/common/modules/testapp_manager.js#L158-L182">setup helper</a> as an example.</li>
 </ul>
 <h2 id="rest">REST client library</h2>
+<p>Client library developers &#8211; clone our <a href="https://docs.google.com/spreadsheets/d/1vBzr9N-0ovtVZ0mxTeg7zLMEhcgj5lB9ivmkOcO-9J0/edit?usp=sharing">REST client library Google Doc spec</a> when developing a REST client library to help you keep track of feature compliance and test coverage.</p>
 <h3 id="restclient">RestClient</h3>
 <ul>
 	<li><code>(RSC1)</code> The constructor accepts either an API key, a token string, or a set of <a href="#options"><code>ClientOptions</code></a>.  An exception is raised if invalid arguments are provided such as no API key, token and no means to create a token</li>
@@ -101,9 +102,9 @@
 			<li><code>(RSC6b4)</code> <code>unit</code> is the period for which the stats will be aggregated by, values supported are <code>minute</code>, <code>hour</code>, <code>day</code> or <code>month</code>; if omitted the unit defaults to the REST API default (<code>minute</code>)</li>
 		</ul></li>
 	</ul></li>
-	<li><code>(RSC6)</code> <code>RestClient#time</code> function sends a get request to <code>rest.ably.io/time</code> and returns the server time in milliseconds since epoch or as a Date/Time object where suitable</li>
+	<li><code>(RSC16)</code> <code>RestClient#time</code> function sends a get request to <code>rest.ably.io/time</code> and returns the server time in milliseconds since epoch or as a Date/Time object where suitable</li>
 	<li><code>(RSC7)</code> Sends REST requests over HTTP and HTTPS to the REST end-point <code>rest.ably.io</code></li>
-	<li><code>(RSC8)</code> If <code>ClientOptions#tls</code> is true, then all communication is over HTTPS. If false, all communication is over HTTP however Basic Auth over HTTP will raise an exception as private keys cannot be submitted over an insecure connection. See <code>Auth</code> below</li>
+	<li><code>(RSC18)</code> If <code>ClientOptions#tls</code> is true, then all communication is over HTTPS. If false, all communication is over HTTP however Basic Auth over HTTP will raise an exception as private keys cannot be submitted over an insecure connection. See <code>Auth</code> below</li>
 	<li><code>(RSC8)</code> Supports two protocols:
 	<ul>
 		<li><code>(RSC8a)</code> <a href="http://msgpack.org/">MessagePack</a> binary protocol (this is the default for environments having a suitable level or support for binary data)</li>
@@ -135,7 +136,7 @@
 	<li><code>(RSA2)</code> Basic Auth is the default authentication scheme if an API key exists</li>
 	<li><code>(RSA3)</code> Token Auth can be used over HTTP or HTTPs using the token string in the header over HTTP or with the querystring param <code>access_token</code> over WebSockets</li>
 	<li><code>(RSA4)</code> Token Auth is the default if option <code>useTokenAuth</code> is set to true, a <code>clientId</code> is specified, <code>authUrl</code> or <code>authCallback</code> is configured, or a an explicit <code>token</code> is provided</li>
-	<li><code>(RSA4)</code> If Token Auth is the default authentication, an exception will be raised if a token is not provided or there is no means to generate a token. For example, if only the option <code>useTokenAuth</code> is specified, and thus a <code>key</code> is not provided, then the client library is unable to authenticate or issue a token</li>
+	<li><code>(RSA14)</code> If Token Auth is the default authentication, an exception will be raised if a token is not provided or there is no means to generate a token. For example, if only the option <code>useTokenAuth</code> is specified, and thus a <code>key</code> is not provided, then the client library is unable to authenticate or issue a token</li>
 	<li><code>(RSA5)</code> TTL for new tokens is specified in milliseconds and defaults to the REST API default (1 hour)</li>
 	<li><code>(RSA6)</code> The <code>capability</code>, if not specified, defaults to allow all operations permitted for the key associated with the token</li>
 	<li><code>(RSA7)</code> If a <code>clientId</code> is provided in the options, then the string will be encoded in UTF-8 format before it is sent to Ably</li>
@@ -655,7 +656,7 @@
 <ul>
 	<li><code>(TI1)</code> Provides a generic Ably <code>ErrorInfo</code> object that contains Ably <code>code</code>, <code>statusCode</code> (analogous to HTTP status code) and <code>message</code> attributes.</li>
 	<li><code>(TI2)</code> Errors returned from the Ably server are compatible with the <code>ErrorInfo</code> structure and should raise exceptions that inherit from <code>ErrorInfo</code></li>
-	<li><code>(TE3)</code> [Ably-common](https://github.com/ably/ably-common) should be included as a submodule so that <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">consistent error codes</a> can be used</li>
+	<li><code>(TE3)</code> <a href="https://github.com/ably/ably-common">Ably-common</a> should be included as a submodule so that <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">consistent error codes</a> can be used</li>
 </ul>
 <h4>ConnectionStateChange</h4>
 <ul>
