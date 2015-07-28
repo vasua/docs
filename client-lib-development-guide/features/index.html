@@ -39,7 +39,7 @@
           <select id="jump-to-nav">
             <option>Jump to ...</option>
             <optgroup label='General'>
-<option id="anchor-general">Test requirements</option>
+<option id="anchor-test-guidelines">Test guidelines</option>
 </optgroup>
 <optgroup label='REST client library'>
 <option id="anchor-restclient">RestClient</option>
@@ -76,7 +76,7 @@
       <p>A detailed <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> that applies to all client libraries is generated from the Ably Ruby client library&#8217;s acceptance and test suites.  Whilst every official Ably client library has test coverage, the amount of test coverage varies, and as such our recommendation is to refer to the official <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> when developing a client library.</p>
 <p>However, we have found the <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> can be difficult as a reference because of both its breadth and the fact that it applies to the Ruby client library which may be unfamiliar as a language for a lot of developers.</p>
 <p>As a result, this document outlines the complete feature set of both the REST and Realtime client libraries.  It is expected that every client library developer refers to this document to ensure that their client library provides the same API and features as the existing Ably client libraries. In addition to this, it is essential that there is test coverage over all of the features described below. We recommend you use the <a href="https://github.com/ably/ably-java">Ably Java</a> library as a reference when reviewing how the API has been implemented as the implementation is straightforward and Java is a language most people are familiar with.</p>
-<h2 id="general">General guidelines</h2>
+<h2 id="test-guidelines">Test guidelines</h2>
 <ul>
 	<li><code>(G1)</code> Every test should be executed using all supported protocols (i.e. JSON and <a href="http://msgpack.org/">MessagePack</a> if supported).  This includes both sending &amp; receiving data.</li>
 	<li><code>(G2)</code> All tests by default are run against a special Ably sandbox environment.  This environment allows apps to be provisioned without any authentication that can then be used for client library testing. Bear in mind that all apps created in the sandbox environment are automatically deleted after 60 minutes and have low limits to prevent abuse. Apps are configured by sending a <code>POST</code> request to <code>https://sandbox-rest.ably.io/apps</code> with a JSON body that specifies the keys and their associated capabilities, channel namespace rules and any presence fixture data that is required; see <a href="https://github.com/ably/ably-common/blob/master/test-resources/test-app-setup.json">ably-common test-app-setup.json</a>.  See the <a href="https://github.com/ably/ably-java/blob/master/test/io/ably/test/rest/RestSetup.java">Java test setup</a>. Presence fixture data is necessary for the REST library presence tests as there is no way to register presence on a channel in the REST library.</li>
@@ -564,124 +564,124 @@
 <h3 id="types">Data types</h3>
 <h4>Message</h4>
 <ul>
-	<li>A <code>Message</code> represents an individual message to be sent or received via the Ably Realtime service.  See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Message">Ruby Message documentation</a>, but bear in mind the attributes following underscore naming in Ruby.</li>
-	<li>Attributes available in a <code>Message</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Message">Ruby Message documentation</a> for an explanation of each attribute:
+	<li><code>(TM1)</code> A <code>Message</code> represents an individual message to be sent or received via the Ably Realtime service.  See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Message">Ruby Message documentation</a>, but bear in mind the attributes following underscore naming in Ruby.</li>
+	<li><code>(TM2)</code> Attributes available in a <code>Message</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Message">Ruby Message documentation</a> for an explanation of each attribute:
 	<ul>
-		<li><code>id</code> string &#8211; unique ID for this message</li>
-		<li><code>clientId</code> string</li>
-		<li><code>connectionId</code> string</li>
-		<li><code>data</code> string, buffer or JSON-encodable object or array</li>
-		<li><code>encoding</code> string</li>
-		<li><code>timestamp</code> time in milliseconds since epoch</li>
+		<li><code>(TM2a)</code> <code>id</code> string &#8211; unique ID for this message</li>
+		<li><code>(TM2b)</code> <code>clientId</code> string</li>
+		<li><code>(TM2c)</code> <code>connectionId</code> string</li>
+		<li><code>(TM2d)</code> <code>data</code> string, buffer or JSON-encodable object or array</li>
+		<li><code>(TM2e)</code> <code>encoding</code> string</li>
+		<li><code>(TM2f)</code> <code>timestamp</code> time in milliseconds since epoch</li>
 	</ul></li>
 </ul>
 <h4>PresenceMessage</h4>
 <ul>
-	<li>A <code>PresenceMessage</code> represents an individual presence message to be sent or received via the Ably Realtime service.  See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/PresenceMessage">Ruby PresenceMessage documentation</a>, but bear in mind the attributes following underscore naming in Ruby.</li>
-	<li><code>PresenceMessage</code> <code>Action</code> enum has the following values in order from zero: <code>ABSENT</code>, <code>PRESENT</code>, <code>ENTER</code>, <code>LEAVE</code>, <code>UPDATE</code></li>
-	<li>Attributes available in a <code>PresenceMessage</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/PresenceMessage">Ruby PresenceMessage documentation</a> for an explanation of each attribute:
+	<li><code>(TP1)</code> A <code>PresenceMessage</code> represents an individual presence message to be sent or received via the Ably Realtime service.  See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/PresenceMessage">Ruby PresenceMessage documentation</a>, but bear in mind the attributes following underscore naming in Ruby.</li>
+	<li><code>(TP2)</code> <code>PresenceMessage</code> <code>Action</code> enum has the following values in order from zero: <code>ABSENT</code>, <code>PRESENT</code>, <code>ENTER</code>, <code>LEAVE</code>, <code>UPDATE</code></li>
+	<li><code>(TP3)</code> Attributes available in a <code>PresenceMessage</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/PresenceMessage">Ruby PresenceMessage documentation</a> for an explanation of each attribute:
 	<ul>
-		<li><code>id</code> string &#8211; unique ID for this message</li>
-		<li><code>action</code> enum</li>
-		<li><code>clientId</code> string</li>
-		<li><code>connectionId</code> string</li>
-		<li><code>data</code> string, buffer or JSON-encodable object or array</li>
-		<li><code>encoding</code> string</li>
-		<li><code>timestamp</code> time in milliseconds since epoch</li>
-		<li><code>memberKey</code> string function that combines the <code>connectionId</code> and <code>clientId</code> ensuring multiple connected clients with the same clientId are uniquely identifiable</li>
+		<li><code>(TP3a)</code> <code>id</code> string &#8211; unique ID for this message</li>
+		<li><code>(TP3b)</code> <code>action</code> enum</li>
+		<li><code>(TP3c)</code> <code>clientId</code> string</li>
+		<li><code>(TP3d)</code> <code>connectionId</code> string</li>
+		<li><code>(TP3e)</code> <code>data</code> string, buffer or JSON-encodable object or array</li>
+		<li><code>(TP3f)</code> <code>encoding</code> string</li>
+		<li><code>(TP3g)</code> <code>timestamp</code> time in milliseconds since epoch</li>
+		<li><code>(TP3h)</code> <code>memberKey</code> string function that combines the <code>connectionId</code> and <code>clientId</code> ensuring multiple connected clients with the same clientId are uniquely identifiable</li>
 	</ul></li>
 </ul>
 <h4>ProtocolMessage</h4>
 <ul>
-	<li>A <code>ProtocolMessage</code> represents the type used to send and receive messages over the Realtime protocol.  A ProtocolMessage always relates either to the connection or to a single channel only, but can contain multiple individual Messages or PresenceMessages.  See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/ProtocolMessage">Ruby ProtocolMessage documentation</a>, but bear in mind the attributes following underscore naming in Ruby.</li>
-	<li><code>ProtocolMessage</code> <code>Action</code> enum has the following values in order from zero: <code>HEARTBEAT</code>, <code>ACK</code>, <code>NACK</code>, <code>CONNECT</code>, <code>CONNECTED</code>, <code>DISCONNECT</code>, <code>DISCONNECTED</code>, <code>CLOSE</code>, <code>CLOSED</code>, <code>ERROR</code>, <code>ATTACH</code>, <code>ATTACHED</code>, <code>DETACH</code>, <code>DETACHED</code>, <code>PRESENCE</code>, <code>MESSAGE</code>, <code>SYNC</code></li>
-	<li><code>ProtocolMessage</code> <code>Flag</code> enum has the following values in order from zero: <code>HAS_PRESENCE</code>, <code>HAS_BACKLOG</code></li>
-	<li>Attributes available in a <code>ProtocolMessage</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/ProtocolMessage">Ruby ProtocolMessage documentation</a> for an explanation of each attribute:
+	<li><code>(TR1)</code> A <code>ProtocolMessage</code> represents the type used to send and receive messages over the Realtime protocol.  A ProtocolMessage always relates either to the connection or to a single channel only, but can contain multiple individual Messages or PresenceMessages.  See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/ProtocolMessage">Ruby ProtocolMessage documentation</a>, but bear in mind the attributes following underscore naming in Ruby.</li>
+	<li><code>(TR2)</code> <code>ProtocolMessage</code> <code>Action</code> enum has the following values in order from zero: <code>HEARTBEAT</code>, <code>ACK</code>, <code>NACK</code>, <code>CONNECT</code>, <code>CONNECTED</code>, <code>DISCONNECT</code>, <code>DISCONNECTED</code>, <code>CLOSE</code>, <code>CLOSED</code>, <code>ERROR</code>, <code>ATTACH</code>, <code>ATTACHED</code>, <code>DETACH</code>, <code>DETACHED</code>, <code>PRESENCE</code>, <code>MESSAGE</code>, <code>SYNC</code></li>
+	<li><code>(TR3)</code> <code>ProtocolMessage</code> <code>Flag</code> enum has the following values in order from zero: <code>HAS_PRESENCE</code>, <code>HAS_BACKLOG</code></li>
+	<li><code>(TR4)</code> Attributes available in a <code>ProtocolMessage</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/ProtocolMessage">Ruby ProtocolMessage documentation</a> for an explanation of each attribute:
 	<ul>
-		<li><code>action</code> enum</li>
-		<li><code>channel</code> string</li>
-		<li><code>channelSerial</code> string</li>
-		<li><code>connectionId</code> string</li>
-		<li><code>connectionKey</code> string</li>
-		<li><code>connectionSerial</code> long</li>
-		<li><code>count</code> integer</li>
-		<li><code>errorInfo</code> <code>ErrorInfo</code> object</li>
-		<li><code>flags</code> integer</li>
-		<li><code>messageSerial</code> long</li>
-		<li><code>messages</code> Array of <code>Message</code> objects</li>
-		<li><code>presence</code> Array of <code>PresenceMessage</code> objects</li>
-		<li><code>timestamp</code> time in milliseconds since epoch</li>
+		<li><code>(TR4a)</code> <code>action</code> enum</li>
+		<li><code>(TR4b)</code> <code>channel</code> string</li>
+		<li><code>(TR4c)</code> <code>channelSerial</code> string</li>
+		<li><code>(TR4d)</code> <code>connectionId</code> string</li>
+		<li><code>(TR4e)</code> <code>connectionKey</code> string</li>
+		<li><code>(TR4f)</code> <code>connectionSerial</code> long</li>
+		<li><code>(TR4g)</code> <code>count</code> integer</li>
+		<li><code>(TR4h)</code> <code>errorInfo</code> <code>ErrorInfo</code> object</li>
+		<li><code>(TR4i)</code> <code>flags</code> integer</li>
+		<li><code>(TR4j)</code> <code>messageSerial</code> long</li>
+		<li><code>(TR4k)</code> <code>messages</code> Array of <code>Message</code> objects</li>
+		<li><code>(TR4l)</code> <code>presence</code> Array of <code>PresenceMessage</code> objects</li>
+		<li><code>(TR4m)</code> <code>timestamp</code> time in milliseconds since epoch</li>
 	</ul></li>
 </ul>
 <h4>PaginatedResult</h4>
 <ul>
-	<li>A <code>PaginatedResult</code> is a type that represents a page of results from a <a href="/rest-api/#pagination">paginated query</a>. The response is accompanied by metadata that indicates the relative queries available.</li>
-	<li><code>PaginatedResult</code> wraps all message and presence history, stats and REST presence requests.  The type must not raise an exception if paging headers are not returned from the REST API.</li>
-	<li><code>PaginatedResult#items</code> attribute contains a page of results (for example an Array of <code>Message</code> objects for a channel history request).</li>
-	<li><code>PaginatedResult#next</code> function returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <code>null</code> is returned.</li>
-	<li><code>PaginatedResult#first</code> function returns a new <code>PaginatedResult</code> for the first page of results.</li>
-	<li><code>PaginatedResult#hasNext</code> function returns <code>true</code> if there are further pages</li>
-	<li><code>PaginatedResult#isLast</code> function returns <code>true</code> if this page is not the last page i.e. <code>!hasNext</code></li>
+	<li><code>(TG1)</code> A <code>PaginatedResult</code> is a type that represents a page of results from a <a href="/rest-api/#pagination">paginated query</a>. The response is accompanied by metadata that indicates the relative queries available.</li>
+	<li><code>(TG2)</code> <code>PaginatedResult</code> wraps all message and presence history, stats and REST presence requests.  The type must not raise an exception if paging headers are not returned from the REST API.</li>
+	<li><code>(TG3)</code> <code>PaginatedResult#items</code> attribute contains a page of results (for example an Array of <code>Message</code> objects for a channel history request).</li>
+	<li><code>(TG4)</code> <code>PaginatedResult#next</code> function returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <code>null</code> is returned.</li>
+	<li><code>(TG5)</code> <code>PaginatedResult#first</code> function returns a new <code>PaginatedResult</code> for the first page of results.</li>
+	<li><code>(TG6)</code> <code>PaginatedResult#hasNext</code> function returns <code>true</code> if there are further pages</li>
+	<li><code>(TG7)</code> <code>PaginatedResult#isLast</code> function returns <code>true</code> if this page is not the last page i.e. <code>!hasNext</code></li>
 </ul>
 <h4>TokenRequest</h4>
 <ul>
-	<li><code>TokenRequest</code> is a type containing the token request details sent to the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a></li>
-	<li>String attributes <code>keyName</code>, <code>clientId</code>, <code>nonce</code> and <code>mac</code></li>
-	<li><code>capability</code> is a string attribute containing capabilities JSON stringified</li>
-	<li><code>ttl</code> attribute represents time to live (expiry) of this token in milliseconds</li>
+	<li><code>(TE1)</code> <code>TokenRequest</code> is a type containing the token request details sent to the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a></li>
+	<li><code>(TE2)</code> String attributes <code>keyName</code>, <code>clientId</code>, <code>nonce</code> and <code>mac</code></li>
+	<li><code>(TE3)</code> <code>capability</code> is a string attribute containing capabilities JSON stringified</li>
+	<li><code>(TE4)</code> <code>ttl</code> attribute represents time to live (expiry) of this token in milliseconds</li>
 </ul>
 <h4>TokenDetails</h4>
 <ul>
-	<li><code>TokenDetails</code> is a type containing the token request response from the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a></li>
-	<li><code>TokenDetails#token</code> attribute contains the token string</li>
-	<li><code>TokenDetails#expires</code> attribute contains the expiry time in milliseconds.  Where idiomatic in the language, this can be a Date/Time object</li>
-	<li><code>TokenDetails#issued</code> attribute contains the time the token was issued in milliseconds.  Where idiomatic in the language, this can be a Date/Time object</li>
-	<li><code>TokenDetails#capability</code> attribute contains the capability JSON stringified</li>
-	<li><code>TokenDetails#clientId</code> attribute contains the clientId assigned to the token if provided</li>
+	<li><code>(TD1)</code> <code>TokenDetails</code> is a type containing the token request response from the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a></li>
+	<li><code>(TD2)</code> <code>TokenDetails#token</code> attribute contains the token string</li>
+	<li><code>(TD3)</code> <code>TokenDetails#expires</code> attribute contains the expiry time in milliseconds.  Where idiomatic in the language, this can be a Date/Time object</li>
+	<li><code>(TD4)</code> <code>TokenDetails#issued</code> attribute contains the time the token was issued in milliseconds.  Where idiomatic in the language, this can be a Date/Time object</li>
+	<li><code>(TD5)</code> <code>TokenDetails#capability</code> attribute contains the capability JSON stringified</li>
+	<li><code>(TD6)</code> <code>TokenDetails#clientId</code> attribute contains the clientId assigned to the token if provided</li>
 </ul>
 <h4>Stats</h4>
 <ul>
-	<li><code>Stats</code> is a type encapsulating a statistics datapoint retrieved from the <a href="/rest-api/#stats">REST stats endpoint</a>.  See <a href="/general/statistics/">example statistics in JSON format</a>.</li>
-	<li>All stats values default to zero when no underlying JSON value exists.  We send sparse JSON to stats requests omitting fields where the value is zero to reduce bandwidth and optimise JSON parsing.</li>
-	<li>See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats">Ruby Stats type documentation</a></li>
-	<li><code>Stats.ConnectionTypes</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ConnectionTypes">Ruby ConnectionTypes documentation</a></li>
-	<li><code>Stats.MessageCount</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageCount">Ruby MessageCount documentation</a></li>
-	<li><code>Stats.MessageTypes</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">Ruby MessageTypes documentation</a></li>
-	<li><code>Stats.MessageTraffic</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTraffic">Ruby MessageTraffic documentation</a></li>
-	<li><code>Stats.RequestCount</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">Ruby RequestCount documentation</a></li>
-	<li><code>Stats.ResourceCount</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ResourceCount">Ruby ResourceCount documentation</a></li>
+	<li><code>(TS1)</code> <code>Stats</code> is a type encapsulating a statistics datapoint retrieved from the <a href="/rest-api/#stats">REST stats endpoint</a>.  See <a href="/general/statistics/">example statistics in JSON format</a>.</li>
+	<li><code>(TS2)</code> All stats values default to zero when no underlying JSON value exists.  We send sparse JSON to stats requests omitting fields where the value is zero to reduce bandwidth and optimise JSON parsing.</li>
+	<li><code>(TS3)</code> See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats">Ruby Stats type documentation</a></li>
+	<li><code>(TS4)</code> <code>Stats.ConnectionTypes</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ConnectionTypes">Ruby ConnectionTypes documentation</a></li>
+	<li><code>(TS5)</code> <code>Stats.MessageCount</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageCount">Ruby MessageCount documentation</a></li>
+	<li><code>(TS6)</code> <code>Stats.MessageTypes</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">Ruby MessageTypes documentation</a></li>
+	<li><code>(TS7)</code> <code>Stats.MessageTraffic</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTraffic">Ruby MessageTraffic documentation</a></li>
+	<li><code>(TS8)</code> <code>Stats.RequestCount</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">Ruby RequestCount documentation</a></li>
+	<li><code>(TS9)</code> <code>Stats.ResourceCount</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ResourceCount">Ruby ResourceCount documentation</a></li>
 </ul>
 <h4>ErrorInfo</h4>
 <ul>
-	<li>Provides a generic Ably <code>ErrorInfo</code> object that contains Ably <code>code</code>, <code>statusCode</code> (analogous to HTTP status code) and <code>message</code> attributes.</li>
-	<li>Errors returned from the Ably server are compatible with the <code>ErrorInfo</code> structure and should raise exceptions that inherit from <code>ErrorInfo</code></li>
-	<li>[Ably-common](https://github.com/ably/ably-common) should be included as a submodule so that <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">consistent error codes</a> can be used</li>
+	<li><code>(TI1)</code> Provides a generic Ably <code>ErrorInfo</code> object that contains Ably <code>code</code>, <code>statusCode</code> (analogous to HTTP status code) and <code>message</code> attributes.</li>
+	<li><code>(TI2)</code> Errors returned from the Ably server are compatible with the <code>ErrorInfo</code> structure and should raise exceptions that inherit from <code>ErrorInfo</code></li>
+	<li><code>(TE3)</code> [Ably-common](https://github.com/ably/ably-common) should be included as a submodule so that <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">consistent error codes</a> can be used</li>
 </ul>
 <h4>ConnectionStateChange</h4>
 <ul>
-	<li>Whenever the connection state changes, a <code>ConnectionStateChange</code> object is emitted on the <code>Connection</code> object</li>
-	<li>The <code>ConnectionStateChange</code> object contains the current state in attribute <code>current</code>, the previous state in attribute <code>previous</code>, and when the client is not connected and a connection attempt will be made automatically by the library, the amount of time in milliseconds until the next retry in the attribute <code>retryIn</code></li>
-	<li>If the connection state change includes error information, then the <code>errorReason</code> attribute will contain an <code>ErrorInfo</code> object describing the reason for the error</li>
-	<li>See the [Java library implementation](https://github.com/ably/ably-java/blob/245a3f20a6dce0d34413ddfed19c5da8ea647422/src/io/ably/realtime/ConnectionStateListener.java#L15-L20) of this object.  Note that <code>reason</code> will be changed in a future release to <code>errorReason</code> in line with this specification</li>
+	<li><code>(TA1)</code> Whenever the connection state changes, a <code>ConnectionStateChange</code> object is emitted on the <code>Connection</code> object</li>
+	<li><code>(TA2)</code> The <code>ConnectionStateChange</code> object contains the current state in attribute <code>current</code>, the previous state in attribute <code>previous</code>, and when the client is not connected and a connection attempt will be made automatically by the library, the amount of time in milliseconds until the next retry in the attribute <code>retryIn</code></li>
+	<li><code>(TA3)</code> If the connection state change includes error information, then the <code>errorReason</code> attribute will contain an <code>ErrorInfo</code> object describing the reason for the error</li>
+	<li><code>(TA4)</code> See the [Java library implementation](https://github.com/ably/ably-java/blob/245a3f20a6dce0d34413ddfed19c5da8ea647422/src/io/ably/realtime/ConnectionStateListener.java#L15-L20) of this object.  Note that <code>reason</code> will be changed in a future release to <code>errorReason</code> in line with this specification</li>
 </ul>
 <h4>Capability &#8211; <strong>API not agreed yet</strong></h4>
 <ul>
-	<li>This type represents a capability for a key or token</li>
-	<li>For now a string representation of the JSON will suffice wherever <code>capability</code> is used</li>
+	<li><code>(TC1)</code> This type represents a capability for a key or token</li>
+	<li><code>(TC2)</code> For now a string representation of the JSON will suffice wherever <code>capability</code> is used</li>
 </ul>
 <h3 id="options">Option types</h3>
 <h4>ClientOptions</h4>
 <ul>
-	<li>Ably library options used when instancing a REST or Realtime client library, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/types/Options.java">Java Options</a></li>
-	<li>Note: <code>ClientOptions</code> does not currently define a default for max message size or request size. This will be added in the future to ensure that a ProtocolMessage or REST request does not exceed the limits before the request is made to the server.</li>
+	<li><code>(TO1)</code> Ably library options used when instancing a REST or Realtime client library, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/types/Options.java">Java Options</a></li>
+	<li><code>(TO2)</code> Note: <code>ClientOptions</code> does not currently define a default for max message size or request size. This will be added in the future to ensure that a ProtocolMessage or REST request does not exceed the limits before the request is made to the server.</li>
 </ul>
-<h4>ChannelOptions@</h4>
+<h4>ChannelOptions</h4>
 <ul>
-	<li>options provided when instancing a channel, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/types/ChannelOptions.java">Java ChannelOptions</a></li>
+	<li><code>(TB1)</code> options provided when instancing a channel, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/types/ChannelOptions.java">Java ChannelOptions</a></li>
 </ul>
 <h4>CipherParams</h4>
 <ul>
-	<li>params to configure encryption for a channel, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/util/Crypto.java#L52">Java CipherParams class</a></li>
+	<li><code>(TZ1)</code> params to configure encryption for a channel, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/util/Crypto.java#L52">Java CipherParams class</a></li>
 </ul>
     </article>
     <hr class="back">
