@@ -2,4 +2,5 @@ tmp
 output
 crash.log
 .sass*
-config/jsbin_config.yaml
+config
+.config
