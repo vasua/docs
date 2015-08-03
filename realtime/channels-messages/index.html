@@ -328,8 +328,8 @@ Related types
 </li></ul>
 </div><h2>Methods</h2>
 <h6 id="publish">publish</h6>
-<blockquote class="definition">
-<p class="definition"><span lang='default'>publish(name, data, callback)</span><span lang='ruby'>publish(name, data, &amp;callback)</span><span lang='java'>public void publish(String name, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+<blockquote class="definition" id="publish-data">
+<p class="definition" id="publish-data"><span lang='default'>publish(name, data, callback)</span><span lang='ruby'>publish(name, data, &amp;callback)</span><span lang='java'>public void publish(String name, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
 </blockquote>
 <p>Publish a single message on this channel based on a given event name and payload. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
 <h4>Parameters</h4>
@@ -349,8 +349,8 @@ Related types
 	<dt><div lang="java">listener</div></dt>
 	<dd>Listener to be notified on completion.</dd>
 </dl>
-<blockquote class="definition">
-<p class="definition"><span lang='default'>publish(message, callback)</span><span lang='java'>public void publish(Message message, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+<blockquote class="definition" id="publish-msg">
+<p class="definition" id="publish-msg"><span lang='default'>publish(message, callback)</span><span lang='java'>public void publish(Message message, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
 </blockquote>
 <p>Publish a single message object on this channel. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
 <h4>Parameters</h4>
@@ -366,8 +366,8 @@ Related types
 	<dt><div lang="java">listener</div></dt>
 	<dd>Listener to be notified on completion.</dd>
 </dl>
-<blockquote class="definition">
-<p class="definition"><span lang='default'>publish(messages, callback)</span><span lang='java'>public void publish(Message[] messages, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+<blockquote class="definition" id="publish-msg-array">
+<p class="definition" id="publish-msg-array"><span lang='default'>publish(messages, callback)</span><span lang='java'>public void publish(Message[] messages, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
 </blockquote>
 <p>Publish several messages on this channel. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
 <h4>Parameters</h4>
@@ -384,8 +384,8 @@ Related types
 	<dd>Listener to be notified on completion.</dd>
 </dl>
 <h6 id="subscribe">subscribe</h6>
-<blockquote class="definition">
-<p class="definition"><span lang='default'>subscribe(listener)</span><span lang='java'>public void subscribe(<a href="#message-listener">MessageListener</a> listener)</span></p>
+<blockquote class="definition" id="subscribe-listener">
+<p class="definition" id="subscribe-listener"><span lang='default'>subscribe(listener)</span><span lang='java'>public void subscribe(<a href="#message-listener">MessageListener</a> listener)</span></p>
 </blockquote>
 <p>Subscribe to messages on this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the <a href="#message-listener">MessageListener</a> interface</span>, which is called each time one or more messages arrives on the channel.</p>
 <h4>Parameters</h4>
@@ -397,12 +397,12 @@ Related types
 	<dt><div lang="java">listener</div></dt>
 	<dd>The <a href="#message-listener">MessageListener</a> to be notified on completion.</dd>
 </dl>
-<blockquote class="definition">
-<p class="definition"><span lang='default'>subscribe(name, listener)</span><span lang='java'>public void subscribe(String name, <a href="#message-listener">MessageListener</a> listener)</span></p>
+<blockquote class="definition" id="subscribe-event">
+<p class="definition" id="subscribe-event"><span lang='default'>subscribe(name, listener)</span><span lang='java'>public void subscribe(String name, <a href="#message-listener">MessageListener</a> listener)</span></p>
 </blockquote>
 <p>Subscribe to messages with a given event <code>name</code> on this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the <a href="#message-listener">MessageListener</a> interface</span>, which is called each time one or more matching messages arrives on the channel.</p>
-<blockquote class="definition">
-<p class="definition"><span lang='default'>subscribe(names, listener)</span><span lang='java'>public void subscribe(String[] names, <a href="#message-listener">MessageListener</a> listener)</span></p>
+<blockquote class="definition" id="subscribe-event-array">
+<p class="definition" id="subscribe-event-array"><span lang='default'>subscribe(names, listener)</span><span lang='java'>public void subscribe(String[] names, <a href="#message-listener">MessageListener</a> listener)</span></p>
 </blockquote>
 <p>Subscribe a single listener to messages on this channel for multiple event @name@s.</p>
 <h4>Parameters</h4>
@@ -419,8 +419,8 @@ Related types
 	<dd>The <a href="#message-listener">MessageListener</a> to be notified on completion.</dd>
 </dl>
 <h6 id="unsubscribe">unsubscribe</h6>
-<blockquote class="definition">
-<p class="definition"><span lang='default'>unsubscribe(listener)</span><span lang='java'>public void unsubscribe(<a href="#message-listener">MessageListener</a> listener)</span></p>
+<blockquote class="definition" id="unsubscribe-listener">
+<p class="definition" id="unsubscribe-listener"><span lang='default'>unsubscribe(listener)</span><span lang='java'>public void unsubscribe(<a href="#message-listener">MessageListener</a> listener)</span></p>
 </blockquote>
 <p>Unsubscribe to messages on this channel. This removes an earlier subscription.</p>
 <h4>Parameters</h4>
@@ -432,8 +432,8 @@ Related types
 	<dt><div lang="java">listener</div></dt>
 	<dd>The <a href="#message-listener">MessageListener</a> registered on subscription.</dd>
 </dl>
-<blockquote class="definition">
-<p class="definition"><span lang='default'>unsubscribe(name, listener)</span><span lang='java'>public void unsubscribe(String name, <a href="#message-listener">MessageListener</a> listener)</span></p>
+<blockquote class="definition" id="unsubscribe-event">
+<p class="definition" id="unsubscribe-event"><span lang='default'>unsubscribe(name, listener)</span><span lang='java'>public void unsubscribe(String name, <a href="#message-listener">MessageListener</a> listener)</span></p>
 </blockquote>
 <p>Unsubscribe to messages on this channel. This removes an earlier event-specific subscription.</p>
 <h4>Parameters</h4>

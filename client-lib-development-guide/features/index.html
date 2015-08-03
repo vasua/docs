@@ -133,8 +133,12 @@
 <h3 id="rest-auth">Auth</h3>
 <ul>
 	<li><code>(RSA1)</code> Basic Auth connects over HTTPS by default.  If HTTP and Basic Auth are used, an exception will be raised</li>
+	<li><code>(RSA11)</code> When using Basic Auth, the API key is sent as the username &amp; password portion of an HTTP URL or in the <code>Authorization: Basic</code> header with a Base64 encoded value</li>
 	<li><code>(RSA2)</code> Basic Auth is the default authentication scheme if an API key exists</li>
-	<li><code>(RSA3)</code> Token Auth can be used over HTTP or HTTPs using the token string in the header over HTTP or with the querystring param <code>access_token</code> over WebSockets</li>
+	<li><code>(RSA3)</code> Token Auth:</li>
+	<li><code>(RSA3a)</code> Can be used over HTTP or HTTPs</li>
+	<li><code>(RSA3b)</code> For REST requests, the token string is Base64 encoded and used in the <code>Authorization: Bearer</code> header</li>
+	<li><code>(RSA3c)</code> For Realtime connections, the querystring param <code>access_token</code> is appended to the URL endpoint</li>
 	<li><code>(RSA4)</code> Token Auth is the default if option <code>useTokenAuth</code> is set to true, a <code>clientId</code> is specified, <code>authUrl</code> or <code>authCallback</code> is configured, or a an explicit <code>token</code> is provided</li>
 	<li><code>(RSA14)</code> If Token Auth is the default authentication, an exception will be raised if a token is not provided or there is no means to generate a token. For example, if only the option <code>useTokenAuth</code> is specified, and thus a <code>key</code> is not provided, then the client library is unable to authenticate or issue a token</li>
 	<li><code>(RSA5)</code> TTL for new tokens is specified in milliseconds and defaults to the REST API default (1 hour)</li>

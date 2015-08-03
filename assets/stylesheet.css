@@ -534,8 +534,12 @@ hr.back {
       #documentation .inline-toc > ul > li {
         font-weight: bold;
         font-size: 11px; }
-      #documentation .inline-toc > ul > li > ul > li > ul li {
-        margin-left: 15px; }
+      #documentation .inline-toc > ul > li > ul > li {
+        float: left;
+        width: 280px;
+        margin-bottom: 20px; }
+        #documentation .inline-toc > ul > li > ul > li > ul li {
+          margin-left: 15px; }
 
 div.global-lang-container {
   font-family: Georgia, Palatino, Times, 'Times New Roman', sans-serif;
