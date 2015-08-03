@@ -135,10 +135,12 @@
 	<li><code>(RSA1)</code> Basic Auth connects over HTTPS by default.  If HTTP and Basic Auth are used, an exception will be raised</li>
 	<li><code>(RSA11)</code> When using Basic Auth, the API key is sent as the username &amp; password portion of an HTTP URL or in the <code>Authorization: Basic</code> header with a Base64 encoded value</li>
 	<li><code>(RSA2)</code> Basic Auth is the default authentication scheme if an API key exists</li>
-	<li><code>(RSA3)</code> Token Auth:</li>
-	<li><code>(RSA3a)</code> Can be used over HTTP or HTTPs</li>
-	<li><code>(RSA3b)</code> For REST requests, the token string is Base64 encoded and used in the <code>Authorization: Bearer</code> header</li>
-	<li><code>(RSA3c)</code> For Realtime connections, the querystring param <code>access_token</code> is appended to the URL endpoint</li>
+	<li><code>(RSA3)</code> Token Auth:
+	<ul>
+		<li><code>(RSA3a)</code> Can be used over HTTP or HTTPs</li>
+		<li><code>(RSA3b)</code> For REST requests, the token string is Base64 encoded and used in the <code>Authorization: Bearer</code> header</li>
+		<li><code>(RSA3c)</code> For Realtime connections, the querystring param <code>access_token</code> is appended to the URL endpoint</li>
+	</ul></li>
 	<li><code>(RSA4)</code> Token Auth is the default if option <code>useTokenAuth</code> is set to true, a <code>clientId</code> is specified, <code>authUrl</code> or <code>authCallback</code> is configured, or a an explicit <code>token</code> is provided</li>
 	<li><code>(RSA14)</code> If Token Auth is the default authentication, an exception will be raised if a token is not provided or there is no means to generate a token. For example, if only the option <code>useTokenAuth</code> is specified, and thus a <code>key</code> is not provided, then the client library is unable to authenticate or issue a token</li>
 	<li><code>(RSA5)</code> TTL for new tokens is specified in milliseconds and defaults to the REST API default (1 hour)</li>
@@ -147,7 +149,7 @@
 	<li><code>(RSA8)</code> <code>Auth#requestToken</code> function:
 	<ul>
 		<li><code>(RSA8a)</code> Implicitly creates a <code>TokenRequest</code> if required, and requests a token from Ably if required. Returns a <code>TokenDetails</code> object</li>
-		<li><code>(RSA8b)</code> Supports all <code>TokenParams</code> in the function arguments, which override defaults for <code>Client</code> <code>Auth</code>. If a <code>clientId</code> option is used, clients using that token will be restricted to using that <code>clientId</code></li>
+		<li><code>(RSA8b)</code> Supports all <code>TokenParams</code> in the function arguments, which override defaults for <code>Client</code> <code>Auth</code>.</li>
 		<li><code>(RSA8c)</code> When <code>authUrl</code> option is set, it will retrieve the token from the provided URL using the HTTP <code>authHeaders</code>, query string <code>authParams</code> and <code>authMethod</code> (<code>GET</code> or <code>POST</code>) HTTP verb.  The token retrieved is assumed by the library to be a token string if the response has <code>Content-Type</code> <code>"text/plain"</code>, or taken to be a <code>TokenRequest</code> or <code>TokenDetails</code> object if the response has <code>Content-Type</code> <code>"application/json"</code></li>
 		<li><code>(RSA8d)</code> When <code>authCallback</code> option is set, it will execute the callback and will expect either a token string, a <code>TokenDetails</code> object or a <code>TokenRequest</code> object which will in turn be used to request a token from Ably.</li>
 	</ul></li>
@@ -677,7 +679,7 @@
 <h3 id="options">Option types</h3>
 <h4>ClientOptions</h4>
 <ul>
-	<li><code>(TO1)</code> Ably library options used when instancing a REST or Realtime client library, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/types/Options.java">Java Options</a></li>
+	<li><code>(TO1)</code> Ably library options used when instancing a REST or Realtime client library, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/types/ClientOptions.java">Java ClientOptions</a> which extends <a href="https://github.com/ably/ably-java/blob/0e9d961a02f4b87a59a45fe59e23a5553590102d/src/io/ably/rest/Auth.java#L44-L129">Java AuthOptions</a></li>
 	<li><code>(TO2)</code> Note: <code>ClientOptions</code> does not currently define a default for max message size or request size. This will be added in the future to ensure that a ProtocolMessage or REST request does not exceed the limits before the request is made to the server.</li>
 </ul>
 <h4>ChannelOptions</h4>
