@@ -175,12 +175,13 @@
 </ul>
 <h3 id="rest-channels">Channels</h3>
 <ul>
-	<li><code>(RSN1)</code> <code>Channels</code> is a collection of <code>Channel</code> objects accessible through <code>Rest#channels</code>.</li>
+	<li><code>(RSN1)</code> <code>Channels</code> is a collection of <code>Channel</code> objects accessible through <code>Rest#channels</code></li>
 	<li><code>(RSN2)</code> Methods should exist to check if a channel exists or iterate through the existing channels</li>
 	<li><code>(RSN3)</code> <code>Channels#get</code> function:
 	<ul>
-		<li><code>(RSN3a)</code> Creates a new <code>Channel</code> object for the specified channel if none exists, or returns the existing channel. <code>ChannelOptions</code> can be specified when instancing a new <code>Channel</code>.</li>
-		<li><code>(RSN3b)</code> If options are provided, the options are set on the <code>Channel</code>. Accessing an existing <code>Channel</code> with options in the form <code>Channels#get(channel, options)</code> will therefore update the options on the channel and then return the existing <code>Channel</code></li>
+		<li><code>(RSN3a)</code> Creates a new <code>Channel</code> object for the specified channel if none exists, or returns the existing channel. <code>ChannelOptions</code> can be specified when instancing a new <code>Channel</code></li>
+		<li><code>(RSN3b)</code> If options are provided, the options are set on the <code>Channel</code></li>
+		<li><code>(RSN3c)</code> Accessing an existing <code>Channel</code> with options in the form <code>Channels#get(channel, options)</code> will update the options on the channel and then return the existing <code>Channel</code> object</li>
 	</ul></li>
 	<li><code>(RSN4)</code> <code>Channels#release</code> function:
 	<ul>
@@ -393,12 +394,13 @@
 </ul>
 <h3 id="realtime-channels">Channels</h3>
 <ul>
-	<li><code>Channels</code> is a collection of <code>Channel</code> objects accessible through <code>Realtime#channels</code>.</li>
+	<li><code>Channels</code> is a collection of <code>Channel</code> objects accessible through <code>Realtime#channels</code></li>
 	<li>Methods should exist to check if a channel exists or iterate through the existing channels</li>
 	<li><code>Channels#get</code> function:
 	<ul>
-		<li>Creates a new <code>Channel</code> object for the specified channel if none exists, or returns the existing channel. <code>ChannelOptions</code> can be specified when instancing a new <code>Channel</code>.</li>
-		<li>If options are provided, the options are set on the <code>Channel</code>. Accessing an existing <code>Channel</code> with options in the form <code>Channels#get(channel, options)</code> will therefore update the options on the channel and then return the existing <code>Channel</code></li>
+		<li>Creates a new <code>Channel</code> object for the specified channel if none exists, or returns the existing channel. <code>ChannelOptions</code> can be specified when instancing a new <code>Channel</code></li>
+		<li>If options are provided, the options are set on the <code>Channel</code> when creaing a new <code>Channel</code></li>
+		<li>Accessing an existing <code>Channel</code> with options in the form <code>Channels#get(channel, options)</code> will update the options on the channel and then return the existing <code>Channel</code> object</li>
 	</ul></li>
 	<li><code>Channels#release</code> function:
 	<ul>
