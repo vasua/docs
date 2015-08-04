@@ -189,53 +189,54 @@
 </ul>
 <h3 id="rest-channel">Channel</h3>
 <ul>
-	<li><code>(RSC1)</code> <code>Channels#publish</code> function:
+	<li><code>(RSL1)</code> <code>Channels#publish</code> function:
 	<ul>
-		<li><code>(RSC1a)</code> Expects either an array of <code>Message</code> objects or a <code>name</code> string and <code>data</code> payload.</li>
-		<li><code>(RSC1b)</code> When <code>name</code> and <code>data</code> is provided, a single message is published to Ably</li>
-		<li><code>(RSC1c)</code> When an array of <code>Message</code> objects is provided, a single request is made to Ably. When publishing multiple messages, this approach is more efficient. However, a yet to be implemented feature should limit the total number of messages bundled in a single POST based on the default max request size, and would raise an exception if any single message exceeds that limit.</li>
-		<li><code>(RSC1d)</code> Indicates an error if the message was not successfully published to Ably</li>
+		<li><code>(RSL1a)</code> Expects either an array of <code>Message</code> objects or a <code>name</code> string and <code>data</code> payload.</li>
+		<li><code>(RSL1b)</code> When <code>name</code> and <code>data</code> is provided, a single message is published to Ably</li>
+		<li><code>(RSL1c)</code> When an array of <code>Message</code> objects is provided, a single request is made to Ably. When publishing multiple messages, this approach is more efficient. However, a yet to be implemented feature should limit the total number of messages bundled in a single POST based on the default max request size, and would raise an exception if any single message exceeds that limit.</li>
+		<li><code>(RSL1d)</code> Indicates an error if the message was not successfully published to Ably</li>
+		<li><code>(RSL1e)</code> Allows <code>name</code> and or <code>data</code> to be <code>null</code>.  If any of the values are null, then key is not sent to Ably i.e. a payload with a <code>null</code> value for <code>data</code> would be sent as follows <code>{ "name": "click" }</code></li>
 	</ul></li>
-	<li><code>(RSC2)</code> <code>Channel#history</code> function:
+	<li><code>(RSL2)</code> <code>Channel#history</code> function:
 	<ul>
-		<li><code>(RSC2a)</code> Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the history request</li>
-		<li><code>(RSC2b)</code> Supports the following params:
+		<li><code>(RSL2a)</code> Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the history request</li>
+		<li><code>(RSL2b)</code> Supports the following params:
 		<ul>
-			<li><code>(RSC2b1)</code> <code>start</code> and <code>end</code> are timestamp fields represented as milliseconds since epoch, or where suitable to the language, Time objects. <code>start</code> must be equal to or less than <code>end</code> and is unaffected by the request direction.</li>
-			<li><code>(RSC2b2)</code> <code>direction</code> backwards or forwards; if omitted the direction defaults to the REST API default (backwards)</li>
-			<li><code>(RSC2b3)</code> <code>limit</code> supports up to 1,000 items; if omitted the direction defaults to the REST API default (100)</li>
+			<li><code>(RSL2b1)</code> <code>start</code> and <code>end</code> are timestamp fields represented as milliseconds since epoch, or where suitable to the language, Time objects. <code>start</code> must be equal to or less than <code>end</code> and is unaffected by the request direction.</li>
+			<li><code>(RSL2b2)</code> <code>direction</code> backwards or forwards; if omitted the direction defaults to the REST API default (backwards)</li>
+			<li><code>(RSL2b3)</code> <code>limit</code> supports up to 1,000 items; if omitted the direction defaults to the REST API default (100)</li>
 		</ul></li>
 	</ul></li>
-	<li><code>(RSC3)</code> <code>Channel#presence</code> attribute returns a <code>Presence</code> object for this channel</li>
-	<li><code>(RSC4)</code> Message encoding
+	<li><code>(RSL3)</code> <code>Channel#presence</code> attribute returns a <code>Presence</code> object for this channel</li>
+	<li><code>(RSL4)</code> Message encoding
 	<ul>
-		<li><code>(RSC4a)</code> Payloads must be binary, strings, or objects capable of JSON representation. Any other data type should not be permitted and an exception should be raised</li>
-		<li><code>(RSC4b)</code> If a message is encoded, the <code>encoding</code> attribute represents the encoding(s) applied in right to left format i.e. &#8220;utf-8/base64&#8221; indicates that the original payload has &#8220;utf-8&#8221; encoding and has subsequently been encoded in Base64 format.</li>
-		<li><code>(RSC4c)</code> When using MessagePack Message encoding
+		<li><code>(RSL4a)</code> Payloads must be binary, strings, or objects capable of JSON representation. Any other data type should not be permitted and an exception should be raised</li>
+		<li><code>(RSL4b)</code> If a message is encoded, the <code>encoding</code> attribute represents the encoding(s) applied in right to left format i.e. &#8220;utf-8/base64&#8221; indicates that the original payload has &#8220;utf-8&#8221; encoding and has subsequently been encoded in Base64 format.</li>
+		<li><code>(RSL4c)</code> When using MessagePack Message encoding
 		<ul>
-			<li><code>(RSC4c1)</code> a binary Message payload is encoded as MessagePack binary type</li>
-			<li><code>(RSC4c2)</code> a string Message payload is encoded as MessagePack string type</li>
-			<li><code>(RSC4c3)</code> a JSON Message payload is stringified either as a JSON Object or Array and encoded as MessagePack string type and the <code>encoding</code> attribute is set to &#8220;json&#8221;</li>
-			<li><code>(RSC4c4)</code> All messages received will deliver payloads in the format they were sent in i.e. binary, string, or a structured type containing the parsed JSON</li>
+			<li><code>(RSL4c1)</code> a binary Message payload is encoded as MessagePack binary type</li>
+			<li><code>(RSL4c2)</code> a string Message payload is encoded as MessagePack string type</li>
+			<li><code>(RSL4c3)</code> a JSON Message payload is stringified either as a JSON Object or Array and encoded as MessagePack string type and the <code>encoding</code> attribute is set to &#8220;json&#8221;</li>
+			<li><code>(RSL4c4)</code> All messages received will deliver payloads in the format they were sent in i.e. binary, string, or a structured type containing the parsed JSON</li>
 		</ul></li>
-		<li><code>(RSC4d)</code> When using JSON Message encoding
+		<li><code>(RSL4d)</code> When using JSON Message encoding
 		<ul>
-			<li><code>(RSC4d1)</code> a binary Message payload is encoded as Base64 and represented as a JSON string the <code>encoding</code> attribute is set to &#8220;base64&#8221;</li>
-			<li><code>(RSC4d2)</code> a string Message payload is represented as a JSON string</li>
-			<li><code>(RSC4d3)</code> a JSON Message payload is stringified either as a JSON Object or Array and represented as a JSON string and the <code>encoding</code> attribute is set to &#8220;json&#8221;</li>
-			<li><code>(RSC4d4)</code> All messages received will be decoded based on the <code>encoding</code> field and deliver payloads in the format they were sent in i.e. binary, string, or a structured type containing the parsed JSON</li>
+			<li><code>(RSL4d1)</code> a binary Message payload is encoded as Base64 and represented as a JSON string the <code>encoding</code> attribute is set to &#8220;base64&#8221;</li>
+			<li><code>(RSL4d2)</code> a string Message payload is represented as a JSON string</li>
+			<li><code>(RSL4d3)</code> a JSON Message payload is stringified either as a JSON Object or Array and represented as a JSON string and the <code>encoding</code> attribute is set to &#8220;json&#8221;</li>
+			<li><code>(RSL4d4)</code> All messages received will be decoded based on the <code>encoding</code> field and deliver payloads in the format they were sent in i.e. binary, string, or a structured type containing the parsed JSON</li>
 		</ul></li>
 	</ul></li>
-	<li><code>(RSC5)</code> Message payload encryption
+	<li><code>(RSL5)</code> Message payload encryption
 	<ul>
-		<li><code>(RSC5a)</code> When a <code>Channel</code> is instanced with the option <code>encrypted</code> true, message payloads will be automtically encrypted when sent to Ably and decrypted when received on this channel. The cipher configuration is set with the <code>cipherParams</code></li>
-		<li><code>(RSC5b)</code> AES 256 and 128 CBC encryption must be supported</li>
-		<li><code>(RSC5c)</code> Tests must exist that encrypt and decrypt the following fixture data for <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-128.json">AES 128</a> and <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-256.json">AES 256</a> to ensure the client library encryption is compatible across libraries</li>
+		<li><code>(RSL5a)</code> When a <code>Channel</code> is instanced with the option <code>encrypted</code> true, message payloads will be automtically encrypted when sent to Ably and decrypted when received on this channel. The cipher configuration is set with the <code>cipherParams</code></li>
+		<li><code>(RSL5b)</code> AES 256 and 128 CBC encryption must be supported</li>
+		<li><code>(RSL5c)</code> Tests must exist that encrypt and decrypt the following fixture data for <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-128.json">AES 128</a> and <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-256.json">AES 256</a> to ensure the client library encryption is compatible across libraries</li>
 	</ul></li>
-	<li><code>(RSC6)</code> Message decoding
+	<li><code>(RSL6)</code> Message decoding
 	<ul>
-		<li><code>(RSC6a)</code> All messages received will be decoded automatically based on the <code>encoding</code> field and the payloads will be converted into the format they were originally sent using i.e. binary, string, or JSON</li>
-		<li><code>(RSC6b)</code> If, for example, incompatible encryption details are provided or invalid Base64 is detected in the message payload, an error message will be sent to the logger, but the message will still be delivered with last successful decoding and the <code>encoding</code> field. For example, if a message had a decoding of &#8220;utf-8/cipher+aes-128-cbc/base64&#8221;, and the payload was successfully Base64 decoded but the payload could not be encrypted because the <code>CipherParam</code> details were not configured, the message would be delivered with a binary payload and an <code>encoding</code> with the value &#8220;utf-8/cipher+aes-128-cbc&#8221;</li>
+		<li><code>(RSL6a)</code> All messages received will be decoded automatically based on the <code>encoding</code> field and the payloads will be converted into the format they were originally sent using i.e. binary, string, or JSON</li>
+		<li><code>(RSL6b)</code> If, for example, incompatible encryption details are provided or invalid Base64 is detected in the message payload, an error message will be sent to the logger, but the message will still be delivered with last successful decoding and the <code>encoding</code> field. For example, if a message had a decoding of &#8220;utf-8/cipher+aes-128-cbc/base64&#8221;, and the payload was successfully Base64 decoded but the payload could not be encrypted because the <code>CipherParam</code> details were not configured, the message would be delivered with a binary payload and an <code>encoding</code> with the value &#8220;utf-8/cipher+aes-128-cbc&#8221;</li>
 	</ul></li>
 </ul>
 <h3 id="rest-presence">Presence</h3>
