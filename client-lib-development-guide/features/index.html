@@ -133,7 +133,7 @@
 <h3 id="rest-auth">Auth</h3>
 <ul>
 	<li><code>(RSA1)</code> Basic Auth connects over HTTPS by default.  If HTTP and Basic Auth are used, an exception will be raised</li>
-	<li><code>(RSA11)</code> When using Basic Auth, the API key is sent as the username &amp; password portion of an HTTP URL or in the <code>Authorization: Basic</code> header with a Base64 encoded value</li>
+	<li><code>(RSA11)</code> When using Basic Auth, the API key is sent as a key query param of the URL (encoded as a URI component) or is Base64 encoded and included in an <code>Authorization</code> header, as specified in <a href="https://tools.ietf.org/html/rfc7235">RFC7235</a></li>
 	<li><code>(RSA2)</code> Basic Auth is the default authentication scheme if an API key exists</li>
 	<li><code>(RSA3)</code> Token Auth:
 	<ul>
@@ -141,8 +141,8 @@
 		<li><code>(RSA3b)</code> For REST requests, the token string is Base64 encoded and used in the <code>Authorization: Bearer</code> header</li>
 		<li><code>(RSA3c)</code> For Realtime connections, the querystring param <code>access_token</code> is appended to the URL endpoint</li>
 	</ul></li>
-	<li><code>(RSA4)</code> Token Auth is the default if option <code>useTokenAuth</code> is set to true, a <code>clientId</code> is specified, <code>authUrl</code> or <code>authCallback</code> is configured, or a an explicit <code>token</code> is provided</li>
-	<li><code>(RSA14)</code> If Token Auth is the default authentication, an exception will be raised if a token is not provided or there is no means to generate a token. For example, if only the option <code>useTokenAuth</code> is specified, and thus a <code>key</code> is not provided, then the client library is unable to authenticate or issue a token</li>
+	<li><code>(RSA4)</code> Token Auth is used if option <code>useTokenAuth</code> is true, or if any of the following conditions case token auth to be selected as the default: a <code>clientId</code> is specified; <code>authUrl</code> or <code>authCallback</code> is configured; an explicit <code>token</code> or <code>TokenDetails</code> is provided</li>
+	<li><code>(RSA14)</code> If Token Auth is being used, an exception will be raised if a token is not provided or there is no means to generate a token. For example, if only the option <code>useTokenAuth</code> is specified and thus no <code>key</code> is provided, then the client library is unable to authenticate or issue a token, and will raise an exception when instanced</li>
 	<li><code>(RSA5)</code> TTL for new tokens is specified in milliseconds and defaults to the REST API default (1 hour)</li>
 	<li><code>(RSA6)</code> The <code>capability</code>, if not specified, defaults to allow all operations permitted for the key associated with the token</li>
 	<li><code>(RSA7)</code> If a <code>clientId</code> is provided in the options, then the string will be encoded in UTF-8 format before it is sent to Ably</li>
@@ -150,7 +150,7 @@
 	<ul>
 		<li><code>(RSA8a)</code> Implicitly creates a <code>TokenRequest</code> if required, and requests a token from Ably if required. Returns a <code>TokenDetails</code> object</li>
 		<li><code>(RSA8b)</code> Supports all <code>TokenParams</code> in the function arguments, which override defaults for <code>Client</code> <code>Auth</code>.</li>
-		<li><code>(RSA8c)</code> When <code>authUrl</code> option is set, it will retrieve the token from the provided URL using the HTTP <code>authHeaders</code>, query string <code>authParams</code> and <code>authMethod</code> (<code>GET</code> or <code>POST</code>) HTTP verb.  The token retrieved is assumed by the library to be a token string if the response has <code>Content-Type</code> <code>"text/plain"</code>, or taken to be a <code>TokenRequest</code> or <code>TokenDetails</code> object if the response has <code>Content-Type</code> <code>"application/json"</code></li>
+		<li><code>(RSA8c)</code> When <code>authUrl</code> option is set, it will retrieve the token from the provided URL using the HTTP <code>authHeaders</code>, query string <code>authParams</code> and <code>authMethod</code> (<code>GET</code> or <code>POST</code>) HTTP verb.  The token retrieved is assumed by the library to be a token string if the response has <code>Content-Type</code> <code>"text/plain"</code>, or taken to be a <code>TokenRequest</code> or <code>TokenDetails</code> object if the response has <code>Content-Type</code> <code>"application/json"</code>. It can be quite difficult to add test coverage for these scenarios &#8211; as such, we have developed a simple echo server that can be used in your tests, see the <a href="https://github.com/ably/ably-js/commit/e77b2c6c197bc71f3d27084fe54524724a00bc92">ably-js authUrl echo tests</a></li>
 		<li><code>(RSA8d)</code> When <code>authCallback</code> option is set, it will execute the callback and will expect either a token string, a <code>TokenDetails</code> object or a <code>TokenRequest</code> object which will in turn be used to request a token from Ably.</li>
 	</ul></li>
 	<li><code>(RSA9)</code> <code>Auth#createTokenRequest</code> function:
@@ -167,7 +167,7 @@
 	<ul>
 		<li><code>(RSA10a)</code> Instructs the library to create a token if needed and use Token Auth for all future requests</li>
 		<li><code>(RSA10b)</code> Supports all <code>AuthOptions</code> and <code>TokenParams</code> in the function arguments</li>
-		<li><code>(RSA10c)</code> Will not create a new token unless no previous token exists or current token has expired</li>
+		<li><code>(RSA10c)</code> Will not create a new token unless no previous token exists or current token has expired. Please note that a buffer of 15s for token expiry is recommended to avoid race conditions where the token is valid at the time of the request, but invalid when it reaches the server. Therefore, we recommend that a token is considered expired 15s before the time field `expires`</li>
 		<li><code>(RSA10d)</code> Providing the option <code>force</code> set to true will force <code>authorise</code> to issue a new token even if an existing token exists.</li>
 		<li><code>(RSA10e)</code> Adheres to the implementation of <code>requestToken</code> when issuing new tokens</li>
 		<li><code>(RSA10f)</code> Returns a <code>TokenDetails</code> object that contains the token string + token meta data</li>
@@ -274,22 +274,22 @@
 	<li><code>(RTC1)</code> Supports all the same <code>ClientOptions</code> as the <code>RestClient</code> in addition to:
 	<ul>
 		<li><code>(RTC1a)</code> <code>echoMessages</code> boolean is true by default. If false, it prevents messages originating from this connection being echoed back on the same connection</li>
-		<li><code>(RTC1b) @ @autoConnect</code> boolean is true by default. If true, as soon as the client library is instanced, it will connect to Ably. If false, the client library will wait for an explicit <code>Connection#connect</code> to be called before connecting</li>
+		<li><code>(RTC1b)</code> <code>autoConnect</code> boolean is true by default. If true, as soon as the client library is instanced, it will connect to Ably. If false, the client library will wait for an explicit <code>Connection#connect</code> to be called before connecting</li>
 		<li><code>(RTC1c)</code> <code>recover</code> string, when set, will attempt to recover the connection state of a previous connection</li>
 		<li><code>(RTC1d)</code> <code>realtimeHost</code> string, when set, will modify the realtime endpoint host used by this client library</li>
 		<li><code>(RTC1e)</code> <code>environment</code> string, when set, will modify both the REST and realtime endpoint hosts by prefixing the environment to the default endpoint host with a hypen delimiter. For example, a <code>RealtimeClient</code> with an <code>environment</code> of &#8220;sandbox&#8221;, would use &#8220;sandbox-rest.ably.io&#8221; as the <code>restHost</code> and <code>sandbox-realtime.ably.io</code> as the <code>realtimeHost</code></li>
 	</ul></li>
 	<li><code>(RTC2)</code> <code>RealtimeClient#connection</code> attribute provides access to the underlying <code>Connection</code> object</li>
-	<li><code>(RTC3)</code><code>RealtimeClient#channels</code> attribute provides access to the underlying <code>Channels</code> object</li>
-	<li><code>(RTC4)</code><code>RealtimeClient#auth</code> attribute provides access to the <code>Auth</code> object that was instanced with the <code>ClientOptions</code> provided in the <code>RealtimeClient</code> constructor</li>
-	<li><code>(RTC5)</code><code>RealtimeClient#stats</code> function:
+	<li><code>(RTC3)</code> <code>RealtimeClient#channels</code> attribute provides access to the underlying <code>Channels</code> object</li>
+	<li><code>(RTC4)</code> <code>RealtimeClient#auth</code> attribute provides access to the <code>Auth</code> object that was instanced with the <code>ClientOptions</code> provided in the <code>RealtimeClient</code> constructor</li>
+	<li><code>(RTC5)</code> <code>RealtimeClient#stats</code> function:
 	<ul>
 		<li><code>(RTC5a)</code> Proxy to <code>RestClient#stats</code> presented with an async or threaded interface as appropriate</li>
 		<li><code>(RTC5b)</code> Accepts all the same params as <code>RestClient#stats</code> and provides all the same functionality</li>
 	</ul></li>
-	<li><code>RealtimeClient#time</code> function:
+	<li><code>(RTC6)</code> <code>RealtimeClient#time</code> function:
 	<ul>
-		<li><code>(RTC5c)</code> Proxy to <code>RestClient#time</code> presented with an async or threaded interface as appropriate</li>
+		<li><code>(RTC6a)</code> Proxy to <code>RestClient#time</code> presented with an async or threaded interface as appropriate</li>
 	</ul></li>
 </ul>
 <h3 id="realtime-connection">Connection</h3>
@@ -342,9 +342,9 @@
 	</ul></li>
 	<li><code>(RTN12)</code> <code>Connection#close</code> function:
 	<ul>
-		<li><code>(RTN12b)</code> Sends a <code>CLOSE</code> <code>ProtocolMessage</code> to the server, sets the state to <code>CLOSING</code> and waits for a <code>CLOSED</code> <code>ProtocolMessage</code> to be received</li>
-		<li><code>(RTN12c)</code> If the <code>CLOSED</code> <code>ProtocolMessage</code> is not received within the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">configured close timeout</a>, the transport will be disconnected and the connection will automatically move to the <code>CLOSED</code> state</li>
-		<li><code>(RTN12d)</code> If the transport is abruptly closed following a <code>CLOSE</code> <code>ProtocolMessage</code> being sent, then the connection will automatically move to the <code>CLOSED</code> state</li>
+		<li><code>(RTN12a)</code> Sends a <code>CLOSE</code> <code>ProtocolMessage</code> to the server, sets the state to <code>CLOSING</code> and waits for a <code>CLOSED</code> <code>ProtocolMessage</code> to be received</li>
+		<li><code>(RTN12b)</code> If the <code>CLOSED</code> <code>ProtocolMessage</code> is not received within the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">configured close timeout</a>, the transport will be disconnected and the connection will automatically move to the <code>CLOSED</code> state</li>
+		<li><code>(RTN12c)</code> If the transport is abruptly closed following a <code>CLOSE</code> <code>ProtocolMessage</code> being sent, then the connection will automatically move to the <code>CLOSED</code> state</li>
 	</ul></li>
 	<li><code>(RTN13)</code> <code>Connection#ping</code> function:
 	<ul>
@@ -355,7 +355,7 @@
 	<ul>
 		<li><code>(RTN14a)</code> If an API key is invalid, then the connection will enter the <code>FAILED</code> state and the <code>errorReason</code> will be set on the <code>Connection</code> object as well as the emitted <code>ConnectionStateChange</code></li>
 		<li><code>(RTN14b)</code> If a connection request fails because the token has expired, and the token is renewable, then a new token will be created and subsequent requests will be made without changing the state or emitting an error. If the token is not renewable, the connection will transition to the <code>FAILED</code> state</li>
-		<li><code>(RTN14c)</code> A new connection attempt will fail if not connected within the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">configured open timeout</a>.</li>
+		<li><code>(RTN14c)</code> A new connection attempt will fail if not connected within the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">configured open timeout</a></li>
 		<li><code>(RTN14d)</code> If a connection attempt fails for any recoverable reason (i.e. not an authentication failure), the <code>Connection#state</code> will change to <code>DISCONNECTED</code>, the <code>Connection#errorReason</code> will be updated, a <code>ConnectionStateChange</code> with the <code>errorReason</code> will be emitted, and new connection attempts will periodically be made until the maximum time in that state threshold is reached.  The <code>retryIn</code> attribute of the <code>ConnectionStateChange</code> object will contain the time in milliseconds until the next connection attempt. See <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected retry config</a>. Each time a new connection attempt is made the state will change to <code>CONNECTING</code> and then to <code>CONNECTED</code> if successful, or <code>DISCONNECTED</code> if unsuccessful and the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected state threshold</a> has not been exceeded.</li>
 		<li><code>(RTN14e)</code> Once the connection state has been in the <code>DISCONNECTED</code> state for more than the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected state threshold</a>, the state will change to <code>SUSPENDED</code> and be emitted with the <code>errorReason</code>, and the <code>Connection#errorReason</code> will be updated. In this state, a new connection attempt will be made periodically as defined in the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">suspended state threshold</a></li>
 		<li><code>(RTN14f)</code> The connection will remain in the <code>SUSPENDED</code> state indefinitely, whilst periodically attempting to reestablish a connection</li>
@@ -480,7 +480,7 @@
 <h3 id="realtime-presence">Presence</h3>
 <ul>
 	<li><code>(RTP1)</code> When a channel <code>ATTACHED</code> <code>ProtocolMessage</code> is received, the <code>ProtocolMessage</code> may contain a bit flag with value 1 indicating that there are currently members present on the channel. If members are present, subsequent <code>ProtocolMessage SYNC</code> messages will be delivered with presence members (messages) until the <code>SYNC</code> operation is complete. If there is no flag or the right most bit is zero, then the presence map should be considered in sync immediately as there are no members present on the channel at the time of attach</li>
-	<li><code>(RTP2)</code> A <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L384-L529">PresenceMap</a> should be used to maintain a list of members present on a channel. As there are no guarantees that during the <code>SYNC</code> phase presence events will arrive in order i.e. a leave event for a member can arrive before that member is later registered as as present as part of the initial <code>SYNC</code> operation. As such, until the <code>SYNC</code> operation is complete, timestamps must be recorded for all members to ensure the most recent present state is used, see the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L418-L431">Java implementation</a>.  Once a <code>SYNC</code> event is complete, the members that are now considered <code>ABSENT</code> can be removed from the map, see the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L504-L509">Java implementation</a>.</li>
+	<li><code>(RTP2)</code> A <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L384-L529">PresenceMap</a> should be used to maintain a list of members present on a channel. As there are no guarantees that during the <code>SYNC</code> phase presence events will arrive in order i.e. a leave event for a member can arrive before that member is later registered as as present as part of the initial <code>SYNC</code> operation. As such, until the <code>SYNC</code> operation is complete, timestamps must be recorded for all members to ensure the most recent present state is used, see the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L418-L431">Java implementation</a>.  Once a <code>SYNC</code> event is complete, the members that are now considered <code>ABSENT</code> can be removed from the map, see the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L504-L509">Java implementation</a></li>
 	<li><code>(RTP3)</code> If a <code>SYNC</code> operation is underway but not yet complete, and the connection is disconnected unexpectedly, then if the connection is resumed successfully, it is the responsibility of the client library to complete the <code>SYNC</code> operation. The client library requests a <code>SYNC</code> resume by sending a <code>SYNC</code> <code>ProtocolMessage</code> with the last received sync serial number. See the <a href="https://github.com/ably/ably-ruby/blob/7b18a20/lib/ably/realtime/presence/members_map.rb#L169-L176">Ruby implementation</a> and the <a href="https://github.com/ably/ably-ruby/blob/7b18a20/spec/acceptance/realtime/presence_spec.rb#L1338-L1357">Ruby test</a></li>
 	<li><code>(RTP4)</code> Ensure a test exists that enters 250 members using <code>Presence#enterClient</code> on a single connection, and checks for <code>PRESENT</code> events to be emitted on another connection for each member, and once sync is complete, all 250 members should be present in a <code>Presence#get</code> request</li>
 	<li><code>(RTP5)</code> Channel state change side effects:
@@ -518,13 +518,13 @@
 		<li><code>(RTP9d)</code> A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>UPDATE</code> is sent to the Ably service</li>
 		<li><code>(RTP9e)</code> In all other ways, this method is identical to <code>Presence#enter</code> and should have matching tests</li>
 	</ul></li>
-	<li><code>(RTP10a)</code> <code>Presence#leave</code> function:
+	<li><code>(RTP10)</code> <code>Presence#leave</code> function:
 	<ul>
-		<li><code>(RTP10b)</code> Leaves this client from the channel and the data will be updated with the value provided. If the language permits the data argument to be omitted, then the previously set data value will be omitted as a convenience</li>
-		<li><code>(RTP10c)</code> Optionally a callback can be provided that is called for both success or failure to leave</li>
-		<li><code>(RTP10d)</code> A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>LEAVE</code> is sent to the Ably service</li>
-		<li><code>(RTP10e)</code> If the client is not currently <code>ENTERED</code> then an exception is raised</li>
-		<li><code>(RTP10f)</code> In all other ways, this method is identical to <code>Presence#enter</code> and should have matching tests</li>
+		<li><code>(RTP10a)</code> Leaves this client from the channel and the data will be updated with the value provided. If the language permits the data argument to be omitted, then the previously set data value will be omitted as a convenience</li>
+		<li><code>(RTP10b)</code> Optionally a callback can be provided that is called for both success or failure to leave</li>
+		<li><code>(RTP10c)</code> A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>LEAVE</code> is sent to the Ably service</li>
+		<li><code>(RTP10d)</code> If the client is not currently <code>ENTERED</code> then an exception is raised</li>
+		<li><code>(RTP10e)</code> In all other ways, this method is identical to <code>Presence#enter</code> and should have matching tests</li>
 	</ul></li>
 	<li><code>(RTP11)</code> <code>Presence#get</code> function:
 	<ul>
@@ -717,6 +717,15 @@
 			<li><code>(TO3k5)</code> <code>tlsPort</code> integer &#8211; for development environments only; allows a non-default Ably TLS port to be specified</li>
 		</ul></li>
 	</ul></li>
+</ul>
+<h4>TokenParams</h4>
+<ul>
+	<li><code>(TK1)</code> A class providing parameters of a token request. These params are used when invoking <code>Auth#authorise</code>, <code>Auth#requestToken</code> and <code>Auth#createTokenRequest</code></li>
+	<li><code>(TK2)</code> The attributes of <code>TokenParams</code> consist of:</li>
+	<li><code>(TK2a)</code> <code>ttl</code> long &#8211; Requested time to live for the token in milliseconds</li>
+	<li><code>(TK2b)</code> <code>capability</code> string &#8211; Capability requirements JSON stringified for the token.</li>
+	<li><code>(TK2c)</code> <code>clientId</code> string &#8211;  A <code>clientId</code> to associate with this token</li>
+	<li><code>(TK2d)</code> <code>timestamp</code> long &#8211; The timestamp (in millis since the epoch) of this request. Timestamps, in conjunction with the <code>nonce</code>, are used to prevent n requests from being replayed</li>
 </ul>
 <h4>ChannelOptions</h4>
 <ul>
