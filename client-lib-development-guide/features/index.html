@@ -440,7 +440,7 @@
 	<ul>
 		<li><code>(RTN6a)</code> Messages are encoded in the same way as the REST <code>Channel#publish</code> method</li>
 		<li><code>(RTN6b)</code> An optional callback can be provided to the <code>#publish</code> method that is called when the message is successfully delivered or upon failure with the appropriate <code>ErrorInfo</code> error. A test should exist to publish lots of messages on a few connections to ensure all message success callbacks are called for all messages published</li>
-		<li><code>(RTN6c)</code> Channel state conditions:
+		<li><code>(RTN6c)</code> Connection state conditions:
 		<ul>
 			<li><code>(RTN6c1)</code> If the connection is <code>CONNECTED</code> then the messages are published immediately</li>
 			<li><code>(RTN6c2)</code> If the connection is <code>CONNECTING</code> or <code>DISCONNECTED</code>, and <code>ClientOptions#queueMessages</code> has not been explicitly set to false, then the message will be queued and delivered as soon as the connection state returns to <code>CONNECTED</code></li>
@@ -486,6 +486,12 @@
 	<ul>
 		<li><code>(RTP5a)</code> If the channel enters the <code>DETACHED</code> or <code>FAILED</code> state then all queued presence messages will fail immediately</li>
 		<li><code>(RTP5b)</code> If a channel enters the <code>ATTACHED</code> state then all queued presence messages will be sent immediately and a presence <code>SYNC</code> will be initiated implicitly</li>
+	</ul></li>
+	<li><code>(RTP16)</code> Connection state conditions:
+	<ul>
+		<li><code>(RTP16a)</code> If the connection is <code>CONNECTED</code> then all presence messages are published immediately</li>
+		<li><code>(RTP16b)</code> If the connection is <code>CONNECTING</code> or <code>DISCONNECTED</code>, and <code>ClientOptions#queueMessages</code> has not been explicitly set to false, then all presence messages will be queued and delivered as soon as the connection state returns to <code>CONNECTED</code></li>
+		<li><code>(RTP16c)</code> Else an exception is raised preventing any presence messages being published</li>
 	</ul></li>
 	<li><code>(RTP6)</code> <code>Presence#subscribe</code> function:
 	<ul>
