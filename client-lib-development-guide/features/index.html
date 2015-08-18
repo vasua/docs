@@ -433,7 +433,6 @@
 	<ul>
 		<li><code>(RTN5a)</code> If state is <code>INITIALISED</code>, <code>DETACHED</code> or <code>DETACHING</code> nothing is done</li>
 		<li><code>(RTN5b)</code> If state is <code>FAILED</code> an exception should be thrown immediately</li>
-		<li><code>(RTN5c)</code> If the connection state is <code>CLOSED</code>, <code>CLOSING</code>, <code>SUSPENDED</code> or <code>FAILED</code>, an exception should be thrown immediately</li>
 		<li><code>(RTN5d)</code> Otherwise a <code>DETACH</code> ProtocolMessage is sent to the server, the state changes to <code>DETACHING</code> and the channel becomes <code>DETACHED</code> when the confirmation <code>DETACHED</code> ProtocolMessage is received</li>
 		<li><code>(RTN5e)</code> If the language permits, a callback can be provided that is called when the channel is detached successfully or the detach fails and the the <code>ErrorInfo</code> error is passed as an argument to the callback.</li>
 	</ul></li>
