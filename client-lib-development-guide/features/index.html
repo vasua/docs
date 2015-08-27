@@ -409,71 +409,71 @@
 </ul>
 <h3 id="realtime-channel">Channel</h3>
 <ul>
-	<li><code>(RTN1)</code> As soon as a <code>Channel</code> becomes attached, all incoming messages and presence messages are processed and emitted where applicable.  <code>PRESENCE</code> and <code>SYNC</code> messages are passed to the <code>Presence</code> object ensuring it maintains a map of current members on a channel in realtime.</li>
-	<li><code>(RTN2)</code> EventEmitter and states:
+	<li><code>(RTL1)</code> As soon as a <code>Channel</code> becomes attached, all incoming messages and presence messages are processed and emitted where applicable.  <code>PRESENCE</code> and <code>SYNC</code> messages are passed to the <code>Presence</code> object ensuring it maintains a map of current members on a channel in realtime.</li>
+	<li><code>(RTL2)</code> EventEmitter and states:
 	<ul>
-		<li><code>(RTN2a)</code> Implements <code>EventEmitter</code> and emits events for state changes <code>INITIALIZED</code>, <code>ATTACHING</code>, <code>ATTACHED</code>, <code>DETACHING</code>, <code>DETACHED</code>, <code>FAILED</code></li>
-		<li><code>(RTN2b)</code> <code>Channel#state</code> attribute is the current state of the channel</li>
-		<li><code>(RTN2c)</code> Additionally, an <code>ERROR</code> event is emitted that contains an <code>ErrorInfo</code> object with details on an error that has occurred for the <code>Channel</code></li>
+		<li><code>(RTL2a)</code> Implements <code>EventEmitter</code> and emits events for state changes <code>INITIALIZED</code>, <code>ATTACHING</code>, <code>ATTACHED</code>, <code>DETACHING</code>, <code>DETACHED</code>, <code>FAILED</code></li>
+		<li><code>(RTL2b)</code> <code>Channel#state</code> attribute is the current state of the channel</li>
+		<li><code>(RTL2c)</code> Additionally, an <code>ERROR</code> event is emitted that contains an <code>ErrorInfo</code> object with details on an error that has occurred for the <code>Channel</code></li>
 	</ul></li>
-	<li><code>(RTN3)</code> Connection state change side effects:
+	<li><code>(RTL3)</code> Connection state change side effects:
 	<ul>
-		<li><code>(RTN3a)</code> If the connection state changes to <code>FAILED</code> then an <code>ATTACHING</code> or <code>ATTACHED</code> channel state will transition to <code>FAILED</code>, set the <code>errorReason</code> and emit the error event</li>
-		<li><code>(RTN3b)</code> If the connection state changes to <code>CLOSED</code> then an <code>ATTACHING</code> or <code>ATTACHED</code> channel state will transition to <code>CLOSED</code></li>
+		<li><code>(RTL3a)</code> If the connection state changes to <code>FAILED</code> then an <code>ATTACHING</code> or <code>ATTACHED</code> channel state will transition to <code>FAILED</code>, set the <code>errorReason</code> and emit the error event</li>
+		<li><code>(RTL3b)</code> If the connection state changes to <code>CLOSED</code> then an <code>ATTACHING</code> or <code>ATTACHED</code> channel state will transition to <code>CLOSED</code></li>
 	</ul></li>
-	<li><code>(RTN4)</code> <code>Channel#attach</code> function:
+	<li><code>(RTL4)</code> <code>Channel#attach</code> function:
 	<ul>
-		<li><code>(RTN4a)</code> If already <code>ATTACHED</code> or <code>ATTACHING</code> nothing is done</li>
-		<li><code>(RTN4b)</code> If the connection state is <code>CLOSED</code>, <code>CLOSING</code>, <code>SUSPENDED</code> or <code>FAILED</code>, an exception should be thrown immediately</li>
-		<li><code>(RTN4c)</code> Otherwise an <code>ATTACH</code> ProtocolMessage is sent to the server, the state changes to <code>ATTACHING</code> and the channel becomes <code>ATTACHED</code> when the confirmation <code>ATTACHED</code> ProtocolMessage is received</li>
-		<li><code>(RTN4d)</code> If the language permits, a callback can be provided that is called when the channel is attached successfully or the attach fails and the the <code>ErrorInfo</code> error is passed as an argument to the callback.</li>
-		<li><code>(RTN4e)</code> If the user does not have sufficient permissions to attach to the channel, the channel state <code>FAILED</code> is emitted with the error <code>ErrorInfo</code>. An error event is also emitted, and the <code>errorReason</code> attribute of the <code>Channel</code> is set to the error <code>ErrorInfo</code> object</li>
+		<li><code>(RTL4a)</code> If already <code>ATTACHED</code> or <code>ATTACHING</code> nothing is done</li>
+		<li><code>(RTL4b)</code> If the connection state is <code>CLOSED</code>, <code>CLOSING</code>, <code>SUSPENDED</code> or <code>FAILED</code>, an exception should be thrown immediately</li>
+		<li><code>(RTL4c)</code> Otherwise an <code>ATTACH</code> ProtocolMessage is sent to the server, the state changes to <code>ATTACHING</code> and the channel becomes <code>ATTACHED</code> when the confirmation <code>ATTACHED</code> ProtocolMessage is received</li>
+		<li><code>(RTL4d)</code> If the language permits, a callback can be provided that is called when the channel is attached successfully or the attach fails and the the <code>ErrorInfo</code> error is passed as an argument to the callback.</li>
+		<li><code>(RTL4e)</code> If the user does not have sufficient permissions to attach to the channel, the channel state <code>FAILED</code> is emitted with the error <code>ErrorInfo</code>. An error event is also emitted, and the <code>errorReason</code> attribute of the <code>Channel</code> is set to the error <code>ErrorInfo</code> object</li>
 	</ul></li>
-	<li><code>(RTN5)</code> <code>Channel#detach</code> function:
+	<li><code>(RTL5)</code> <code>Channel#detach</code> function:
 	<ul>
-		<li><code>(RTN5a)</code> If state is <code>INITIALISED</code>, <code>DETACHED</code> or <code>DETACHING</code> nothing is done</li>
-		<li><code>(RTN5b)</code> If state is <code>FAILED</code> an exception should be thrown immediately</li>
-		<li><code>(RTN5d)</code> Otherwise a <code>DETACH</code> ProtocolMessage is sent to the server, the state changes to <code>DETACHING</code> and the channel becomes <code>DETACHED</code> when the confirmation <code>DETACHED</code> ProtocolMessage is received</li>
-		<li><code>(RTN5e)</code> If the language permits, a callback can be provided that is called when the channel is detached successfully or the detach fails and the the <code>ErrorInfo</code> error is passed as an argument to the callback.</li>
+		<li><code>(RTL5a)</code> If state is <code>INITIALISED</code>, <code>DETACHED</code> or <code>DETACHING</code> nothing is done</li>
+		<li><code>(RTL5b)</code> If state is <code>FAILED</code> an exception should be thrown immediately</li>
+		<li><code>(RTL5d)</code> Otherwise a <code>DETACH</code> ProtocolMessage is sent to the server, the state changes to <code>DETACHING</code> and the channel becomes <code>DETACHED</code> when the confirmation <code>DETACHED</code> ProtocolMessage is received</li>
+		<li><code>(RTL5e)</code> If the language permits, a callback can be provided that is called when the channel is detached successfully or the detach fails and the the <code>ErrorInfo</code> error is passed as an argument to the callback.</li>
 	</ul></li>
-	<li><code>(RTN6)</code> <code>Channel#publish</code> function:
+	<li><code>(RTL6)</code> <code>Channel#publish</code> function:
 	<ul>
-		<li><code>(RTN6a)</code> Messages are encoded in the same way as the REST <code>Channel#publish</code> method</li>
-		<li><code>(RTN6b)</code> An optional callback can be provided to the <code>#publish</code> method that is called when the message is successfully delivered or upon failure with the appropriate <code>ErrorInfo</code> error. A test should exist to publish lots of messages on a few connections to ensure all message success callbacks are called for all messages published</li>
-		<li><code>(RTN6c)</code> Connection state conditions:
+		<li><code>(RTL6a)</code> Messages are encoded in the same way as the REST <code>Channel#publish</code> method</li>
+		<li><code>(RTL6b)</code> An optional callback can be provided to the <code>#publish</code> method that is called when the message is successfully delivered or upon failure with the appropriate <code>ErrorInfo</code> error. A test should exist to publish lots of messages on a few connections to ensure all message success callbacks are called for all messages published</li>
+		<li><code>(RTL6c)</code> Connection state conditions:
 		<ul>
-			<li><code>(RTN6c1)</code> If the connection is <code>CONNECTED</code> then the messages are published immediately</li>
-			<li><code>(RTN6c2)</code> If the connection is <code>CONNECTING</code> or <code>DISCONNECTED</code>, and <code>ClientOptions#queueMessages</code> has not been explicitly set to false, then the message will be queued and delivered as soon as the connection state returns to <code>CONNECTED</code></li>
-			<li><code>(RTN6c3)</code> Else an exception is raised preventing the message publishing</li>
+			<li><code>(RTL6c1)</code> If the connection is <code>CONNECTED</code> then the messages are published immediately</li>
+			<li><code>(RTL6c2)</code> If the connection is <code>CONNECTING</code> or <code>DISCONNECTED</code>, and <code>ClientOptions#queueMessages</code> has not been explicitly set to false, then the message will be queued and delivered as soon as the connection state returns to <code>CONNECTED</code></li>
+			<li><code>(RTL6c3)</code> Else an exception is raised preventing the message publishing</li>
 		</ul></li>
-		<li><code>(RTN6d)</code> Messages are delivered using a single <code>ProtocolMessage</code> where possible by bundling in all messages for that channel into the <code>ProtocolMessage#messages</code> array. However, a yet to be implemented feature should limit the total number of messages bundled per <code>ProtocolMessage</code> based on the default max message size, and would raise an exception if any single message exceeds that limit</li>
-		<li><code>(RTN6e)</code> If token auth is being used along with a <code>clientId</code>, the <code>clientId</code> will be present on any messages published. A test should exist that connects with a <code>clientId</code>, publishes a message on a channel, and with another client, the message should be received with the correct <code>clientId</code> attribute of the message</li>
-		<li><code>(RTN6f)</code> <code>Message#connectionId</code> should match the current <code>Connection#id</code> for all published messages, a test should exist to ensure the <code>connectionId</code> for received messages matches that of the publisher</li>
+		<li><code>(RTL6d)</code> Messages are delivered using a single <code>ProtocolMessage</code> where possible by bundling in all messages for that channel into the <code>ProtocolMessage#messages</code> array. However, a yet to be implemented feature should limit the total number of messages bundled per <code>ProtocolMessage</code> based on the default max message size, and would raise an exception if any single message exceeds that limit</li>
+		<li><code>(RTL6e)</code> If token auth is being used along with a <code>clientId</code>, the <code>clientId</code> will be present on any messages published. A test should exist that connects with a <code>clientId</code>, publishes a message on a channel, and with another client, the message should be received with the correct <code>clientId</code> attribute of the message</li>
+		<li><code>(RTL6f)</code> <code>Message#connectionId</code> should match the current <code>Connection#id</code> for all published messages, a test should exist to ensure the <code>connectionId</code> for received messages matches that of the publisher</li>
 	</ul></li>
-	<li><code>(RTN7)</code> <code>Channel#subscribe</code> function:
+	<li><code>(RTL7)</code> <code>Channel#subscribe</code> function:
 	<ul>
-		<li><code>(RTN7a)</code> Subscribe with no arguments subscribes a listener to all messages</li>
-		<li><code>(RTN7b)</code> Subscribe with a single name argument subscribes a listener to only messages whose <code>name</code> member matches the string name</li>
-		<li><code>(RTN7c)</code> Implicitly attaches the channel if not attached</li>
-		<li><code>(RTN7d)</code> Messages delivered are automatically decoded based on the <code>encoding</code> attribute; see REST <code>Channel</code> encoding features. If there is an error decoding a message, the message is still delivered, but in addition to sending an error message to the logger, an <code>ErrorInfo</code> error object is emitted as an error on the <code>Channel</code>. Tests should exist to publish and subscribe to encoded messages using the <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-128.json">AES 128</a> and <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-256.json">AES 256</a> fixture test data</li>
-		<li><code>(RTN7e)</code> If a message cannot be decoded or decrypted successfully, it should be delivered to the listener with the <code>encoding</code> attribute set indicating the residual encoding state, and an error should be emitted on the channel</li>
-		<li><code>(RTN7f)</code> A test should exist ensuring published messages are not echoed back to the subscriber when <code>echoMessages</code> is set to false in the <code>Realtime</code> library constructor</li>
+		<li><code>(RTL7a)</code> Subscribe with no arguments subscribes a listener to all messages</li>
+		<li><code>(RTL7b)</code> Subscribe with a single name argument subscribes a listener to only messages whose <code>name</code> member matches the string name</li>
+		<li><code>(RTL7c)</code> Implicitly attaches the channel if not attached</li>
+		<li><code>(RTL7d)</code> Messages delivered are automatically decoded based on the <code>encoding</code> attribute; see REST <code>Channel</code> encoding features. If there is an error decoding a message, the message is still delivered, but in addition to sending an error message to the logger, an <code>ErrorInfo</code> error object is emitted as an error on the <code>Channel</code>. Tests should exist to publish and subscribe to encoded messages using the <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-128.json">AES 128</a> and <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-256.json">AES 256</a> fixture test data</li>
+		<li><code>(RTL7e)</code> If a message cannot be decoded or decrypted successfully, it should be delivered to the listener with the <code>encoding</code> attribute set indicating the residual encoding state, and an error should be emitted on the channel</li>
+		<li><code>(RTL7f)</code> A test should exist ensuring published messages are not echoed back to the subscriber when <code>echoMessages</code> is set to false in the <code>Realtime</code> library constructor</li>
 	</ul></li>
-	<li><code>(RTN8)</code> <code>Channel#unsubscribe</code> function:
+	<li><code>(RTL8)</code> <code>Channel#unsubscribe</code> function:
 	<ul>
-		<li><code>(RTN8a)</code> Unsubscribe with no arguments unsubscribes the provided listener to all messages if subscribed</li>
-		<li><code>(RTN8b)</code> Unsubscribe with a single name argument unsubscribes the provided listener if previously subscribed with a name-specific subscription</li>
+		<li><code>(RTL8a)</code> Unsubscribe with no arguments unsubscribes the provided listener to all messages if subscribed</li>
+		<li><code>(RTL8b)</code> Unsubscribe with a single name argument unsubscribes the provided listener if previously subscribed with a name-specific subscription</li>
 	</ul></li>
-	<li><code>(RTN9)</code> <code>Channel#presence</code> attribute:
+	<li><code>(RTL9)</code> <code>Channel#presence</code> attribute:
 	<ul>
-		<li><code>(RTN9a)</code> Returns the <code>Presence</code> object for this channel</li>
+		<li><code>(RTL9a)</code> Returns the <code>Presence</code> object for this channel</li>
 	</ul></li>
-	<li><code>(RTN10)</code> <code>Channel#history</code> function:
+	<li><code>(RTL10)</code> <code>Channel#history</code> function:
 	<ul>
-		<li><code>(RTN10a)</code> Supports all the same params as REST <code>Channel#history</code></li>
-		<li><code>(RTN10b)</code> Additionally supports the param <code>untilAttach</code>, which if true, will only retrive messages prior to the moment that the channel was attached. This bound is specified by passing the querystring param <code>from_serial</code> with the serial number assigned to the channel in the <code>ATTACHED</code> <code>ProtocolMessage</code>. If the <code>untilAttach</code> param is specified when the channel is not attached an exception should be raised.</li>
-		<li><code>(RTN10c)</code> Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the history request.</li>
-		<li><code>(RTN10d)</code> A test should exist that publishes messages from one client, and upon confirmation of message delivery, a history request should be made on another client to ensure all messages are available</li>
+		<li><code>(RTL10a)</code> Supports all the same params as REST <code>Channel#history</code></li>
+		<li><code>(RTL10b)</code> Additionally supports the param <code>untilAttach</code>, which if true, will only retrive messages prior to the moment that the channel was attached. This bound is specified by passing the querystring param <code>from_serial</code> with the serial number assigned to the channel in the <code>ATTACHED</code> <code>ProtocolMessage</code>. If the <code>untilAttach</code> param is specified when the channel is not attached an exception should be raised.</li>
+		<li><code>(RTL10c)</code> Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the history request.</li>
+		<li><code>(RTL10d)</code> A test should exist that publishes messages from one client, and upon confirmation of message delivery, a history request should be made on another client to ensure all messages are available</li>
 	</ul></li>
 </ul>
 <h3 id="realtime-presence">Presence</h3>
@@ -614,6 +614,7 @@
 	<li><code>(TR4)</code> Attributes available in a <code>ProtocolMessage</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/ProtocolMessage">Ruby ProtocolMessage documentation</a> for an explanation of each attribute:
 	<ul>
 		<li><code>(TR4a)</code> <code>action</code> enum</li>
+		<li><code>(TR4n)</code> <code>id</code> string</li>
 		<li><code>(TR4b)</code> <code>channel</code> string</li>
 		<li><code>(TR4c)</code> <code>channelSerial</code> string</li>
 		<li><code>(TR4d)</code> <code>connectionId</code> string</li>
