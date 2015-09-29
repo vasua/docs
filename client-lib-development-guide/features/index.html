@@ -129,11 +129,12 @@
 		<li><code>(RSC15c)</code> See the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/transport/Defaults.java#L7">default fallback hosts</a> and the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/http/Http.java#L204-L224">fallback mechanism implemented in Java for POST requests</a> as an example.</li>
 		<li><code>(RSC15d)</code> Automatic retries to fallback hosts will not occur for any other HTTP status codes. For example, if the credentials are invalid or the maxmimum message length has been exceeded, then resending the request to an alternative data center will not fix the problem and will only increase the load on other data centers. See the <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json#L11">complete list of Ably error codes</a> and a <a href="https://github.com/ably/ably-java/issues/14">discussion in the Java library about this</a></li>
 	</ul></li>
+	<li><code>(RSC17)</code> When instancing the library, if a <code>clientId</code> attribute is set in <code>ClientOptions</code>, then the <code>Auth#clientId</code> attribute will contain the provided <code>clientId</code></li>
 </ul>
 <h3 id="rest-auth">Auth</h3>
 <ul>
 	<li><code>(RSA1)</code> Basic Auth connects over HTTPS by default.  If HTTP and Basic Auth are used, an exception will be raised</li>
-	<li><code>(RSA11)</code> When using Basic Auth, the API key is sent as a key query param of the URL (encoded as a URI component) or is Base64 encoded and included in an <code>Authorization</code> header, as specified in <a href="https://tools.ietf.org/html/rfc7235">RFC7235</a></li>
+	<li><code>(RSA11)</code> When using Basic Auth, the API key is Base64 encoded and included in an <code>Authorization</code> header, as specified in <a href="https://tools.ietf.org/html/rfc7235">RFC7235</a></li>
 	<li><code>(RSA2)</code> Basic Auth is the default authentication scheme if an API key exists</li>
 	<li><code>(RSA3)</code> Token Auth:
 	<ul>
@@ -141,20 +142,47 @@
 		<li><code>(RSA3b)</code> For REST requests, the token string is Base64 encoded and used in the <code>Authorization: Bearer</code> header</li>
 		<li><code>(RSA3c)</code> For Realtime connections, the querystring param <code>access_token</code> is appended to the URL endpoint</li>
 	</ul></li>
-	<li><code>(RSA4)</code> Token Auth is used if option <code>useTokenAuth</code> is true, or if any of the following conditions case token auth to be selected as the default: a <code>clientId</code> is specified; <code>authUrl</code> or <code>authCallback</code> is configured; an explicit <code>token</code> or <code>TokenDetails</code> is provided</li>
-	<li><code>(RSA14)</code> If Token Auth is being used, an exception will be raised if a token is not provided or there is no means to generate a token. For example, if only the option <code>useTokenAuth</code> is specified and thus no <code>key</code> is provided, then the client library is unable to authenticate or issue a token, and will raise an exception when instanced</li>
+	<li><code>(RSA4)</code> Token Auth is used if <code>useTokenAuth</code> is set to true, or if <code>useTokenAuth</code> is unspecified and any one of the following conditions cause token auth to be selected as the default: a <code>clientId</code> is specified; <code>authUrl</code> or <code>authCallback</code> is provided; an explicit <code>token</code> or <code>TokenDetails</code> is provided</li>
+	<li><code>(RSA14)</code> If Token Auth is selected, an exception will be raised if a token is not provided or there is no means to generate a token. For example, if only the option <code>useTokenAuth</code> is specified, and a <code>key</code> is not provided, then the client library is unable to authenticate or issue a token</li>
+	<li><code>(RSA15)</code> If Token Auth is selected and <code>clientId</code> has been set in the <code>ClientOptions</code> when the library was instanced, any <code>clientId</code> present in the token must match the <code>clientId</code> provided in <code>ClientOptions</code>. Following an auth request which uses a <code>TokenDetails</code> or <code>TokenRequest</code> object that contains an incompatible <code>clientId</code>, the library should change the connection state to <code>FAILED</code> and emit an error</li>
 	<li><code>(RSA5)</code> TTL for new tokens is specified in milliseconds and defaults to the REST API default (1 hour)</li>
 	<li><code>(RSA6)</code> The <code>capability</code>, if not specified, defaults to allow all operations permitted for the key associated with the token</li>
-	<li><code>(RSA7)</code> If a <code>clientId</code> is provided in the options, then the string will be encoded in UTF-8 format before it is sent to Ably</li>
+	<li><code>(RSA7)</code> <code>clientId</code> and authenticated clients:
+	<ul>
+		<li><code>(RAS7a)</code> If a <code>clientId</code> is provided in the <code>ClientOptions</code>, or is present in the current authentication token, then the client is considered to be authenticated i.e. it has an identity that is implicit in all operations. The following applies to authenticated clients:
+		<ul>
+			<li><code>(RAS7a1)</code> All operations (such as message publishing or presence) will have an implicit <code>clientId</code>. The Ably service automatically updates the <code>clientId</code> attribute (when empty) for all <code>Message</code> and <code>PresenceMessage</code> messages received from that authenticated client, and any messages then published from the Ably service, will have the <code>clientId</code> attribute populated. It is therefore expected that Ably client libraries do not explicitly set the <code>clientId</code> field on messages published when <code>clientId</code> is implicit in the connection or authentication scheme</li>
+			<li><code>(RSA7a2)</code> The server will reject the publishing of messages with an explicit <code>clientId</code> that does not match the authenticated client&#8217;s <code>clientId</code>. The connection and channel remains available for further operations</li>
+			<li><code>(RSA7a3)</code> The client library raises an exception if the <code>clientId</code> attribute of any <code>Message</code> or <code>PresenceMessage</code> published is not <code>null</code> and does not match the non-<code>null</code> <code>Auth#clientId</code>. The connection and channel remains available for further operations</li>
+			<li><code>(RSA7a4)</code> <code>Auth#clientId</code> attribute returns a string value for the authenticated client&#8217;s <code>clientId</code>. If the client is not authenticated and a <code>clientId</code> value was not provided when instanced with <code>ClientOptions</code>, then <code>Auth#clientId</code> is <code>null</code></li>
+		</ul></li>
+		<li><code>(RSA7b)</code> <code>Auth#clientId</code> is not <code>null</code> when:
+		<ul>
+			<li><code>(RSA7b1)</code> A <code>clientId</code> is provided in the <code>ClientOptions</code>. <code>clientId</code> should be a string</li>
+			<li><code>(RSA7b2)</code> Token authentication is being used, and the <code>TokenRequest</code> or <code>TokenDetails</code> object, used for authentication, has a <code>clientId</code> value</li>
+			<li><code>(RSA7b3)</code> Following a realtime connection being established, if the <code>CONNECTED</code> <code>ProtocolMessages</code> contains a <code>clientId</code> in the <code>ConnectionDetails</code> object, which is optionally present in <code>ProtocolMessage#connectionDetails</code></li>
+		</ul></li>
+	</ul></li>
 	<li><code>(RSA8)</code> <code>Auth#requestToken</code> function:
 	<ul>
+		<li><code>(RSA8e)</code> Method signature is <code>requestToken(TokenParams, AuthOptions)</code>. <code>TokenParams</code> and <code>AuthOptions</code> are optional. When provided, the values supersede matching client library configured params and options.</li>
 		<li><code>(RSA8a)</code> Implicitly creates a <code>TokenRequest</code> if required, and requests a token from Ably if required. Returns a <code>TokenDetails</code> object</li>
 		<li><code>(RSA8b)</code> Supports all <code>TokenParams</code> in the function arguments, which override defaults for <code>Client</code> <code>Auth</code>.</li>
-		<li><code>(RSA8c)</code> When <code>authUrl</code> option is set, it will retrieve the token from the provided URL using the HTTP <code>authHeaders</code>, query string <code>authParams</code> and <code>authMethod</code> (<code>GET</code> or <code>POST</code>) HTTP verb.  The token retrieved is assumed by the library to be a token string if the response has <code>Content-Type</code> <code>"text/plain"</code>, or taken to be a <code>TokenRequest</code> or <code>TokenDetails</code> object if the response has <code>Content-Type</code> <code>"application/json"</code>. It can be quite difficult to add test coverage for these scenarios &#8211; as such, we have developed a simple echo server that can be used in your tests, see the <a href="https://github.com/ably/ably-js/commit/e77b2c6c197bc71f3d27084fe54524724a00bc92">ably-js authUrl echo tests</a></li>
-		<li><code>(RSA8d)</code> When <code>authCallback</code> option is set, it will execute the callback and will expect either a token string, a <code>TokenDetails</code> object or a <code>TokenRequest</code> object which will in turn be used to request a token from Ably.</li>
+		<li><code>(RSA8c)</code> When <code>authUrl</code> option is set, it will query the provided URL to obtain a <code>TokenRequest</code> or the token itself (either a token string or a <code>TokenDetails</code>). The query is performed using the given URL using the HTTP method in <code>authMethod</code>, headers (from <code>authHeaders</code>) and supplementary params (from <code>authParams</code>). The token retrieved is assumed by the library to be a token string if the response has <code>Content-Type</code> <code>"text/plain"</code>, or taken to be a <code>TokenRequest</code> or <code>TokenDetails</code> object if the response has <code>Content-Type</code> <code>"application/json"</code>. <code>authMethod</code> can be either <code>GET</code> or <code>POST</code>, or if not specified, will default to <code>GET</code>. It can be quite difficult to add test coverage for these scenarios &#8211; as such, we have developed a simple echo server that can be used in your tests, see the <a href="https://github.com/ably/ably-js/commit/e77b2c6c197bc71f3d27084fe54524724a00bc92">ably-js authUrl echo tests</a>
+		<ul>
+			<li><code>(RSA8c1)</code> <code>TokenParams</code> and any configured <code>authParams</code> are always sent to the <code>authUrl</code> as follows:
+			<ul>
+				<li><code>(RSA8c1a)</code> When the <code>authMethod</code> is <code>GET</code> or unspecified, the combined params are appened to the URL as query string params</li>
+				<li><code>(RSA8c1b)</code> When the <code>authMethod</code> is <code>POST</code>, the combined params are sent in the body of the <code>POST</code> request</li>
+			</ul></li>
+			<li><code>(RSA8c2)</code> <code>TokenParams</code> take precedence over any configured <code>authParams</code> when a name conflict occurs</li>
+			<li><code>(RSA8c3)</code> Specifying <code>authParams</code> as part of <code>AuthOptions</code> replaces any configured <code>authParams</code> specified in <code>ClientOptions</code>. As the key/value pairs are not merged, this enables a developer to delete <code>authParams</code> where necessary by providing an entire new set of <code>authParams</code></li>
+		</ul></li>
+		<li><code>(RSA8d)</code> When <code>authCallback</code> option is set, it will invoke the callback, passing in the <code>TokenParams</code>, and expects either a token string, a <code>TokenDetails</code> object or a <code>TokenRequest</code> object to be returned, which will in turn be used to request a token from Ably</li>
 	</ul></li>
 	<li><code>(RSA9)</code> <code>Auth#createTokenRequest</code> function:
 	<ul>
+		<li><code>(RSA9h)</code> Method signature is <code>createTokenRequest(TokenParams, AuthOptions)</code>. <code>TokenParams</code> and <code>AuthOptions</code> are optional. When provided, the values supersede any client library configured params and options.</li>
 		<li><code>(RSA9a)</code> Returns a signed <code>TokenRequest</code> object that can be used to obtain a token from Ably. This is useful for servers that can create a <code>TokenRequest</code> signed with the API key without communicating with Ably directly. The <code>TokenRequest</code> can then be passed to a designated client that is then responsible for communicating with Ably and requesting a token for authentication from that <code>TokenRequest</code></li>
 		<li><code>(RSA9b)</code> Supports all <code>AuthOptions</code></li>
 		<li><code>(RSA9c)</code> Generates a unique 16+ character <code>nonce</code> if none is provided; the nonce is used to protect against replay attacks</li>
@@ -162,15 +190,20 @@
 		<li><code>(RSA9e)</code> TTL is optional and specified in milliseconds</li>
 		<li><code>(RSA9f)</code> Capability JSON text can be provided that specifies the rights of the token in terms of the channel(s) authorised and the permitted operations on each</li>
 		<li><code>(RSA9g)</code> A valid HMAC is created using the key secret  to sign the <code>TokenRequest</code> so that it can be used by any client to request a token without having or exchanging any secrets</li>
+		<li><code>(RSA9i)</code> Adheres to all requirements in <code>RSA8</code> relating to <code>TokenParams</code>, <code>authCallback</code> and <code>authUrl</code></li>
 	</ul></li>
 	<li><code>(RSA10)</code> <code>Auth#authorise</code> function:
 	<ul>
-		<li><code>(RSA10a)</code> Instructs the library to create a token if needed and use Token Auth for all future requests</li>
+		<li><code>(RSA10a)</code> Instructs the library to create a token if needed and uses Token Auth for all future requests</li>
+		<li><code>(RSA10j)</code> Method signature is <code>authorise(TokenParams, AuthOptions)</code>. <code>TokenParams</code> and <code>AuthOptions</code> are optional. When provided, the values supersede any client library configured params and options.</li>
 		<li><code>(RSA10b)</code> Supports all <code>AuthOptions</code> and <code>TokenParams</code> in the function arguments</li>
 		<li><code>(RSA10c)</code> Will not create a new token unless no previous token exists or current token has expired. Please note that a buffer of 15s for token expiry is recommended to avoid race conditions where the token is valid at the time of the request, but invalid when it reaches the server. Therefore, we recommend that a token is considered expired 15s before the time field `expires`</li>
 		<li><code>(RSA10d)</code> Providing the option <code>force</code> set to true will force <code>authorise</code> to issue a new token even if an existing token exists.</li>
 		<li><code>(RSA10e)</code> Adheres to the implementation of <code>requestToken</code> when issuing new tokens</li>
-		<li><code>(RSA10f)</code> Returns a <code>TokenDetails</code> object that contains the token string + token meta data</li>
+		<li><code>(RSA10f)</code> Returns a <code>TokenDetails</code> object that contains the token string + token metadata</li>
+		<li><code>(RSA10g)</code> Stores the <code>AuthOptions</code> and <code>TokenParams</code> arguments as defaults for subsequent authorisations</li>
+		<li><code>(RSA10h)</code> Will use the configured <code>Auth#clientId</code> by default, if not <code>null</code></li>
+		<li><code>(RSA10i)</code> Adheres to all requirements in <code>RSA8</code> relating to <code>TokenParams</code>, <code>authCallback</code> and <code>authUrl</code></li>
 	</ul></li>
 </ul>
 <h3 id="rest-channels">Channels</h3>
@@ -196,7 +229,24 @@
 		<li><code>(RSL1b)</code> When <code>name</code> and <code>data</code> is provided, a single message is published to Ably</li>
 		<li><code>(RSL1c)</code> When an array of <code>Message</code> objects is provided, a single request is made to Ably. When publishing multiple messages, this approach is more efficient. However, a yet to be implemented feature should limit the total number of messages bundled in a single POST based on the default max request size, and would raise an exception if any single message exceeds that limit.</li>
 		<li><code>(RSL1d)</code> Indicates an error if the message was not successfully published to Ably</li>
-		<li><code>(RSL1e)</code> Allows <code>name</code> and or <code>data</code> to be <code>Null</code>.  If any of the values are null, then key is not sent to Ably i.e. a payload with a <code>Null</code> value for <code>data</code> would be sent as follows <code>{ "name": "click" }</code></li>
+		<li><code>(RSL1e)</code> Allows <code>name</code> and or <code>data</code> to be <code>null</code>.  If any of the values are null, then key is not sent to Ably i.e. a payload with a <code>null</code> value for <code>data</code> would be sent as follows <code>{ "name": "click" }</code></li>
+		<li><code>(RSL1f)</code> Unauthenticated clients without a <code>clientId</code> (any <code>clientId</code> is permitted):
+		<ul>
+			<li><code>(RSL1f1)</code> When a <code>Message</code> with a <code>clientId</code> value is published, Ably will accept and publish that message with the provided <code>clientId</code>. A test should assert via the history API that the <code>clientId</code> of the published <code>Message</code> is correct for both authentication schemes (token and basic)</li>
+		</ul></li>
+		<li><code>(RSL1g)</code> Authenticated clients with a <code>clientId</code> (as a result of either an explicitly configured <code>clientId</code> in <code>ClientOptions</code>, or implicitly through token auth):
+		<ul>
+			<li><code>(RSL1g1)</code> When publishing a <code>Message</code> with the <code>clientId</code> attribute set to <code>null</code>:
+			<ul>
+				<li><code>(RSL1g1a)</code> It is unnecessary for the client to set the <code>clientId</code> of the <code>Message</code> before publishing</li>
+				<li><code>(RSL1g1b)</code> Ably is expected to automatically assign a <code>clientId</code> upon receiving the <code>Message</code>. A test should assert via the history API that the <code>clientId</code> value is populated for the <code>Message</code> when received</li>
+			</ul></li>
+			<li><code>(RSL1g2)</code> When publishing a <code>Message</code> with the <code>clientId</code> attribute value set to the authenticated client&#8217;s <code>clientId</code>, Ably will accept the message and publish it. A test should assert that the <code>clientId</code> value is populated for the <code>Message</code> when received</li>
+			<li><code>(RSL1g3)</code> When publishing a <code>Message</code> with a different <code>clientId</code> attribute value to the authenticated <code>clientId</code>, the client library should reject the message, and an exception should be raised. The connection and channel remains available for further operations</li>
+			<li><code>(RSL1g4)</code> When using the Realtime library, it is possible to publish a message with an explicit <code>clientId</code> before the library has completed authentication. As such, it is possible that the <code>clientId</code> inferred following authentication is incompatible with the explicit <code>clientId</code> of the message queued for delivery. In this case, it is not expected that the client library will reject the already queued message as the Ably server will reject the message anyway when received. However, all future messages published with an incompatible <code>clientId</code> should be immediately rejected by the client library</li>
+			<li><code>(RSL1g5)</code> When using the REST library, publishing a message with an explicit <code>clientId</code> that is incompatible with the <code>clientId</code> inferred following authentication will cause the library to reject the message immediately. Unlike the Realtime library, the message is never queued,and as such, authentication will be completed synchronously before attempting to publish the message over REST</li>
+		</ul></li>
+		<li><code>(RSL1h)</code> Where the library language permits, the <code>Channel#publish(name, data)</code> method should provide an optional argument that allows the <code>clientId</code> value to be specified such as <code>Channel#publish('event', 'data', { clientId: 'John' })</code></li>
 	</ul></li>
 	<li><code>(RSL2)</code> <code>Channel#history</code> function:
 	<ul>
@@ -211,7 +261,7 @@
 	<li><code>(RSL3)</code> <code>Channel#presence</code> attribute returns a <code>Presence</code> object for this channel</li>
 	<li><code>(RSL4)</code> Message encoding
 	<ul>
-		<li><code>(RSL4a)</code> Payloads must be binary, strings, or objects capable of JSON representation. Any other data type should not be permitted and an exception should be raised</li>
+		<li><code>(RSL4a)</code> Payloads must be binary, strings, or objects capable of JSON representation, or can be empty (omitted). Any other data type should not be permitted and an exception should be raised</li>
 		<li><code>(RSL4b)</code> If a message is encoded, the <code>encoding</code> attribute represents the encoding(s) applied in right to left format i.e. &#8220;utf-8/base64&#8221; indicates that the original payload has &#8220;utf-8&#8221; encoding and has subsequently been encoded in Base64 format.</li>
 		<li><code>(RSL4c)</code> When using MessagePack Message encoding
 		<ul>
@@ -281,7 +331,10 @@
 	</ul></li>
 	<li><code>(RTC2)</code> <code>RealtimeClient#connection</code> attribute provides access to the underlying <code>Connection</code> object</li>
 	<li><code>(RTC3)</code> <code>RealtimeClient#channels</code> attribute provides access to the underlying <code>Channels</code> object</li>
-	<li><code>(RTC4)</code> <code>RealtimeClient#auth</code> attribute provides access to the <code>Auth</code> object that was instanced with the <code>ClientOptions</code> provided in the <code>RealtimeClient</code> constructor</li>
+	<li><code>(RTC4)</code> <code>RealtimeClient#auth</code> attribute provides access to the <code>Auth</code> object that was instanced with the <code>ClientOptions</code> provided in the <code>RealtimeClient</code> constructor
+	<ul>
+		<li><code>(RTC4a)</code> Unlike the stateless REST client library, the <code>Auth#clientId</code> may be populated when the connection is established.  The <code>CONNECTED</code> <code>ProtocolMessage</code> may contain a <code>clientId</code> that notifies the <code>RealtimeClient</code> that all further operations are implicitly for that <code>clientId</code>, and operations for any other <code>clientId</code> are no longer permitted. See Auth for further details</li>
+	</ul></li>
 	<li><code>(RTC5)</code> <code>RealtimeClient#stats</code> function:
 	<ul>
 		<li><code>(RTC5a)</code> Proxy to <code>RestClient#stats</code> presented with an async or threaded interface as appropriate</li>
@@ -299,6 +352,9 @@
 	<ul>
 		<li><code>(RTN2a)</code> <code>format</code> should be <code>msgpack</code> (default) or <code>json</code></li>
 		<li><code>(RTN2b)</code> <code>echo</code> should be <code>true</code> by default; <code>false</code> will prevent messages published by the client being echoed back</li>
+		<li><code>(RTN2c)</code> <code>timestamp</code> should contain the milliseconds since the epoch</li>
+		<li><code>(RTN2d)</code> <code>clientId</code> contains the provided <code>clientId</code> option of <code>ClientOptions</code>, unless <code>clientId</code> is <code>null</code></li>
+		<li><code>(RTN2e)</code> Depending on the authentication scheme, either <code>accessToken</code> contains the token string, or <code>key</code> contains the API key</li>
 	</ul></li>
 	<li><code>(RTN3)</code> If connection option <code>autoConnect</code> is true, a connection is initiated immediately; otherwise a connection is only initiated following an explicit call to <code>connect()</code>.</li>
 	<li><code>(RTN4)</code> EventEmitter and states:
@@ -440,6 +496,10 @@
 	<ul>
 		<li><code>(RTL6a)</code> Messages are encoded in the same way as the REST <code>Channel#publish</code> method</li>
 		<li><code>(RTL6b)</code> An optional callback can be provided to the <code>#publish</code> method that is called when the message is successfully delivered or upon failure with the appropriate <code>ErrorInfo</code> error. A test should exist to publish lots of messages on a few connections to ensure all message success callbacks are called for all messages published</li>
+		<li><code>(RTL6g)</code> Expects either an array of <code>Message</code> objects or a <code>name</code> string and <code>data</code> payload:</li>
+		<li><code>(RTL6g1)</code> When <code>name</code> and <code>data</code> is provided, a single <code>ProtocolMessage</code> containing one @Messaeg@@ is published to Ably</li>
+		<li><code>(RTL6g2)</code> When an array of <code>Message</code> objects is provided, a single <code>ProtocolMessage</code> is used to publish all <code>Message</code> objects in the array. However, a yet to be implemented feature should limit the total number of messages bundled in a single ProtocolMessage based on the default max message size.</li>
+		<li><code>(RTL6g3)</code> Allows <code>name</code> and or <code>data</code> to be <code>Null</code>.  If any of the values are null, then key is not sent to Ably i.e. a payload with a <code>Null</code> value for <code>data</code> would be sent as follows <code>{ "name": "click" }</code></li>
 		<li><code>(RTL6c)</code> Connection state conditions:
 		<ul>
 			<li><code>(RTL6c1)</code> If the connection is <code>CONNECTED</code> then the messages are published immediately</li>
@@ -447,7 +507,22 @@
 			<li><code>(RTL6c3)</code> Else an exception is raised preventing the message publishing</li>
 		</ul></li>
 		<li><code>(RTL6d)</code> Messages are delivered using a single <code>ProtocolMessage</code> where possible by bundling in all messages for that channel into the <code>ProtocolMessage#messages</code> array. However, a yet to be implemented feature should limit the total number of messages bundled per <code>ProtocolMessage</code> based on the default max message size, and would raise an exception if any single message exceeds that limit</li>
-		<li><code>(RTL6e)</code> If token auth is being used along with a <code>clientId</code>, the <code>clientId</code> will be present on any messages published. A test should exist that connects with a <code>clientId</code>, publishes a message on a channel, and with another client, the message should be received with the correct <code>clientId</code> attribute of the message</li>
+		<li><code>(RTL6e)</code> Unauthenticated clients without a <code>clientId</code> (any <code>clientId</code> is permitted):
+		<ul>
+			<li><code>(RTL6e1)</code>When a <code>Message</code> with a <code>clientId</code> value is published, Ably will accept and publish that message with the provided <code>clientId</code>. A test should assert that the <code>clientId</code> of the published <code>Message</code> is correct for both authentication schemes (token and basic)</li>
+		</ul></li>
+		<li><code>(RTL6g)</code> Authenticated clients with a <code>clientId</code> (as a result of either an explicitly configured <code>clientId</code> in <code>ClientOptions</code>, or implicitly through token auth):
+		<ul>
+			<li><code>(RTL6g1)</code> When publishing a <code>Message</code> with the <code>clientId</code> attribute set to <code>null</code>:
+			<ul>
+				<li><code>(RTL6g1a)</code> It is unnecessary for the client to set the <code>clientId</code> of the <code>Message</code> before publishing</li>
+				<li><code>(RTL6g1b)</code> Ably is expected to automatically assign a <code>clientId</code> upon receiving the <code>Message</code>. A test should assert that the <code>clientId</code> value is populated for the <code>Message</code> when received</li>
+			</ul></li>
+			<li><code>(RTL6g2)</code> When publishing a <code>Message</code> with the <code>clientId</code> attribute value set to the authenticated client&#8217;s <code>clientId</code>, Ably will accept the message and publish it. A test should assert that the <code>clientId</code> value is populated for the <code>Message</code> when received</li>
+			<li><code>(RTL6g3)</code> When publishing a <code>Message</code> with a different <code>clientId</code> attribute value to the authenticated <code>clientId</code>, the client library should reject publishing immediately. The message should not be sent to Ably and an exception should be raised. The connection and channel remains available for further operations</li>
+			<li><code>(RTL6g4)</code> When using token auth, unless a <code>clientId</code> has been provided in <code>ClientOptions</code> or inferred following authentication, the client library will not be constrained when publishing messages with any explicit <code>clientId</code>. If a <code>Message</code> with a <code>clientId</code> value is published before the <code>clientId</code> is configured or inferred following authentication, the client library should not reject any explicit <code>clientId</code> specified in a message. A test should instance a library without an explicit <code>clientId</code> and an <code>authCallback</code> that returns a <code>tokenDetails</code> object with a <code>clientId</code>, then publish a message with the same <code>clientId</code> before authentication, and ensure that the message is published following authentication and received back with the <code>clientId</code> intact. A further test should follow the same sequence of events, but should instead use an incompatible <code>clientId</code> in the message, expecting that the message is rejected by the Ably service and the message error should contain the server error message, and the connection and channel should remain available for further operations</li>
+		</ul></li>
+		<li><code>(RTL6h)</code> Where the library language permits, the <code>Channel#publish(name, data)</code> method should provide an optional argument that allows the <code>clientId</code> value to be specified such as <code>Channel#publish('event', 'data', { clientId: 'John' })</code></li>
 		<li><code>(RTL6f)</code> <code>Message#connectionId</code> should match the current <code>Connection#id</code> for all published messages, a test should exist to ensure the <code>connectionId</code> for received messages matches that of the publisher</li>
 	</ul></li>
 	<li><code>(RTL7)</code> <code>Channel#subscribe</code> function:
@@ -506,28 +581,29 @@
 	</ul></li>
 	<li><code>(RTP8)</code> <code>Presence#enter</code> function:
 	<ul>
-		<li><code>(RTP8a)</code> Enters this client into this channel</li>
+		<li><code>(RTP8a)</code> Enters the current client into this channel, optionally with the data provided</li>
 		<li><code>(RTP8b)</code> Optionally a callback can be provided that is called for both success or failure to enter</li>
-		<li><code>(RTP8c)</code> A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>ENTER</code> is sent to the Ably service</li>
+		<li><code>(RTP8c)</code> A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>ENTER</code> is sent to the Ably service. The <code>clientId</code> attribute of the <code>PresenceMessage</code> must not be present. Entering without an explicit <code>PresenceMessage#clientId</code>, implicitly uses the <code>clientId</code> for the current connection</li>
 		<li><code>(RTP8d)</code> Implicitly attaches to the channel if not attached</li>
 		<li><code>(RTP8e)</code> Optional data can be included when entering a channel that will be encoded / decoded as with normal messages. A test should exist to ensure data used with enter is encoded &amp; decoded correctly. Also, when data is provided when entering, but no data is provided when leaving, the data attribute should be emitted in the <code>LEAVE</code> event for this client</li>
-		<li><code>(RTP8f)</code> Raises an exception of the client library has not <code>clientId</code> configured</li>
+		<li><code>(RTP8f)</code> Raises an exception if the client library is using basic auth (i.e. no <code>clientId</code> is configured)</li>
 		<li><code>(RTP8g)</code> Raises an exception if the channel is <code>DETACHED</code> or <code>FAILED</code></li>
-		<li><code>(RTP8h)</code> Fails and emits an error if the client does not have required presence permissions</li>
+		<li><code>(RTP8h)</code> Fails and emits an error if the client does not have required presence permission</li>
+		<li><code>(RTP8i)</code> Fails and emits an error if the current client is not authenticated, and no implicit <code>clientId</code> is assigned by the Ably service</li>
 	</ul></li>
 	<li><code>(RTP9)</code> <code>Presence#update</code> function:
 	<ul>
 		<li><code>(RTP9a)</code> Updates the data for the present member with a value or <code>Null</code></li>
 		<li><code>(RTP9b)</code> If the client was not already entered, it enters this client into this channel</li>
 		<li><code>(RTP9c)</code> Optionally a callback can be provided that is called for both success or failure to update</li>
-		<li><code>(RTP9d)</code> A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>UPDATE</code> is sent to the Ably service</li>
+		<li><code>(RTP9d)</code> A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>UPDATE</code> is sent to the Ably service. The <code>clientId</code> attribute of the <code>PresenceMessage</code> must not be present. Updating without an explicit <code>PresenceMessage#clientId</code>, implicitly uses the <code>clientId</code> for the current connection</li>
 		<li><code>(RTP9e)</code> In all other ways, this method is identical to <code>Presence#enter</code> and should have matching tests</li>
 	</ul></li>
 	<li><code>(RTP10)</code> <code>Presence#leave</code> function:
 	<ul>
 		<li><code>(RTP10a)</code> Leaves this client from the channel and the data will be updated with the value provided. If the language permits the data argument to be omitted, then the previously set data value will be omitted as a convenience</li>
 		<li><code>(RTP10b)</code> Optionally a callback can be provided that is called for both success or failure to leave</li>
-		<li><code>(RTP10c)</code> A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>LEAVE</code> is sent to the Ably service</li>
+		<li><code>(RTP10c)</code> A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>LEAVE</code> is sent to the Ably service. The <code>clientId</code> attribute of the <code>PresenceMessage</code> must not be present. Leaving without an explicit <code>PresenceMessage#clientId</code>, implicitly uses the <code>clientId</code> for the current connection</li>
 		<li><code>(RTP10d)</code> If the client is not currently <code>ENTERED</code> then an exception is raised</li>
 		<li><code>(RTP10e)</code> In all other ways, this method is identical to <code>Presence#enter</code> and should have matching tests</li>
 	</ul></li>
@@ -555,7 +631,7 @@
 		<li><code>(RTP14a)</code> Enters into presence on a channel on behalf of another <code>clientId</code>. This allows a single client with suitable permissions to register presence on behalf of any number of clients using a single connection</li>
 		<li><code>(RTP14b)</code> Optionally a callback can be provided that is called for both success or failure to enter</li>
 		<li><code>(RTP14c)</code> Data can optionally be provided when entering and will follow the normal encoding &amp; decoding rules</li>
-		<li><code>(RTP14d)</code> A test should exist that registers a number of members each with different @clientId@s on a presence channel, and then a <code>Presence#get</code> should be used to verify that all members are present as expected</li>
+		<li><code>(RTP14d)</code> A test should exist that registers a number of members each with a different <code>clientId</code> on a presence channel, and then a <code>Presence#get</code> should be used to verify that all members are present as expected</li>
 	</ul></li>
 	<li><code>(RTP15)</code> <code>Presence#enterClient</code> <code>Presence#updateClient</code> and <code>Presence#leaveClient</code> function:
 	<ul>
@@ -564,6 +640,7 @@
 		<li><code>(RTP15c)</code> Tests should also ensure that using these methods has no side effects on a client that has entered normally using <code>Presence#enter</code></li>
 		<li><code>(RTP15d)</code> A callback can be provided that will be called upon success or failure</li>
 		<li><code>(RTP15e)</code> A channel will be implicitly attached when these methods are called</li>
+		<li><code>(RTP15f)</code> If the client is authenticated and has a configured <code>clientId</code>, if the <code>clientId</code> argument does not match the client&#8217;s <code>clientId</code>, then an exception should be raised. The connection and channel remains available for further operations</li>
 	</ul></li>
 </ul>
 <h3 id="eventemitter">EventEmitter mixin / interface</h3>
@@ -620,6 +697,7 @@
 		<li><code>(TR4d)</code> <code>connectionId</code> string</li>
 		<li><code>(TR4e)</code> <code>connectionKey</code> string</li>
 		<li><code>(TR4f)</code> <code>connectionSerial</code> long</li>
+		<li><code>(TR4n)</code> <code>connectionDetails</code> <code>ConnectionDetails</code> object &#8211; provides details on the constraints for the connection such as max message size or client ID</li>
 		<li><code>(TR4g)</code> <code>count</code> integer</li>
 		<li><code>(TR4h)</code> <code>errorInfo</code> <code>ErrorInfo</code> object</li>
 		<li><code>(TR4i)</code> <code>flags</code> integer</li>
@@ -685,6 +763,18 @@
 	<li><code>(TC1)</code> This type represents a capability for a key or token</li>
 	<li><code>(TC2)</code> For now a string representation of the JSON will suffice wherever <code>capability</code> is used</li>
 </ul>
+<h4>ConnectionDetails</h4>
+<ul>
+	<li><code>(CD1)</code> Connection details are optionally passed to the client library in the <code>CONNECTED</code> <code>ProtocolMessage#connectionDetails</code> attribute to inform the client about any constraints it should adhere to, and provide additional metadata about the connection. For example, if a request is made to publish a message that exceeds the <code>maxMessageSize</code>, the client library can reject the message immediately, without communicating with the Ably service</li>
+	<li><code>(CD2)</code> Attributes available in <code>ConnectionDetails</code>:
+	<ul>
+		<li><code>(CD2a)</code> <code>clientId</code> contains the client ID assigned to the token, when present</li>
+		<li><code>(CD2b)</code> <code>connectionKey</code> is the connection secret key string that is used to resume a connection and its state</li>
+		<li><code>(CD2c)</code> <code>maxMessageSize</code> is the maximum individual message size in bytes</li>
+		<li><code>(CD2d)</code> <code>maxFrameSize</code> is the maximum size for a single frame of data sent to Ably. This restriction applies to a <code>ProtocolMessage</code> sent over a realtime connection, or the total body size for a REST request</li>
+		<li><code>(CD2e)</code> <code>maxInboundRate</code> is the maximum allowable number of requests per second from a client or Ably. In the case of a realtime connection, this restriction applies to the number of <code>ProtocolMessage</code> objects sent, whereas in the case of REST, it is the total number of REST requests per second</li>
+	</ul></li>
+</ul>
 <h3 id="options">Option types</h3>
 <h4>ClientOptions</h4>
 <ul>
@@ -709,9 +799,9 @@
 			<li><code>(TO3j4)</code> <code>useTokenAuth</code> boolean &#8211; When true, token authentication will always be used by the client</li>
 			<li><code>(TO3j5)</code> <code>authCallback</code> &#8211; A callback to call to obtain a signed <code>TokenRequest</code>, <code>TokenDetails</code> or a token string. This enables a client to obtain token requests or tokens from another entity, so tokens can be renewed without the client requiring a key</li>
 			<li><code>(TO3j6)</code> <code>authUrl</code> string &#8211; A URL to query to obtain a signed <code>TokenRequest</code>, <code>TokenDetails</code> or a token string. This enables a client to obtain token request or token from another entity, so tokens can be renewed without the client requiring a key</li>
-			<li><code>(TO3j7)</code> <code>authMethod</code> &#8211; The HTTP verb to be used when a request is made by the library to the <code>authUrl</code>. Defaults to <code>GET</code></li>
+			<li><code>(TO3j7)</code> <code>authMethod</code> &#8211; The HTTP verb to be used when a request is made by the library to the <code>authUrl</code>. Defaults to <code>GET</code>, supports <code>GET</code> and <code>POST</code></li>
 			<li><code>(TO3j8)</code> <code>authHeaders</code> &#8211; Headers to be included in any request made by the library to the <code>authUrl</code></li>
-			<li><code>(TO3j9)</code> <code>authParams</code> &#8211; Query params to be included in any request made by the library to the <code>authUrl</code></li>
+			<li><code>(TO3j9)</code> <code>authParams</code> &#8211; Additional params to be included in any request made by the library to the <code>authUrl</code>, either as query params added to the URL in the case of <code>GET</code>, or form-encoded in the body in the case of <code>POST</code></li>
 			<li><code>(TO3j10)</code> <code>queryTime</code> &#8211; If true, the library will query the Ably system for the current time instead of relying on a locally-available time of day</li>
 		</ul></li>
 		<li><code>(TO3k)</code> Development environment attributes:
@@ -733,6 +823,20 @@
 	<li><code>(TK2c)</code> <code>clientId</code> string &#8211;  A <code>clientId</code> to associate with this token</li>
 	<li><code>(TK2d)</code> <code>timestamp</code> long &#8211; The timestamp (in millis since the epoch) of this request. Timestamps, in conjunction with the <code>nonce</code>, are used to prevent n requests from being replayed</li>
 </ul>
+<h4>AuthOptions</h4>
+<ul>
+	<li><code>(AO1)</code> A class providing configurable authentication options used when authenticating or issuing tokens explicitly. These options are used when invoking <code>Auth#authorise</code>, <code>Auth#requestToken</code> and <code>Auth#createTokenRequest</code></li>
+	<li><code>(AO2)</code> The attributes of <code>AuthOptions</code> consist of:
+	<ul>
+		<li><code>(AO2a)</code> <code>key</code> string &#8211; Full Ably key string, as obtained from dashboard, used when signing token requests locally</li>
+		<li><code>(AO2b)</code> <code>authCallback</code> &#8211; A callback to call to obtain a signed <code>TokenRequest</code>, <code>TokenDetails</code> or a token string. This enables a client to obtain token requests or tokens from another entity, so tokens can be renewed without the client requiring a key</li>
+		<li><code>(AO2c)</code> <code>authUrl</code> string &#8211; A URL to query to obtain a signed <code>TokenRequest</code>, <code>TokenDetails</code> or a token string. This enables a client to obtain token request or token from another entity, so tokens can be renewed without the client requiring a key</li>
+		<li><code>(AO2d)</code> <code>authMethod</code> &#8211; The HTTP verb to be used when a request is made by the library to the <code>authUrl</code>. Defaults to <code>GET</code>, supports <code>GET</code> and <code>POST</code></li>
+		<li><code>(AO2e)</code> <code>authHeaders</code> &#8211; Headers to be included in any request made by the library to the <code>authUrl</code></li>
+		<li><code>(AO2f)</code> <code>authParams</code> &#8211; Additional params to be included in any request made by the library to the <code>authUrl</code>, either as query params in the case of <code>GET</code> or in the body in the case of <code>POST</code></li>
+		<li><code>(AO2g)</code> <code>queryTime</code> &#8211; If true, the library will query the Ably system for the current time instead of relying on a locally-available time of day</li>
+	</ul></li>
+</ul>
 <h4>ChannelOptions</h4>
 <ul>
 	<li><code>(TB1)</code> options provided when instancing a channel, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/types/ChannelOptions.java">Java ChannelOptions</a> as a reference</li>
@@ -745,11 +849,16 @@
 <h4>CipherParams</h4>
 <ul>
 	<li><code>(TZ1)</code> params to configure encryption for a channel, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/util/Crypto.java#L52">Java CipherParams class</a> as a reference</li>
-	<li><code>(TZ2)</code> The attributes of <code>CipherParams</code> consist of:
+	<li><code>(TZ2)</code> The attributes of <code>CipherParams</code> consist of anything necessary to implement the supported algorithms (eg key and iv), in addition to the following standardised attributes:
 	<ul>
 		<li><code>(TZ2a)</code> <code>algorithm</code> string &#8211; Default is <code>AES</code>. Optionally specify the algorithm to use for encryption, currently only <code>AES</code> is supported</li>
-		<li><code>(TZ2b)</code> <code>keyLength</code> integer &#8211; Default is 128. Optionally specify the key length of the cipher, typically 128 or 256</li>
+		<li><code>(TZ2b)</code> <code>keyLength</code> integer &#8211; An integer, from an algorithm-dependent range of possible values. If unspecified, an algorithm-dependent default is used. For AES the allowed values at least include 128 and 256, with a default of 128.</li>
 		<li><code>(TZ2c)</code> <code>mode</code> string &#8211; Default is <code>CBC</code>. Optionally specify cipher mode, currently only <code>CBC</code> is supported</li>
+	</ul></li>
+	<li><code>(TZ3)</code> <code>Crypto#getDefaultParams</code> function
+	<ul>
+		<li><code>(TZ3a)</code> returns a complete <code>CipherParams</code> instance with randomly generated key and iv</li>
+		<li><code>(TZ3b)</code> takes an optional key parameter, returning a <code>CipherParams</code> instance created with that key and with a keyLength calculated from that key</li>
 	</ul></li>
 </ul>
     </article>
