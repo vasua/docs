@@ -497,7 +497,7 @@
 		<li><code>(RTL6a)</code> Messages are encoded in the same way as the REST <code>Channel#publish</code> method</li>
 		<li><code>(RTL6b)</code> An optional callback can be provided to the <code>#publish</code> method that is called when the message is successfully delivered or upon failure with the appropriate <code>ErrorInfo</code> error. A test should exist to publish lots of messages on a few connections to ensure all message success callbacks are called for all messages published</li>
 		<li><code>(RTL6g)</code> Expects either an array of <code>Message</code> objects or a <code>name</code> string and <code>data</code> payload:</li>
-		<li><code>(RTL6g1)</code> When <code>name</code> and <code>data</code> is provided, a single <code>ProtocolMessage</code> containing one @Messaeg@@ is published to Ably</li>
+		<li><code>(RTL6g1)</code> When <code>name</code> and <code>data</code> is provided, a single <code>ProtocolMessage</code> containing one <code>Message</code> is published to Ably</li>
 		<li><code>(RTL6g2)</code> When an array of <code>Message</code> objects is provided, a single <code>ProtocolMessage</code> is used to publish all <code>Message</code> objects in the array. However, a yet to be implemented feature should limit the total number of messages bundled in a single ProtocolMessage based on the default max message size.</li>
 		<li><code>(RTL6g3)</code> Allows <code>name</code> and or <code>data</code> to be <code>Null</code>.  If any of the values are null, then key is not sent to Ably i.e. a payload with a <code>Null</code> value for <code>data</code> would be sent as follows <code>{ "name": "click" }</code></li>
 		<li><code>(RTL6c)</code> Connection state conditions:
