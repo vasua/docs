@@ -198,7 +198,7 @@
 		<li><code>(RSA10j)</code> Method signature is <code>authorise(TokenParams, AuthOptions)</code>. <code>TokenParams</code> and <code>AuthOptions</code> are optional. When provided, the values supersede any client library configured params and options.</li>
 		<li><code>(RSA10b)</code> Supports all <code>AuthOptions</code> and <code>TokenParams</code> in the function arguments</li>
 		<li><code>(RSA10c)</code> Will not create a new token unless no previous token exists or current token has expired. Please note that a buffer of 15s for token expiry is recommended to avoid race conditions where the token is valid at the time of the request, but invalid when it reaches the server. Therefore, we recommend that a token is considered expired 15s before the time field `expires`</li>
-		<li><code>(RSA10d)</code> Providing the option <code>force</code> set to true will force <code>authorise</code> to issue a new token even if an existing token exists.</li>
+		<li><code>(RSA10d)</code> Providing the <code>AuthOption</code> set to true will force <code>authorise</code> to issue a new token even if an existing token exists.</li>
 		<li><code>(RSA10e)</code> Adheres to the implementation of <code>requestToken</code> when issuing new tokens</li>
 		<li><code>(RSA10f)</code> Returns a <code>TokenDetails</code> object that contains the token string + token metadata</li>
 		<li><code>(RSA10g)</code> Stores the <code>AuthOptions</code> and <code>TokenParams</code> arguments as defaults for subsequent authorisations</li>
@@ -424,8 +424,9 @@
 			<li><code>(RTN15b1)</code> <code>resume</code> is the private connection key assigned to the connection when the first <code>CONNECTED</code> <code>ProtocolMessage</code> was received</li>
 			<li><code>(RTN15b2)</code> <code>connection_serial</code> is the most recent <code>ProtocolMessage#connectionSerial</code> received from Ably or <code>Connection#serial</code> which should be identical</li>
 		</ul></li>
-		<li><code>(RTN15c)</code> When a new connection is made using the <code>resume</code> and <code>connection_serial</code> params, the client library must consider the resume to have failed if the <code>CONNECTED</code> <code>ProtocolMessage</code> contains an error or if the <code>Connection#id</code> or <code>Connection#key</code> has changed. When a <code>Connection</code> resume has failed, all channels should be detach with a suitable error reason</li>
+		<li><code>(RTN15c)</code> When a new connection is made using the <code>resume</code> and <code>connection_serial</code> params, the client library must consider the resume to have failed if the <code>CONNECTED</code> <code>ProtocolMessage</code> contains an error or if the <code>Connection#id</code> has changed. When a <code>Connection</code> resume has failed, all channels should be detach with a suitable error reason</li>
 		<li><code>(RTN15d)</code> Client libraries should have test coverage to ensure connection state recovery is working as expected by forciby disconnecting a client and checking that messages published on channels are delivered once the connection is resumed</li>
+		<li><code>(RTN15e)</code> When a connection is resumed, the <code>Connection#key</code> may change and will be provided in the first <code>CONNECTED</code> <code>ProtocolMessage#connectionDetails</code> when the connection is established. The client library must update the <code>Connection#key</code> value with the new <code>connectionKey</code> value every time</li>
 	</ul></li>
 	<li><code>(RTN16)</code> <code>Connection</code> recovery:
 	<ul>
@@ -496,10 +497,10 @@
 	<ul>
 		<li><code>(RTL6a)</code> Messages are encoded in the same way as the REST <code>Channel#publish</code> method</li>
 		<li><code>(RTL6b)</code> An optional callback can be provided to the <code>#publish</code> method that is called when the message is successfully delivered or upon failure with the appropriate <code>ErrorInfo</code> error. A test should exist to publish lots of messages on a few connections to ensure all message success callbacks are called for all messages published</li>
-		<li><code>(RTL6g)</code> Expects either an array of <code>Message</code> objects or a <code>name</code> string and <code>data</code> payload:</li>
-		<li><code>(RTL6g1)</code> When <code>name</code> and <code>data</code> is provided, a single <code>ProtocolMessage</code> containing one <code>Message</code> is published to Ably</li>
-		<li><code>(RTL6g2)</code> When an array of <code>Message</code> objects is provided, a single <code>ProtocolMessage</code> is used to publish all <code>Message</code> objects in the array. However, a yet to be implemented feature should limit the total number of messages bundled in a single ProtocolMessage based on the default max message size.</li>
-		<li><code>(RTL6g3)</code> Allows <code>name</code> and or <code>data</code> to be <code>Null</code>.  If any of the values are null, then key is not sent to Ably i.e. a payload with a <code>Null</code> value for <code>data</code> would be sent as follows <code>{ "name": "click" }</code></li>
+		<li><code>(RTL6i)</code> Expects either an array of <code>Message</code> objects or a <code>name</code> string and <code>data</code> payload:</li>
+		<li><code>(RTL6i1)</code> When <code>name</code> and <code>data</code> is provided, a single <code>ProtocolMessage</code> containing one <code>Message</code> is published to Ably</li>
+		<li><code>(RTL6i2)</code> When an array of <code>Message</code> objects is provided, a single <code>ProtocolMessage</code> is used to publish all <code>Message</code> objects in the array. However, a yet to be implemented feature should limit the total number of messages bundled in a single ProtocolMessage based on the default max message size.</li>
+		<li><code>(RTL6i3)</code> Allows <code>name</code> and or <code>data</code> to be <code>Null</code>.  If any of the values are null, then key is not sent to Ably i.e. a payload with a <code>Null</code> value for <code>data</code> would be sent as follows <code>{ "name": "click" }</code></li>
 		<li><code>(RTL6c)</code> Connection state conditions:
 		<ul>
 			<li><code>(RTL6c1)</code> If the connection is <code>CONNECTED</code> then the messages are published immediately</li>
@@ -662,6 +663,7 @@
 		<li><code>(TM2a)</code> <code>id</code> string &#8211; unique ID for this message</li>
 		<li><code>(TM2b)</code> <code>clientId</code> string</li>
 		<li><code>(TM2c)</code> <code>connectionId</code> string</li>
+		<li><code>(TM2g)</code> <code>name</code> string</li>
 		<li><code>(TM2d)</code> <code>data</code> string, buffer or JSON-encodable object or array</li>
 		<li><code>(TM2e)</code> <code>encoding</code> string</li>
 		<li><code>(TM2f)</code> <code>timestamp</code> time in milliseconds since epoch</li>
@@ -835,6 +837,7 @@
 		<li><code>(AO2e)</code> <code>authHeaders</code> &#8211; Headers to be included in any request made by the library to the <code>authUrl</code></li>
 		<li><code>(AO2f)</code> <code>authParams</code> &#8211; Additional params to be included in any request made by the library to the <code>authUrl</code>, either as query params in the case of <code>GET</code> or in the body in the case of <code>POST</code></li>
 		<li><code>(AO2g)</code> <code>queryTime</code> &#8211; If true, the library will query the Ably system for the current time instead of relying on a locally-available time of day</li>
+		<li><code>(AO2h)</code> <code>force</code> &#8211; when true, indicates that a new token should be requested</li>
 	</ul></li>
 </ul>
 <h4>ChannelOptions</h4>
