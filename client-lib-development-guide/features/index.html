@@ -114,7 +114,7 @@
 	<li><code>(RSC10)</code> If a REST request responds with 401 with code 40140, then the server is indicating the token is no longer valid. Using the <code>Auth</code> class a token should be automatically issued if possible, otherwise an error should be indicated (e.g. exception raised or an error passed in callback as appropriate to the language).</li>
 	<li><code>(RSC11)</code> Requests are sent to the default endpoint <code>rest.ably.io</code>. However, if the <code>host</code> option is set, the client will send requests to the specified host. If <code>environment</code> option is configured, the environment name is prefixed to the default host endpoint and the <code>host</code> is set accordingly. For example, if the <code>environment</code> is set to sandbox, then the <code>host</code> endpoint will become <code>sandbox-rest.ably.io</code></li>
 	<li><code>(RSC12)</code> REST endpoint host is configurable in the Client constructor with the option <code>restHost</code></li>
-	<li><code>(RSC13)</code> The client library must use <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/rest/client.rb#L24-L30">default connection and request timeouts</a>. Ideally these default timeouts should be configurable by the developer.</li>
+	<li><code>(RSC13)</code> The client library must use the connection and request timeouts specified in the <code>ClientOptions</code>, falling back to the defaults described in <code>ClientOptions</code> below</li>
 	<li><code>(RSC14)</code> Authentication
 	<ul>
 		<li><code>(RSC14a)</code> Supports basic authentication when an API key is provided with the <code>key</code> option.  The API key follows the format <code>"KEY_NAME:KEY_SECRET"</code> so when authenticating using basic auth, the key name can be used as the username and the key secret as the password.</li>
@@ -144,24 +144,30 @@
 	</ul></li>
 	<li><code>(RSA4)</code> Token Auth is used if <code>useTokenAuth</code> is set to true, or if <code>useTokenAuth</code> is unspecified and any one of the following conditions cause token auth to be selected as the default: a <code>clientId</code> is specified; <code>authUrl</code> or <code>authCallback</code> is provided; an explicit <code>token</code> or <code>TokenDetails</code> is provided</li>
 	<li><code>(RSA14)</code> If Token Auth is selected, an exception will be raised if a token is not provided or there is no means to generate a token. For example, if only the option <code>useTokenAuth</code> is specified, and a <code>key</code> is not provided, then the client library is unable to authenticate or issue a token</li>
-	<li><code>(RSA15)</code> If Token Auth is selected and <code>clientId</code> has been set in the <code>ClientOptions</code> when the library was instanced, any <code>clientId</code> present in the token must match the <code>clientId</code> provided in <code>ClientOptions</code>. Following an auth request which uses a <code>TokenDetails</code> or <code>TokenRequest</code> object that contains an incompatible <code>clientId</code>, the library should change the connection state to <code>FAILED</code> and emit an error</li>
+	<li><code>(RSA15)</code> If Token Auth is selected and <code>clientId</code> has been set in the <code>ClientOptions</code> when the library was instanced:
+	<ul>
+		<li><code>(RSA15a)</code> Any <code>clientId</code> provided in <code>ClientOptions</code> must match any non <code>null</code> <code>clientId</code> value in <code>TokenDetails</code> or <code>connectionDetails</code> of the <code>CONNECTED</code> <code>ProtocolMessage</code>, where applicable</li>
+		<li><code>(RSA15b)</code> If the <code>clientId</code> from <code>TokenDetails</code> or <code>connectionDetails</code> contains only a wildcard string <code>'*'</code>, then the client is permitted to be either unauthenticated (effectively anonymous without a <code>clientId</code>) or authenticated providing a <code>clientId</code> when communicating with Ably</li>
+		<li><code>(RSA15c)</code> Following an auth request which uses a <code>TokenDetails</code> or <code>TokenRequest</code> object that contains an incompatible <code>clientId</code>, the library should change the connection state to <code>FAILED</code> and emit an error</li>
+	</ul></li>
 	<li><code>(RSA5)</code> TTL for new tokens is specified in milliseconds and defaults to the REST API default (1 hour)</li>
 	<li><code>(RSA6)</code> The <code>capability</code>, if not specified, defaults to allow all operations permitted for the key associated with the token</li>
 	<li><code>(RSA7)</code> <code>clientId</code> and authenticated clients:
 	<ul>
-		<li><code>(RAS7a)</code> If a <code>clientId</code> is provided in the <code>ClientOptions</code>, or is present in the current authentication token, then the client is considered to be authenticated i.e. it has an identity that is implicit in all operations. The following applies to authenticated clients:
+		<li><code>(RSA7a)</code> If a <code>clientId</code> is provided in the <code>ClientOptions</code>, or is present in the current authentication token, then the client is considered to be authenticated (it has a <code>clientId</code> that is implicit in all operations). Note that an authentication token <code>clientId</code> wildcard value of <code>'*'</code> is the exception where the client is not necessarily authenticated and any <code>clientId</code> is permitted. The following applies to authenticated clients:
 		<ul>
-			<li><code>(RAS7a1)</code> All operations (such as message publishing or presence) will have an implicit <code>clientId</code>. The Ably service automatically updates the <code>clientId</code> attribute (when empty) for all <code>Message</code> and <code>PresenceMessage</code> messages received from that authenticated client, and any messages then published from the Ably service, will have the <code>clientId</code> attribute populated. It is therefore expected that Ably client libraries do not explicitly set the <code>clientId</code> field on messages published when <code>clientId</code> is implicit in the connection or authentication scheme</li>
-			<li><code>(RSA7a2)</code> The server will reject the publishing of messages with an explicit <code>clientId</code> that does not match the authenticated client&#8217;s <code>clientId</code>. The connection and channel remains available for further operations</li>
-			<li><code>(RSA7a3)</code> The client library raises an exception if the <code>clientId</code> attribute of any <code>Message</code> or <code>PresenceMessage</code> published is not <code>null</code> and does not match the non-<code>null</code> <code>Auth#clientId</code>. The connection and channel remains available for further operations</li>
-			<li><code>(RSA7a4)</code> <code>Auth#clientId</code> attribute returns a string value for the authenticated client&#8217;s <code>clientId</code>. If the client is not authenticated and a <code>clientId</code> value was not provided when instanced with <code>ClientOptions</code>, then <code>Auth#clientId</code> is <code>null</code></li>
+			<li><code>(RSA7a1)</code> All operations (such as message publishing or presence) will have an implicit <code>clientId</code>. The Ably service automatically updates the <code>clientId</code> attribute (when empty) for all <code>Message</code> and <code>PresenceMessage</code> messages received from that authenticated client, and any messages then published from the Ably service, will have the <code>clientId</code> attribute populated. It is therefore expected that Ably client libraries do not explicitly set the <code>clientId</code> field on messages published when <code>clientId</code> is implicit in the connection or authentication scheme</li>
+			<li><code>(RSA7a2)</code> If <code>clientId</code> is provided in <code>ClientOptions</code>, and an API key is provided along with no other means to generate a token, the client library will authenticate with Ably and obtain a token using the provided <code>clientId</code> ensuring the token is restricted to operations for that <code>clientId</code></li>
+			<li><code>(RSA7a3)</code> <code>Auth#clientId</code> attribute returns a string value for the authenticated client&#8217;s <code>clientId</code></li>
 		</ul></li>
+		<li><code>(RSA12)</code> <code>Auth#clientId</code> attribute is <code>null</code>, when following authentication, the <code>clientId</code> attribute of the <code>TokenDetails</code> is a wildcard <code>'*'</code>, indicating that any <code>clientId</code> can be used by this client</li>
 		<li><code>(RSA7b)</code> <code>Auth#clientId</code> is not <code>null</code> when:
 		<ul>
 			<li><code>(RSA7b1)</code> A <code>clientId</code> is provided in the <code>ClientOptions</code>. <code>clientId</code> should be a string</li>
-			<li><code>(RSA7b2)</code> Token authentication is being used, and the <code>TokenRequest</code> or <code>TokenDetails</code> object, used for authentication, has a <code>clientId</code> value</li>
-			<li><code>(RSA7b3)</code> Following a realtime connection being established, if the <code>CONNECTED</code> <code>ProtocolMessages</code> contains a <code>clientId</code> in the <code>ConnectionDetails</code> object, which is optionally present in <code>ProtocolMessage#connectionDetails</code></li>
+			<li><code>(RSA7b2)</code> Token authentication is being used, and the <code>TokenRequest</code> or <code>TokenDetails</code> object, used for authentication, has a <code>clientId</code> value that is not <code>null</code> or a wildcard string <code>'*'</code></li>
+			<li><code>(RSA7b3)</code> Following a realtime connection being established, if the <code>CONNECTED</code> <code>ProtocolMessages</code> contains a <code>clientId</code> that is both not <code>null</code> and not a wildcard string <code>'*'</code>. <code>clientId</code> is an attribute of <code>ProtocolMessage#connectionDetails</code> within a <code>CONNECTED</code> <code>ProtocolMessage</code></li>
 		</ul></li>
+		<li><code>(RSA7c)</code> A <code>clientId</code> provided in the <code>ClientOptions</code> when instancing the library must be either <code>null</code> or a string, and cannot contain only a wilcard <code>'*'</code> value which is reserved</li>
 	</ul></li>
 	<li><code>(RSA8)</code> <code>Auth#requestToken</code> function:
 	<ul>
@@ -179,6 +185,13 @@
 			<li><code>(RSA8c3)</code> Specifying <code>authParams</code> as part of <code>AuthOptions</code> replaces any configured <code>authParams</code> specified in <code>ClientOptions</code>. As the key/value pairs are not merged, this enables a developer to delete <code>authParams</code> where necessary by providing an entire new set of <code>authParams</code></li>
 		</ul></li>
 		<li><code>(RSA8d)</code> When <code>authCallback</code> option is set, it will invoke the callback, passing in the <code>TokenParams</code>, and expects either a token string, a <code>TokenDetails</code> object or a <code>TokenRequest</code> object to be returned, which will in turn be used to request a token from Ably</li>
+		<li><code>(RSA8e)</code> A test should exist for the following:
+		<ul>
+			<li><code>(RSA8e1)</code> Request a token with a <code>null</code> value <code>clientId</code>, authenticate a client with the token, publish a message without an explicit <code>clientId</code>, and ensure the message published does not have a <code>clientId</code>. Check that <code>Auth#clientId</code> is <code>null</code></li>
+			<li><code>(RSA8e2)</code> Request a token with a <code>null</code> value <code>clientId</code>, authenticate a client with the token, publish a message with an explicit <code>clientId</code> value, and ensure that the message is rejected</li>
+			<li><code>(RSA8e1)</code> Request a token with a wildcard <code>'*'</code> value <code>clientId</code>, authenticate a client with the token, publish a message without an explicit <code>clientId</code>, and ensure the message published does not have a <code>clientId</code>. Check that <code>Auth#clientId</code> is <code>null</code></li>
+			<li><code>(RSA8e2)</code> Request a token with a wildcard <code>'*'</code> value <code>clientId</code>, authenticate a client with the token, publish a message with an explicit <code>clientId</code> value, and ensure that the message published has the provided <code>clientId</code></li>
+		</ul></li>
 	</ul></li>
 	<li><code>(RSA9)</code> <code>Auth#createTokenRequest</code> function:
 	<ul>
@@ -227,10 +240,10 @@
 	<ul>
 		<li><code>(RSL1a)</code> Expects either an array of <code>Message</code> objects or a <code>name</code> string and <code>data</code> payload.</li>
 		<li><code>(RSL1b)</code> When <code>name</code> and <code>data</code> is provided, a single message is published to Ably</li>
-		<li><code>(RSL1c)</code> When an array of <code>Message</code> objects is provided, a single request is made to Ably. When publishing multiple messages, this approach is more efficient. However, a yet to be implemented feature should limit the total number of messages bundled in a single POST based on the default max request size, and would raise an exception if any single message exceeds that limit.</li>
+		<li><code>(RSL1c)</code> When an array of <code>Message</code> objects is provided, a single request is made to Ably. When publishing multiple messages, this approach is more efficient. However, a yet to be implemented feature should limit the total number of messages bundled in a single POST based on the default max request size, and would reject the publish and indicate an error if any single message exceeds that limit</li>
 		<li><code>(RSL1d)</code> Indicates an error if the message was not successfully published to Ably</li>
 		<li><code>(RSL1e)</code> Allows <code>name</code> and or <code>data</code> to be <code>null</code>.  If any of the values are null, then key is not sent to Ably i.e. a payload with a <code>null</code> value for <code>data</code> would be sent as follows <code>{ "name": "click" }</code></li>
-		<li><code>(RSL1f)</code> Unauthenticated clients without a <code>clientId</code> (any <code>clientId</code> is permitted):
+		<li><code>(RSL1f)</code> Unauthenticated clients using basic auth without a <code>clientId</code> (i.e. any <code>clientId</code> is permitted):
 		<ul>
 			<li><code>(RSL1f1)</code> When a <code>Message</code> with a <code>clientId</code> value is published, Ably will accept and publish that message with the provided <code>clientId</code>. A test should assert via the history API that the <code>clientId</code> of the published <code>Message</code> is correct for both authentication schemes (token and basic)</li>
 		</ul></li>
@@ -242,9 +255,8 @@
 				<li><code>(RSL1g1b)</code> Ably is expected to automatically assign a <code>clientId</code> upon receiving the <code>Message</code>. A test should assert via the history API that the <code>clientId</code> value is populated for the <code>Message</code> when received</li>
 			</ul></li>
 			<li><code>(RSL1g2)</code> When publishing a <code>Message</code> with the <code>clientId</code> attribute value set to the authenticated client&#8217;s <code>clientId</code>, Ably will accept the message and publish it. A test should assert that the <code>clientId</code> value is populated for the <code>Message</code> when received</li>
-			<li><code>(RSL1g3)</code> When publishing a <code>Message</code> with a different <code>clientId</code> attribute value to the authenticated <code>clientId</code>, the client library should reject the message, and an exception should be raised. The connection and channel remains available for further operations</li>
-			<li><code>(RSL1g4)</code> When using the Realtime library, it is possible to publish a message with an explicit <code>clientId</code> before the library has completed authentication. As such, it is possible that the <code>clientId</code> inferred following authentication is incompatible with the explicit <code>clientId</code> of the message queued for delivery. In this case, it is not expected that the client library will reject the already queued message as the Ably server will reject the message anyway when received. However, all future messages published with an incompatible <code>clientId</code> should be immediately rejected by the client library</li>
-			<li><code>(RSL1g5)</code> When using the REST library, publishing a message with an explicit <code>clientId</code> that is incompatible with the <code>clientId</code> inferred following authentication will cause the library to reject the message immediately. Unlike the Realtime library, the message is never queued,and as such, authentication will be completed synchronously before attempting to publish the message over REST</li>
+			<li><code>(RSL1g3)</code> When publishing a <code>Message</code> with a different <code>clientId</code> attribute value to the authenticated <code>clientId</code>, the client library should reject the message, and indicate an error. The connection and channel remains available for further operations</li>
+			<li><code>(RSL1g4)</code> When publishing a message with an explicit <code>clientId</code> that is incompatible with the <code>clientId</code> (either inferred or explicitly configured in the token or <code>ClientOptions</code>), the library will reject the message immediately and indicate an error</li>
 		</ul></li>
 		<li><code>(RSL1h)</code> Where the library language permits, the <code>Channel#publish(name, data)</code> method should provide an optional argument that allows the <code>clientId</code> value to be specified such as <code>Channel#publish('event', 'data', { clientId: 'John' })</code></li>
 	</ul></li>
@@ -333,7 +345,7 @@
 	<li><code>(RTC3)</code> <code>RealtimeClient#channels</code> attribute provides access to the underlying <code>Channels</code> object</li>
 	<li><code>(RTC4)</code> <code>RealtimeClient#auth</code> attribute provides access to the <code>Auth</code> object that was instanced with the <code>ClientOptions</code> provided in the <code>RealtimeClient</code> constructor
 	<ul>
-		<li><code>(RTC4a)</code> Unlike the stateless REST client library, the <code>Auth#clientId</code> may be populated when the connection is established.  The <code>CONNECTED</code> <code>ProtocolMessage</code> may contain a <code>clientId</code> that notifies the <code>RealtimeClient</code> that all further operations are implicitly for that <code>clientId</code>, and operations for any other <code>clientId</code> are no longer permitted. See Auth for further details</li>
+		<li><code>(RTC4a)</code> Unlike the stateless REST client library, the <code>Auth#clientId</code> may be populated when the connection is established.  The <code>CONNECTED</code> <code>ProtocolMessage</code> may contain a <code>clientId</code> that notifies the <code>RealtimeClient</code> that all further operations are implicitly for that <code>clientId</code>, and operations for any other <code>clientId</code> are no longer permitted. See <code>RSA7b</code> for complete details</li>
 	</ul></li>
 	<li><code>(RTC5)</code> <code>RealtimeClient#stats</code> function:
 	<ul>
@@ -344,6 +356,7 @@
 	<ul>
 		<li><code>(RTC6a)</code> Proxy to <code>RestClient#time</code> presented with an async or threaded interface as appropriate</li>
 	</ul></li>
+	<li><code>(RTC7)</code> The client library must use the configured timeouts specified in the <code>ClientOptions</code>, falling back to the <a href="#defaults">client library defaults</a> and defaults described in <code>ClientOptions</code> below</li>
 </ul>
 <h3 id="realtime-connection">Connection</h3>
 <ul>
@@ -368,6 +381,7 @@
 	</ul></li>
 	<li><code>(RTN5)</code> A test should exist that instances many (50+) clients simultaneously and performs a few basic operations such as attaching to a channel, publishing a message, and expecting all of those messages to arrive on all clients to ensure that there are no concurrency issues with the client library</li>
 	<li><code>(RTN6)</code> A <code>Connection</code> is successful and considered <code>CONNECTED</code> once the websocket connection is open and the intial <code>CONNECTED</code> <code>ProtocolMessage</code> has been received</li>
+	<li><code>(RTN19)</code> If the <code>CONNECTED</code> <code>ProtocolMessage</code> contains a <code>connectionDetails</code> property, the attributes within <code>ConnectionDetails</code> will be used as the defaults for this client library, overriding any configured options at the time the <code>CONNECTED</code> <code>ProtocolMessage</code> is received</li>
 	<li><code>(RTN7)</code> <code>ACK</code> and <code>NACK</code>:
 	<ul>
 		<li><code>(RTN7a)</code> All <code>ProtocolMessage</code> <code>Presence</code> and <code>Message</code> objects sent to Ably expect either an <code>ACK</code> or <code>NACK</code> from Ably to confirm successful receipt and acceptance or failure respectively</li>
@@ -376,7 +390,7 @@
 	</ul></li>
 	<li><code>(RTN8)</code> <code>Connection#id</code> attribute:
 	<ul>
-		<li><code>(RTN8a)</code> Is <code>Null</code> until connected</li>
+		<li><code>(RTN8a)</code> Is <code>null</code> until connected</li>
 		<li><code>(RTN8b)</code> Is a unique string provided by Ably. You should have a test to ensure multiple connected clients have unique connection IDs</li>
 	</ul></li>
 	<li><code>(RTN9)</code> <code>Connection#key</code> attribute:
@@ -399,21 +413,22 @@
 	<li><code>(RTN12)</code> <code>Connection#close</code> function:
 	<ul>
 		<li><code>(RTN12a)</code> Sends a <code>CLOSE</code> <code>ProtocolMessage</code> to the server, sets the state to <code>CLOSING</code> and waits for a <code>CLOSED</code> <code>ProtocolMessage</code> to be received</li>
-		<li><code>(RTN12b)</code> If the <code>CLOSED</code> <code>ProtocolMessage</code> is not received within the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">configured close timeout</a>, the transport will be disconnected and the connection will automatically move to the <code>CLOSED</code> state</li>
+		<li><code>(RTN12b)</code> If the <code>CLOSED</code> <code>ProtocolMessage</code> is not received within the <a href="#defaults">default realtime request timeout</a>, the transport will be disconnected and the connection will automatically move to the <code>CLOSED</code> state</li>
 		<li><code>(RTN12c)</code> If the transport is abruptly closed following a <code>CLOSE</code> <code>ProtocolMessage</code> being sent, then the connection will automatically move to the <code>CLOSED</code> state</li>
 	</ul></li>
 	<li><code>(RTN13)</code> <code>Connection#ping</code> function:
 	<ul>
 		<li><code>(RTN13a)</code> Will send a <code>ProtocolMessage</code> with action <code>HEARTBEAT</code> the Ably service when connected and expects a <code>HEARTBEAT</code> message in response. If the client library language supports callbacks, then the callback will be called with the response time or error</li>
-		<li><code>(RTN13b)</code> Will immediately raise an exception if in the <code>CLOSED</code> or <code>FAILED</code> state</li>
+		<li><code>(RTN13b)</code> Will immediately indicate an error if in the <code>CLOSED</code> or <code>FAILED</code> state</li>
+		<li><code>(RTN13c)</code> Will fail if a <code>HEARTBEAT</code> <code>ProtocolMessage</code> is not received within the <a href="#defaults">default realtime request timeout</a></li>
 	</ul></li>
 	<li><code>(RTN14)</code> <code>Connection</code> opening failures:
 	<ul>
 		<li><code>(RTN14a)</code> If an API key is invalid, then the connection will enter the <code>FAILED</code> state and the <code>errorReason</code> will be set on the <code>Connection</code> object as well as the emitted <code>ConnectionStateChange</code></li>
 		<li><code>(RTN14b)</code> If a connection request fails because the token has expired, and the token is renewable, then a new token will be created and subsequent requests will be made without changing the state or emitting an error. If the token is not renewable, the connection will transition to the <code>FAILED</code> state</li>
-		<li><code>(RTN14c)</code> A new connection attempt will fail if not connected within the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">configured open timeout</a></li>
-		<li><code>(RTN14d)</code> If a connection attempt fails for any recoverable reason (i.e. not an authentication failure), the <code>Connection#state</code> will change to <code>DISCONNECTED</code>, the <code>Connection#errorReason</code> will be updated, a <code>ConnectionStateChange</code> with the <code>errorReason</code> will be emitted, and new connection attempts will periodically be made until the maximum time in that state threshold is reached.  The <code>retryIn</code> attribute of the <code>ConnectionStateChange</code> object will contain the time in milliseconds until the next connection attempt. See <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected retry config</a>. Each time a new connection attempt is made the state will change to <code>CONNECTING</code> and then to <code>CONNECTED</code> if successful, or <code>DISCONNECTED</code> if unsuccessful and the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected state threshold</a> has not been exceeded.</li>
-		<li><code>(RTN14e)</code> Once the connection state has been in the <code>DISCONNECTED</code> state for more than the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">disconnected state threshold</a>, the state will change to <code>SUSPENDED</code> and be emitted with the <code>errorReason</code>, and the <code>Connection#errorReason</code> will be updated. In this state, a new connection attempt will be made periodically as defined in the <a href="https://github.com/ably/ably-ruby/blob/master/lib/ably/realtime/connection/connection_manager.rb">suspended state threshold</a></li>
+		<li><code>(RTN14c)</code> A new connection attempt will fail if not connected within the <a href="#defaults">default realtime request timeout</a></li>
+		<li><code>(RTN14d)</code> If a connection attempt fails for any recoverable reason (i.e. not an authentication failure), the <code>Connection#state</code> will change to <code>DISCONNECTED</code>, the <code>Connection#errorReason</code> will be updated, a <code>ConnectionStateChange</code> with the <code>errorReason</code> will be emitted, and new connection attempts will periodically be made until the maximum time in that state threshold is reached.  The <code>retryIn</code> attribute of the <code>ConnectionStateChange</code> object will contain the time in milliseconds until the next connection attempt. See the <code>disconnectedRetryFrequency</code> of <code>ClientOptions</code> below. Each time a new connection attempt is made the state will change to <code>CONNECTING</code> and then to <code>CONNECTED</code> if successful, or <code>DISCONNECTED</code> if unsuccessful and the <a href="#defaults">default <code>connectionStateTtl</code></a> has not been exceeded.</li>
+		<li><code>(RTN14e)</code> Once the connection state has been in the <code>DISCONNECTED</code> state for more than the <a href="#defaults">default <code>connectionStateTtl</code></a>, the state will change to <code>SUSPENDED</code> and be emitted with the <code>errorReason</code>, and the <code>Connection#errorReason</code> will be updated. In this state, a new connection attempt will be made periodically as specified within <code>suspendedRetryFrequency</code> of <code>ClientOptions</code></li>
 		<li><code>(RTN14f)</code> The connection will remain in the <code>SUSPENDED</code> state indefinitely, whilst periodically attempting to reestablish a connection</li>
 	</ul></li>
 	<li><code>(RTN15)</code> <code>Connection</code> failures once <code>CONNECTED</code>:
@@ -424,21 +439,34 @@
 			<li><code>(RTN15b1)</code> <code>resume</code> is the private connection key assigned to the connection when the first <code>CONNECTED</code> <code>ProtocolMessage</code> was received</li>
 			<li><code>(RTN15b2)</code> <code>connection_serial</code> is the most recent <code>ProtocolMessage#connectionSerial</code> received from Ably or <code>Connection#serial</code> which should be identical</li>
 		</ul></li>
-		<li><code>(RTN15c)</code> When a new connection is made using the <code>resume</code> and <code>connection_serial</code> params, the client library must consider the resume to have failed if the <code>CONNECTED</code> <code>ProtocolMessage</code> contains an error or if the <code>Connection#id</code> has changed. When a <code>Connection</code> resume has failed, all channels should be detach with a suitable error reason</li>
+		<li><code>(RTN15c)</code> The system&#8217;s response to a resume request will be one of the following:
+			<ul>
+				<li><code>(RTN15c1)</code> <code>CONNECTED</code> <code>ProtocolMessage</code> with the same <code>connectionId</code> as the current client, and no <code>error</code>. In this case, the server is indicating that the resume succeeded, all channels are still attached, and all backlog messages are available</li>
+				<li><code>(RTN15c2)</code> <code>CONNECTED</code> <code>ProtocolMessage</code> with the same <code>connectionId</code> as the current client, and an <code>error</code>. In this case, the server is indicating that the resume succeeded but with a non-fatal error, all channels are still attached, and some backlog messages may be unavailable. The <code>ErrorInfo</code> received should be emitted on the client <code>Connection</code> as well as all <code>ATTACHED</code> <code>Channel</code> objects.</li>
+				<li><code>(RTN15c3)</code> <code>CONNECTED</code> <code>ProtocolMessage</code> with a new <code>connectionId</code>, and an error in <code>error</code>. In this case, a new connection has been established, the resume has failed, the channels are no longer attached, and the error indicates the resume problem which should be emitted. The client library should immediately detach all channels and set the <code>errorReason</code> on each detached <code>Channel</code></li>
+				<li><code>(RTN15c4)</code> <code>ERROR</code> <code>ProtocolMessage</code> indicating a fatal error in the connection. The server will close the transport immediately after. If the <code>ERROR</code> is non-recoverable, the client will move to the <code>FAILED</code> state triggering all attached channels to move to the <code>FAILED</code> state as well</li>
+			</ul></li>
+		<li><code>(RTN15g)</code> When the connection resume has failed, all channels should be detached with a suitable error reason</li>
+		<li><code>(RTN15f)</code> <code>ACK</code> and <code>NACK</code> responses for published messages can only ever be received on the transport connection on which those messages were sent. Therefore, once a transport drops, the client library must either fail the publish attempt, or re-attempt by re-sending the messages on a new transport if the resume was successful (i.e. the <code>CONNECTED</code> response includes the expected <code>connectionId</code>)</li>
 		<li><code>(RTN15d)</code> Client libraries should have test coverage to ensure connection state recovery is working as expected by forciby disconnecting a client and checking that messages published on channels are delivered once the connection is resumed</li>
 		<li><code>(RTN15e)</code> When a connection is resumed, the <code>Connection#key</code> may change and will be provided in the first <code>CONNECTED</code> <code>ProtocolMessage#connectionDetails</code> when the connection is established. The client library must update the <code>Connection#key</code> value with the new <code>connectionKey</code> value every time</li>
+	</ul></li>
+	<li><code>(RTN20)</code> When the client library can subscribe to the Operating System events for network/internet connectivity changes:
+	<ul>
+		<li><code>(RTN20a)</code> When <code>CONNECTED</code>, <code>CONNECTING</code> or <code>DISCONNECTING</code>, if the operating system indicates that the underlying internet connection is no longer available, then the client library should immediately change state to <code>DISCONNECTED</code> with a suitable <code>errorReason</code>. This state change will automatically trigger the client library to attempt to reconnect, see <code>RTN15</code> above</li>
+		<li><code>(RTN20b)</code> When <code>DISCONNECTED</code> or <code>SUSPENDED</code>, if the operating system indicates that the underlying internet connection is now available, the client library should immediately attempt to connect</li>
 	</ul></li>
 	<li><code>(RTN16)</code> <code>Connection</code> recovery:
 	<ul>
 		<li><code>(RTN16a)</code> Connection recovery is similar to the automatic connection resume except that connection state is recovered explicitly because a <code>recover</code> key is passed to the Realtime library when instanced. Once a connection is recovered, all channels must be explicitly attached by the developer, and any messages queued to be delivered whilst the client was disconnected will be delivered</li>
 		<li><code>(RTN16b)</code> <code>Connection#recoveryKey</code> is an attribute composed of the connection key and latest serial received on the connection</li>
-		<li><code>(RTN16c)</code> <code>Connection#recoveryKey</code> is <code>Null</code> when a connection is explicitly <code>CLOSED</code> as connection state is not retained for connections closed at the request of the client</li>
+		<li><code>(RTN16c)</code> <code>Connection#recoveryKey</code> becomes <code>Null</code> when a connection is explicitly <code>CLOSED</code> or <code>CLOSED</code> by the server, as connection state is not retained for connections closed intentionally. The <code>Connection#key</code> and <code>Connection#id</code> is set to <code>Null</code></li>
 		<li><code>(RTN16d)</code> When a connection is successfully recovered, the <code>Connection#id</code> and <code>Connection#key</code> will be identical to the <code>id</code> &amp; <code>key</code> of the connection that was recovered</li>
 		<li><code>(RTN16e)</code> If the <code>recover</code> option is missing or no longer valid when connecting to Ably, the client will connect anyway, but emit a <code>ConnectionStateChange</code> with an <code>errorReason</code>, and will additionally set the <code>Connection#errorReason</code> with an <code>ErrorInfo</code> object describing the failure</li>
 	</ul></li>
 	<li><code>(RTN17)</code> Host Fallback
 	<ul>
-		<li><code>(RTN17a)</code> All HTTP requests sent to Ably are fault-tolerant and will fallback to an alternative host if the default host is unreachable, or indicates that it is unserviceable with a 500 to 504 status code. This ensures that a client library is able to work around routing or other problems with the user&#8217;s closest datacenter. For example, if a connection attempt to <code>realtime.ably.io</code> fails because the default endpoint is unreachable or unserviceable, then the <code>Connection</code> manager should check if an internet connection is available by sending a request to our CDN <code>internet-up.ably-realtime.com/is-the-internet-up.txt</code> and looking for the text &#8220;yes&#8221; in the response.  If the text &#8220;yes&#8221; is included in the response, then the the client library can assume it has a viable internet connection and should then automatically retry the connection against all the fallback hosts <code>[a-e].ably-realtime.com</code> in attempt to find an alternate healthy datacenter.</li>
+		<li><code>(RTN17a)</code> All requests sent to Ably are fault-tolerant and will fallback to an alternative host if the default host is unreachable, or indicates that it is unserviceable with a 500 to 504 status code. This ensures that a client library is able to work around routing or other problems with the user&#8217;s closest datacenter. For example, if a connection attempt to <code>realtime.ably.io</code> fails because the default endpoint is unreachable or unserviceable, then the <code>Connection</code> manager should check if an internet connection is available by sending a request to our CDN <code>internet-up.ably-realtime.com/is-the-internet-up.txt</code> and looking for the text &#8220;yes&#8221; in the response.  If the text &#8220;yes&#8221; is included in the response, then the client library can assume it has a viable internet connection and should then immediately retry the connection against all the fallback hosts <code>[a-e].ably-realtime.com</code> in attempt to find an alternate healthy datacenter.</li>
 		<li><code>(RTN17b)</code> The fallback behaviour only applies to the default <code>realtime.ably.io</code> endpoint; if either <code>host</code> or <code>environment</code> options are set, no fallback host is used.</li>
 		<li><code>(RTN17c)</code> See the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/transport/Defaults.java#L7">default fallback hosts</a> and the <a href="https://github.com/ably/ably-java/blob/39f3f0226bd995bd6baffa1df47a0a4957d29c43/src/io/ably/transport/ConnectionManager.java#L428-L455">fallback mechanism implemented in the Java ConnectionManager</a> as an example.</li>
 	</ul></li>
@@ -447,6 +475,12 @@
 		<li><code>(RTN18a)</code> When a connection enters the <code>DISCONNECTED</code> state, it will have no effect on the the channel states. Channels in the <code>ATTACHED</code> state will queue messages that are sent as soon as the connection is resumed</li>
 		<li><code>(RTN18b)</code> When a connection enters the <code>SUSPENDED</code> state, all channels will move to the <code>DETACHED</code> state. Channels in the <code>DETACHED</code> state should reject publishing of messages</li>
 		<li><code>(RTN18c)</code> When a channel enters the <code>FAILED</code> state, all channels will move to the <code>FAILED</code> state. Channels in the <code>FAILED</code> state should reject publishing of messages</li>
+	</ul></li>
+	<li><code>(RTN19)</code> Transport state side effects &#8211; when a transport is upgraded or disconnected for any reason:
+	<ul>
+		<li><code>(RTN19a)</code> Any <code>ProtocolMessage</code> that is awaiting an <code>ACK</code>/<code>NACK</code> on the old transport will not receive the <code>ACK</code>/<code>NACK</code> on the new transport. The client library must therefore resend any <code>ProtocolMessage</code> that is awaiting a <code>ACK</code>/<code>NACK</code> to Ably in order to receive the expected <code>ACK</code>/<code>NACK</code> for that message. The Ably service is responsible for keeping track of messages, ignoring duplicates and responding with suitable <code>ACK</code>/<code>NACK</code> messages</li>
+		<li><code>(RTN19b)</code> If there are any pending channels i.e. in the <code>ATTACHING</code> or <code>DETACHING</code> state, the respective <code>ATTACH</code> or <code>DETACH</code> message should be resent to Ably</li>
+		<li><code>(RTN19b)</code> If a <code>SYNC</code> is underway, ensure the client library adheres to <code>RTP3</code></li>
 	</ul></li>
 </ul>
 <h3 id="realtime-channels">Channels</h3>
@@ -483,6 +517,7 @@
 		<li><code>(RTL4a)</code> If already <code>ATTACHED</code> or <code>ATTACHING</code> nothing is done</li>
 		<li><code>(RTL4b)</code> If the connection state is <code>CLOSED</code>, <code>CLOSING</code>, <code>SUSPENDED</code> or <code>FAILED</code>, an exception should be thrown immediately</li>
 		<li><code>(RTL4c)</code> Otherwise an <code>ATTACH</code> ProtocolMessage is sent to the server, the state changes to <code>ATTACHING</code> and the channel becomes <code>ATTACHED</code> when the confirmation <code>ATTACHED</code> ProtocolMessage is received</li>
+		<li><code>(RTL4f)</code> Once an <code>ATTACH</code> <code>ProtocolMessage</code> is sent, if an <code>ATTACHED</code> <code>ProtocolMessage</code> is not received within the <a href="#defaults">default realtime request timeout</a>, the attach request should be treated as though it has failed</li>
 		<li><code>(RTL4d)</code> If the language permits, a callback can be provided that is called when the channel is attached successfully or the attach fails and the the <code>ErrorInfo</code> error is passed as an argument to the callback.</li>
 		<li><code>(RTL4e)</code> If the user does not have sufficient permissions to attach to the channel, the channel state <code>FAILED</code> is emitted with the error <code>ErrorInfo</code>. An error event is also emitted, and the <code>errorReason</code> attribute of the <code>Channel</code> is set to the error <code>ErrorInfo</code> object</li>
 	</ul></li>
@@ -491,6 +526,7 @@
 		<li><code>(RTL5a)</code> If state is <code>INITIALISED</code>, <code>DETACHED</code> or <code>DETACHING</code> nothing is done</li>
 		<li><code>(RTL5b)</code> If state is <code>FAILED</code> an exception should be thrown immediately</li>
 		<li><code>(RTL5d)</code> Otherwise a <code>DETACH</code> ProtocolMessage is sent to the server, the state changes to <code>DETACHING</code> and the channel becomes <code>DETACHED</code> when the confirmation <code>DETACHED</code> ProtocolMessage is received</li>
+		<li><code>(RTL5f)</code> Once a <code>DETACH</code> <code>ProtocolMessage</code> is sent, if a <code>DETACHED</code> <code>ProtocolMessage</code> is not received within the <a href="#defaults">default realtime request timeout</a>, the detach request should be treated as though it has failed</li>
 		<li><code>(RTL5e)</code> If the language permits, a callback can be provided that is called when the channel is detached successfully or the detach fails and the the <code>ErrorInfo</code> error is passed as an argument to the callback.</li>
 	</ul></li>
 	<li><code>(RTL6)</code> <code>Channel#publish</code> function:
@@ -500,15 +536,15 @@
 		<li><code>(RTL6i)</code> Expects either an array of <code>Message</code> objects or a <code>name</code> string and <code>data</code> payload:</li>
 		<li><code>(RTL6i1)</code> When <code>name</code> and <code>data</code> is provided, a single <code>ProtocolMessage</code> containing one <code>Message</code> is published to Ably</li>
 		<li><code>(RTL6i2)</code> When an array of <code>Message</code> objects is provided, a single <code>ProtocolMessage</code> is used to publish all <code>Message</code> objects in the array. However, a yet to be implemented feature should limit the total number of messages bundled in a single ProtocolMessage based on the default max message size.</li>
-		<li><code>(RTL6i3)</code> Allows <code>name</code> and or <code>data</code> to be <code>Null</code>.  If any of the values are null, then key is not sent to Ably i.e. a payload with a <code>Null</code> value for <code>data</code> would be sent as follows <code>{ "name": "click" }</code></li>
+		<li><code>(RTL6i3)</code> Allows <code>name</code> and or <code>data</code> to be <code>null</code>.  If any of the values are null, then key is not sent to Ably i.e. a payload with a <code>null</code> value for <code>data</code> would be sent as follows <code>{ "name": "click" }</code></li>
 		<li><code>(RTL6c)</code> Connection state conditions:
 		<ul>
 			<li><code>(RTL6c1)</code> If the connection is <code>CONNECTED</code> then the messages are published immediately</li>
 			<li><code>(RTL6c2)</code> If the connection is <code>CONNECTING</code> or <code>DISCONNECTED</code>, and <code>ClientOptions#queueMessages</code> has not been explicitly set to false, then the message will be queued and delivered as soon as the connection state returns to <code>CONNECTED</code></li>
 			<li><code>(RTL6c3)</code> Else an exception is raised preventing the message publishing</li>
 		</ul></li>
-		<li><code>(RTL6d)</code> Messages are delivered using a single <code>ProtocolMessage</code> where possible by bundling in all messages for that channel into the <code>ProtocolMessage#messages</code> array. However, a yet to be implemented feature should limit the total number of messages bundled per <code>ProtocolMessage</code> based on the default max message size, and would raise an exception if any single message exceeds that limit</li>
-		<li><code>(RTL6e)</code> Unauthenticated clients without a <code>clientId</code> (any <code>clientId</code> is permitted):
+		<li><code>(RTL6d)</code> Messages are delivered using a single <code>ProtocolMessage</code> where possible by bundling in all messages for that channel into the <code>ProtocolMessage#messages</code> array. However, a yet to be implemented feature should limit the total number of messages bundled per <code>ProtocolMessage</code> based on the default max message size, and would reject the publish and indicate an error if any single message exceeds that limit</li>
+		<li><code>(RTL6e)</code> Unauthenticated clients using basic auth without a <code>clientId</code> (i.e. any <code>clientId</code> is permitted):
 		<ul>
 			<li><code>(RTL6e1)</code>When a <code>Message</code> with a <code>clientId</code> value is published, Ably will accept and publish that message with the provided <code>clientId</code>. A test should assert that the <code>clientId</code> of the published <code>Message</code> is correct for both authentication schemes (token and basic)</li>
 		</ul></li>
@@ -520,7 +556,7 @@
 				<li><code>(RTL6g1b)</code> Ably is expected to automatically assign a <code>clientId</code> upon receiving the <code>Message</code>. A test should assert that the <code>clientId</code> value is populated for the <code>Message</code> when received</li>
 			</ul></li>
 			<li><code>(RTL6g2)</code> When publishing a <code>Message</code> with the <code>clientId</code> attribute value set to the authenticated client&#8217;s <code>clientId</code>, Ably will accept the message and publish it. A test should assert that the <code>clientId</code> value is populated for the <code>Message</code> when received</li>
-			<li><code>(RTL6g3)</code> When publishing a <code>Message</code> with a different <code>clientId</code> attribute value to the authenticated <code>clientId</code>, the client library should reject publishing immediately. The message should not be sent to Ably and an exception should be raised. The connection and channel remains available for further operations</li>
+			<li><code>(RTL6g3)</code> When publishing a <code>Message</code> with a different <code>clientId</code> attribute value to the authenticated <code>clientId</code>, the client library should reject publishing immediately. The message should not be sent to Ably and the errr callback should be called. The connection and channel must remain available for further publishing and other operations</li>
 			<li><code>(RTL6g4)</code> When using token auth, unless a <code>clientId</code> has been provided in <code>ClientOptions</code> or inferred following authentication, the client library will not be constrained when publishing messages with any explicit <code>clientId</code>. If a <code>Message</code> with a <code>clientId</code> value is published before the <code>clientId</code> is configured or inferred following authentication, the client library should not reject any explicit <code>clientId</code> specified in a message. A test should instance a library without an explicit <code>clientId</code> and an <code>authCallback</code> that returns a <code>tokenDetails</code> object with a <code>clientId</code>, then publish a message with the same <code>clientId</code> before authentication, and ensure that the message is published following authentication and received back with the <code>clientId</code> intact. A further test should follow the same sequence of events, but should instead use an incompatible <code>clientId</code> in the message, expecting that the message is rejected by the Ably service and the message error should contain the server error message, and the connection and channel should remain available for further operations</li>
 		</ul></li>
 		<li><code>(RTL6h)</code> Where the library language permits, the <code>Channel#publish(name, data)</code> method should provide an optional argument that allows the <code>clientId</code> value to be specified such as <code>Channel#publish('event', 'data', { clientId: 'John' })</code></li>
@@ -556,7 +592,7 @@
 <ul>
 	<li><code>(RTP1)</code> When a channel <code>ATTACHED</code> <code>ProtocolMessage</code> is received, the <code>ProtocolMessage</code> may contain a bit flag with value 1 indicating that there are currently members present on the channel. If members are present, subsequent <code>ProtocolMessage SYNC</code> messages will be delivered with presence members (messages) until the <code>SYNC</code> operation is complete. If there is no flag or the right most bit is zero, then the presence map should be considered in sync immediately as there are no members present on the channel at the time of attach</li>
 	<li><code>(RTP2)</code> A <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L384-L529">PresenceMap</a> should be used to maintain a list of members present on a channel. As there are no guarantees that during the <code>SYNC</code> phase presence events will arrive in order i.e. a leave event for a member can arrive before that member is later registered as as present as part of the initial <code>SYNC</code> operation. As such, until the <code>SYNC</code> operation is complete, timestamps must be recorded for all members to ensure the most recent present state is used, see the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L418-L431">Java implementation</a>.  Once a <code>SYNC</code> event is complete, the members that are now considered <code>ABSENT</code> can be removed from the map, see the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L504-L509">Java implementation</a></li>
-	<li><code>(RTP3)</code> If a <code>SYNC</code> operation is underway but not yet complete, and the connection is disconnected unexpectedly, then if the connection is resumed successfully, it is the responsibility of the client library to complete the <code>SYNC</code> operation. The client library requests a <code>SYNC</code> resume by sending a <code>SYNC</code> <code>ProtocolMessage</code> with the last received sync serial number. See the <a href="https://github.com/ably/ably-ruby/blob/7b18a20/lib/ably/realtime/presence/members_map.rb#L169-L176">Ruby implementation</a> and the <a href="https://github.com/ably/ably-ruby/blob/7b18a20/spec/acceptance/realtime/presence_spec.rb#L1338-L1357">Ruby test</a></li>
+	<li><code>(RTP3)</code> If a <code>SYNC</code> operation is underway but not yet complete, and the transport is disconnected unexpectedly, then if the connection is resumed successfully, it is the responsibility of the client library to complete the <code>SYNC</code> operation. The client library requests a <code>SYNC</code> resume by sending a <code>SYNC</code> <code>ProtocolMessage</code> with the last received sync serial number. See the <a href="https://github.com/ably/ably-ruby/blob/7b18a20/lib/ably/realtime/presence/members_map.rb#L169-L176">Ruby implementation</a> and the <a href="https://github.com/ably/ably-ruby/blob/7b18a20/spec/acceptance/realtime/presence_spec.rb#L1338-L1357">Ruby test</a></li>
 	<li><code>(RTP4)</code> Ensure a test exists that enters 250 members using <code>Presence#enterClient</code> on a single connection, and checks for <code>PRESENT</code> events to be emitted on another connection for each member, and once sync is complete, all 250 members should be present in a <code>Presence#get</code> request</li>
 	<li><code>(RTP5)</code> Channel state change side effects:
 	<ul>
@@ -587,14 +623,14 @@
 		<li><code>(RTP8c)</code> A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>ENTER</code> is sent to the Ably service. The <code>clientId</code> attribute of the <code>PresenceMessage</code> must not be present. Entering without an explicit <code>PresenceMessage#clientId</code>, implicitly uses the <code>clientId</code> for the current connection</li>
 		<li><code>(RTP8d)</code> Implicitly attaches to the channel if not attached</li>
 		<li><code>(RTP8e)</code> Optional data can be included when entering a channel that will be encoded / decoded as with normal messages. A test should exist to ensure data used with enter is encoded &amp; decoded correctly. Also, when data is provided when entering, but no data is provided when leaving, the data attribute should be emitted in the <code>LEAVE</code> event for this client</li>
-		<li><code>(RTP8f)</code> Raises an exception if the client library is using basic auth (i.e. no <code>clientId</code> is configured)</li>
+		<li><code>(RTP8f)</code> Raises an exception if the client library is not authenticated (i.e. no <code>clientId</code> is configured)</li>
 		<li><code>(RTP8g)</code> Raises an exception if the channel is <code>DETACHED</code> or <code>FAILED</code></li>
 		<li><code>(RTP8h)</code> Fails and emits an error if the client does not have required presence permission</li>
 		<li><code>(RTP8i)</code> Fails and emits an error if the current client is not authenticated, and no implicit <code>clientId</code> is assigned by the Ably service</li>
 	</ul></li>
 	<li><code>(RTP9)</code> <code>Presence#update</code> function:
 	<ul>
-		<li><code>(RTP9a)</code> Updates the data for the present member with a value or <code>Null</code></li>
+		<li><code>(RTP9a)</code> Updates the data for the present member with a value or <code>null</code></li>
 		<li><code>(RTP9b)</code> If the client was not already entered, it enters this client into this channel</li>
 		<li><code>(RTP9c)</code> Optionally a callback can be provided that is called for both success or failure to update</li>
 		<li><code>(RTP9d)</code> A <code>PRESENCE ProtocolMessage</code> with a <code>PresenceMessage</code> with the action <code>UPDATE</code> is sent to the Ably service. The <code>clientId</code> attribute of the <code>PresenceMessage</code> must not be present. Updating without an explicit <code>PresenceMessage#clientId</code>, implicitly uses the <code>clientId</code> for the current connection</li>
@@ -641,7 +677,7 @@
 		<li><code>(RTP15c)</code> Tests should also ensure that using these methods has no side effects on a client that has entered normally using <code>Presence#enter</code></li>
 		<li><code>(RTP15d)</code> A callback can be provided that will be called upon success or failure</li>
 		<li><code>(RTP15e)</code> A channel will be implicitly attached when these methods are called</li>
-		<li><code>(RTP15f)</code> If the client is authenticated and has a configured <code>clientId</code>, if the <code>clientId</code> argument does not match the client&#8217;s <code>clientId</code>, then an exception should be raised. The connection and channel remains available for further operations</li>
+		<li><code>(RTP15f)</code> If the client is authenticated and has a configured <code>clientId</code>, if the <code>clientId</code> argument does not match the client&#8217;s <code>clientId</code>, then it should indicate an error. The connection and channel remains available for further operations</li>
 	</ul></li>
 </ul>
 <h3 id="eventemitter">EventEmitter mixin / interface</h3>
@@ -699,9 +735,9 @@
 		<li><code>(TR4d)</code> <code>connectionId</code> string</li>
 		<li><code>(TR4e)</code> <code>connectionKey</code> string</li>
 		<li><code>(TR4f)</code> <code>connectionSerial</code> long</li>
-		<li><code>(TR4n)</code> <code>connectionDetails</code> <code>ConnectionDetails</code> object &#8211; provides details on the constraints for the connection such as max message size or client ID</li>
+		<li><code>(TR4n)</code> <code>connectionDetails</code> <code>ConnectionDetails</code> object &#8211; provides details on the constraints or defaults for the connection such as max message size, client ID or connection state TTL</li>
 		<li><code>(TR4g)</code> <code>count</code> integer</li>
-		<li><code>(TR4h)</code> <code>errorInfo</code> <code>ErrorInfo</code> object</li>
+		<li><code>(TR4h)</code> <code>error</code> <code>ErrorInfo</code> object</li>
 		<li><code>(TR4i)</code> <code>flags</code> integer</li>
 		<li><code>(TR4j)</code> <code>messageSerial</code> long</li>
 		<li><code>(TR4k)</code> <code>messages</code> Array of <code>Message</code> objects</li>
@@ -714,7 +750,7 @@
 	<li><code>(TG1)</code> A <code>PaginatedResult</code> is a type that represents a page of results from a <a href="/rest-api/#pagination">paginated query</a>. The response is accompanied by metadata that indicates the relative queries available.</li>
 	<li><code>(TG2)</code> <code>PaginatedResult</code> wraps all message and presence history, stats and REST presence requests.  The type must not raise an exception if paging headers are not returned from the REST API.</li>
 	<li><code>(TG3)</code> <code>PaginatedResult#items</code> attribute contains a page of results (for example an Array of <code>Message</code> objects for a channel history request).</li>
-	<li><code>(TG4)</code> <code>PaginatedResult#next</code> function returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <code>Null</code> is returned.</li>
+	<li><code>(TG4)</code> <code>PaginatedResult#next</code> function returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <code>null</code> is returned.</li>
 	<li><code>(TG5)</code> <code>PaginatedResult#first</code> function returns a new <code>PaginatedResult</code> for the first page of results.</li>
 	<li><code>(TG6)</code> <code>PaginatedResult#hasNext</code> function returns <code>true</code> if there are further pages</li>
 	<li><code>(TG7)</code> <code>PaginatedResult#isLast</code> function returns <code>true</code> if this page is not the last page i.e. <code>!hasNext</code></li>
@@ -733,7 +769,7 @@
 	<li><code>(TD3)</code> <code>TokenDetails#expires</code> attribute contains the expiry time in milliseconds.  Where idiomatic in the language, this can be a Date/Time object</li>
 	<li><code>(TD4)</code> <code>TokenDetails#issued</code> attribute contains the time the token was issued in milliseconds.  Where idiomatic in the language, this can be a Date/Time object</li>
 	<li><code>(TD5)</code> <code>TokenDetails#capability</code> attribute contains the capability JSON stringified</li>
-	<li><code>(TD6)</code> <code>TokenDetails#clientId</code> attribute contains the clientId assigned to the token if provided</li>
+	<li><code>(TD6)</code> <code>TokenDetails#clientId</code> attribute contains the <code>clientId</code> assigned to the token. If <code>clientId</code> is <code>null</code> or omitted, then the token is prohibited from assuming a <code>clientId</code> in any operations, however if <code>clientId</code> is a wildcard string <code>'*'</code>, then the token is permitted to assume any <code>clientId</code>. Any other string value for <code>clientId</code> implies that the <code>clientId</code> is both enforced and assumed for all operations for this token</li>
 </ul>
 <h4>Stats</h4>
 <ul>
@@ -760,7 +796,7 @@
 	<li><code>(TA3)</code> If the connection state change includes error information, then the <code>errorReason</code> attribute will contain an <code>ErrorInfo</code> object describing the reason for the error</li>
 	<li><code>(TA4)</code> See the [Java library implementation](https://github.com/ably/ably-java/blob/245a3f20a6dce0d34413ddfed19c5da8ea647422/src/io/ably/realtime/ConnectionStateListener.java#L15-L20) of this object.  Note that <code>reason</code> will be changed in a future release to <code>errorReason</code> in line with this specification</li>
 </ul>
-<h4>Capability &#8211; <strong>API not agreed yet</strong></h4>
+<h4>Capability &#8211; <strong>API not defined yet</strong></h4>
 <ul>
 	<li><code>(TC1)</code> This type represents a capability for a key or token</li>
 	<li><code>(TC2)</code> For now a string representation of the JSON will suffice wherever <code>capability</code> is used</li>
@@ -770,11 +806,12 @@
 	<li><code>(CD1)</code> Connection details are optionally passed to the client library in the <code>CONNECTED</code> <code>ProtocolMessage#connectionDetails</code> attribute to inform the client about any constraints it should adhere to, and provide additional metadata about the connection. For example, if a request is made to publish a message that exceeds the <code>maxMessageSize</code>, the client library can reject the message immediately, without communicating with the Ably service</li>
 	<li><code>(CD2)</code> Attributes available in <code>ConnectionDetails</code>:
 	<ul>
-		<li><code>(CD2a)</code> <code>clientId</code> contains the client ID assigned to the token, when present</li>
+		<li><code>(CD2a)</code> <code>clientId</code> contains the client ID assigned to the token. If <code>clientId</code> is <code>null</code> or omitted, then the client is prohibited from assuming a <code>clientId</code> in any operations, however if <code>clientId</code> is a wildcard string <code>'*'</code>, then the client is permitted to assume any <code>clientId</code>. Any other string value for <code>clientId</code> implies that the <code>clientId</code> is both enforced and assumed for all operations from this client</li>
 		<li><code>(CD2b)</code> <code>connectionKey</code> is the connection secret key string that is used to resume a connection and its state</li>
 		<li><code>(CD2c)</code> <code>maxMessageSize</code> is the maximum individual message size in bytes</li>
 		<li><code>(CD2d)</code> <code>maxFrameSize</code> is the maximum size for a single frame of data sent to Ably. This restriction applies to a <code>ProtocolMessage</code> sent over a realtime connection, or the total body size for a REST request</li>
 		<li><code>(CD2e)</code> <code>maxInboundRate</code> is the maximum allowable number of requests per second from a client or Ably. In the case of a realtime connection, this restriction applies to the number of <code>ProtocolMessage</code> objects sent, whereas in the case of REST, it is the total number of REST requests per second</li>
+		<li><code>(CD2f)</code> <code>connectionStateTtl</code> is the duration that Ably will persist the connection state when a Realtime client is abruptly disconnected</li>
 	</ul></li>
 </ul>
 <h3 id="options">Option types</h3>
@@ -814,6 +851,15 @@
 			<li><code>(TO3k4)</code> <code>port</code> integer &#8211; for development environments only; allows a non-default Ably non-TLS port to be specified</li>
 			<li><code>(TO3k5)</code> <code>tlsPort</code> integer &#8211; for development environments only; allows a non-default Ably TLS port to be specified</li>
 		</ul></li>
+		<li><code>(TO3l)</code> The follow attributes, if set, are used to change the default behaviour of the libary:
+		<ul>
+			<li><code>(TO3l1)</code> <code>disconnectedRetryFrequency</code> integer &#8211; default 15,000 (15s). When the connection is in the <code>DISCONNECTED</code> state, this delay in milliseconds controls how frequently the client library attempts to reconnect automatically</li>
+			<li><code>(TO3l2)</code> <code>suspendedRetryFrequency</code> integer &#8211; default 30,000 (30s). When the connection is in the <code>SUSPENDED</code> state, this delay in milliseconds controls how frequently the client library attempts to reconnect automatically</li>
+			<li><code>(TO3l3)</code> <code>httpOpenTimeout</code> integer &#8211; default 4,000 (4s). Timeout for opening the connection, available in the client library if supported by the transport</li>
+			<li><code>(TO3l4)</code> <code>httpRequestTimeout</code> integer &#8211; default 15,000 (15s). Timeout for any single HTTP request and response</li>
+			<li><code>(TO3l5)</code> <code>httpMaxRetryCount</code> integer &#8211; default 3. Max number of fallback host retries for HTTP requests that fail due to network issues or server problems</li>
+			<li><code>(TO3l6)</code> <code>httpMaxRetryDuration</code> integer &#8211; default 10,000 (10s). Max elapsed time in which fallback host retries for HTTP requests will be attempted i.e. if the first default host attempt takes 5s, and then the subsequent fallback retry attempt takes 7s, no further fallback host attempts will be made as the total elapsed time of 12s exceeds the default 10s limit</li>
+		</ul></li>
 	</ul></li>
 </ul>
 <h4>TokenParams</h4>
@@ -822,7 +868,7 @@
 	<li><code>(TK2)</code> The attributes of <code>TokenParams</code> consist of:</li>
 	<li><code>(TK2a)</code> <code>ttl</code> long &#8211; Requested time to live for the token in milliseconds</li>
 	<li><code>(TK2b)</code> <code>capability</code> string &#8211; Capability requirements JSON stringified for the token.</li>
-	<li><code>(TK2c)</code> <code>clientId</code> string &#8211;  A <code>clientId</code> to associate with this token</li>
+	<li><code>(TK2c)</code> <code>clientId</code> string &#8211; A <code>clientId</code> string to associate with this token. If <code>clientId</code> is <code>null</code> or omitted, then the token is prohibited from assuming a <code>clientId</code> in any operations, however if <code>clientId</code> is a wildcard string <code>'*'</code>, then the token is permitted to assume any <code>clientId</code>. Any other string value for <code>clientId</code> implies that the <code>clientId</code> is both enforced and assumed for all operations for this token</li>
 	<li><code>(TK2d)</code> <code>timestamp</code> long &#8211; The timestamp (in millis since the epoch) of this request. Timestamps, in conjunction with the <code>nonce</code>, are used to prevent n requests from being replayed</li>
 </ul>
 <h4>AuthOptions</h4>
@@ -862,6 +908,16 @@
 	<ul>
 		<li><code>(TZ3a)</code> returns a complete <code>CipherParams</code> instance with randomly generated key and iv</li>
 		<li><code>(TZ3b)</code> takes an optional key parameter, returning a <code>CipherParams</code> instance created with that key and with a keyLength calculated from that key</li>
+	</ul></li>
+</ul>
+<h3 id="defaults">Client Library defaults</h3>
+<p>The following default values are configured for the client library:</p>
+<ul>
+	<li><code>(DF1)</code> Realtime defaults:
+	<ul>
+		<li><code>(DF1a)</code> <code>connectionStateTtl</code> integer &#8211; default 60s. The duration that Ably will persist the connection state when a Realtime client is abruptly disconnected. When the client is in the <code>DISCONNECTED</code> state, once this TTL has passed, the client should change the state to the <code>SUSPENDED</code> state signifying that the state is now lost i.e. channels need to be reattached manually.<br />
+Note that this default is override by any <code>connectionStateTtl</code> specified in the <code>ConnectionDetails</code> of the <code>CONNECTED</code> <code>ProtocolMessage</code></li>
+		<li><code>(DF1b)</code> <code>realtimeRequestTimeout</code> &#8211; default 10s. When a realtime client library is establishing a connection with Ably, or sending a <code>HEARTBEAT</code>, <code>CLOSE</code>, <code>ATTACH</code>, <code>DETACH</code> or <code>CLOSE</code> <code>ProtocolMessage</code> to Ably, this is the amount of time that the client library will wait before considering that request as failed and triggering a suitable failure condition</li>
 	</ul></li>
 </ul>
     </article>
