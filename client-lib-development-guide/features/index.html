@@ -185,12 +185,12 @@
 			<li><code>(RSA8c3)</code> Specifying <code>authParams</code> as part of <code>AuthOptions</code> replaces any configured <code>authParams</code> specified in <code>ClientOptions</code>. As the key/value pairs are not merged, this enables a developer to delete <code>authParams</code> where necessary by providing an entire new set of <code>authParams</code></li>
 		</ul></li>
 		<li><code>(RSA8d)</code> When <code>authCallback</code> option is set, it will invoke the callback, passing in the <code>TokenParams</code>, and expects either a token string, a <code>TokenDetails</code> object or a <code>TokenRequest</code> object to be returned, which will in turn be used to request a token from Ably</li>
-		<li><code>(RSA8e)</code> A test should exist for the following:
+		<li><code>(RSA8f)</code> A test should exist for the following:
 		<ul>
-			<li><code>(RSA8e1)</code> Request a token with a <code>null</code> value <code>clientId</code>, authenticate a client with the token, publish a message without an explicit <code>clientId</code>, and ensure the message published does not have a <code>clientId</code>. Check that <code>Auth#clientId</code> is <code>null</code></li>
-			<li><code>(RSA8e2)</code> Request a token with a <code>null</code> value <code>clientId</code>, authenticate a client with the token, publish a message with an explicit <code>clientId</code> value, and ensure that the message is rejected</li>
-			<li><code>(RSA8e1)</code> Request a token with a wildcard <code>'*'</code> value <code>clientId</code>, authenticate a client with the token, publish a message without an explicit <code>clientId</code>, and ensure the message published does not have a <code>clientId</code>. Check that <code>Auth#clientId</code> is <code>null</code></li>
-			<li><code>(RSA8e2)</code> Request a token with a wildcard <code>'*'</code> value <code>clientId</code>, authenticate a client with the token, publish a message with an explicit <code>clientId</code> value, and ensure that the message published has the provided <code>clientId</code></li>
+			<li><code>(RSA8f1)</code> Request a token with a <code>null</code> value <code>clientId</code>, authenticate a client with the token, publish a message without an explicit <code>clientId</code>, and ensure the message published does not have a <code>clientId</code>. Check that <code>Auth#clientId</code> is <code>null</code></li>
+			<li><code>(RSA8f2)</code> Request a token with a <code>null</code> value <code>clientId</code>, authenticate a client with the token, publish a message with an explicit <code>clientId</code> value, and ensure that the message is rejected</li>
+			<li><code>(RSA8f3)</code> Request a token with a wildcard <code>'*'</code> value <code>clientId</code>, authenticate a client with the token, publish a message without an explicit <code>clientId</code>, and ensure the message published does not have a <code>clientId</code>. Check that <code>Auth#clientId</code> is <code>null</code></li>
+			<li><code>(RSA8f4)</code> Request a token with a wildcard <code>'*'</code> value <code>clientId</code>, authenticate a client with the token, publish a message with an explicit <code>clientId</code> value, and ensure that the message published has the provided <code>clientId</code></li>
 		</ul></li>
 	</ul></li>
 	<li><code>(RSA9)</code> <code>Auth#createTokenRequest</code> function:
@@ -211,7 +211,7 @@
 		<li><code>(RSA10j)</code> Method signature is <code>authorise(TokenParams, AuthOptions)</code>. <code>TokenParams</code> and <code>AuthOptions</code> are optional. When provided, the values supersede any client library configured params and options.</li>
 		<li><code>(RSA10b)</code> Supports all <code>AuthOptions</code> and <code>TokenParams</code> in the function arguments</li>
 		<li><code>(RSA10c)</code> Will not create a new token unless no previous token exists or current token has expired. Please note that a buffer of 15s for token expiry is recommended to avoid race conditions where the token is valid at the time of the request, but invalid when it reaches the server. Therefore, we recommend that a token is considered expired 15s before the time field `expires`</li>
-		<li><code>(RSA10d)</code> Providing the <code>AuthOption</code> set to true will force <code>authorise</code> to issue a new token even if an existing token exists.</li>
+		<li><code>(RSA10d)</code> If the <code>AuthOption</code> argument&#8217;s <code>force</code> attribute is true, it will force <code>Auth#authorise</code> to issue a new token even if an existing token exists</li>
 		<li><code>(RSA10e)</code> Adheres to the implementation of <code>requestToken</code> when issuing new tokens</li>
 		<li><code>(RSA10f)</code> Returns a <code>TokenDetails</code> object that contains the token string + token metadata</li>
 		<li><code>(RSA10g)</code> Stores the <code>AuthOptions</code> and <code>TokenParams</code> arguments as defaults for subsequent authorisations</li>
@@ -735,7 +735,7 @@
 		<li><code>(TR4d)</code> <code>connectionId</code> string</li>
 		<li><code>(TR4e)</code> <code>connectionKey</code> string</li>
 		<li><code>(TR4f)</code> <code>connectionSerial</code> long</li>
-		<li><code>(TR4n)</code> <code>connectionDetails</code> <code>ConnectionDetails</code> object &#8211; provides details on the constraints or defaults for the connection such as max message size, client ID or connection state TTL</li>
+		<li><code>(TR4o)</code> <code>connectionDetails</code> <code>ConnectionDetails</code> object &#8211; provides details on the constraints or defaults for the connection such as max message size, client ID or connection state TTL</li>
 		<li><code>(TR4g)</code> <code>count</code> integer</li>
 		<li><code>(TR4h)</code> <code>error</code> <code>ErrorInfo</code> object</li>
 		<li><code>(TR4i)</code> <code>flags</code> integer</li>
