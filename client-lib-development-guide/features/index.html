@@ -853,8 +853,8 @@
 		</ul></li>
 		<li><code>(TO3l)</code> The follow attributes, if set, are used to change the default behaviour of the libary:
 		<ul>
-			<li><code>(TO3l1)</code> <code>disconnectedRetryTimeout</code> integer &#8211; default 15,000 (15s). When the connection is in the <code>DISCONNECTED</code> state, this delay in milliseconds controls how frequently the client library attempts to reconnect automatically</li>
-			<li><code>(TO3l2)</code> <code>suspendedRetryTimeout</code> integer &#8211; default 30,000 (30s). When the connection is in the <code>SUSPENDED</code> state, this delay in milliseconds controls how frequently the client library attempts to reconnect automatically</li>
+			<li><code>(TO3l1)</code> <code>disconnectedRetryTimeout</code> integer &#8211; default 15,000 (15s). When the connection enters the <code>DISCONNECTED</code> state, after this delay in milliseconds, if the state is still <code>DISCONNECTED</code>, the client library will attempt to reconnect automatically</li>
+			<li><code>(TO3l2)</code> <code>suspendedRetryTimeout</code> integer &#8211; default 30,000 (30s). When the connection enters the <code>SUSPENDED</code> state, after this delay in milliseconds, if the state is still <code>SUSPENDED</code>, the client library will attempt to reconnect automatically</li>
 			<li><code>(TO3l3)</code> <code>httpOpenTimeout</code> integer &#8211; default 4,000 (4s). Timeout for opening the connection, available in the client library if supported by the transport</li>
 			<li><code>(TO3l4)</code> <code>httpRequestTimeout</code> integer &#8211; default 15,000 (15s). Timeout for any single HTTP request and response</li>
 			<li><code>(TO3l5)</code> <code>httpMaxRetryCount</code> integer &#8211; default 3. Max number of fallback host retries for HTTP requests that fail due to network issues or server problems</li>
@@ -915,8 +915,7 @@
 <ul>
 	<li><code>(DF1)</code> Realtime defaults:
 	<ul>
-		<li><code>(DF1a)</code> <code>connectionStateTtl</code> integer &#8211; default 60s. The duration that Ably will persist the connection state when a Realtime client is abruptly disconnected. When the client is in the <code>DISCONNECTED</code> state, once this TTL has passed, the client should change the state to the <code>SUSPENDED</code> state signifying that the state is now lost i.e. channels need to be reattached manually.<br />
-Note that this default is override by any <code>connectionStateTtl</code> specified in the <code>ConnectionDetails</code> of the <code>CONNECTED</code> <code>ProtocolMessage</code></li>
+		<li><code>(DF1a)</code> <code>connectionStateTtl</code> integer &#8211; default 60s. The duration that Ably will persist the connection state when a Realtime client is abruptly disconnected. When the client is in the <code>DISCONNECTED</code> state, once this TTL has passed, the client should change the state to the <code>SUSPENDED</code> state signifying that the state is now lost i.e. channels need to be reattached manually. Note that this default is overriden by <code>connectionStateTtl</code>, if specified in the <code>ConnectionDetails</code> of the <code>CONNECTED</code> <code>ProtocolMessage</code></li>
 		<li><code>(DF1b)</code> <code>realtimeRequestTimeout</code> &#8211; default 10s. When a realtime client library is establishing a connection with Ably, or sending a <code>HEARTBEAT</code>, <code>CONNECT</code>, <code>ATTACH</code>, <code>DETACH</code> or <code>CLOSE</code> <code>ProtocolMessage</code> to Ably, this is the amount of time that the client library will wait before considering that request as failed and triggering a suitable failure condition</li>
 	</ul></li>
 </ul>
