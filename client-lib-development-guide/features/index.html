@@ -733,7 +733,7 @@
 		<li><code>(TR4b)</code> <code>channel</code> string</li>
 		<li><code>(TR4c)</code> <code>channelSerial</code> string</li>
 		<li><code>(TR4d)</code> <code>connectionId</code> string</li>
-		<li><code>(TR4e)</code> <code>connectionKey</code> string</li>
+		<li><code>(TR4e)</code> <code>connectionKey</code> string. Note that this field is soon to be deprecated; when <code>ConnectionDetails#connectionKey</code> is present, it should be considered the definitive <code>connectionKey</code> for the current connection</li>
 		<li><code>(TR4f)</code> <code>connectionSerial</code> long</li>
 		<li><code>(TR4o)</code> <code>connectionDetails</code> <code>ConnectionDetails</code> object &#8211; provides details on the constraints or defaults for the connection such as max message size, client ID or connection state TTL</li>
 		<li><code>(TR4g)</code> <code>count</code> integer</li>
@@ -807,7 +807,7 @@
 	<li><code>(CD2)</code> Attributes available in <code>ConnectionDetails</code>:
 	<ul>
 		<li><code>(CD2a)</code> <code>clientId</code> contains the client ID assigned to the token. If <code>clientId</code> is <code>null</code> or omitted, then the client is prohibited from assuming a <code>clientId</code> in any operations, however if <code>clientId</code> is a wildcard string <code>'*'</code>, then the client is permitted to assume any <code>clientId</code>. Any other string value for <code>clientId</code> implies that the <code>clientId</code> is both enforced and assumed for all operations from this client</li>
-		<li><code>(CD2b)</code> <code>connectionKey</code> is the connection secret key string that is used to resume a connection and its state</li>
+		<li><code>(CD2b)</code> <code>connectionKey</code> is the connection secret key string that is used to resume a connection and its state. When present, this <code>connectionKey</code> should be considered the definitive <code>connectionKey</code> for the current connection and the soon to be deprecated <code>ProtocolMessage#connectionKey</code> should be ignored</li>
 		<li><code>(CD2c)</code> <code>maxMessageSize</code> is the maximum individual message size in bytes</li>
 		<li><code>(CD2d)</code> <code>maxFrameSize</code> is the maximum size for a single frame of data sent to Ably. This restriction applies to a <code>ProtocolMessage</code> sent over a realtime connection, or the total body size for a REST request</li>
 		<li><code>(CD2e)</code> <code>maxInboundRate</code> is the maximum allowable number of requests per second from a client or Ably. In the case of a realtime connection, this restriction applies to the number of <code>ProtocolMessage</code> objects sent, whereas in the case of REST, it is the total number of REST requests per second</li>
