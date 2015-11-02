@@ -148,7 +148,7 @@
 	<ul>
 		<li><code>(RSA15a)</code> Any <code>clientId</code> provided in <code>ClientOptions</code> must match any non <code>null</code> <code>clientId</code> value in <code>TokenDetails</code> or <code>connectionDetails</code> of the <code>CONNECTED</code> <code>ProtocolMessage</code>, where applicable</li>
 		<li><code>(RSA15b)</code> If the <code>clientId</code> from <code>TokenDetails</code> or <code>connectionDetails</code> contains only a wildcard string <code>'*'</code>, then the client is permitted to be either unauthenticated (effectively anonymous without a <code>clientId</code>) or authenticated providing a <code>clientId</code> when communicating with Ably</li>
-		<li><code>(RSA15c)</code> Following an auth request which uses a <code>TokenDetails</code> or <code>TokenRequest</code> object that contains an incompatible <code>clientId</code>, the library should change the connection state to <code>FAILED</code> and emit an error</li>
+		<li><code>(RSA15c)</code> Following an auth request which uses a <code>TokenDetails</code> or <code>TokenRequest</code> object that contains an incompatible <code>clientId</code>, the library should in the case of Realtime change the connection state to <code>FAILED</code> and emit an error, and in the case of REST raise an exception</li>
 	</ul></li>
 	<li><code>(RSA5)</code> TTL for new tokens is specified in milliseconds and defaults to the REST API default (1 hour)</li>
 	<li><code>(RSA6)</code> The <code>capability</code>, if not specified, defaults to allow all operations permitted for the key associated with the token</li>
