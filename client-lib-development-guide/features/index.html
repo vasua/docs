@@ -245,7 +245,7 @@
 		<li><code>(RSL1e)</code> Allows <code>name</code> and or <code>data</code> to be <code>null</code>.  If any of the values are null, then key is not sent to Ably i.e. a payload with a <code>null</code> value for <code>data</code> would be sent as follows <code>{ "name": "click" }</code></li>
 		<li><code>(RSL1f)</code> Unauthenticated clients using basic auth without a <code>clientId</code> (i.e. any <code>clientId</code> is permitted):
 		<ul>
-			<li><code>(RSL1f1)</code> When a <code>Message</code> with a <code>clientId</code> value is published, Ably will accept and publish that message with the provided <code>clientId</code>. A test should assert via the history API that the <code>clientId</code> of the published <code>Message</code> is correct for both authentication schemes (token and basic)</li>
+			<li><code>(RSL1f1)</code> When a <code>Message</code> with a <code>clientId</code> value is published, Ably will accept and publish that message with the provided <code>clientId</code>. A test should assert via the history API that the <code>clientId</code> of the published <code>Message</code> is populated</li>
 		</ul></li>
 		<li><code>(RSL1g)</code> Authenticated clients with a <code>clientId</code> (as a result of either an explicitly configured <code>clientId</code> in <code>ClientOptions</code>, or implicitly through token auth):
 		<ul>
@@ -376,7 +376,7 @@
 		<li><code>(RTN4c)</code> A connection will emit the following events when closing the connection: <code>CLOSING</code>, then <code>CLOSED</code></li>
 		<li><code>(RTN4d)</code> <code>Connection#state</code> attribute is the current state of the connection</li>
 		<li><code>(RTN4e)</code> A <code>ConnectionStateChange</code> object is emitted as the first argument for every connection state change</li>
-		<li><code>(RTN4f)</code> Additionally, a <code>ConnectionStateChange</code> can be emitted that contains an <code>errorReason</code> which contains an <code>ErrorInfo</code> object with details of the error that has occurred for the <code>Connection</code>.</li>
+		<li><code>(RTN4f)</code> Additionally, a <code>ConnectionStateChange</code> can be emitted that contains an <code>reason</code> which contains an <code>ErrorInfo</code> object with details of the error that has occurred for the <code>Connection</code>.</li>
 	</ul></li>
 	<li><code>(RTN5)</code> A test should exist that instances many (50+) clients simultaneously and performs a few basic operations such as attaching to a channel, publishing a message, and expecting all of those messages to arrive on all clients to ensure that there are no concurrency issues with the client library</li>
 	<li><code>(RTN6)</code> A <code>Connection</code> is successful and considered <code>CONNECTED</code> once the websocket connection is open and the intial <code>CONNECTED</code> <code>ProtocolMessage</code> has been received</li>
@@ -545,7 +545,7 @@
 		<li><code>(RTL6d)</code> Messages are delivered using a single <code>ProtocolMessage</code> where possible by bundling in all messages for that channel into the <code>ProtocolMessage#messages</code> array. However, a yet to be implemented feature should limit the total number of messages bundled per <code>ProtocolMessage</code> based on the default max message size, and would reject the publish and indicate an error if any single message exceeds that limit</li>
 		<li><code>(RTL6e)</code> Unauthenticated clients using basic auth without a <code>clientId</code> (i.e. any <code>clientId</code> is permitted):
 		<ul>
-			<li><code>(RTL6e1)</code>When a <code>Message</code> with a <code>clientId</code> value is published, Ably will accept and publish that message with the provided <code>clientId</code>. A test should assert that the <code>clientId</code> of the published <code>Message</code> is correct for both authentication schemes (token and basic)</li>
+			<li><code>(RTL6e1)</code>When a <code>Message</code> with a <code>clientId</code> value is published, Ably will accept and publish that message with the provided <code>clientId</code>. A test should assert that the <code>clientId</code> of the published <code>Message</code> is populated</li>
 		</ul></li>
 		<li><code>(RTL6g)</code> Authenticated clients with a <code>clientId</code> (as a result of either an explicitly configured <code>clientId</code> in <code>ClientOptions</code>, or implicitly through token auth):
 		<ul>
