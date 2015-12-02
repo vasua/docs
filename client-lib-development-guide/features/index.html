@@ -317,7 +317,7 @@
 	<li><a id='RSP2' name='RSP2' href='#RSP2'><code>(RSP2)</code></a> There is no way to register a member as present on a channel via the REST API</li>
 	<li><a id='RSP3' name='RSP3' href='#RSP3'><code>(RSP3)</code></a> <code>Presence#get</code> function:
 	<ul>
-		<li><a id='RSP3a' name='RSP3a' href='#RSP3a'><code>(RSP3a)</code></a> Returns a <code>PaginatedResult</code> page containing the first page of members present in the <code>PaginatedResult#items</code> attribute returned from the presence request. Each member is represented as a <code>PresenceMessage</code>
+		<li><a id='RSP3a' name='RSP3a' href='#RSP3a'><code>(RSP3a)</code></a> Returns a <code>PaginatedResult</code> page containing the first page of members present in the <code>PaginatedResult#items</code> attribute returned from the presence request. Each member is represented as a <code>PresenceMessage</code>. Supports the following params:
 		<ul>
 			<li><a id='RSP3a1' name='RSP3a1' href='#RSP3a1'><code>(RSP3a1)</code></a> <code>limit</code> supports up to 1,000 items; if unspecified it defaults to the REST API default (100)</li>
 			<li><a id='RSP3a2' name='RSP3a2' href='#RSP3a2'><code>(RSP3a2)</code></a> <code>clientId</code> filters members by the provided <code>clientId</code></li>
