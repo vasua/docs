@@ -41,8 +41,10 @@
             <optgroup label='Help with'>
 <option id="anchor-title">Overview</option>
 <option id="anchor-getting-started">Getting started</option>
-<option id="anchor-selecting-auth">Selecting auth mechanism</option>
-<option id="anchor-token-requests">Token requests</option>
+<option id="anchor-selecting-auth">Selecting auth</option>
+<option id="anchor-basic-authentication">Basic authentication</option>
+<option id="anchor-token-authentication">Token authentication</option>
+<option id="anchor-token-request-spec">Token request spec</option>
 </optgroup>
           </select>
         </div>
@@ -56,40 +58,89 @@
     </header>
     <article>
       <p>Both the REST API and the Realtime API use common authentication mechanisms.</p>
-<p>Each is based on having a series of keys set up for each application. Each key is configured via the <a href="https://www.ably.io/dashboard">dashboard</a> and exposed as a single string such as <code>{{API_KEY}}</code> which contains information that identifies the key as well as containing the &#8220;secret&#8221; key value.</p>
-<p>If you are using an Ably client library then the key can be considered to be an opaque string supplied when the library is instanced.  If you are using the Ably REST authentication endpoint directly, then the API key string can be used in the <a href="http://localhost:4000/rest-api/#basic-authentication">basic authorization header</a></p>
-<p>A key is associated with a set of capabilities &#8211; i.e. an explicit indication of which operations (such as publish, subscribe or presence) are allowable using that key. Additionally, the capabilities can be restricted to a set of a resources (which is either a channel namespace or a specific channel).  View <a href="#capabilities">all supported capabilities</a>.</p>
+<p>Each is based on having a series of API keys set up for each application. Each key is <a href="https://support.ably.io/support/solutions/articles/3000030502-setting-up-and-managing-api-keys">configured via the dashboard</a> and exposed as a single string such as <code>{{API_KEY}}</code> which contains information that identifies the key as well as containing the &#8220;secret&#8221; key value.</p>
+<p>If you are using an Ably client library then the key can be considered to be an opaque string supplied when the library is instanced. If you are using the <a href="/rest-api/">Ably REST API endpoint</a> directly, then the API key string can be used in the <a href="/rest-api/#basic-authentication">basic authorization header</a></p>
+<p>A key is associated with a set of capabilities &#8211; i.e. an explicit indication of which operations (such as publish, subscribe or presence) are allowable using that key. Additionally, the capabilities can be restricted to a set of a resources (which is either a channel namespace or a specific channel). View <a href="#capabilities">all supported capabilities</a>.</p>
 <h2 id="getting-started">Getting started</h2>
-<p>The simplest method for authentication with Ably is to use the API key string when instancing the client library Basic Authentication passing the key string to the client library</p>
-<p>This method is simple, but suffers from a number of problems that might make it unsuitable for certain use cases:</p>
+<p>The simplest method for authentication with Ably is to use an API key string when instancing the client library. This method is simple and authenticates with Ably using basic authentication. However, this method suffers from a number of problems that might make it unsuitable for certain use cases:</p>
 <ul>
-	<li>the secret is passed directly by the client to Ably, so it is not suitable for connections that are not over TLS (HTTPS or non-encrypted realtime connections)</li>
+	<li>the secret is passed directly by the client to Ably, so it is not permitted for connections that are not over TLS (HTTPS or non-encrypted realtime connections) to prevent the key secret being intercepted</li>
 	<li>the secret may be required to be embedded in a script on a public site</li>
-	<li>all of the configured capabilities of the key are implicitly possible in any request, and clients that legitimately obtain the secret may then abuse the rights conferred by that key</li>
+	<li>all of the configured capabilities of the key are implicitly possible in any request, and clients that legitimately obtain this key may then abuse the rights for that key</li>
+	<li>clients are permitted to use any <code>client ID</code> in all operations with Ably. As such, a <code>client ID</code> in messages and presence cannot be trusted as any client using Basic Authentication can masquerade with any <code>client ID</code></li>
 </ul>
-<p>These issues are addressed with the second <a href="#token-requests">token-based authentication method</a>. Tokens are authentication credentials that only have a short lifetime, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of access rights, or being limited to use by a specific client &#8211; and therefore token-based authentication provides the flexibility to implement access control policies in the application. Tokens may be obtained via the <a href="/rest/authentication">client library authentication API</a> or directly via the Ably <a href="/rest-api">REST API</a>.</p>
+<p>These issues are addressed with the <a href="#token-authentication">token-based authentication method</a>. Tokens are authentication credentials that only have a short lifetime, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of access rights, or being limited to use by a specific <code>client ID</code> &#8211; and therefore token-based authentication provides the flexibility to implement access control policies in the application. Tokens may be obtained using the <a href="/rest/authentication">client library authentication API</a> or directly via the Ably <a href="/rest-api/#requestToken">REST API tokenRequest endpoint</a>.</p>
 <h2 id="selecting-auth">Selecting an authentication mechanism</h2>
-<p>When first using the Ably API, it is simplest just to instance the library with the key string which will in turn use Basic authentication for all operations. However, there are many situations in which it is preferable to use the token-based system instead. The following guidance aims to help you choose which system to use in any given situation.</p>
-<p>When deciding the mechanism to use, it is necessary to bear in mind the <a href="http://en.wikipedia.org/wiki/Principle_of_least_privilege">principle of least privilege</a>: a client should ideally only possess the credentials and rights that it needs to accomplish what it wants; this way, if the credentials are compromised, the rights that can be abused by an attacker are minimised.</p>
+<p>The following guidance aims to help you choose which system to use in any given situation. When deciding, it is recommended to bear in mind the <a href="http://en.wikipedia.org/wiki/Principle_of_least_privilege">principle of least privilege</a>: a client should ideally only possess the credentials and rights that it needs to accomplish what it wants; this way, if the credentials are compromised, the rights that can be abused by an attacker are minimised.</p>
 <p>Basic authentication is appropriate where:</p>
 <ul>
-	<li>the script, program or system holding the key is not exposed; for example, a key should not be embedded in a script in a public-facing web page</li>
+	<li>the script, program or system holding the key is not exposed; for example, typically on one of your own servers. A key should not be embedded in a script in a public-facing web page</li>
 	<li>a secure, unmediated connection exists between the client and the Ably service. Keys should only really be sent over a TLS conection (that&#8217;s either an HTTPS connection, or an encrypted realtime connection). A key should not be used over a proxied connection unless the proxy is trusted</li>
 	<li>access needs to be granted selectively to groups of clients to specific channels or channel namespaces, but only a small number of such access control groups need to be established</li>
+	<li>clients are trusted to assume any <code>clientID</code> in the operations they are permitted to perform</li>
 </ul>
 <p>Token authentication is appropriate when:</p>
 <ul>
 	<li>there is a risk of exposure of the client&#8217;s credentials, either directly or over an insecure, or insecurely proxied, connection</li>
 	<li>a client is only intended to have use of the service for a limited period of time</li>
-	<li>a client needs to have the ability to authenticate its specific identity, but cannot be trusted sufficiently not to masquerade as a different client identity</li>
+	<li>a client needs to have the ability to identify itself (authenticate its specific identity), but cannot be trusted sufficiently not to masquerade as a different client identity</li>
 	<li>fine-grained access needs to be given on a per-client basis to specific channels and/or capabilities</li>
 	<li>there may be a requirement to be able to revoke the rights of a client individually</li>
 </ul>
 <p>Note that many applications will most naturally use a mixed strategy: one or more application servers will use basic authentication to access the service, and to issue tokens, but browser or device clients will use individually-issued tokens.</p>
-<h2 id="token-requests">Token requests</h2>
-<p>The Ably REST client libraries aim to make things as simple as possible, and it is not necessary to understand all of the details of token requests to interact with the service and issue tokens for clients. However, the details below are relevant if using the <a href="/rest-api/#requesttoken">REST token endpoint directly</a>, or if you are creating token requests on behalf of a client.</p>
-<h3>Key format</h3>
-<p>A key string is structured as a triple <code>&lt;app id&gt;:&lt;key id&gt;:&lt;key value&gt;</code>, where:</p>
+<h3 id="basic-authentication">Basic Authentication explained</h3>
+<p>Basic authentication is the default authentication scheme when a client library is instanced with an API key.  It as simple as:</p>
+<pre class="code-editor open-jsbin open-jsbin-ocacox" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ocacox" lang="javascript">var ably = new Ably.Realtime({ key: '{{API_KEY}}' });</code></pre>
+<h4>Process used by client libraries connecting with basic auth:</h4>
+<p><a href="/assets/diagrams/basic-auth-process.png" target="_blank"><br />
+  <img src="/assets/diagrams/basic-auth-process.png" style="width: 100%" alt="Basic authentication process diagram"><br />
+</a></p>
+<h3 id="token-authentication">Token Authentication explained</h3>
+<p>Token authentication is the default authentication scheme when a client library is instances with any of the following options:</p>
+<ul>
+	<li>a <code>token</code> or <code>tokenDetails</code> is provided;</li>
+	<li>an <code>authUrl</code> or <code>authCallback</code> is provided that returns a token or token request;</li>
+	<li>a <code>clientId</code> is provided;</li>
+	<li><code>useTokenAuth</code> is true</li>
+</ul>
+<p>Token authentication is typically done in one of two ways:</p>
+<h4>Signed token request is created by your servers and passed to clients</h4>
+<p>Using our client libraries, a signed token request is generated and handed to client libraries that will in turn authenticate with Ably. This is the recommended approach for authentication for our customers as: a signed token request can be generated securely by your servers without communicating with Ably; your secret API key is never shared with Ably or your clients; signed token requests cannot be tampered with, must be used soon after creation and can only be used once. This process is described simply in the following diagram:</p>
+<p><a href="/assets/diagrams/signed-token-request-auth-process.png" target="_blank"><br />
+  <img src="/assets/diagrams/signed-token-request-auth-process.png" style="width: 100%" alt="Signed token request auth process diagram"><br />
+</a></p>
+<p>An example of creating a token request can be seen below:</p>
+<pre class="code-editor open-jsbin open-jsbin-icuzay" lang="javascript"><code class="code-editor open-jsbin open-jsbin-icuzay" lang="javascript">var ably = new Ably.Rest({ key: '{{API_KEY}}' });
+ably.createTokenRequest({ clientId: 'client@example.com' }, null, function(err, tokenRequest) {
+  /* tokenRequest =&gt; {
+       "keyName": "{{API_KEY_NAME}}",
+       "capability": "{\"*\":[\"*\"]}",
+       "timestamp": {{MS_SINCE_EPOCH}},
+       "nonce": "5576521221082658",
+       "mac": "GZRgXssZDCegRV....EXAMPLE"
+     } */
+});</code></pre>
+<h4>Token is issued by your servers and passed to clients</h4>
+<p>Using our client libraries, a token is requested from Ably on your servers and then handed to client libraries that will in turn authenticate with Ably. This is an alternative approach for authentication that allows you to issue tokens as opposed to signed token requests from your servers thus saving one round trip request for clients as they do not need to request a token. This process is described simply in the following diagram:</p>
+<p><a href="/assets/diagrams/token-auth-process.png" target="_blank"><br />
+  <img src="/assets/diagrams/token-auth-process.png" style="width: 100%" alt="Token auth process diagram"><br />
+</a></p>
+<p>An example of issuing a token can be seen below:</p>
+<pre class="code-editor open-jsbin open-jsbin-ovabur" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ovabur" lang="javascript">var ably = new Ably.Rest({ key: '{{API_KEY}}' });
+ably.requestToken({ clientId: 'client@example.com' }, function(err, token) {
+  /* token =&gt; {
+       "token": "xVLyHw.Dtxd9tuz....EXAMPLE",
+       "keyName": "{{API_KEY_NAME}}",
+       "issued": 1449741687315,
+       "expires": 1449745287315,
+       "capability": "{\"*\":[\"*\"]}"
+     } */
+});</code></pre>
+<h2 id="token-request-spec">Token request spec</h2>
+<p>The <a href="https://www.ably.io/download/">Ably REST and Realtime client libraries</a> aim to make things as simple as possible so it is not necessary to understand all of the details of token requests to interact with the service and issue tokens for clients. If you wish to issue tokens or token requests, we recommend you read the <a href="/rest/authentication">client library authentication documentation</a>.</p>
+<p>However, if you are using the <a href="/rest-api/#requesttoken">REST token endpoint directly</a>, or if you are creating token requests without the use of our client libraries, then the following specification will give you an in-depth understanding of how token requests work.</p>
+<h3>API key format</h3>
+<p>API keys are issued and managed from <a href="https://support.ably.io/support/solutions/articles/3000030502-setting-up-and-managing-api-keys">within your account dashboard</a>. The API key string available in your dashboard is structured as a triple <code>&lt;app id&gt;:&lt;key id&gt;:&lt;key value&gt;</code>, where:</p>
 <dl>
 	<dt>app id</dt>
 	<dd>(public) identifier for the application</dd>
@@ -101,36 +152,36 @@
 <h3>Token request format</h3>
 <p>A token request is made against the <a href="/rest-api#requesttoken"><code>requestToken</code></a> endpoint, with a JSON token request in the request body. The token request comprises:</p>
 <ul>
-	<li>the key id</li>
+	<li>the <code>keyName</code> comprising of the app id and key id such as <code>{{API_KEY_NAME}}</code></li>
 	<li>a capability (i.e. a set of channel names/namespaces and, for each, a set of <a href="#capabilities">operations</a>) which should be a subset of the set of capability associated with the key specified in key id</li>
-	<li>optionally, a clientId thus identifying clients using this token and preventing them from identifying themselves with any other clientId</li>
-	<li>optionally, an expiry time or TTL</li>
+	<li>optionally, a <code>clientId</code> thus identifying clients using this token and preventing them from identifying themselves with any other <code>clientId</code></li>
+	<li>optionally, an expiry time or TTL, will default to 1 hour if not specified</li>
 	<li>a timestamp to ensure token request is still valid</li>
-	<li>a unique nonce string, randomly-generated by the client</li>
+	<li>a unique nonce string, randomly-generated by the client, to ensure the token request cannot be reused</li>
 </ul>
 <p>A signed token request also contains:</p>
 <ul>
 	<li>a signature, generated as an HMAC of each of the above components, using the key secret value.</li>
 </ul>
-<p>Signed token requests can be used to request a token from Ably without an authenticated connection.  The signature generated with the key secret confirms the authenticity of the token and can thus be &#8220;trusted&#8221; by Ably. As signed token requests can be issued without a request to Ably, a server with a valid API key and secret can issue token requests directly to clients, and clients can in turn generate a token by sending the token request to Ably.</p>
+<p>Signed token requests can be used to request a token from Ably without an authenticated connection. The signature generated with the key secret confirms the authenticity of the token and can thus be &#8220;trusted&#8221; by Ably. As signed token requests can be issued without a request to Ably, a server with a valid API key can issue token requests directly to clients, and clients can in turn generate a token by sending the token request to Ably.</p>
 <p>The receiving Ably server verifies the signature if present, the timestamp (which must be within 2 minutes of the current time), verifies that the nonce/timestamp combination has not been used previously, verifies that the requested validity period is permitted, and verifies that the requested capabilities are permitted for that token based on the key capabilities.</p>
 <p>The server may choose to subset the capabilities based on the capabilities of the key.</p>
 <p>The server replies with an access token, which is essentially a signed version of the resolved set of capabilities, plus other metadata associated with the token (such as expiry time).</p>
-<p>This access token can then be used for subsequent REST requests or Realtime connections. If a clientId was included in the request, then the token is associated with that clientId, and may be used to authenticate that clientId in operations that require authentication (eg joining a channel that requires authentication).</p>
+<p>This access token can then be used for subsequent REST requests or Realtime connections. If a <code>clientId</code> was included in the request, then the token is associated with that <code>clientId</code>, and may be used to identify that client in operations that require identification (e.g. joining a channel that requires identification, or publishing a message with a verified <code>clientId</code>).</p>
 <h3>Parameter canonicalisation</h3>
 <p>The parameters of the token request are normalised/canonicalised as follows:</p>
 <dl>
-	<dt>key id</dt>
+	<dt><code>keyName</code></dt>
 	<dd>no action required</dd>
-	<dt>ttl</dt>
+	<dt><code>ttl</code></dt>
 	<dd>the decimal integer representation, without leading zeros, of the requested life of the token in seconds, if none is specified a default of 1 hour is used</dd>
-	<dt>capability</dt>
+	<dt><code>capability</code></dt>
 	<dd>this is a canonicalised representation of the resource paths and associated operations in the capability. It is the JSON stringified value of an object of the form:<br />
-<code lang="json">{
+<pre class="code-editor" lang="json"><code class="code-editor">{
   resource1: [operation1a, operation1b, operation1c, ...],
   resource2: [operation2a, operation2b, operation2c, ...].
   ...
-}</code><br />
+}</code></pre><br />
 with the following constraints:<br />
 <ul>
 <li>all whitespace is removed;</li>
@@ -141,22 +192,22 @@ with the following constraints:<br />
 <li>the wildcard @*@ can be used for resource or operation fields</li>
 </ul>
 </dd>
-	<dt>clientId</dt>
+	<dt><code>clientId</code></dt>
 	<dd>the canonical form is the unquoted and unescaped string. In the case that no clientId is included in the request, the empty string is used.</dd>
-	<dt>timestamp</dt>
+	<dt><code>timestamp</code></dt>
 	<dd>the decimal integer representation, without leading zeros, of the time of the of the request in seconds since the epoch.</dd>
-	<dt>nonce</dt>
+	<dt><code>nonce</code></dt>
 	<dd>an unquoted, unescaped random string of at least 16 characters.</dd>
 </dl>
 <h3 id="capabilities">Capability operations</h3>
 <p>The following capability operations are available for API keys and issued tokens.</p>
 <dl>
 	<dt>subscribe</dt>
-	<dd>can subscribe to messages on channels</dd>
+	<dd>can subscribe to messages and presence state change messages on channels</dd>
 	<dt>publish</dt>
 	<dd>can publish messages to channels</dd>
 	<dt>presence</dt>
-	<dd>can register presence on a channel and subscribe to presence state changes on a channel</dd>
+	<dd>can register presence on a channel</dd>
 	<dt>history</dt>
 	<dd>can retrieve message and presence state history on channels</dd>
 	<dt>stats</dt>
@@ -174,19 +225,19 @@ Note that a newline character is added for each field, including any empty clien
 	</ul></li>
 </ul>
 <p>The resulting string must then the UTF8-encoded and then HMAC value is computed with <a href="http://tools.ietf.org/html/rfc4868">hmac-sha-256</a> using the key secret value.</p>
-<p>The HMAC value is then base-64 encoded.</p>
+<p>The HMAC value is then <a href="https://tools.ietf.org/html/rfc4648">base-64 encoded</a>.</p>
 <h3>Request body format</h3>
 <p>In the case of a signed token request, the request body is the JSON stringified representation of the object with the form:</p>
 <pre lang="json"><code lang="json">{
-  id: "&lt;key id&gt;",
+  keyName: "&lt;app id&gt;:&lt;key id&gt;",
   ttl: &lt;expiry in milliseconds&gt;,
   capability: "&lt;capability string&gt;",
   clientId: "&lt;client id optional&gt;",
-  timestamp: &lt;timestamp&gt;,
-  nonce: "&lt;nonce&gt;",
+  timestamp: &lt;timestamp as ms since epoch&gt;,
+  nonce: "&lt;random unique nonce&gt;",
   mac: "&lt;base 64-encoded HMAC value&gt;"
 }</code></pre>
-<p>An unsigned token request is identical except that the mac property is omitted. Note that Basic auth must be used in order to request a token with an unsigned request.</p>
+<p>An unsigned token request is identical except that the mac property is omitted. Note that <a href="#basic-authentication">Basic authentication</a> must be used in order to request a token with an unsigned request.</p>
 <h3>Response body format</h3>
 <p>If successful, the authorisation request returns the JSON stringified representation of an object containing the token:</p>
 <pre lang="json"><code lang="json">{
@@ -199,33 +250,26 @@ Note that a newline character is added for each field, including any empty clien
 <h3>Example token requests</h3>
 <h4>Unsigned token request example</h4>
 <pre lang="sh"><code lang="sh">curl -X POST "https://rest.ably.io/keys/{{API_KEY_NAME}}/requestToken" \
- -u "{{API_KEY}}" \
- -H "Content-Type: application/json" \
+ --user "{{API_KEY}}" \
+ --header "Content-Type: application/json" \
  --data '{
    "keyName": "{{API_KEY_NAME}}",
-   "ttl": "600000",
+   "ttl": "3600000",
    "capability":
      "{\"private\":[\"subscribe\",\"publish\",\"presence\"],\"*\":[\"subscribe\"]}",
-   "clientId": "John",
-   "timestamp": {{SECONDS_SINCE_EPOCH}},
+   "clientId": "unique_identifier",
+   "timestamp": {{MS_SINCE_EPOCH}},
    "nonce": "95e543b88299f6bae83df9b12fbd1ecd"
 }'</code></pre>
 <p>Responds with JSON token:</p>
 <pre lang="json"><code lang="json">{
-  "token": "xVLyHw.GdFXtlosUQgfHaU...eUMQgCfFY77fKSUQM0u8vmxJy",
-  "keyName": "xVLyHw.zKkAHQ",
-  "issued": 1427233520,
-  "expires": 1427234120,
-  "capability": {
-    "*": [
-      "subscribe"
-    ],
-    "private": [
-      "presence",
-      "publish",
-      "subscribe"
-    ]
-  }
+  "token": "{{APP_ID}}.HHZNjgqmC-ACW....truncated",
+  "keyName": "{{API_KEY_NAME}}",
+  "issued": 1449745478956,
+  "expires": 1449749078956,
+  "capability":
+    "{\"*\":[\"subscribe\"],\"private\":[\"presence\",\"publish\",\"subscribe\"]}",
+  "clientId": "unique_identifier"
 }</code></pre>
 <h4>Signed token request example</h4>
 <pre lang="sh"><code lang="sh">curl -X POST "https://rest.ably.io/keys/{{API_KEY_NAME}}/requestToken" \
@@ -233,15 +277,11 @@ Note that a newline character is added for each field, including any empty clien
  --data '{{SIGNED_TOKEN_REQUEST_EXAMPLE}}'</code></pre>
 <p>Responds with JSON token:</p>
 <pre lang="json"><code lang="json">{
-  "token": "xVLyHw.DTSukCRj1lis1sJltr...rhLRBcZgmXLf1FP8wKGrPYkkIs",
-  "keyName": "xVLyHw.lwnKYQ",
-  "issued": 1427235604,
-  "expires": 1427236204,
-  "capability": {
-    "*": [
-      "*"
-    ]
-  }
+  "token": "{{APP_ID}}.DTSukCRj1lis1sJltr...rhLRBcZgmXLf1FP8wKGrPYkkIs",
+  "keyName": "{{API_KEY_NAME}}",
+  "issued": 1449745797497,
+  "expires": 1449749397497,
+  "capability": "{\"*\":[\"*\"]}"
 }</code></pre>
     </article>
     <hr class="back">

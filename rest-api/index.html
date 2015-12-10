@@ -236,24 +236,21 @@ X-Ably-ErrorMessage: &lt;string, equivalent to error.message&gt;</code></pre>
 <p>A client that is unable to access response headers or status code can request an <code>envelope</code> response that contains the usual response, plus <code>Link</code> header information and the response status code wrapped in an object as a single response body. This is useful for JSONP and may be useful in other environments. Envelope responses are only supported for JSON, JSONP and HTML formats.</p>
 <p>A client requests an envelope response by including an <code>envelope=true</code> param in the request.</p>
 <p>An envelope response body then has the format:</p>
-<pre>
-{
+<pre lang="json"><code lang="json">{
     "statusCode": &lt;status code&gt;,
     "response": &lt;result of API call&gt;,
     "rel": {
         "first": &lt;URL&gt;,
         ...
     }
-}
-
-</pre>
+}</code></pre>
 <p>where the <code>response</code> member references the API result in the usual format. The <code>rel</code> member, present only in paginated responses, includes each of the rel links associated with the response.</p>
 <p>Envelope responses always are always made with a 200 status code; the status of the API request itself must be obtained from the <code>statusCode</code> member of the response body.</p>
 <h2 id="authentication">Authentication</h2>
-<p>To understand the REST API it is easiest first to understand the various authentication methods that Ably supports.</p>
-<p>Clients can access Ably, whether using REST or the Realtime service, by two methods.</p>
+<p>To understand the REST API it is easiest first to understand the various authentication methods that Ably supports. For a detailed explanation, view the <a href="/general/authentication">Authentication documentation</a>.</p>
+<p>Clients can access Ably, whether using REST or the Realtime service, by two methods, explained briefly below:</p>
 <h3 id="basic-authentication">Basic Authentication</h3>
-<p>Using one of the application keys created via the <a href="http://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>. Basic Authentication is the simplest method to use but has two important limitations:</p>
+<p>Using one of the application keys created via the <a href="http://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>, basic authentication provides the simplest method to authenticate with Ably, but has two important limitations:</p>
 <ul>
 	<li>the application key is transmitted over the network as part of a request; therefore it may only be used over TLS (HTTPS or &#8220;SSL&#8221;) connections. This can be a performance disadvantage in some network environments where long round-trip times are amplified by the SSL handshake.</li>
 	<li>the client using the API must be in possession of the application key, which potentially exposes the key to compromise. For example, it is not advisable to simply embed the key in a script in a public web page.</li>
@@ -263,20 +260,20 @@ X-Ably-ErrorMessage: &lt;string, equivalent to error.message&gt;</code></pre>
 <p>where <code>&lt;Base64-encoded key&gt;</code> is the full application key string obtained through the dashboard, encoded with <a href="http://www.ietf.org/rfc/rfc4648.txt">RFC 4648 Base64</a>.</p>
 <p>Example request:</p>
 <pre lang="sh"><code lang="sh">curl https://rest.ably.io/channels/rest-example/messages \
- -H "Authorization: Basic {{API_KEY_BASE64}}"</code></pre>
+ --header "Authorization: Basic {{API_KEY_BASE64}}"</code></pre>
 <p>When using a generic HTTP client library that accepts separate username and password arguments for an HTTP request, the application key can be split at the first colon, with the initial segment being used as the username, and the remaining string (without the leading colon) used as the password.</p>
 <p>Example request:</p>
 <pre lang="sh"><code lang="sh">curl https://rest.ably.io/channels/rest-example/messages \
- -u "{{API_KEY}}"</code></pre>
+ --user "{{API_KEY}}"</code></pre>
 <h3 id="token-authentication">Token Authentication</h3>
-<p>Using a token obtained via the REST API <a href="#requesttoken"><code>requestToken</code></a> endpoint. Tokens are authentication tokens that only have a short lifetime, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of access rights, or being limited to use by a specific client &#8211; and therefore token-based authentication provides the flexibility to implement access control policies in the application. See <a href="/general/authentication">Authentication</a> for more details.</p>
+<p>Using a token obtained via the REST API <a href="#requesttoken"><code>requestToken</code></a> endpoint, tokens provide a means to authenticate with Ably without sharing a private API key. Tokens have  a short lifetime and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of access rights, or being limited to use by a specific <code>clientId</code> &#8211; and therefore token-based authentication provides the flexibility to implement trusted identities and access control policies in the application. See <a href="/general/authentication">Authentication</a> for more details.</p>
 <p>The <a href="#requesttoken"><code>requestToken</code></a> endpoint may be used without explicit authentication, relying on the implicit authentication of submitting a validly signed token request.</p>
 <h4>Usage in HTTP request header</h4>
 <pre>Authorization: Bearer &lt;Base64-encoded token string&gt;</pre>
-<p>The <code>&lt;Base64-encoded token string&gt;</code> is the ID attribute of the token generated by <a href="#requesttoken"><code>requestToken</code></a>, encoded with <a href="http://www.ietf.org/rfc/rfc4648.txt">RFC 4648 Base64</a>. If using a generic HTTP client library it will probably be necessary to add the <code>Authorization</code> header explicitly.</p>
+<p>The <code>&lt;Base64-encoded token string&gt;</code> is the <code>token</code> attribute of the token generated by <a href="#requesttoken"><code>requestToken</code></a>, encoded with <a href="http://www.ietf.org/rfc/rfc4648.txt">RFC 4648 Base64</a>. If using a generic HTTP client library it will probably be necessary to add the <code>Authorization</code> header explicitly.</p>
 <p>Example request:</p>
 <pre lang="sh"><code lang="sh">curl https://rest.ably.io/channels/rest-example/messages \
- -H "Authorization: Bearer {{TOKEN_BASE64}}"</code></pre>
+ --header "Authorization: Bearer {{TOKEN_BASE64}}"</code></pre>
 <h1 id="api">API routes</h1>
 <h2 id="channel">Channel routes</h2>
 <p>Routes providing access to the messaging service within a channel scope.</p>
@@ -412,7 +409,7 @@ X-Ably-ErrorMessage: &lt;string, equivalent to error.message&gt;</code></pre>
 <h2>Authentication</h2>
 <h3 id="requesttoken">Request an access token</h3>
 <h6>POST rest.ably.io/keys/<code>key id</code>/requestToken</h6>
-<p>This is the means by which clients obtain access tokens to use the service. The construction of a token request is described in the <a href="/general/authentication">Authentication</a> page. The resulting <code>token response</code> object contains the token properties as defined in <a href="/general/authentication">Authentication</a>.</p>
+<p>This is the means by which clients obtain access tokens to use the service. The construction of a token request is described in the <a href="/general/authentication#token-request-spec">Authentication token request spec documentation</a>. The resulting <code>token response</code> object contains the token properties as defined in <a href="/general/authentication#token-request-spec">token request spec</a>.</p>
 <p>Example request:</p>
 <pre lang="sh"><code lang="sh">curl -X POST "https://rest.ably.io/keys/{{API_KEY_NAME}}/requestToken" \
  -u "{{API_KEY}}" \
@@ -429,7 +426,7 @@ X-Ably-ErrorMessage: &lt;string, equivalent to error.message&gt;</code></pre>
 	<dt>Accept</dt>
 	<dd><code>application/json</code> by default, or <code>application/x-msgpack</code></dd>
 	<dt>Auth required</dt>
-	<dd>no (for signed token requests), yes ((<a href="#basic-authentication">basic</a> or <a href="#token-authentication">token</a> for unsigned token requests)</dd>
+	<dd>no (for signed token requests), yes (for unsigned token requests, <a href="#basic-authentication">basic</a> or <a href="#token-authentication">token</a> permitted)</dd>
 </dl>
 <h5>Returns</h5>
 <p>A successful request will return a token.</p>
