@@ -781,9 +781,9 @@
 </ul>
 <h4>Stats</h4>
 <ul>
-	<li><a id='TS1' name='TS1' href='#TS1'><code>(TS1)</code></a> <code>Stats</code> is a type encapsulating a statistics datapoint retrieved from the <a href="/rest-api/#stats">REST stats endpoint</a>.  See <a href="/general/statistics/">example statistics in JSON format</a>.</li>
-	<li><a id='TS2' name='TS2' href='#TS2'><code>(TS2)</code></a> All stats values default to zero when no underlying JSON value exists.  We send sparse JSON to stats requests omitting fields where the value is zero to reduce bandwidth and optimise JSON parsing.</li>
-	<li><a id='TS3' name='TS3' href='#TS3'><code>(TS3)</code></a> See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats">Ruby Stats type documentation</a></li>
+	<li><a id='TS1' name='TS1' href='#TS1'><code>(TS1)</code></a> <code>Stats</code> is a type encapsulating a statistics datapoint retrieved from the <a href="/rest-api/#stats">REST stats endpoint</a>.  See <a href="/general/statistics/">example statistics in JSON format</a></li>
+	<li><a id='TS2' name='TS2' href='#TS2'><code>(TS2)</code></a> All stats values default to zero when no underlying JSON value exists. We send sparse JSON to stats requests omitting fields where the value is zero to reduce bandwidth and optimise JSON parsing, however the API exposed to developers ensures that all properties of the <code>Stats</code> object such as <code>stats.all.messages.count</code> will always return an <code>Integer</code> value i.e. all attributes are non-nullable</li>
+	<li><a id='TS3' name='TS3' href='#TS3'><code>(TS3)</code></a> See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats">Ruby Stats type documentation</a> for a list of attributes and their types for the <code>Stats</code> object</li>
 	<li><a id='TS4' name='TS4' href='#TS4'><code>(TS4)</code></a> <code>Stats.ConnectionTypes</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ConnectionTypes">Ruby ConnectionTypes documentation</a></li>
 	<li><a id='TS5' name='TS5' href='#TS5'><code>(TS5)</code></a> <code>Stats.MessageCount</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageCount">Ruby MessageCount documentation</a></li>
 	<li><a id='TS6' name='TS6' href='#TS6'><code>(TS6)</code></a> <code>Stats.MessageTypes</code> &#8211; see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">Ruby MessageTypes documentation</a></li>
