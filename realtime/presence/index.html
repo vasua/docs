@@ -102,7 +102,7 @@ client.channel('realtime-chat').attach(function(channel) {
   channel.presence.enter();
 });</code></pre>
 <p>A client must be attached to a channel, and must have the relevant permission, in order to enter. Although, the library implicitly calls <span lang="ruby">#attach</span><span lang="javascript,nodejs">attach()</span> if the client is not attached at the time <span lang="javascript,nodejs">enter()</span> is called.</p>
-<p>A given <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span> might be present multiple times, via different connections. As far as Ably is concerned these are different members of the presence set. A member of the presence set is, therefore, the combination of a <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span> string and a <span lang="javascript,nodejs">memberId</span><span lang="ruby">member_id</span> string unique to a connection.</p>
+<p>A given <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span> might be present multiple times, via different connections. As far as Ably is concerned these are different members of the presence set. A member of the presence set is, therefore, the combination of a <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span> string and a <span lang="javascript,nodejs">connectionId</span><span lang="ruby">connection_id</span> string unique to a connection.</p>
 <h3>Managing multiple client ID</h3>
 <p>An Ably client instance might, if on an application server for example, publish messages on behalf of multiple distinct clientIds. The channel&#8217;s <code>presence</code> object therefore also supports methods that enable presence messages to be published for a clientId specified at the time of the call, rather than for a clientId specified when the library was instanced.</p>
 <p>In order to be able to publish presence changes for arbitrary clientIds, the client library must have been instanced either with a key, or with a token bound to the wildcard clientId.</p>
@@ -174,19 +174,19 @@ channel.presence.enter({ clientId: 'bob', data: 'robert@example.com' })</code></
 <p>A number of presence actions are therefore defined.</p>
 <dl>
 	<dt>enter</dt>
-	<dd>A clientId, or a clientId/memberId combination, is entering the presence channel.</dd>
+	<dd>A clientId, or a clientId/connectionId combination, is entering the presence channel.</dd>
 </dl>
 <dl>
 	<dt>leave</dt>
-	<dd>A clientId, or a clientId/memberId combination, is leaving the presence channel.</dd>
+	<dd>A clientId, or a clientId/connectionId combination, is leaving the presence channel.</dd>
 </dl>
 <dl>
 	<dt>update</dt>
-	<dd>An already-present clientId or clientId/memberId combination has been updated.</dd>
+	<dd>An already-present clientId or clientId/connectionId combination has been updated.</dd>
 </dl>
 <dl>
 	<dt>present</dt>
-	<dd>An already-present clientId or clientId/memberId combination is signaling its presence on the channel. (happens only when a listener is bound to the channel)</dd>
+	<dd>An already-present clientId or clientId/connectionId combination is signaling its presence on the channel. (happens only when a listener is bound to the channel)</dd>
 </dl>
 <h3>Presence list</h3>
 <p>A Channel&#8217;s <code>presence</code> <span lang="default">property</span><span lang="java">field</span> exposes a <code>get</code> method whereby a client can discover the set of all members present on the channel.</p>
@@ -465,8 +465,8 @@ h4. Returns</p>
 	<dd>The id of the client associated with the update. This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the clientId is known, for messages delivered to subscribers. It is not required to populate the clientId of a message before publishing it.</dd>
 </dl>
 <dl>
-	<dt><span lang="java">String</span>memberId</dt>
-	<dd>A unique id for the client associated with the update, to disambiguate in the case that a single clientId is simultaneously present multiple times (eg on different connections). This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the memberId is known, for messages delivered to subscribers.</dd>
+	<dt><span lang="java">String</span>connectionId</dt>
+	<dd>A unique id for the client associated with the update, to disambiguate in the case that a single clientId is simultaneously present multiple times (eg on different connections). This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the connectionId is known, for messages delivered to subscribers.</dd>
 </dl>
 <dl>
 	<dt><span lang="java">Object</span>clientData</dt>

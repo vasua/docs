@@ -65,20 +65,20 @@
       <p>Ably Channels support the concept of presence. Each channel may have a presence set associated with it, which is a set of clientIds for those clients that have announced their presence by entering the channel.</p>
 <p>Using the Ably REST API it is possible to obtain the set of clientIds that are currently present on a channel. It is also possible to obtain the presence history for the channel, if persistence is enabled for that channel.</p>
 <p>Since the REST API is stateless, and REST clients do not have realtime connections to the Ably service, it is not possible to enter or leave a channel via the REST API.</p>
-<p>A given <code>clientId</code> might be present multiple times, via different connections. As far as Ably is concerned these are different members of the presence set. A member of the presence set is, therefore, the combination of a <code>clientId</code> string and a <code>memberId</code> string unique to a connection.</p>
+<p>A given <code>clientId</code> might be present multiple times, via different connections. As far as Ably is concerned these are different members of the presence set. A member of the presence set is, therefore, the combination of a <code>clientId</code> string and a <code>connectionId</code> string unique to a connection.</p>
 <p>Each member entering a presence channel may include a payload in the <code>clientData</code> attribute of the <code>PresenceMessage</code> and this is then included in the presence updates broadcast to subscribed clients. Clients can update this <code>clientData</code> whilst being members of the channel.</p>
 <p>A number of presence actions are therefore defined.</p>
 <dl>
 	<dt>enter</dt>
-	<dd>A clientId, or a clientId/memberId combination, is entering the presence channel.</dd>
+	<dd>A clientId, or a clientId/connectionId combination, is entering the presence channel.</dd>
 </dl>
 <dl>
 	<dt>leave</dt>
-	<dd>A clientId, or a clientId/memberId combination, is leaving the presence channel.</dd>
+	<dd>A clientId, or a clientId/connectionId combination, is leaving the presence channel.</dd>
 </dl>
 <dl>
 	<dt>update</dt>
-	<dd>An already-present clientId or clientId/memberId combination has been updated.</dd>
+	<dd>An already-present clientId or clientId/connectionId combination has been updated.</dd>
 </dl>
 <h2>Presence Messages</h2>
 <p>An Ably REST <code>PresenceMessage</code> has an <code>action</code>, a <code>clientId</code>, and optionally a <code>clientData</code> member carrying a status message or other data associated with the action. As with Message payloads, various primitive and object types are portably defined and supported in all clients, enabling clients to be interoperable across languages and environments.</p>
@@ -216,8 +216,8 @@ h4. Returns</p>
 	<dd>The id of the client associated with the update. This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the clientId is known, for messages delivered to subscribers. It is not required to populate the clientId of a message before publishing it.</dd>
 </dl>
 <dl>
-	<dt><span lang="java">String</span>memberId</dt>
-	<dd>A unique id for the client associated with the update, to disambiguate in the case that a single clientId is simultaneously present multiple times (eg on different connections). This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the memberId is known, for messages delivered to subscribers.</dd>
+	<dt><span lang="java">String</span>connectionId</dt>
+	<dd>A unique id for the client associated with the update, to disambiguate in the case that a single clientId is simultaneously present multiple times (eg on different connections). This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the connectionId is known, for messages delivered to subscribers.</dd>
 </dl>
 <dl>
 	<dt><span lang="java">Object</span>clientData</dt>
