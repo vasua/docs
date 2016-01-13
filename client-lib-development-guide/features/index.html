@@ -820,6 +820,7 @@
 		<li><a id='CD2d' name='CD2d' href='#CD2d'><code>(CD2d)</code></a> <code>maxFrameSize</code> is the maximum size for a single frame of data sent to Ably. This restriction applies to a <code>ProtocolMessage</code> sent over a realtime connection, or the total body size for a REST request</li>
 		<li><a id='CD2e' name='CD2e' href='#CD2e'><code>(CD2e)</code></a> <code>maxInboundRate</code> is the maximum allowable number of requests per second from a client or Ably. In the case of a realtime connection, this restriction applies to the number of <code>ProtocolMessage</code> objects sent, whereas in the case of REST, it is the total number of REST requests per second</li>
 		<li><a id='CD2f' name='CD2f' href='#CD2f'><code>(CD2f)</code></a> <code>connectionStateTtl</code> is the duration that Ably will persist the connection state when a Realtime client is abruptly disconnected</li>
+		<li><a id='CD2g' name='CD2g' href='#CD2g'><code>(CD2g)</code></a> <code>serverId</code> string is a unique identifier for the front-end server that the client has connected to. This server ID is only used for the purposes of debugging.</li>
 	</ul></li>
 </ul>
 <h3 id="options">Option types</h3>
