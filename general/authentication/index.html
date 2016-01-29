@@ -113,10 +113,11 @@
 <pre class="code-editor open-jsbin open-jsbin-icuzay" lang="javascript"><code class="code-editor open-jsbin open-jsbin-icuzay" lang="javascript">var ably = new Ably.Rest({ key: '{{API_KEY}}' });
 ably.createTokenRequest({ clientId: 'client@example.com' }, null, function(err, tokenRequest) {
   /* tokenRequest =&gt; {
-       "keyName": "{{API_KEY_NAME}}",
        "capability": "{\"*\":[\"*\"]}",
-       "timestamp": {{MS_SINCE_EPOCH}},
+       "clientId": "client@example.com",
+       "keyName": "{{API_KEY_NAME}}",
        "nonce": "5576521221082658",
+       "timestamp": {{MS_SINCE_EPOCH}},
        "mac": "GZRgXssZDCegRV....EXAMPLE"
      } */
 });</code></pre>
@@ -130,10 +131,11 @@ ably.createTokenRequest({ clientId: 'client@example.com' }, null, function(err, 
 ably.requestToken({ clientId: 'client@example.com' }, function(err, token) {
   /* token =&gt; {
        "token": "xVLyHw.Dtxd9tuz....EXAMPLE",
+       "capability": "{\"*\":[\"*\"]}"
+       "clientId": "client@example.com",
+       "expires": 1449745287315,
        "keyName": "{{API_KEY_NAME}}",
        "issued": 1449741687315,
-       "expires": 1449745287315,
-       "capability": "{\"*\":[\"*\"]}"
      } */
 });</code></pre>
 <h2 id="token-request-spec">Token request spec</h2>
@@ -290,9 +292,8 @@ Note that a newline character is added for each field, including any empty clien
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
   <ul>
-<li class=''><a href='/root/quick-start-guide/'>Quickstart Guide</a></li>
-<li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
-<li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
+<li class=''><a href='/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/how-ably-works/'>How Ably works</a></li>
 </ul>
   <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>

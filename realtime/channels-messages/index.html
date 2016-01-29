@@ -72,36 +72,107 @@
       <p>The Ably Realtime service organises the traffic within any application into named channels. Channels are the &#8220;unit&#8221; of message distribution; clients attach to channels to subscribe to messages, and every message broadcast by the service is associated with a unique channel.</p>
 <h2>Channels in the Realtime API</h2>
 <h3>Obtaining a channel instance</h3>
-<p>A <code>Channel</code> object is a reference to a single channel. A channel instance is obtained from the <code>channels</code> collection of the Ably <code>Realtime</code> instance.</p>
-<pre lang="javascript"><code lang="javascript">var channel = realtime.channels.get('myChannel');</code></pre>
-<pre lang="nodejs"><code lang="nodejs">var channel = realtime.channels.get('myChannel');</code></pre>
+<p>A <code>Channel</code> object is a reference to a single channel. A channel instance is obtained from the <a href="/realtime/usage/#channels"><code>channels</code> collection</a> of the Ably <span lang="ruby"><code>Realtime::Client</code></span><span lang="default"><code>Realtime</code></span> instance.</p>
+<pre class="code-editor open-jsbin open-jsbin-igidoq" lang="javascript"><code class="code-editor open-jsbin open-jsbin-igidoq" lang="javascript">var channel = realtime.channels.get('channelName');</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-igidoq" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-igidoq" lang="nodejs">var channel = realtime.channels.get('channelName');</code></pre>
 <pre lang="java"><code lang="java">import io.ably.realtime.Channel;
-Channel channel = realtime.channels.get("myChannel");</code></pre>
-<pre lang="ruby"><code lang="ruby">channel = realtime.channels.get('myChannel')</code></pre>
+Channel channel = realtime.channels.get("channelName");</code></pre>
+<pre lang="ruby"><code lang="ruby">channel = realtime.channels.get('channelName')</code></pre>
 <p>A set of <a href="#channel-options">channel options</a> may also be passed when getting a channel instance.</p>
-<pre lang="javascript"><code lang="javascript">var channel = realtime.channels.get('myChannel', channelOpts);</code></pre>
-<pre lang="nodejs"><code lang="nodejs">var channel = realtime.channels.get('myChannel', channelOpts);</code></pre>
+<pre lang="javascript"><code lang="javascript">var options = { encrypted: true, cipherParams: { key: 'privateKey' } };
+var channel = realtime.channels.get('channelName', options);</code></pre>
+<pre lang="nodejs"><code lang="nodejs">var options = { encrypted: true, cipherParams: { key: 'privateKey' } };
+var channel = realtime.channels.get('channelName', options);</code></pre>
 <pre lang="java"><code lang="java">import io.ably.realtime.Channel;
-Channel channel = realtime.channels.get("myChannel", channelOpts);</code></pre>
-<pre lang="ruby"><code lang="ruby">channel = realtime.channels.get('myChannel', channelOpts)</code></pre>
+import io.ably.lib.types.ChannelOptions;
+import io.ably.lib.util.Crypto.CipherParams;
+CipherParams params = Crypto.getDefaultParams("privateKey");
+ChannelOptions options = new ChannelOptions();
+options.encrypted = true;
+options.cipherParams = params;
+Channel channel = realtime.channels.get("channelName", channelOpts);</code></pre>
+<pre lang="ruby"><code lang="ruby">options = { encrypted: true, cipherParams: { key: 'privateKey' } }
+channel = realtime.channels.get('channelName', options)</code></pre>
 <h3>Channel lifecycle</h3>
-<p>Channels are not pre-configured; they are created on demand when clients attach, and remain active until such time that there are no remaining attached clients. Applications do have, however, the ability to pre-configure one or more channel namespaces (ie name prefixes), and associate different attributes and access rights with those namespaces.</p>
+<p>Channels are not pre-configured or provisioned in advance; they are created on demand when clients attach, and remain active until such time that there are no remaining attached clients. Applications do have, however, the ability to pre-configure one or more channel namespaces (ie name prefixes), and associate different attributes and access rights with those namespaces. Find out <a href="https://support.ably.io/solution/articles/3000030058-what-is-a-channel-namespace-and-how-can-i-use-them">more about channel namespaces</a>.</p>
+<p>The following example explicitly attaches to a channel, which results in the channel being provisioned in Ably&#8217;s global realtime cluster. This channel will remain available globally until there are no more clients attached to the channel:</p>
+<pre lang="javascript"><code lang="javascript">realtime.channels.get('chatroom').attach(function() {
+  console.log('"chatroom" exists and is now available globally in every data centre');
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">realtime.channels.get('chatroom').attach(function() {
+  console.log('"chatroom" exists and is now available globally in every data centre');
+});</code></pre>
 <pre lang="ruby"><code lang="ruby">realtime.channels.get('chatroom').attach do |channel|
-  puts "'chatroom' exist and is now available on the server"
+  puts "'chatroom' exists and is now available globally in every data centre"
 end</code></pre>
+<pre lang="java"><code lang="java">Channel channel = realtime.channels.get("chatroom");
+channel.on(new ChannelStateListener() {
+  @Override
+  public void onChannelStateChanged(ChannelState state, ErrorInfo reason) {
+    switch (state.current) {
+      case attached: {
+        System.out.println("'chatroom' exists and is now available globally");
+      }
+    }
+  }
+});</code></pre>
 <p>Clients attach to a channel in order to participate on that channel in any way (either to publish, subscribe, or be present on the channel).</p>
 <h3>Implicit attach</h3>
-<p>Although the attach operation can be initiated explicitly by a client, it is more common for the client to perform a publish or subscribe operation, and the client library will initiate the attach if the channel is not already attached. The client library allows clients to begin publishing messages to a channel as soon as the attach has been initiated, and messages are queued until such time as the attach has succeeded or failed.</p>
-<pre lang="ruby"><code lang="ruby">realtime.channels.get('chatroom').subscribe('myEvent') do
-  puts "#attach was called before #subscribe"
-end</code></pre>
+<p>Although the attach operation can be initiated explicitly by a client, it is more common for the client to perform a publish or subscribe operation, and the client library will initiate the attach if the channel is not already attached. The client library allows clients to begin publishing messages to a channel as soon as the channel has been created, and messages are queued until such time as the attach has succeeded or failed.</p>
+<pre class="code-editor open-jsbin open-jsbin-ayazac" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ayazac" lang="javascript">var channel = realtime.channels.get('chatroom');
+channel.subscribe('action', function(message) { // implicit attach
+  console.log("Message received " + message.data);
+});
+channel.publish('action', 'boom!');</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-ayazac" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ayazac" lang="nodejs">var channel = realtime.channels.get('chatroom');
+channel.subscribe('action', function(message) { // implicit attach
+  console.log("Message received " + message.data);
+});
+channel.publish('action', 'boom!');</code></pre>
+<pre lang="ruby"><code lang="ruby">channel = realtime.channels.get('chatroom')
+channel.subscribe('action') do |message| # implicit attach
+  puts "Message received: #{message}";
+end
+channel.publish 'action', 'boom!'</code></pre>
+<pre lang="java"><code lang="java">Channel channel = realtime.channels.get("chatroom");
+/* Implicit attach when subscribing */
+channel.subscribe(new MessageListener() {
+  @Override
+  public void onMessage(Message[] messages) {
+    for(Message message : messages) {
+      System.out.println("Message received: " + message.data);
+    }
+  }
+});
+channel.publish("action", "boom!");</code></pre>
 <h3>Channel failure handling</h3>
 <p>Channel attach and detach operations are synchronous &#8211; after initiating an attach request, the client must wait for a response that confirms that the channel is established on the service.</p>
-<p>There is a case though where an attach will fail, and that is if the client doesn&#8217;t have the necessary rights to access the channel.</p>
+<p>There are cases where an attach will fail deterministically, such as if the client doesn&#8217;t have the necessary rights to access the channel.</p>
+<pre lang="javascript"><code lang="javascript">realtime.channels.get('private-chatroom').attach(function(err) {
+  if (err) {
+    console.error('Attach failed: ' + err);
+  }
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">realtime.channels.get('private-chatroom').attach(function(err) {
+  if (err) {
+    console.error('Attach failed: ' + err);
+  }
+});</code></pre>
 <pre lang="ruby"><code lang="ruby">promise = realtime.channels.get('private-chatroom').attach
-promise.errback do |channel|
-  puts "Attach failed: #{channel.error_reason.message}"
+promise.errback do |error|
+  puts "Attach failed: #{error}"
 end</code></pre>
+<pre lang="java"><code lang="java">Channel channel = realtime.channels.get("private-chatroom");
+channel.on(new ChannelStateListener() {
+  @Override
+  public void onChannelStateChanged(ChannelState state, ErrorInfo reason) {
+    switch (state.current) {
+      case failed: {
+        System.out.println("Attach failed: " + errorInfo.message);
+      }
+    }
+  }
+});</code></pre>
 <h3>Channel states</h3>
 <p>A number of states are therefore defined for a channel.</p>
 <dl>
@@ -109,7 +180,7 @@ end</code></pre>
 	<dd>A channel object having this state has been initialised but no attach has yet been attempted.</dd>
 </dl>
 <dl>
-	<dt>pending</dt>
+	<dt>attaching</dt>
 	<dd>An attach has been initiated by sending a request to the service. This is a transient state; it will be followed either<br />
 by a transition to attached or failed.</dd>
 </dl>
@@ -126,43 +197,44 @@ by a transition to attached or failed.</dd>
 	<dd>An indefinite failure condition. This state is entered if a channel error has been received from the Ably service (such as an attempt to attach without the necessary access rights).</dd>
 </dl>
 <h3>Listening for state changes</h3>
-<div lang="javascript,nodejs">
-<p>The <code>channel</code> object is an <code>EventEmitter</code> and emits an event whose name is the new state whenever there is a channel state change. As with all events from an <code>EventEmitter</code> in the Ably library, <code>this</code> within the listener function is a reference to an event object whose <code>name</code> property is the name of the event that fired. This allows a listener to listen for all events with a single registration and know, which event fired when it is entered.</p>
-<pre lang="javascript,nodejs"><code lang="javascript,nodejs">channel.on('attached', function() {
+<p>The <code>channel</code> object is an <code>EventEmitter</code> and emits an event whose name is the new state whenever there is a channel state change. <span lang="javascript,nodejs">As with all events from an <code>EventEmitter</code> in the Ably library, <code>this</code> within the listener function is a reference to an event object whose <code>name</code> property is the name of the event that fired. This allows a listener to listen for all events with a single registration and know, which event fired when it is entered.</span></p>
+<pre lang="javascript"><code lang="javascript">channel.on('attached', function() {
   console.log('channel ' + channel.name + ' is now attached');
-});
-</code></pre>
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">channel.on('attached', function() {
+  console.log('channel ' + channel.name + ' is now attached');
+});</code></pre>
+<pre lang="ruby"><code lang="ruby">channel.on(:attached) do
+  puts "channel #{channel.name} is now attached"
+end</code></pre>
 <p>Alternatively a listener may be registered so that it receives all state change events.</p>
-<pre lang="javascript,nodejs"><code lang="javascript,nodejs">var myListener = function() {
+<pre lang="javascript"><code lang="javascript">var myListener = function() {
   console.log('New channel state is ' + this.name);
 });
-['attached', 'detached', 'failed'].forEach(function(event) {
-  channel.on(event, myListener);
+channel.on(myListener);</code></pre>
+<pre lang="nodejs"><code lang="nodejs">var myListener = function() {
+  console.log('New channel state is ' + this.name);
 });
-</code></pre>
+channel.on(myListener);</code></pre>
+<pre lang="ruby"><code lang="ruby">channel.on do |channel_state_change"
+  puts "New channel state is #{channel_state_change.current}"
+end</code></pre>
 <p>Previously registered listeners can be removed individually or all together.</p>
-<pre lang="javascript,nodejs"><code lang="javascript,nodejs">/* remove a listener registered for a single event */
+<pre lang="javascript"><code lang="javascript">/* remove a listener registered for a single event */
 channel.off('attached', myListener);
 
 /* remove a listener registered for all events */
-channel.off(myListener);
-</code></pre>
-<p></div><div lang="java"><br />
-A client can register for connection state changes by implementing <a href="#channel-state-listener">ChannelStateListener</a> and adding it to the <code>stateListeners</code> Collection. The listener is passed the new <code>ChannelState</code> on each state change event together with reason or error information where available.</p>
-<pre lang="java"><code lang="java">channel.stateListeners.add(new ChannelStateListener() {
-	@Override
-	public void onChannelStateChanged(ChannelState state, ErrorInfo reason) {
-		System.out.println("New state is " + state.name());
-	}});
-</code></pre>
-<p>Previously registered listeners can be removed individually or all together.</p>
-<pre lang="java"><code lang="java">/* remove a single listener */
-channel.stateListeners.remove(myListener);
+channel.off(myListener);</code></pre>
+<pre lang="nodejs"><code lang="nodejs">/* remove a listener registered for a single event */
+channel.off('attached', myListener);
 
-/* remove all event listeners */
-channel.stateListeners.clear();
-</code></pre>
-</div>
+/* remove a listener registered for all events */
+channel.off(myListener);</code></pre>
+<pre lang="ruby"><code lang="ruby">/* remove a listener registered for a single event */
+channel.off(:attached, &amp;my_proc)
+
+/* remove a listener registered for all events */
+channel.off(&amp;my_proc)</code></pre>
 <h3>Channel namespaces</h3>
 <p>One or more channel namespaces, or channel name prefixes, may be configured for an app. When a channel is created whose name is prefixed with one of the namespaces, the channel assumes certain configured attributes associated with that namespace.</p>
 <p>Namespace-prefixed names are delimited by a single colon &#8216;:&#8217;; the first component of the channel name (from the start up to and including the last character before the colon) is the namespace. A channel name may validly contain a colon even if the namespace component does not correspond to a namespace; also, a channel may contain multiple colons and only the component up to the first colon will be matched with a namespace. The only restriction on channel names is that a channel name may not start with a colon and may not be empty.</p>
@@ -603,9 +675,8 @@ On success the listener&#8217;s <code>onSuccess()</code> method is called. If th
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
   <ul>
-<li class=''><a href='/root/quick-start-guide/'>Quickstart Guide</a></li>
-<li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
-<li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
+<li class=''><a href='/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/how-ably-works/'>How Ably works</a></li>
 </ul>
   <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>

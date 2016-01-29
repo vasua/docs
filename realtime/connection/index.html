@@ -40,7 +40,8 @@
             <option>Jump to ...</option>
             <optgroup label='Help with'>
 <option id="anchor-title">Connection</option>
-<option id="anchor-connection-states">Connection states</option>
+<option id="anchor-connection-state-explained">Connection state explained</option>
+<option id="anchor-connection-states">Available connection states</option>
 <option id="anchor-connection-state-recovery">Connection state recovery</option>
 </optgroup>
 <optgroup label='Connection API properties'>
@@ -75,12 +76,22 @@
     </header>
     <article>
       <p>The Ably Realtime library establishes and maintains a connection to the Ably service, using the most efficient transport available, typically WebSockets. The Ably realtime protocol operates and multiplexes all channel traffic over that connection.</p>
-<p>Although connection state is temporary, the Ably protocol provides continuity of message delivery between the client and the service, provided that a dropped connection is reestablished by the client within a limited interval (typically around 1 minute). Beyond that, the connection becomes stale and the system will not attempt to recover the connection state. The lifecycle of a connection, and the strategy for reconnecting on failure, reflect the transient nature of the connection state.</p>
+<p>Here is the simplest example of a client connecting to ably and handling a connection state change event:</p>
+<pre class="code-editor open-jsbin open-jsbin-afigev" lang="javascript"><code class="code-editor open-jsbin open-jsbin-afigev" lang="javascript">var ably = new Ably.Realtime('{{API_KEY}}');
+ably.connection.on('connected', function() {
+  alert('Wow, that was easy');
+})</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-afigev" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-afigev" lang="nodejs">var ably = new Ably.Realtime('{{API_KEY}}');
+ably.connection.on('connected', function() {
+  alert('Wow, that was easy');
+})</code></pre>
+<h3 id="connection-state-explained">Connection state explained</h3>
+<p>Although connection state is temporary, the Ably protocol provides continuity of message delivery between the client and the service, provided that a dropped connection is reestablished by the client within a limited interval (typically around 2 minutes). Beyond that, the connection becomes stale and the system will not attempt to recover the connection state. The lifecycle of a connection, and the strategy for reconnecting on failure, reflect the transient nature of the connection state.</p>
 <p>The client library is responsible for managing the connection; this includes selecting a transport (in those environments supporting multiple transports), selecting a host to connect to (automatically falling back to an alternate data centre host if the closest data centre is unreachable), and managing continuity of operation when the connection drops.</p>
 <p>When the library is instanced, if connectivity to the service is available, the library will establish a connection immediately, and if the connection drops at any time it will attempt to re-establish it by making repeated connection attempts every 15 seconds for up to two minutes.</p>
-<p>If, after that time, there has been no connection, the library falls back to a lower level of activity, still periodically attempting reconnection at two minute intervals. This reflects the assumption that there will no longer be recoverable connection state and the client may be offline for a period of time. As soon as a reconnection attempt has been successful, the system reverts to the more active connection behaviour. Further, you can explicitly trigger a reconnection attempt at any time if you wish to implement a different reconnection strategy.</p>
+<p>If, after that time, there has been no connection, the library falls back to a lower level of activity, still periodically attempting reconnection at 30 second intervals. This reflects the assumption that there will no longer be recoverable connection state and the client may be offline for a period of time. As soon as a reconnection attempt has been successful, the system reverts to the more active connection behaviour. Further, you can explicitly trigger a reconnection attempt at any time if you wish to implement a different reconnection strategy.</p>
 <p>The connection object provides methods to observe the lifecycle of the connection and to trigger state transitions.</p>
-<h3 id="connection-states">Connection states</h3>
+<h3 id="connection-states">Available connection states</h3>
 <p>A series of connection states is defined as follows:</p>
 <dl>
 	<dt>initialised</dt>
@@ -96,11 +107,11 @@
 </dl>
 <dl>
 	<dt>disconnected</dt>
-	<dd>A temporary failure condition. No current connection exists because there is no network connectivity or no host is available.<br><br>The disconnected state is entered if an established connection is dropped, or if a connection attempt was unsuccessful. In the disconnected state the library will periodically attempt to open a new connection (approximately every 15 seconds), anticipating that the connection will be re-established soon and thus connection and channel continuity will be possible. <br><br>In this state, developers can continue to publish messages as they are automatically placed in a local queue, and sent as soon as a connection is established. <br>Messages published by other clients to the Ably service, whilst this client is disconnected, are queued and delivered to this client upon reconnection, so long as the connection is resumed within 1 minute. <br><br>If connection state recovery is not possible following a new connection being established, all channels are detached, thus ensuring the developer is made aware that continuity on the channel was not possible. The developer is then responsible for reattaching channels and recovering state, if required, using the <a href="/realtime/history">history API</a>.</dd>
+	<dd>A temporary failure condition. No current connection exists because there is no network connectivity or no host is available.<br><br>The disconnected state is entered if an established connection is dropped, or if a connection attempt was unsuccessful. In the disconnected state the library will periodically attempt to open a new connection (approximately every 15 seconds), anticipating that the connection will be re-established soon and thus connection and channel continuity will be possible. <br><br>In this state, developers can continue to publish messages as they are automatically placed in a local queue, and sent as soon as a connection is established. <br>Messages published by other clients to the Ably service, whilst this client is disconnected, are queued and delivered to this client upon reconnection, so long as the connection is resumed within 2 minutes. <br><br>If connection state recovery is not possible following a new connection being established, all channels are detached, thus ensuring the developer is made aware that continuity on the channel was not possible. The developer is then responsible for reattaching channels and recovering state, if required, using the <a href="/realtime/history">history API</a>.</dd>
 </dl>
 <dl>
 	<dt>suspended</dt>
-	<dd>A long term failure condition. No current connection exists because there is no network connectivity or no host is available.<br><br>The suspended state is entered after a failed connection attempt if there has then been no connection for a period of two minutes. In the suspended state, the library will periodically attempt to open a new connection every two minutes. Developers are unable to publish messages in this state. A new connection attempt can also be triggered by an explicit call to <span lang="default"><a href="#connect"><code>connect()</code></a></span><span lang="ruby"><a href="#connect"><code>connect</code></a></span> on the <code>Connection</code> object.</dd>
+	<dd>A long term failure condition. No current connection exists because there is no network connectivity or no host is available.<br><br>The suspended state is entered after a failed connection attempt if there has then been no connection for a period of two minutes. In the suspended state, the library will periodically attempt to open a new connection every 30 seconds. Developers are unable to publish messages in this state. A new connection attempt can also be triggered by an explicit call to <span lang="default"><a href="#connect"><code>connect()</code></a></span><span lang="ruby"><a href="#connect"><code>connect</code></a></span> on the <code>Connection</code> object.</dd>
 </dl>
 <dl>
 	<dt>closing</dt>
@@ -201,7 +212,7 @@ realtime.connection.off();</code></pre>
 
 
 <div lang="ruby"> <!-- start ruby language block -->
-<pre lang="ruby"><code lang="ruby">realtime.connection.on('connected') do
+<pre lang="ruby"><code lang="ruby">realtime.connection.on(:connected) do
   puts 'Ably is connected'
 end</code></pre>
 <p>Alternatively a listener may be registered so that it receives all state change events.</p>
@@ -210,7 +221,7 @@ end</code></pre>
 end</code></pre>
 <p>Previously registered listeners can be removed individually or all together.</p>
 <pre lang="ruby"><code lang="ruby"># remove a listener registered for a single even
-realtime.connection.off 'connected', &amp;block
+realtime.connection.off :connected, &amp;block
 
 # remove a listener registered for all events
 realtime.connection.off &amp;block
@@ -224,15 +235,14 @@ realtime.connection.off</code></pre>
 <p>The Ably system preserves connection state to allow connections to continue transparently across brief disconnections. The connection state that is tracked includes the messages sent to the client on the connection, members present on a channel and the set of channels that the client is attached to.</p>
 <p>There are two modes of connection state recovery:</p>
 <ul>
-	<li><code>resume</code>: this is transparent recovery of a live client instance across disconnections. Upon disconnection, the library will automatically re-attempt connection and, once connection is re-established, any missed messages will be sent to the client. The developer does not need to do anything to trigger this behaviour; all client channel event listeners remain attached and are called when the backlog of messages is received.</li>
+	<li><code>resume</code>: this is transparent recovery of a live client instance across disconnections. Upon disconnection, the library will automatically re-attempt connection and, once the connection is re-established, any missed messages will be sent to the client. The developer does not need to do anything to trigger this behaviour; all client channel event listeners remain attached and are called when the backlog of messages is received.</li>
 </ul>
 <ul>
-	<li><code>recover</code>: this addresses the case in which a new client library instance wishes to connect and recover the state of an earlier connection. This occurs typically in a browser environment when the page has been refreshed and therefore no client state is retained. In this case any message listeners associated with channels will no longer exist so it is not possible for the library simply to send the message backlog on reconnection; instead the client must re-subscribe to each channel it is interested in, and its message listener(s) will be called with any message backlog for that channel. A client requests recovery of connection state by including a recovery string in the <a href="/realtime/usage#client-options">client options</a> when instancing the Realtime library.  See <a href="#connection-state-recover-options">connection state recover options</a> for more info.</li>
+	<li><code>recover</code>: this addresses the case in which a new client library instance wishes to connect and recover the state of an earlier connection. This occurs typically in a browser environment when the page has been refreshed and therefore the client instance is disposed and no client state is retained. In this case any message listeners associated with channels will no longer exist so it is not possible for the library simply to send the message backlog on reconnection; instead the client must re-subscribe to each channel it is interested in, and its message listener(s) will be called with any message backlog for that channel. A client requests recovery of connection state by including a recovery string in the <a href="/realtime/usage#client-options">client options</a> when instancing the Realtime library.  See <a href="#connection-state-recover-options">connection state recover options</a> for more info.</li>
 </ul>
-<p>In either case, the need to send a message backlog does not prevent new messages being sent to the client as soon as they are available, or messages could be indefinitely deferred on very heavily loaded connections. Therefore the system does not guarantee that messages received after reconnection are delivered in the same order that would have occurred if the connection had not been dropped. In the <code>recover</code> case, in particular, the order of the message delivery depends on the timing of the re-attachment of each channel.</p>
-<p>Each time a reconnection is attempted, the client library decides which transport to use (in those environments supporting multiple transports). Connection state recovery works in the same way irrespective of the transport used prior to, and after, reconnection.</p>
+<p>In either case, when a connection is resumed or recovered, the message backlog held on the server will be pushed to the client. However, any new messages published will be sent as they become available or messages could be indefinitely deferred on very heavily loaded connections. Therefore the system does not guarantee that messages received after reconnection are delivered in the same order that would have occurred if the connection had not been dropped. In the <code>recover</code> case, in particular, the order of the message delivery depends on the timing of the re-attachment of each channel.</p>
 <h4 id="connection-state-recover-options">Connection state recover options</h4>
-<p>In <code>recover</code> mode it is necessary to request recovery mode in the <a href="/realtime/usage#client-options">client options</a> when instancing the library. Recovery requires that the library knows the most previous connection&#8217;s <span lang="default"><a href="#recovery-key"><code>recoveryKey</code></a></span><span lang="ruby"><a href="#recovery-key"><code>recovery_key</code></a></span> value, which includes both the <a href="#key"><code>Connection#key</code></a> and the last message serial received on that connection.</p>
+<p>In <code>recover</code> mode it is necessary to request recovery mode in the <a href="/realtime/usage#client-options">client options</a> when instancing the library. Recovery requires that the library knows the most previous connection&#8217;s <span lang="default"><a href="#recovery-key"><code>recoveryKey</code></a></span><span lang="ruby"><a href="#recovery-key"><code>recovery_key</code></a></span> value, which includes both the private unique <a href="#key"><code>Connection#key</code></a> and the last message serial received on that connection. As the recovery key is never shared with any other clients, it allows Ably to safely resend message backlogs to the original client.</p>
 
 
 <div lang="javascript"> <!-- start javascript language block -->
@@ -247,14 +257,14 @@ realtime.connection.off</code></pre>
 <p>The <code>Connection</code> object exposes the following public <span lang="default">properties</span><span lang="ruby">attributes</span><span lang="java">members</span>.</p>
 <h6 id="id">id</h6>
 <p>A unique public identifier <code>String</code> for this connection, used to identify this member in presence events and messages.</p>
-<h6 id="error-reason"><span lang='default'>reason</span><span lang='ruby'>error_reason</span></h6>
-<p>When a connection failure occurs this <span lang="default">attribute</span><span lang="java">member</span><span lang="javascript,nodejs">property</span> contains the <span lang="javascript,nodejs"><a href="/realtime/types#error-info"><code>ErrorInfo</code></a></span><span lang="java,ruby"><a href="/realtime/types#ably-exception"><code>AblyException</code></a></span>.</p>
+<h6 id="error-reason"><span lang='default'>errorReason</span><span lang='ruby'>error_reason</span></h6>
+<p>When a connection failure occurs this <span lang="default,ruby">attribute</span><span lang="java">member</span><span lang="javascript,nodejs">property</span> contains the <span lang="javascript,nodejs"><a href="/realtime/types#error-info"><code>ErrorInfo</code></a></span><span lang="java,ruby"><a href="/realtime/types#ably-exception"><code>AblyException</code></a></span>.</p>
 <h6 id="key">key</h6>
 <p>A unique private connection key <code>String</code> used to recover or resume a connection, assigned by Ably. When recovering a connection explicitly, the <span lang="default"><code>recoveryKey</code></span><span lang="ruby"><code>recovery_key</code></span> is used in the <code>recover</code> <a href="/realtime/usage#client-options">client options</a> as it contains both the <code>key</code> and the last message <code>serial</code>.</p>
 <h6 id="recovery-key"><span lang='default'>recoveryKey</span><span lang='ruby'>recovery_key</span></h6>
 <p>The recovery key <code>String</code> can be used by another client to recover this connection&#8217;s state in the <code>recover</code> <a href="/realtime/usage#client-options">client options</a> <span lang="default">property</span><span lang="java">member</span><span lang="ruby">attribute</span>. See <a href="#connection-state-recover-options">connection state recover options</a> for more information.</p>
 <h6 id="serial">serial</h6>
-<p>The serial number <code>Integer</code> of the last message to be received on this connection, used to recover or resume a connection. When recovering a connection explicitly, the <span lang="default"><code>recoveryKey</code></span><span lang="ruby"><code>recovery_key</code></span> is used in the <code>recover</code> <a href="/realtime/usage#client-options">client options</a> as it contains both the <code>key</code> and the last message <code>serial</code>.</p>
+<p>The serial number <code>Integer</code> of the last message to be received on this connection, used automatically by the library when recovering or resuming a connection. When recovering a connection explicitly, the <span lang="default"><code>recoveryKey</code></span><span lang="ruby"><code>recovery_key</code></span> is used in the <code>recover</code> <a href="/realtime/usage#client-options">client options</a> as it contains both the <code>key</code> and the last message <code>serial</code>.</p>
 <h6 id="state">state</h6>
 <p>The current <span lang="java"><a href="#connection-state"><code>io.ably.realtime.ConnectionState</code></a> <code>state</code></span><span lang="ruby"><a href="#connection-state"><code>Ably::Realtime::Connection::STATE</code></a> <code>state</code></span><span lang="default"><code>state String</code></span> of this Connection. See the <a href="#connection-states"><code>Connection</code> states</a> for more information.</p>
 <h2 id="methods"><span lang='default'>Connection Methods</span><span lang='ruby'>Ably::Realtime::Connection Methods</span><span lang='java'>io.ably.realtime.Connection Methods</span></h2>
@@ -368,24 +378,24 @@ client.connection.on(Ably::Realtime::Connection::STATE.Connected) { ... }</code>
 
 </div> <!-- /end ruby language block -->
 
-<h3 id="connection-state-change"><span lang='javascript,nodejs'>ConnectionStateChange Object</span><span lang='java'>ConnectionStateChange</span></h3>
+<h3 id="connection-state-change"><span lang='javascript,nodejs'>ConnectionStateChange Object</span><span lang='java'>ConnectionStateChange</span><span lang='ruby'>ConnectionStateChange</span></h3>
 
 
-<div lang="java,javascript,nodejs"> <!-- start java,javascript,nodejs language block -->
-<p>A <span lang="java"><code>io.ably.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by an object that implements an <code>EventEmitter</code>.</p>
+<div lang="java,javascript,nodejs,ruby"> <!-- start java,javascript,nodejs,ruby language block -->
+<p>A <span lang="java"><code>io.ably.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="ruby"><code>Ably::Models::ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by an object that implements an <code>EventEmitter</code>.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>previous</code></dt>
-	<dd>the previous state<br><i>Type: <span lang="default">String</span><span lang="java">ConnectionState</span></i></dd>
+	<dd>the previous state<br><i>Type: <span lang="default">String</span><span lang="ruby"><a href="/realtime/types#connection-state">Connection::STATE</a></span><span lang="java"><a href="/realtime/types#connection-state">ConnectionState</a></span></i></dd>
 	<dt><code>current</code></dt>
-	<dd>the new state<br><i>Type: <span lang="default">String</span><span lang="java">ConnectionState</span></i></dd>
+	<dd>the new state<br><i>Type: <span lang="default">String</span><span lang="ruby"><a href="/realtime/types#connection-state">Connection::STATE</a></span><span lang="java"><a href="/realtime/types#connection-state">ConnectionState</a></span></i></dd>
 	<dt><code>reason</code></dt>
-	<dd>an <a href="#error-info"><code>ErrorInfo</code></a> containing any information relating to the transition<br><i>Type: <a href="#error-info"><code>ErrorInfo</code></a></i></dd>
+	<dd>an <a href="#error-info"><code>ErrorInfo</code></a> containing any information relating to the transition<br><i>Type: <a href="/realtime/types#error-info"><code>ErrorInfo</code></a></i></dd>
 	<dt><span lang="default"><code>retryIn</code></span><span lang="ruby"><code>retry_in</code></span></dt>
-	<dd>Timestamp at which the library will retry a connection where applicable, as milliseconds since the epoch<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+	<dd>Duration upon which the library will retry a connection where applicable, as <span lang="default">milliseconds</span><span lang="ruby">seconds</span><br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Integer</span></i></dd>
 </dl>
 
-</div> <!-- /end java,javascript,nodejs language block -->
+</div> <!-- /end java,javascript,nodejs,ruby language block -->
 
 <p>&nbsp;</p>
     </article>
@@ -395,9 +405,8 @@ client.connection.on(Ably::Realtime::Connection::STATE.Connected) { ... }</code>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/assets/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
   <ul>
-<li class=''><a href='/root/quick-start-guide/'>Quickstart Guide</a></li>
-<li class=''><a href='/root/how-ably-works/'>How Ably works</a></li>
-<li class=''><a href='/root/usage-limits-billing/'>Usage Limits &amp; Billing</a></li>
+<li class=''><a href='/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/how-ably-works/'>How Ably works</a></li>
 </ul>
   <h2><a href="/realtime/">Realtime client lib</a></h2>
 <ul>
