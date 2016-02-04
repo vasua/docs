@@ -49,10 +49,13 @@
 </optgroup>
 <optgroup label='Other Types'>
 <option id="anchor-client-options">Client Options</option>
+<option id="anchor-channel-state-listener">Channel State Listener</option>
 <option id="anchor-completion-listener">Completion Listener</option>
-<option id="anchor-connection-state">Connection State enum</option>
+<option id="anchor-connection-state">Connection State Enum</option>
+<option id="anchor-connection-state-listener">Connection State Listener</option>
 <option id="anchor-connection-state-change">Connection State Change</option>
 <option id="anchor-deferrable">Deferrable</option>
+<option id="anchor-message-listener">Message Listener</option>
 </optgroup>
           </select>
         </div>
@@ -69,7 +72,7 @@
     <article>
       <p>The Ably client library defines both data types and option types.  Data types are used to represent object such as messages; Option types are used in method arguments.</p>
 <h2>Data types</h2>
-<h3 id="message"><span lang='default'>Message</span><span lang='java'>io.ably.types.Message</span><span lang='ruby'>Ably::Models::Message</span></h3>
+<h3 id="message"><span lang='default'>Message</span><span lang='java'>io.ably.lib.types.Message</span><span lang='ruby'>Ably::Models::Message</span></h3>
 <p>A <code>Message</code> represents an individual message that is sent to or received from Ably.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
@@ -104,7 +107,7 @@
 	<dt><code>encoding</code></dt>
 	<dd>This will typically be empty as all messages received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: String</i></dd>
 </dl>
-<h3 id="presence-message"><span lang='default'>PresenceMessage</span><span lang='java'>io.ably.types.PresenceMessage</span><span lang='ruby'>Ably::Models::PresenceMessage</span></h3>
+<h3 id="presence-message"><span lang='default'>PresenceMessage</span><span lang='java'>io.ably.lib.types.PresenceMessage</span><span lang='ruby'>Ably::Models::PresenceMessage</span></h3>
 <p>A <code>PresenceMessage</code> represents an individual presence update that is sent to or received from Ably.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
@@ -143,16 +146,12 @@
 	<dt><code>encoding</code></dt>
 	<dd>This will typically be empty as all presence updates received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: String</i></dd>
 </dl>
-<h3 id="paginated-result"><span lang='default'>PaginatedResult</span><span lang='java'>io.ably.types.PaginatedResult</span><span lang='ruby'>Ably::Models::PaginatedResult</span></h3>
+<h3 id="paginated-result"><span lang='default'>PaginatedResult</span><span lang='java'>io.ably.lib.types.PaginatedResult</span><span lang='ruby'>Ably::Models::PaginatedResult</span></h3>
 <p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">paginated REST API query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>items</code></dt>
 	<dd>contains a page of results (for example an Array of <a href="#message"><code>Message</code></a> or <a href="#presence-message"><code>PresenceMessage</code></a> objects for a channel history request)<br><i>Type: Array &lt;Message, Presence, Stats&gt;</i></dd>
-	<dt><div lang="default"><code>isFirst</code></div></dt>
-	<dd><code>true</code> if this page is the first page<br><i>Type: Boolean</i></dd>
-	<dt><div lang="ruby"><code>first?</code></div></dt>
-	<dd><code>true</code> if this page is the first page<br><i>Type: Boolean</i></dd>
 </dl>
 <dl>
 	<dt><div lang="default"><code>isLast</code></div></dt>
@@ -167,29 +166,34 @@
 	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
 </dl>
 <h4>Methods</h4>
+<h6>first</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>first()</span><span lang='ruby'>first</span><span lang='java'>public PaginatedResult first()</span></p>
+<p class="definition"><span lang='default'>first(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))</span><span lang='ruby'><a href="/realtime/types#paginated-result">PaginatedResult</a> first</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a> first()</span></p>
 </blockquote>
-<p>Returns a new <code>PaginatedResult</code> for the first page of results</p>
+<p>Returns a new <code>PaginatedResult</code> for the first page of results. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</p>
+<h6>items</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>items()</span><span lang='ruby'>items</span><span lang='java'>public Array items()</span></p>
+<p class="definition"><span lang='default'>Object[] items()</span><span lang='ruby'>Object[] items</span><span lang='java'>public Object[] items()</span></p>
 </blockquote>
-<p>Returns the current page of results as an Array</p>
+<p>Returns the current page of results as an Array. The type of the objects in the Array is determined by the operation that provided the <code>PaginatedResult</code>. For example, a <a href="/realtime/channels-messages#history">Message#history</a> request will return an array of <code>Message</code> objects.</p>
+<h6>next</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>next()</span><span lang='ruby'>next</span><span lang='java'>public PaginatedResult next()</span></p>
+<p class="definition"><span lang='default'>next(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))</span><span lang='ruby'><a href="/realtime/types#paginated-result">PaginatedResult</a> next</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a> next()</span></p>
 </blockquote>
-<p>Returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <span lang="default"><code>null</code></span><span lang="java"><code>Null</code></span><span lang="ruby"><code>nil</code></span> is returned</p>
+<p>Returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <span lang="default"><code>null</code></span><span lang="java"><code>Null</code></span><span lang="ruby"><code>nil</code></span> is returned. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</p>
 <h4>Example</h4>
 <pre lang="javascript"><code lang="javascript">channel.history(function(err, paginatedResult) {
-  console.log("Page 0 item 0:" + paginatedResult.items[0].data);
+  console.log('Page 0 item 0:' + paginatedResult.items[0].data);
   paginatedResult.next(function(err, nextPage) {
-    console.log("Page 1 item 1:" + nextPage.items[1].data);
+    console.log('Page 1 item 1: ' + nextPage.items[1].data);
+    console.log('Last page?: ' + nextPage.isLast;
   });
 });</code></pre>
 <pre lang="nodejs"><code lang="nodejs">channel.history(function(err, paginatedResult) {
-  console.log("Page 0 item 0:" + paginatedResult.items[0].data);
+  console.log('Page 0 item 0:' + paginatedResult.items[0].data);
   paginatedResult.next(function(err, nextPage) {
-    console.log("Page 1 item 1:" + nextPage.items[1].data);
+    console.log('Page 1 item 1: ' + nextPage.items[1].data);
+    console.log('Last page?: ' + nextPage.isLast;
   });
 });</code></pre>
 <pre lang="java"><code lang="java">PaginatedResult firstPage = channel.history();
@@ -197,6 +201,7 @@ System.out.println("Page 0 item 0:" + firstPage.items[0].data);
 if (firstPage.hasNext) {
   PaginatedResult nextPage = firstPage.next();
   System.out.println("Page 1 item 1:" + nextPage.items[1].data);
+  System.out.println("More pages?:" + Strong.valueOf(nextpage.hasNext()));
 });</code></pre>
 <pre lang="ruby"><code lang="ruby"># When using the REST sync library
 first_page = channel.history
@@ -204,6 +209,7 @@ puts "Page 0 item 0: #{first_page.items[0].data}"
 if first_page.has_next?
   next_page = first_page.next
   puts "Page 1 item 1: #{next_page.items[1].data}"
+  puts "Last page?: #{next_page.is_last?}"
 end
 
 # When using the Realtime EventMachine library
@@ -212,10 +218,11 @@ channel.history do |first_page|
   if first_page.has_next?
     first_page.next do |next_page|
       puts "Page 1 item 1: #{next_page.items[1].data}"
+      puts "Last page?: #{next_page.is_last?}"
     end
   end
 end</code></pre>
-<h3 id="token-request"><span lang='default'>TokenRequest</span><span lang='java'>io.ably.types.TokenRequest</span><span lang='ruby'>Ably::Models::TokenRequest</span></h3>
+<h3 id="token-request"><span lang='default'>TokenRequest</span><span lang='java'>io.ably.lib.types.TokenRequest</span><span lang='ruby'>Ably::Models::TokenRequest</span></h3>
 <p><code>TokenRequest</code> is a type containing parameters for a token request. Tokens are requested using the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a>.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
@@ -234,7 +241,7 @@ end</code></pre>
 	<dt><code>mac</code></dt>
 	<dd>The Message Authentication Code for this request<br><i>Type: String</i></dd>
 </dl>
-<h3 id="token-details"><span lang='default'>TokenDetails</span><span lang='java'>io.ably.types.TokenDetails</span><span lang='ruby'>Ably::Models::TokenDetails</span></h3>
+<h3 id="token-details"><span lang='default'>TokenDetails</span><span lang='java'>io.ably.lib.types.TokenDetails</span><span lang='ruby'>Ably::Models::TokenDetails</span></h3>
 <p><code>TokenDetails</code> is a type providing details of a token and its associated metadata, provided when the system successfully requests a token from the system.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
@@ -256,7 +263,7 @@ end</code></pre>
 	<dd>True when the token has expired<br><i>Type: Boolean</i><br />
 </div></dd>
 </dl>
-<h3 id="error-info"><span lang='default'>ErrorInfo</span><span lang='java'>io.ably.types.ErrorInfo</span><span lang='ruby'>Ably::Models::ErrorInfo</span></h3>
+<h3 id="error-info"><span lang='default'>ErrorInfo</span><span lang='java'>io.ably.lib.types.ErrorInfo</span><span lang='ruby'>Ably::Models::ErrorInfo</span></h3>
 <p>An <code>ErrorInfo</code> is a type encapsulating error information containing an Ably-specific error code and generic status code.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
@@ -271,7 +278,7 @@ end</code></pre>
 	<dt><code>message</code></dt>
 	<dd>Additional message information, where available<br><i>Type: String</i></dd>
 </dl>
-<h3 id="ably-exception"><span lang='java'>io.ably.types.AblyException</span><span lang='ruby'>Ably::Exceptions::BaseAblyException</span></h3>
+<h3 id="ably-exception"><span lang='java'>io.ably.lib.types.AblyException</span><span lang='ruby'>Ably::Exceptions::BaseAblyException</span></h3>
 
 
 <div lang="java"> <!-- start java language block -->
@@ -305,25 +312,25 @@ end</code></pre>
 </div> <!-- /end ruby language block -->
 
 <h2>Other types</h2>
-<h3 id="client-options"><span lang='default'>ClientOptions Object</span><span lang='ruby'>ClientOptions Hash</span><span lang='java'>io.ably.types.ClientOptions</span></h3>
+<h3 id="client-options"><span lang='default'>ClientOptions Object</span><span lang='ruby'>ClientOptions Hash</span><span lang='java'>io.ably.lib.types.ClientOptions</span></h3>
 
 
-<div lang="nodejs,javascript"> <!-- start nodejs,javascript language block -->
-<p><code>ClientOptions</code> is a plain Javascript object and is used in the the <code>Ably.Realtime</code> constructor&#8217;s <code>options</code> argument.  The following attributes can be defined on the object:</p>
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<p><code>ClientOptions</code> is a plain Javascript object and is used in the <code>Ably.Realtime</code> constructor&#8217;s <code>options</code> argument.  The following attributes can be defined on the object:</p>
 
-</div> <!-- /end nodejs,javascript language block -->
+</div> <!-- /end javascript,nodejs language block -->
 
 
 
 <div lang="ruby"> <!-- start ruby language block -->
-<p><code>ClientOptions</code> is a Hash object and is used in the the <code>Ably::Realtime</code> constructor&#8217;s <code>options</code> argument.  The following key symbol values can be added to the Hash:</p>
+<p><code>ClientOptions</code> is a Hash object and is used in the <code>Ably::Realtime</code> constructor&#8217;s <code>options</code> argument.  The following key symbol values can be added to the Hash:</p>
 
 </div> <!-- /end ruby language block -->
 
 
 
 <div lang="java"> <!-- start java language block -->
-<p><code>ClientOptions</code> is used in the the <code>AblyRealtime</code> constructor&#8217;s <code>options</code> argument.</p>
+<p><code>ClientOptions</code> is used in the <code>AblyRealtime</code> constructor&#8217;s <code>options</code> argument.</p>
 
 </div> <!-- /end java language block -->
 
@@ -455,11 +462,23 @@ Note that the log level and log handler have global scope in the library and wil
 	<dt><span lang="default"><code>suspendedRetryTimeout</code></span><span lang="ruby"><code>:suspended_retry_timeout</code></span></dt>
 	<dd><em><span lang="default">30,000ms</span><span lang="ruby">30s</span></em> When the connection enters the <code>SUSPENDED</code> state, after this delay in <span lang="default">milliseconds</span><span lang="ruby">seconds</span>, if the state is still <code>SUSPENDED</code>, the client library will attempt to reconnect automatically<br><i>Type: Integer</i></dd>
 </dl>
-<h3 id="completion-listener"><span lang='java'>io.ably.realtime.CompletionListener</span></h3>
+<h3 id="channel-state-listener"><span lang='java'>io.ably.lib.realtime.ChannelStateListener</span></h3>
 
 
 <div lang="java"> <!-- start java language block -->
-<p>A <span lang="java"><code>io.ably.realtime.CompletionListener</code></span> is an interface allowing a client to be notified of the outcome of an asynchronous operation.</p>
+<p>A <span lang="java"><code>io.ably.lib.realtime.ChannelStateListener</code></span> is an interface allowing a client to be notified of state changes for a <a href="/realtime/channels-messages#channel"><code>Channel</code></a></p>
+<pre lang="java"><code lang="java">public interface ChannelStateListener {
+  // Called when the channel state changes
+  public void onChannelStateChanged(ChannelState state, ErrorInfo reason);
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+<h3 id="completion-listener"><span lang='java'>io.ably.lib.realtime.CompletionListener</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p>A <span lang="java"><code>io.ably.lib.realtime.CompletionListener</code></span> is an interface allowing a client to be notified of the outcome of an asynchronous operation.</p>
 <pre lang="java"><code lang="java">public interface CompletionListener {
   // Called when the associated operation completes successfully,
   public void onSuccess();
@@ -470,11 +489,28 @@ Note that the log level and log handler have global scope in the library and wil
 
 </div> <!-- /end java language block -->
 
-<h3 id="connection-state"><span lang='ruby'>Connection::STATE enum</span><span lang='java'>io.ably.realtime.ConnectionState enum</span></h3>
+<h3 id="connection-state"><span lang='default'>ConnectionState</span><span lang='ruby'>Connection::STATE Enum</span><span lang='java'>io.ably.lib.realtime.ConnectionState Enum</span></h3>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<p><code>ConnectionState</code> is a String with a value matching any of the <a href="/realtime/connection#connection-states"><code>Realtime Connection</code> states</a>.</p>
+<pre lang="javascript"><code lang="javascript">var allConnectionStates = [
+  'initialized',
+  'connecting',
+  'connected',
+  'disconnected',
+  'suspended',
+  'closing',
+  'closed',
+  'failed'
+]</code></pre>
+
+</div> <!-- /end javascript,nodejs language block -->
+
 
 
 <div lang="java"> <!-- start java language block -->
-<p><code>io.ably.realtime.ConnectionState</code> is an enum representing all the <a href="/realtime/connection#connection-states"><code>Realtime Connection</code> states</a>.</p>
+<p><code>io.ably.lib.realtime.ConnectionState</code> is an enum representing all the <a href="/realtime/connection#connection-states"><code>Realtime Connection</code> states</a>.</p>
 <pre lang="java"><code lang="java">public enum ConnectionState {
   initialized,   // 0
   connecting,    // 1
@@ -515,15 +551,27 @@ Connection::STATE.Failed # =&gt;       7</code></pre>
 client.connection.on(:connected) { ... }
 
 # Example with constants
-client.connection.on(Ably::Realtime::Connection::STATE.Connected) { ... }</code></pre>
+client.connection.on(Ably::Realtime::Connection::STATE.Connected) { ... }
+
+# Interchangeable
+Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></pre>
 
 </div> <!-- /end ruby language block -->
 
-<h3 id="connection-state-change"><span lang='javascript,nodejs'>ConnectionStateChange Object</span><span lang='java'>ConnectionStateChange</span></h3>
+<h3 id="connection-state-listener"><span lang='java'>io.ably.lib.realtime.ConnectionStateListener</span></h3>
 
 
-<div lang="java,javascript,nodejs"> <!-- start java,javascript,nodejs language block -->
-<p>A <span lang="java"><code>io.ably.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="ruby"><code>Ably::Models::ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by an object that implements an <code>EventEmitter</code>.</p>
+<div lang="java"> <!-- start java language block -->
+<p>A <span lang="java"><code>io.ably.lib.realtime.ConnectionStateListener</code></span> is an interface allowing a client to be notified of connection state change. See <a href="/realtime/connection#on"><code>Connection#on</code></a> to register a listener for one or more events.</p>
+<pre lang="java"><code lang="java">public interface ConnectionStateListener {
+  // Called when the connection state changes
+  public void onConnectionStateChanged(ConnectionStateListener.ConnectionStateChange state);
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+<h3 id="connection-state-change"><span lang='default'>ConnectionStateChange Object</span><span lang='ruby'>ConnectionStateChange</span><span lang='java'>io.ably.lib.realtime.ConnectionStateListener.ConnectionStateChange</span></h3>
+<p>A <span lang="java"><code>io.ably.lib.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="ruby"><code>Ably::Models::ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by the <a href="/realtime/connection"><code>Connection</code></a> object. See <a href="/realtime/connection#on"><code>Connection#on</code></a> to register a listener for one or more events.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>previous</code></dt>
@@ -535,10 +583,18 @@ client.connection.on(Ably::Realtime::Connection::STATE.Connected) { ... }</code>
 	<dt><span lang="default"><code>retryIn</code></span><span lang="ruby"><code>retry_in</code></span></dt>
 	<dd>Duration upon which the library will retry a connection where applicable, as <span lang="default">milliseconds</span><span lang="ruby">seconds</span><br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Integer</span></i></dd>
 </dl>
+<h3 id="message-listener"><span lang='java'>io.ably.lib.realtime.MessageListener</span></h3>
 
-</div> <!-- /end java,javascript,nodejs language block -->
 
-<p>&nbsp;</p>
+<div lang="java"> <!-- start java language block -->
+<p>A <span lang="java"><code>io.ably.lib.realtime.Channel.MessageListener</code></span> is an interface allowing a client to be notified when messages are received on a channel using a <a href="/realtime/channels-messages#message-subscription">channel subscription</a>.</p>
+<pre lang="java"><code lang="java">public interface MessageListener {
+  // Called when one or more messages are received
+  public void onMessage(Message[] messages);
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
 
 
 <div lang="ruby"> <!-- start ruby language block -->

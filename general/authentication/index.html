@@ -90,7 +90,7 @@
 <p>Note that many applications will most naturally use a mixed strategy: one or more application servers will use basic authentication to access the service, and to issue tokens, but browser or device clients will use individually-issued tokens.</p>
 <h3 id="basic-authentication">Basic Authentication explained</h3>
 <p>Basic authentication is the default authentication scheme when a client library is instanced with an API key.  It as simple as:</p>
-<pre class="code-editor open-jsbin open-jsbin-ocacox" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ocacox" lang="javascript">var ably = new Ably.Realtime({ key: '{{API_KEY}}' });</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-utaheq" lang="javascript"><code class="code-editor open-jsbin open-jsbin-utaheq" lang="javascript">var ably = new Ably.Realtime({ key: '{{API_KEY}}' });</code></pre>
 <h4>Process used by client libraries connecting with basic auth:</h4>
 <p><a href="/images/diagrams/basic-auth-process.png" target="_blank"><br />
   <img src="/images/diagrams/basic-auth-process.png" style="width: 100%" alt="Basic authentication process diagram"><br />
@@ -110,7 +110,7 @@
   <img src="/images/diagrams/signed-token-request-auth-process.png" style="width: 100%" alt="Signed token request auth process diagram"><br />
 </a></p>
 <p>An example of creating a token request can be seen below:</p>
-<pre class="code-editor open-jsbin open-jsbin-icuzay" lang="javascript"><code class="code-editor open-jsbin open-jsbin-icuzay" lang="javascript">var ably = new Ably.Rest({ key: '{{API_KEY}}' });
+<pre class="code-editor open-jsbin open-jsbin-uduxab" lang="javascript"><code class="code-editor open-jsbin open-jsbin-uduxab" lang="javascript">var ably = new Ably.Rest({ key: '{{API_KEY}}' });
 ably.createTokenRequest({ clientId: 'client@example.com' }, null, function(err, tokenRequest) {
   /* tokenRequest =&gt; {
        "capability": "{\"*\":[\"*\"]}",
@@ -127,7 +127,7 @@ ably.createTokenRequest({ clientId: 'client@example.com' }, null, function(err, 
   <img src="/images/diagrams/token-auth-process.png" style="width: 100%" alt="Token auth process diagram"><br />
 </a></p>
 <p>An example of issuing a token can be seen below:</p>
-<pre class="code-editor open-jsbin open-jsbin-ovabur" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ovabur" lang="javascript">var ably = new Ably.Rest({ key: '{{API_KEY}}' });
+<pre class="code-editor open-jsbin open-jsbin-ehifaw" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ehifaw" lang="javascript">var ably = new Ably.Rest({ key: '{{API_KEY}}' });
 ably.requestToken({ clientId: 'client@example.com' }, function(err, token) {
   /* token =&gt; {
        "token": "xVLyHw.Dtxd9tuz....EXAMPLE",

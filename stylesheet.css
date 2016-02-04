@@ -259,7 +259,11 @@ hr.back {
     #documentation blockquote p:last-child {
       margin: 0; }
   #documentation dl {
-    margin-bottom: 1em; }
+    /* make space for anything after a definiion list */
+    margin-bottom: 3em; }
+    #documentation dl + dl {
+      /* push up consecutive definition lists so only 1em between */
+      margin-top: -2em; }
     #documentation dl dt {
       clear: left;
       float: left;

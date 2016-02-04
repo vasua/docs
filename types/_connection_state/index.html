@@ -33,8 +33,22 @@
     <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/images/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
-    <p>blang[java].<br />
-  <code>io.ably.realtime.ConnectionState</code> is an enum representing all the <a href="/realtime/connection#connection-states"><code>Realtime Connection</code> states</a>.</p>
+    <p>blang[jsall].<br />
+  <code>ConnectionState</code> is a String with a value matching any of the <a href="/realtime/connection#connection-states"><code>Realtime Connection</code> states</a>.</p>
+```[javascript]
+var allConnectionStates = [
+&#8216;initialized&#8217;,
+&#8216;connecting&#8217;,
+&#8216;connected&#8217;,
+&#8216;disconnected&#8217;,
+&#8216;suspended&#8217;,
+&#8216;closing&#8217;,
+&#8216;closed&#8217;,
+&#8216;failed&#8217;
+]
+```
+<p>blang[java].<br />
+  <code>io.ably.lib.realtime.ConnectionState</code> is an enum representing all the <a href="/realtime/connection#connection-states"><code>Realtime Connection</code> states</a>.</p>
 ```[java]
 public enum ConnectionState {
 initialized,   // 0
@@ -79,7 +93,11 @@ h4. Example usage
 </ol>
 <ol>
 	<li>Example with constants<br />
-    client.connection.on(Ably::Realtime::Connection::STATE.Connected) { &#8230; }<br />
+    client.connection.on(Ably::Realtime::Connection::STATE.Connected) { &#8230; }</li>
+</ol>
+<ol>
+	<li>Interchangeable<br />
+    Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true<br />
   ```</li>
 </ol>
   </div>

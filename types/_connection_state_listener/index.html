@@ -33,21 +33,13 @@
     <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/images/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
-    <p>A <span lang="java"><code>io.ably.lib.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="ruby"><code>Ably::Models::ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by the <a href="/realtime/connection"><code>Connection</code></a> object. See <a href="/realtime/connection#on"><code>Connection#on</code></a> to register a listener for one or more events.</p>
-<p>h4.<br />
-  default: Properties<br />
-  java:    Members<br />
-  ruby:    Attributes</p>
-<dl>
-	<dt><code>previous</code></dt>
-	<dd>the previous state<br><i>Type: <span lang="default">String</span><span lang="ruby"><a href="/realtime/types#connection-state">Connection::STATE</a></span><span lang="java"><a href="/realtime/types#connection-state">ConnectionState</a></span></i></dd>
-	<dt><code>current</code></dt>
-	<dd>the new state<br><i>Type: <span lang="default">String</span><span lang="ruby"><a href="/realtime/types#connection-state">Connection::STATE</a></span><span lang="java"><a href="/realtime/types#connection-state">ConnectionState</a></span></i></dd>
-	<dt><code>reason</code></dt>
-	<dd>an <a href="#error-info"><code>ErrorInfo</code></a> containing any information relating to the transition<br><i>Type: <a href="/realtime/types#error-info"><code>ErrorInfo</code></a></i></dd>
-	<dt><span lang="default"><code>retryIn</code></span><span lang="ruby"><code>retry_in</code></span></dt>
-	<dd>Duration upon which the library will retry a connection where applicable, as <span lang="default">milliseconds</span><span lang="ruby">seconds</span><br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Integer</span></i></dd>
-</dl>
+    <p>A <span lang="java"><code>io.ably.lib.realtime.ConnectionStateListener</code></span> is an interface allowing a client to be notified of connection state change. See <a href="/realtime/connection#on"><code>Connection#on</code></a> to register a listener for one or more events.</p>
+<p>```[java]<br />
+  public interface ConnectionStateListener {<br />
+    // Called when the connection state changes<br />
+    public void onConnectionStateChanged(ConnectionStateListener.ConnectionStateChange state);<br />
+  }<br />
+```</p>
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/images/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>

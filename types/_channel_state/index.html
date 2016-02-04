@@ -33,21 +33,65 @@
     <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/images/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
-    <p>A <span lang="java"><code>io.ably.lib.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="ruby"><code>Ably::Models::ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by the <a href="/realtime/connection"><code>Connection</code></a> object. See <a href="/realtime/connection#on"><code>Connection#on</code></a> to register a listener for one or more events.</p>
-<p>h4.<br />
-  default: Properties<br />
-  java:    Members<br />
-  ruby:    Attributes</p>
-<dl>
-	<dt><code>previous</code></dt>
-	<dd>the previous state<br><i>Type: <span lang="default">String</span><span lang="ruby"><a href="/realtime/types#connection-state">Connection::STATE</a></span><span lang="java"><a href="/realtime/types#connection-state">ConnectionState</a></span></i></dd>
-	<dt><code>current</code></dt>
-	<dd>the new state<br><i>Type: <span lang="default">String</span><span lang="ruby"><a href="/realtime/types#connection-state">Connection::STATE</a></span><span lang="java"><a href="/realtime/types#connection-state">ConnectionState</a></span></i></dd>
-	<dt><code>reason</code></dt>
-	<dd>an <a href="#error-info"><code>ErrorInfo</code></a> containing any information relating to the transition<br><i>Type: <a href="/realtime/types#error-info"><code>ErrorInfo</code></a></i></dd>
-	<dt><span lang="default"><code>retryIn</code></span><span lang="ruby"><code>retry_in</code></span></dt>
-	<dd>Duration upon which the library will retry a connection where applicable, as <span lang="default">milliseconds</span><span lang="ruby">seconds</span><br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Integer</span></i></dd>
-</dl>
+    <p>blang[jsall].<br />
+  <code>ChannelState</code> is a String with a value matching any of the <a href="/realtime/channel#channel-states"><code>Realtime Channel</code> states</a>.</p>
+```[javascript]
+var allChannelStates = [
+&#8216;initialized&#8217;,
+&#8216;attaching&#8217;,
+&#8216;attached&#8217;,
+&#8216;detaching&#8217;,
+&#8216;detached&#8217;,
+&#8216;failed&#8217;
+]
+```
+<p>blang[java].<br />
+  <code>io.ably.lib.realtime.ChannelState</code> is an enum representing all the <a href="/realtime/channel#channel-states"><code>Realtime Channel</code> states</a>.</p>
+```[java]
+public enum ChannelState {
+initialised,  // 0
+attaching,    // 1
+attached,     // 2
+detaching,    // 3
+detached,     // 4
+failed        // 5
+}
+```
+<p>blang[ruby].<br />
+  <code>Ably::Realtime::Channel::STATE</code> is an enum-like value representing all the <a href="/realtime/channel#channel-states"><code>Realtime Channel</code> states</a>. <code>STATE</code> can be represented interchangeably as either symbols or constants.</p>
+h4. Symbol states
+```[ruby]
+:initialized # =&gt; 0
+:attaching # =&gt;   1
+:attached # =&gt;    2
+:detaching # =&gt;   3
+:detached # =&gt;    4
+:failed # =&gt;      5
+```
+h4. Constant states
+```[ruby]
+Connection::STATE.Initialized # =&gt; 0
+Connection::STATE.Attaching # =&gt;   1
+Connection::STATE.Attached # =&gt;    2
+Connection::STATE.Detaching # =&gt;   3
+Connection::STATE.Detached # =&gt;    4
+Connection::STATE.Failed # =&gt;      5
+```
+h4. Example usage
+```[ruby]
+<ol>
+	<li>Example with symbols<br />
+    channel.on(:attached) { &#8230; }</li>
+</ol>
+<ol>
+	<li>Example with constants<br />
+    channel.on(Ably::Realtime::Channel::STATE.Attached) { &#8230; }</li>
+</ol>
+<ol>
+	<li>Interchangeable<br />
+    Ably::Realtime::Channel::STATE.Attached == :attached # =&gt; true<br />
+  ```</li>
+</ol>
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/images/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>

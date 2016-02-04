@@ -115,23 +115,52 @@ var realtime = new Ably.Realtime({ key: apiKey });</code></pre>
 <div lang="java"> <!-- start java language block -->
 <p>The Realtime library for Java and Android is downloadable as a JAR from <a href="https://github.com/ably/ably-java/releases">https://github.com/ably/ably-java/releases</a> or via <a href="https://bintray.com/ably-io/ably">JCentre</a>.</p>
 <p>Ensure the JAR is included in your classpath as follows:</p>
-<pre lang="java"><code lang="java">import io.ably.types;
-import io.ably.realtime;
+<pre lang="java"><code lang="java">import io.ably.lib.types;
+import io.ably.lib.realtime;
 ClientOptions options = new ClientOptions(apiKey);
 AblyRealtime realtime = new AblyRealtime(options);</code></pre>
 
 </div> <!-- /end java language block -->
 
 <p>The supported <a href="#client-options">client options are described below</a>.</p>
-<h1>Realtime API Reference</h1>
-<h2 id="constructor">Constructor</h2>
+<h1><span lang='default'>Realtime API Reference</span><span lang='ruby'>Realtime::Client API reference</span></h1>
+<div class="inline-toc">
+<ul><li>Realtime API reference
+<ul>
+<li>
+Methods
+<ul>
+<li><a href='#connect'>connect()</a></li>
+<li><a href='#close'>close()</a></li>
+<li><a href='#stats'>stats(params)</a></li>
+<li><a href='#time'>time()</a></li>
+</ul>
+</li>
+<li>
+Members
+<ul>
+<li><a href='#auth'>auth</a></li>
+<li><a href='#channels'>channels</a></li>
+<li><a href='#client-id'>clientId</a></li>
+<li><a href='#connection'>connection</a></li>
+</ul>
+</li>
+<li>
+Related types
+<ul>
+<li><a href='#client-options'>ClientOptions</a></li>
+</ul>
+</li>
+</ul>
+</li></ul>
+</div><h2 id="constructor">Constructor</h2>
 <p>The Ably Realtime library constructor is overloaded allowing it to be instanced using a <a href="#client-options"><code>ClientOptions</code></a> object, or more simply using a string containing an <a href="/general/authentication/#basic-authentication">API key</a> or <a href="/general/authentication/#token-authentication">Token</a>.</p>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>new Ably.Realtime(keyOrTokenIdString)</span><span lang='ruby'>Ably::Realtime.new(key_or_token_id_string)</span><span lang='java'>new io.ably.AblyRealtime(String keyOrTokenIdString)</span></p>
+<p class="definition"><span lang='default'>new Ably.Realtime(String keyOrTokenId)</span><span lang='ruby'>Ably::Realtime.new(String key_or_token_id)</span><span lang='java'>new io.ably.lib.AblyRealtime(String keyOrTokenIdString)</span></p>
 </blockquote>
 <p>This will instance the Realtime library with the provided API key or Token ID string.</p>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>new Ably.Realtime(clientOptions)</span><span lang='ruby'>Ably::Realtime.new(client_options)</span><span lang='java'>new io.ably.AblyRealtime(ClientOptions clientOptions)</span></p>
+<p class="definition"><span lang='default'>new Ably.Realtime(<a href="#client-options">ClientOptions</a> clientOptions)</span><span lang='ruby'>Ably::Realtime.new(<a href="#client-options">ClientOptions</a> client_options)</span><span lang='java'>new io.ably.lib.AblyRealtime(<a href="#client-options">ClientOptions</a> clientOptions)</span></p>
 </blockquote>
 
 
@@ -156,8 +185,8 @@ AblyRealtime realtime = new AblyRealtime(options);</code></pre>
 <p>The <a href="#client-options"><code>ClientOptions#token</code></a> option takes a token string, and assumes the token has been obtained from some other instance that requested the token. Use the token option if you are provided with a token to use and you do not have a key (or do not have a key with the capabilities that you require).</p>
 <p>Since tokens are short-lived, it is rarely sufficient to start with a token without the means for refreshing it. The <span lang="default"><a href="#client-options"><code>authUrl</code> and <code>authCallback</code> options</a></span><span lang="ruby"><a href="#client-options"><code>:auth_url</code> and <code>:auth_callback</code> options</a></span> are provided to allow a user of the library to provide new tokens or token requests to the library as required; using these options allows the library to be instanced without a <code>key</code> or <code>token</code>, and an initial token will be obtained automatically when required.</p>
 <p>Read more on <a href="/realtime/authentication">authentication</a>.</p>
-<h2 id="members"><span lang='default'>AblyRealtime Attributes</span><span lang='java'>io.ably.AblyRealtime Members</span><span lang='javascript,nodejs'>AblyRealtime Properties</span><span lang='ruby'>Ably::Realtime::Client Attributes</span></h2>
-<p>The realtime client exposes the following public <span lang="default">attributes</span><span lang="java">members</span><span lang="javascript,nodejs">properties</span>.</p>
+<h2 id="members"><span lang='default'>AblyRealtime Properties</span><span lang='java'>io.ably.lib.AblyRealtime Members</span><span lang='ruby'>Ably::Realtime::Client Attributes</span></h2>
+<p>The realtime client exposes the following public <span lang="default">attributes</span><span lang="java">members</span><span lang="javascript,nodejs">properties</span>:</p>
 <h6 id="auth">auth</h6>
 <p>A reference to the <a href="/realtime/authentication"><code>Auth</code></a> authentication object configured for this client library.</p>
 <h6 id="channels">channels</h6>
@@ -174,25 +203,10 @@ AblyRealtime realtime = new AblyRealtime(options);</code></pre>
 
 </div> <!-- /end ruby language block -->
 
-<h2 id="methods"><span lang='default'>AblyRealtime Methods</span><span lang='ruby'>Realtime::Client Methods</span><span lang='java'>io.ably.AblyRealtime Methods</span><span lang='ruby'>Ably::Realtime::Client Methods</span></h2>
-<h6 id="close">close</h6>
-<blockquote class="definition">
-<p class="definition"><span lang='default'>close()</span><span lang='ruby'>close &#8594; <a href="/realtime/types#deferrable">EventMachine::Deferrable</a> &#8594; yields <a href="/realtime/connection"><code>Connection</code></a></span><span lang='java'>public void close()</span></p>
-</blockquote>
-<p>This calls <span lang="default"><a href="/realtime/connection#close"><code>connection.close()</code></a></span><span lang="ruby"><a href="/realtime/connection#close"><code>connection.close</code></a></span> and causes the connection to close, entering the <code>closing</code> state. Once <code>closed</code>, the library will not attempt to re-establish the connection without an explicit call to <span lang="default"><a href="/realtime/connection#connect"><code>connect()</code></a></span><span lang="ruby"><a href="/realtime/connection#connect"><code>connect</code></a></span>.</p>
-
-
-<div lang="ruby"> <!-- start ruby language block -->
-<h4>Returns</h4>
-<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from this method.</p>
-<p>On successfully closing the connection, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields a <a href="/realtime/connection"><code>Connection</code></a> object.</p>
-<p>Failure to close the connection will trigger the errback callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object containing an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
-
-</div> <!-- /end ruby language block -->
-
+<h2 id="methods"><span lang='default'>AblyRealtime Methods</span><span lang='ruby'>Realtime::Client Methods</span><span lang='java'>io.ably.lib.AblyRealtime Methods</span><span lang='ruby'>Ably::Realtime::Client Methods</span></h2>
 <h6 id="connect">connect</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>connect()</span><span lang='ruby'>connect &#8594; <a href="/realtime/types#deferrable">EventMachine::Deferrable</a> &#8594; yields <a href="/realtime/connection"><code>Connection</code></a></span><span lang='java'>public void connect()</span></p>
+<p class="definition"><span lang='default'>connect()</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> connect &#8594; yields <a href="/realtime/connection"><code>Connection</code></a></span><span lang='java'>public void connect()</span></p>
 </blockquote>
 <p>Explicitly calling <code>connect</code> is unnecessary unless the <a href="#client-option"><code>ClientOption</code></a> <span lang="default"><code>connectAutomatically</code></span><span lang="ruby"><code>connect_automatically</code></span> is disabled. This method calls <span lang="default"><a href="/realtime/connection#connect"><code>connection.connect()</code></a></span><span lang="ruby"><a href="/realtime/connection#connect"><code>connection.connect</code></a></span> and causes the connection to open, entering the <code>connecting</code> state.</p>
 
@@ -205,9 +219,24 @@ AblyRealtime realtime = new AblyRealtime(options);</code></pre>
 
 </div> <!-- /end ruby language block -->
 
+<h6 id="close">close</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>close()</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> close &#8594; yields <a href="/realtime/connection"><code>Connection</code></a></span><span lang='java'>public void close()</span></p>
+</blockquote>
+<p>This calls <span lang="default"><a href="/realtime/connection#close"><code>connection.close()</code></a></span><span lang="ruby"><a href="/realtime/connection#close"><code>connection.close</code></a></span> and causes the connection to close, entering the <code>closing</code> state. Once <code>closed</code>, the library will not attempt to re-establish the connection without an explicit call to <span lang="default"><a href="/realtime/connection#connect"><code>connect()</code></a></span><span lang="ruby"><a href="/realtime/connection#connect"><code>connect</code></a></span>.</p>
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from this method.</p>
+<p>On successfully closing the connection, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields a <a href="/realtime/connection"><code>Connection</code></a> object.</p>
+<p>Failure to close the connection will trigger the errback callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object containing an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
+
+</div> <!-- /end ruby language block -->
+
 <h6 id="stats">stats</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>stats(params, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt; result))</span><span lang='ruby'>stats(Hash options) &#8594; <a href="/realtime/types#deferrable">EventMachine::Deferrable</a> &#8594; yields <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt;</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt; stats(Param[] params)</span></p>
+<p class="definition"><span lang='default'>stats(params, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt; results))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> stats(Hash options) &#8594; yields <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt;</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt; stats(Param[] params)</span></p>
 </blockquote>
 <p>This call queries the <a href="/rest-api#stats">REST <code>/stats</code> API</a> and retrieves your application&#8217;s usage statistics. A <a href="/realtime/types#paginated-result">PaginatedResult</a> is returned, containing an array of <a href="/realtime/types#stats">Stats</a> for the first page of results. <a href="/realtime/types#paginated-result">PaginatedResult</a> objects are iterable providing a means to page through historical statistics.</p>
 <h4>Parameters</h4>
@@ -220,7 +249,7 @@ AblyRealtime realtime = new AblyRealtime(options);</code></pre>
 	<dd>an optional array <code>Param</code> key value pairs containing the query parameters</dd>
 </dl>
 <dl>
-	<dt><div lang="nodejs,javascript">callback</div></dt>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
 	<dd>is a function of the form: <code>callback(err, result)</code></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>yields a <code>PaginatedResult&lt;Stats&gt;</code> array</dd>
@@ -241,12 +270,12 @@ AblyRealtime realtime = new AblyRealtime(options);</code></pre>
 </dl>
 
 
-<div lang="nodejs,javascript"> <!-- start nodejs,javascript language block -->
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
 <h4>Callback result</h4>
 <p>On success, <code>result</code> contains a <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulating an array of <a href="/realtime/types#stats"><code>Stats</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
 <p>On failure to retrieve stats, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
 
-</div> <!-- /end nodejs,javascript language block -->
+</div> <!-- /end javascript,nodejs language block -->
 
 
 
@@ -269,17 +298,17 @@ AblyRealtime realtime = new AblyRealtime(options);</code></pre>
 
 <h6 id="time">time</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>time(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, Number time))</span><span lang='ruby'>time → <a href="/realtime/types#deferrable">EventMachine::Deferrable</a> → yields Time</span><span lang='java'>public long time()</span></p>
+<p class="definition"><span lang='default'>time(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, Number time))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> time &#8594; yields Time</span><span lang='java'>public long time()</span></p>
 </blockquote>
 <p>Obtains the time from the Ably service. This may be required on clients that do not have access to a sufficiently well maintained time source and wish to issue token requests with a more accurate timestamp.</p>
 
 
-<div lang="nodejs,javascript"> <!-- start nodejs,javascript language block -->
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
 <h4>Callback result</h4>
-<p>On success, <code>time</code> is millisecond since epoch.</p>
+<p>On success, <code>time</code> is a number containing the millisecond since the epoch.</p>
 <p>On failure to retrieve the Ably server time, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
 
-</div> <!-- /end nodejs,javascript language block -->
+</div> <!-- /end javascript,nodejs language block -->
 
 
 
@@ -300,25 +329,25 @@ AblyRealtime realtime = new AblyRealtime(options);</code></pre>
 
 </div> <!-- /end ruby language block -->
 
-<h2 id="client-options"><span lang='default'>ClientOptions</span><span lang='java'>io.ably.types.ClientOptions</span></h2>
+<h2 id="client-options"><span lang='default'>ClientOptions</span><span lang='java'>io.ably.lib.types.ClientOptions</span></h2>
 
 
-<div lang="nodejs,javascript"> <!-- start nodejs,javascript language block -->
-<p><code>ClientOptions</code> is a plain Javascript object and is used in the the <code>Ably.Realtime</code> constructor&#8217;s <code>options</code> argument.  The following attributes can be defined on the object:</p>
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<p><code>ClientOptions</code> is a plain Javascript object and is used in the <code>Ably.Realtime</code> constructor&#8217;s <code>options</code> argument.  The following attributes can be defined on the object:</p>
 
-</div> <!-- /end nodejs,javascript language block -->
+</div> <!-- /end javascript,nodejs language block -->
 
 
 
 <div lang="ruby"> <!-- start ruby language block -->
-<p><code>ClientOptions</code> is a Hash object and is used in the the <code>Ably::Realtime</code> constructor&#8217;s <code>options</code> argument.  The following key symbol values can be added to the Hash:</p>
+<p><code>ClientOptions</code> is a Hash object and is used in the <code>Ably::Realtime</code> constructor&#8217;s <code>options</code> argument.  The following key symbol values can be added to the Hash:</p>
 
 </div> <!-- /end ruby language block -->
 
 
 
 <div lang="java"> <!-- start java language block -->
-<p><code>ClientOptions</code> is used in the the <code>AblyRealtime</code> constructor&#8217;s <code>options</code> argument.</p>
+<p><code>ClientOptions</code> is used in the <code>AblyRealtime</code> constructor&#8217;s <code>options</code> argument.</p>
 
 </div> <!-- /end java language block -->
 

@@ -231,9 +231,9 @@ channel.presence.history(params, function(err, messages, rel) {
       channel.presence.history(rel.next, function(...) { ... });
     }
 });</code></pre>
-<pre lang="java"><code lang="java">import io.ably.types.PresenceMessage;
-import io.ably.types.Param;
-import io.ably.types.PaginatedResult;
+<pre lang="java"><code lang="java">import io.ably.lib.types.PresenceMessage;
+import io.ably.lib.types.Param;
+import io.ably.lib.types.PaginatedResult;
 
 Param[] params = new Param[] {
   new Param("direction", "backwards"),
@@ -410,14 +410,14 @@ Related types
 <p>Get the current presence set for this channel. This returns synchronously with the presence set already known by the client.</p>
 <h6 id="history">history</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='javascript,nodejs'>presence.history(params, callback)</span><span lang='ruby'>presence.history(options) → json_result</span><span lang='java'>public PaginatedResult&lt;PresenceMessage&gt; history(Param[] params)</span></p>
+<p class="definition"><span lang='default'>presence.history(params, callback)</span><span lang='ruby'>presence.history(options) → json_result</span><span lang='java'>public PaginatedResult&lt;PresenceMessage&gt; history(Param[] params)</span></p>
 </blockquote>
 <p>Get presence history for this channel.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>params</dt>
 	<dd>an optional object containing the query parameters, as specified in the <a href="/realtime/history">history</a> API documentation.</dd>
-	<dt><div lang="nodejs,javascript">callback</div></dt>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
 	<dd>is a function of the form: <code>callback(err, messages, relParams)</code><br />
 where:<br />
 <ul><br />
@@ -447,7 +447,7 @@ h4. Returns</p>
 	<li><code>Ably::QuotaExceededException</code></li>
 	<li><code>Ably::AuthenticationFailureException</code></li>
 </ul>
-<p></div><div lang="nodejs,javascript"></p>
+<p></div><div lang="javascript,nodejs"></p>
 <h4>Pagination</h4>
 <p>A paginated result is indicated in the <code>relParams</code> callback argument. For each available link, <code>relParams</code> contains a map of params to pass to a subsequent <code>history()</code> call.<br />
   Example <code>relParams</code>:</p>

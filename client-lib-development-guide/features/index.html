@@ -479,7 +479,7 @@
 	</ul></li>
 	<li><a id='RTN18' name='RTN18' href='#RTN18'><code>(RTN18)</code></a> Connection state change side effects:
 	<ul>
-		<li><a id='RTN18a' name='RTN18a' href='#RTN18a'><code>(RTN18a)</code></a> When a connection enters the <code>DISCONNECTED</code> state, it will have no effect on the the channel states. Channels in the <code>ATTACHED</code> state will queue messages that are sent as soon as the connection is resumed</li>
+		<li><a id='RTN18a' name='RTN18a' href='#RTN18a'><code>(RTN18a)</code></a> When a connection enters the <code>DISCONNECTED</code> state, it will have no effect on the channel states. Channels in the <code>ATTACHED</code> state will queue messages that are sent as soon as the connection is resumed</li>
 		<li><a id='RTN18b' name='RTN18b' href='#RTN18b'><code>(RTN18b)</code></a> When a connection enters the <code>CLOSED</code> or <code>SUSPENDED</code> state, all channels will move to the <code>DETACHED</code> state. Channels in the <code>DETACHED</code> state should reject publishing of messages</li>
 		<li><a id='RTN18c' name='RTN18c' href='#RTN18c'><code>(RTN18c)</code></a> When a connection enters the <code>FAILED</code> state, all channels will move to the <code>FAILED</code> state. Channels in the <code>FAILED</code> state should reject publishing of messages</li>
 	</ul></li>
@@ -526,7 +526,7 @@
 		<li><a id='RTL4b' name='RTL4b' href='#RTL4b'><code>(RTL4b)</code></a> If the connection state is <code>CLOSED</code>, <code>CLOSING</code>, <code>SUSPENDED</code> or <code>FAILED</code>, the <code>attach</code> request results in an error</li>
 		<li><a id='RTL4c' name='RTL4c' href='#RTL4c'><code>(RTL4c)</code></a> Otherwise an <code>ATTACH</code> ProtocolMessage is sent to the server, the state changes to <code>ATTACHING</code> and the channel becomes <code>ATTACHED</code> when the confirmation <code>ATTACHED</code> ProtocolMessage is received</li>
 		<li><a id='RTL4f' name='RTL4f' href='#RTL4f'><code>(RTL4f)</code></a> Once an <code>ATTACH</code> <code>ProtocolMessage</code> is sent, if an <code>ATTACHED</code> <code>ProtocolMessage</code> is not received within the <a href="#defaults">default realtime request timeout</a>, the attach request should be treated as though it has failed</li>
-		<li><a id='RTL4d' name='RTL4d' href='#RTL4d'><code>(RTL4d)</code></a> If the language permits, a callback can be provided that is called when the channel is attached successfully or the attach fails and the the <code>ErrorInfo</code> error is passed as an argument to the callback</li>
+		<li><a id='RTL4d' name='RTL4d' href='#RTL4d'><code>(RTL4d)</code></a> If the language permits, a callback can be provided that is called when the channel is attached successfully or the attach fails and the <code>ErrorInfo</code> error is passed as an argument to the callback</li>
 		<li><a id='RTL4e' name='RTL4e' href='#RTL4e'><code>(RTL4e)</code></a> If the user does not have sufficient permissions to attach to the channel, the channel state <code>FAILED</code> is emitted with the error <code>ErrorInfo</code>. An error event is also emitted, and the <code>Channel#errorReason</code> attribute of the <code>Channel</code> is set to the error <code>ErrorInfo</code> object</li>
 	</ul></li>
 	<li><a id='RTL5' name='RTL5' href='#RTL5'><code>(RTL5)</code></a> <code>Channel#detach</code> function:
@@ -535,7 +535,7 @@
 		<li><a id='RTL5b' name='RTL5b' href='#RTL5b'><code>(RTL5b)</code></a> If state is <code>FAILED</code>, the <code>detach</code> request results in an error</li>
 		<li><a id='RTL5d' name='RTL5d' href='#RTL5d'><code>(RTL5d)</code></a> Otherwise a <code>DETACH</code> ProtocolMessage is sent to the server, the state changes to <code>DETACHING</code> and the channel becomes <code>DETACHED</code> when the confirmation <code>DETACHED</code> ProtocolMessage is received</li>
 		<li><a id='RTL5f' name='RTL5f' href='#RTL5f'><code>(RTL5f)</code></a> Once a <code>DETACH</code> <code>ProtocolMessage</code> is sent, if a <code>DETACHED</code> <code>ProtocolMessage</code> is not received within the <a href="#defaults">default realtime request timeout</a>, the detach request should be treated as though it has failed</li>
-		<li><a id='RTL5e' name='RTL5e' href='#RTL5e'><code>(RTL5e)</code></a> If the language permits, a callback can be provided that is called when the channel is detached successfully or the detach fails and the the <code>ErrorInfo</code> error is passed as an argument to the callback</li>
+		<li><a id='RTL5e' name='RTL5e' href='#RTL5e'><code>(RTL5e)</code></a> If the language permits, a callback can be provided that is called when the channel is detached successfully or the detach fails and the <code>ErrorInfo</code> error is passed as an argument to the callback</li>
 	</ul></li>
 	<li><a id='RTL6' name='RTL6' href='#RTL6'><code>(RTL6)</code></a> <code>Channel#publish</code> function:
 	<ul>
@@ -803,7 +803,7 @@
 	<li><a id='TA1' name='TA1' href='#TA1'><code>(TA1)</code></a> Whenever the connection state changes, a <code>ConnectionStateChange</code> object is emitted on the <code>Connection</code> object</li>
 	<li><a id='TA2' name='TA2' href='#TA2'><code>(TA2)</code></a> The <code>ConnectionStateChange</code> object contains the current state in attribute <code>current</code>, the previous state in attribute <code>previous</code>, and when the client is not connected and a connection attempt will be made automatically by the library, the amount of time in milliseconds until the next retry in the attribute <code>retryIn</code></li>
 	<li><a id='TA3' name='TA3' href='#TA3'><code>(TA3)</code></a> If the connection state change includes error information, then the <code>reason</code> attribute will contain an <code>ErrorInfo</code> object describing the reason for the error</li>
-	<li><a id='TA4' name='TA4' href='#TA4'><code>(TA4)</code></a> See the [Java library implementation](https://github.com/ably/ably-java/blob/245a3f20a6dce0d34413ddfed19c5da8ea647422/src/io/ably/realtime/ConnectionStateListener.java#L15-L20) of this object</li>
+	<li><a id='TA4' name='TA4' href='#TA4'><code>(TA4)</code></a> See the <a href="https://github.com/ably/ably-java/blob/245a3f20a6dce0d34413ddfed19c5da8ea647422/src/io/ably/realtime/ConnectionStateListener.java#L15-L20">Java library implementation</a> of this object</li>
 </ul>
 <h4>Capability &#8211; <strong>API not defined yet</strong></h4>
 <ul>

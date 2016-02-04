@@ -76,7 +76,7 @@
 <p><strong>Token Authentication</strong> uses a token obtained via the REST API <a href="#requesttoken"><code>requestToken</code></a> endpoint. Tokens are authentication tokens that only have a short lifetime, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of access rights, or being limited to use by a specific client &#8211; and therefore token-based authentication provides the flexibility to implement access control policies in the application. See <a href="/general/authentication">Authentication</a> for more details.</p>
 <p>Both the <a href="/rest/usage#constructor">REST</a> and <a href="/realtime/usage#constructor">Realtime</a>, libraries would typically be instanced with either a <code>key</code> or a <code>token</code> option, and these given credentials are used to authenticate requests made by the library. In this situation, the library assumes responsibility for authentication operations, calling any <code>authUrl</code> or <code>authCallback</code> as needed. REST operations and Realtime connections can then proceed using the given credentials with no need to make further calls to the authentication-specific functionality in the library.</p>
 <p>The principal use-case for <code>auth</code> object is to make requests for tokens to issue to other clients. A subsidiary use-case is to preemptively trigger renewal of a token or to acquire a new token with a revised set of capabilities.</p>
-<p>The REST client library provides the ability to issue tokens using the the <a href="/rest-api#requesttoken"><code>requestToken</code> API endpoint</a>, and also provides a number of helper functions to simplify the use of the authentication API.</p>
+<p>The REST client library provides the ability to issue tokens using the <a href="/rest-api#requesttoken"><code>requestToken</code> API endpoint</a>, and also provides a number of helper functions to simplify the use of the authentication API.</p>
 <p>The <a href="#requesttoken"><code>requestToken</code></a> endpoint may itself be used without explicit authentication, relying on the implicit authentication of submitting a validly signed token request.</p>
 <h1>API Reference</h1>
 <div class="inline-toc">
@@ -109,13 +109,13 @@ Related types
 </blockquote>
 <h6 lang="java" id="requesttoken">public TokenDetails requestToken(AuthOptions options, TokenParams params)</h6>
 <p>Calls the <a href="/rest-api#requesttoken"><code>requestToken</code> API endpoint</a> to obtain a token according to the specified <span lang="default">options</span><span lang="java">authOptions and tokenParams</span>. If the request is successful the resulting <a href="#token-details">TokenDetails</a> instance <span lang="java">is returned</span><span lang="default">is passed back in the callback</span>. If the request is unsuccessful <span lang="java">an appropriate Exception is thrown</span><span lang="default">an appropriate error object is passed to the callback</span>.</p>
-<pre lang="nodejs"><code lang="nodejs">client.auth.requestToken(options, function(err, tokenDetails){
+<pre lang="javascript"><code lang="javascript">client.auth.requestToken(options, function(err, tokenDetails){
   if(err)
     console.log('An error occurred; err = ' + err.message);
   else
     console.log('Success; token = ' + tokenDetails.id);
 });</code></pre>
-<pre lang="javascript"><code lang="javascript">client.auth.requestToken(options, function(err, tokenDetails){
+<pre lang="nodejs"><code lang="nodejs">client.auth.requestToken(options, function(err, tokenDetails){
   if(err)
     console.log('An error occurred; err = ' + err.message);
   else
@@ -155,13 +155,13 @@ where:<br />
 </blockquote>
 <p>Ensures valid auth credentials are present for the library instance. This may rely on an already-known and valid token, and will obtain a new token if necessary or explicitly requested via the <a href="/rest-api#requesttoken"><code>requestToken</code> API endpoint</a>.</p>
 <p>In the event that a new token request is made, the specified <span lang="default">options</span><span lang="java">authOptions and tokenParams</span> are used. If the check or a subsequent request is successful the resulting <a href="#token-details">TokenDetails</a> instance <span lang="java">is returned</span><span lang="default">is passed back in the callback</span>. If the request is unsuccessful <span lang="java">an appropriate Exception is thrown</span><span lang="default">an appropriate error object is passed to the callback</span>.</p>
-<pre lang="nodejs"><code lang="nodejs">client.auth.authorise(options, function(err, tokenDetails){
+<pre lang="javascript"><code lang="javascript">client.auth.authorise(options, function(err, tokenDetails){
   if(err)
     console.log('An error occurred; err = ' + err.message);
   else
     console.log('Success; token = ' + tokenDetails.id);
 });</code></pre>
-<pre lang="javascript"><code lang="javascript">client.auth.authorise(options, function(err, tokenDetails){
+<pre lang="nodejs"><code lang="nodejs">client.auth.authorise(options, function(err, tokenDetails){
   if(err)
     console.log('An error occurred; err = ' + err.message);
   else
@@ -199,13 +199,13 @@ where:<br />
 </blockquote>
 <p>Creates and signs a token request based on the specified <span lang="default">options</span><span lang="java">authOptions and  tokenParams</span>. Note this can only be used when the key value is available locally. Otherwise, signed token requests must be obtained from the key owner (either using the token request callback or url). Use this to generate signed token requests in order to implement a token request callback for use by other clients.</p>
 <p>If the request is successful the resulting token request is JSON-encoded and <span lang="java">returned</span><span lang="default">passed back in the callback</span>. If the request is unsuccessful <span lang="java">an appropriate Exception is thrown</span><span lang="default">an appropriate error object is passed to the callback</span>.</p>
-<pre lang="nodejs"><code lang="nodejs">client.auth.createTokenRequest(options, function(err, tokenRequest){
+<pre lang="javascript"><code lang="javascript">client.auth.createTokenRequest(options, function(err, tokenRequest){
   if(err)
     console.log('An error occurred; err = ' + err.message);
   else
     console.log('Success; token request = ' + tokenRequest);
 });</code></pre>
-<pre lang="javascript"><code lang="javascript">client.auth.createTokenRequest(options, function(err, tokenRequest){
+<pre lang="nodejs"><code lang="nodejs">client.auth.createTokenRequest(options, function(err, tokenRequest){
   if(err)
     console.log('An error occurred; err = ' + err.message);
   else

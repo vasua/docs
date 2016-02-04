@@ -67,12 +67,12 @@
 <p>A <code>Channel</code> object is a reference to a single channel. A channel instance is obtained from the <code>channels</code> collection of the Ably <code>Rest</code> instance.</p>
 <pre lang="javascript"><code lang="javascript">var channel = rest.channels.get('myChannel');</code></pre>
 <pre lang="nodejs"><code lang="nodejs">var channel = rest.channels.get('myChannel');</code></pre>
-<pre lang="java"><code lang="java">import io.ably.realtime.Channel;
+<pre lang="java"><code lang="java">import io.ably.lib.realtime.Channel;
 Channel channel = rest.channels.get("myChannel");</code></pre>
 <p>A set of <a href="#channel-options">channel options</a> may also be passed when getting a channel instance.</p>
 <pre lang="javascript"><code lang="javascript">var channel = rest.channels.get('myChannel', channelOpts);</code></pre>
 <pre lang="nodejs"><code lang="nodejs">var channel = rest.channels.get('myChannel', channelOpts);</code></pre>
-<pre lang="java"><code lang="java">import io.ably.rest.Channel;
+<pre lang="java"><code lang="java">import io.ably.lib.rest.Channel;
 Channel channel = rest.channels.get("myChannel", channelOpts);</code></pre>
 <h3>Channel namespaces</h3>
 <p>One or more channel namespaces, or channel name prefixes, may be configured for an app. When a channel is created whose name is prefixed with one of the namespaces, the channel assumes certain configured attributes associated with that namespace.</p>
@@ -101,7 +101,7 @@ Channel channel = rest.channels.get("myChannel", channelOpts);</code></pre>
   else
     console.log('Message successfully sent');
 });</code></pre>
-<pre lang="java"><code lang="java">import io.ably.rest.CompletionListener;
+<pre lang="java"><code lang="java">import io.ably.lib.rest.CompletionListener;
 channel.publish("myEvent", "This is my message", new CompletionListener() {
 	@Override
 	public void onError(ErrorInfo reason) {
@@ -135,9 +135,9 @@ channel.history(params, function(err, messages, rel) {
       channel.history(rel.next, function(...) { ... });
     }
 });</code></pre>
-<pre lang="java"><code lang="java">import io.ably.types.Message;
-import io.ably.types.Param;
-import io.ably.types.PaginatedResult;
+<pre lang="java"><code lang="java">import io.ably.lib.types.Message;
+import io.ably.lib.types.Param;
+import io.ably.lib.types.PaginatedResult;
 Param[] params = new Param[] {
   new Param("direction", "backwards"),
   new Param("limit", 100)
@@ -228,7 +228,7 @@ where:<br />
 <dl>
 	<dt>params</dt>
 	<dd>an optional object containing the query parameters, as specified in the <a href="/realtime/history">history</a> API documentation.</dd>
-	<dt><div lang="nodejs,javascript">callback</div></dt>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
 	<dd>is a function of the form: <code>callback(err, messages, relParams)</code><br />
 where:<br />
 <ul><br />
@@ -260,7 +260,7 @@ h4. Returns</p>
 	<li><code>Ably::AuthenticationFailureException</code><br />
   </div></li>
 </ul>
-<p></div><div lang="nodejs,javascript"></p>
+<p></div><div lang="javascript,nodejs"></p>
 <h4>Pagination</h4>
 <p>A paginated result is indicated in the <code>relParams</code> callback argument. For each available link, <code>relParams</code> contains a map of params to pass to a subsequent <code>history()</code> call.<br />
   Example <code>relParams</code>:<br />

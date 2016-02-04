@@ -72,7 +72,7 @@
 <p></div><div lang="java"></p>
 <p>The REST library for Java is downloadable as a JAR from <a href="https://github.com/ably/ably-java/bin">https://github.com/ably/ably-java/bin</a></p>
 <p>Ensure this JAR is included in your class path.</p>
-<pre lang="java"><code lang="java">import io.ably.rest.AblyRest;</code></pre>
+<pre lang="java"><code lang="java">import io.ably.lib.rest.AblyRest;</code></pre>
 </div>
 <p><em>Note: Since the REST client library is a direct subset of the Realtime client library, all <a href="/realtime">Realtime client libraries</a> also provide access to the functionality of the REST client library.</em></p>
 <h1>API Reference</h1>
@@ -104,7 +104,7 @@ will be obtained when required.</p>
 <dl>
 	<dt>params</dt>
 	<dd>an optional object containing the query parameters, as specified in the <a href="/rest/stats">stats</a> API documentation.</dd>
-	<dt><div lang="nodejs,javascript">callback</div></dt>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
 	<dd>is a function of the form: <code>callback(err, stats, relParams)</code><br />
 where:<br />
 <ul><br />
@@ -136,7 +136,7 @@ h4. Returns</p>
 	<li><code>Ably::AuthenticationFailureException</code><br />
   </div></li>
 </ul>
-<p></div><div lang="nodejs,javascript"></p>
+<p></div><div lang="javascript,nodejs"></p>
 <h4>Pagination</h4>
 <p>A paginated result is indicated in the <code>relParams</code> callback argument. For each available link, <code>relParams</code> contains a map of params to pass to a subsequent <code>stats()</code> call.<br />
   Example <code>relParams</code>:<br />
@@ -155,7 +155,7 @@ h4. Returns</p>
 </dl>
 <h2 id="options">Options</h2>
 <div lang="java">
-<p>The Ably constructor&#8217;s <code>Options</code> argument is an instance of <code>io.ably.types.Options</code>, constructed either with the default no-argument constructor or with a key string. The following options may be specified.</p>
+<p>The Ably constructor&#8217;s <code>Options</code> argument is an instance of <code>io.ably.lib.types.Options</code>, constructed either with the default no-argument constructor or with a key string. The following options may be specified.</p>
 <p></div><div lang="default"><br />
 The Ably constructor&#8217;s <code>Options</code> argument is an object with one or more of the following properties.</p>
 </div>
@@ -196,7 +196,7 @@ The Ably constructor&#8217;s <code>Options</code> argument is an object with one
 	<dd>A client id, used for identifying this client for presence purposes. The clientId can be any string. This option is primarily intended to be used in situations where the library is instanced with a key; note that a clientId may also be implicit in a token used to instance the library; an error will be raised if a clientId specified here conflicts with the clientId implicit in the token.</dd>
 </dl>
 <dl>
-	<dt><div lang="javascript,nodejs,ruby">log</div></dt>
+	<dt><div lang="javascript,nodejs,,ruby">log</div></dt>
 	<dd>Parameters to control the log output of the library. The supplied value must be an object that may contain one or both of the following entries:<br />
 <ul><li><code>level</code>: a number controlling the verbosity of the output from 1 (minimum, errors only) to 4 (most verbose);</li><br />
 <li><code>handler</code>: a function to handle each line of log output. If <code>handler</code> is not specified, <code>console.log</code> is used.</li></ul><br />

@@ -33,20 +33,28 @@
     <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/images/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
-    <p>A <span lang="java"><code>io.ably.lib.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="ruby"><code>Ably::Models::ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by the <a href="/realtime/connection"><code>Connection</code></a> object. See <a href="/realtime/connection#on"><code>Connection#on</code></a> to register a listener for one or more events.</p>
+    <p>blang[jsall].<br />
+  <code>ChannelOptions</code>, a plain Javascript object, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following attributes can be defined on the object:</p>
+<p>blang[ruby].<br />
+  <code>ChannelOptions</code>, a Hash object, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following key symbol values can be added to the Hash:</p>
+<p>blang[java].<br />
+  <code>io.ably.lib.types.ChannelOptions</code> may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options.</p>
+<p>Currently the supported channel options are only encryption-related.</p>
 <p>h4.<br />
   default: Properties<br />
   java:    Members<br />
   ruby:    Attributes</p>
 <dl>
-	<dt><code>previous</code></dt>
-	<dd>the previous state<br><i>Type: <span lang="default">String</span><span lang="ruby"><a href="/realtime/types#connection-state">Connection::STATE</a></span><span lang="java"><a href="/realtime/types#connection-state">ConnectionState</a></span></i></dd>
-	<dt><code>current</code></dt>
-	<dd>the new state<br><i>Type: <span lang="default">String</span><span lang="ruby"><a href="/realtime/types#connection-state">Connection::STATE</a></span><span lang="java"><a href="/realtime/types#connection-state">ConnectionState</a></span></i></dd>
-	<dt><code>reason</code></dt>
-	<dd>an <a href="#error-info"><code>ErrorInfo</code></a> containing any information relating to the transition<br><i>Type: <a href="/realtime/types#error-info"><code>ErrorInfo</code></a></i></dd>
-	<dt><span lang="default"><code>retryIn</code></span><span lang="ruby"><code>retry_in</code></span></dt>
-	<dd>Duration upon which the library will retry a connection where applicable, as <span lang="default">milliseconds</span><span lang="ruby">seconds</span><br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Integer</span></i></dd>
+	<dt><span lang="ruby"><code>:</code></span><code>encrypted</code></dt>
+	<dd>Requests encryption for this channel.<br><i>Type: Boolean</i></dd>
+</dl>
+<dl>
+	<dt><div lang="jsall"><code>cipherParams</code></div></dt>
+	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). When providing only the required <code>key</code> property, the default cipher <code>AES-CBC-128</code> will be used. The Javascript library currently supports <code>algorithm</code>, <code>key</code> and <code>iv</code> cipher params.  Additionally, the default cipher params for the Javascript implementation may be obtained by calling <code>Ably.Realtime.Crypto.getDefaultParams()</code>.<br><i>Type: Object</i></dd>
+	<dt><div lang="java"><code>cipherParams</code></div></dt>
+	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). When providing only the required <code>key</code> property, the default cipher <code>AES-CBC-128</code> will be used. The Java library currently supports <code>algorithm</code>, <code>key</code>, and <code>iv</code> cipher params.  Additionally, the default cipher params for the Java implementation may be obtained by calling <code>Crypto.getDefaultParams()</code>.<br><i>Type: Object</i></dd>
+	<dt><div lang="ruby"><code>:cipher_params</code></div></dt>
+	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). When providing only the required <code>key</code> property, the default cipher <code>AES-CBC-128</code> will be used. The Ruby library currently supports <code>algorithm</code>, <code>key</code>, <code>mode</code>, <code>key_length</code> and <code>iv</code> cipher params.<br><i>Type: Hash object</i></dd>
 </dl>
   </div>
   <div id="sidebar">

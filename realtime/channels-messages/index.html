@@ -39,7 +39,14 @@
           <select id="jump-to-nav">
             <option>Jump to ...</option>
             <optgroup label='Help with'>
-<option id="anchor-title">Channels and messages</option>
+<option id="anchor-getting-started">Getting started</option>
+<option id="anchor-channels">Channels</option>
+<option id="anchor-channel-lifecycle">Channel lifecycle</option>
+<option id="anchor-channel-states">Channel states</option>
+<option id="anchor-channel-namespaces">Channel namespaces</option>
+<option id="anchor-messages">Messages</option>
+<option id="anchor-message-subscription">Subscribing to messages</option>
+<option id="anchor-message-publish">Publishing messages</option>
 </optgroup>
 <optgroup label='Channel API reference'>
 <option id="anchor-publish">publish</option>
@@ -48,13 +55,18 @@
 <option id="anchor-history">history</option>
 <option id="anchor-attach">attach</option>
 <option id="anchor-detach">detach</option>
+<option id="anchor-on">on</option>
+<option id="anchor-once">once</option>
+<option id="anchor-off">off</option>
 </optgroup>
 <optgroup label='Related types'>
+<option id="anchor-channel-state">ChannelState</option>
 <option id="anchor-message">Message</option>
-<option id="anchor-message-listener">MessageListener</option>
+<option id="anchor-channel-options">ChannelOptions</option>
 <option id="anchor-channel-state-listener">ChannelStateListener</option>
 <option id="anchor-completion-listener">CompletionListener</option>
-<option id="anchor-channel-options">ChannelOptions</option>
+<option id="anchor-message-listener">MessageListener</option>
+<option id="anchor-paginated-result">PaginatedResult</option>
 </optgroup>
           </select>
         </div>
@@ -69,13 +81,45 @@
       
     </header>
     <article>
-      <p>The Ably Realtime service organises the traffic within any application into named channels. Channels are the &#8220;unit&#8221; of message distribution; clients attach to channels to subscribe to messages, and every message broadcast by the service is associated with a unique channel.</p>
-<h2>Channels in the Realtime API</h2>
+      <p>The Ably Realtime service organises the message traffic within applications into named channels. Channels are the &#8220;unit&#8221; of message distribution; clients attach to channels to subscribe to messages, and every message published to a unique channel is broadcast by Ably to all subscribers. This scalable and resilient messaging pattern is commonly called <a href="https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern">pub/sub</a>.</p>
+<h2 id="getting-started">Getting started</h2>
+<p>The Ably Realtime client library provides a straightforward API for publishing and subscribing to messages on a channel. If the channel does not exist at the time the client is attached, a channel will be created in the Ably system immediately.</p>
+<pre class="code-editor open-jsbin open-jsbin-imamug" lang="javascript"><code class="code-editor open-jsbin open-jsbin-imamug" lang="javascript">var realtime = new Ably.Realtime('{{API_KEY}}');
+var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}');
+channel.subscribe(function(message) {
+  alert('Received: ' + message.data);
+});
+channel.publish('example', 'message published successfully');</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-imamug" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-imamug" lang="nodejs">var Ably = require('ably-js');
+var realtime = new Ably.Realtime('{{API_KEY}}');
+var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}');
+channel.subscribe(function(message) {
+  alert("Received: "  message.data);
+});
+channel.publish("example", "message published successfully");</code></pre>
+<pre lang="ruby"><code lang="ruby">realtime = Ably::Realtime.new('{{API_KEY}}')
+channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}')
+channel.subscribe do |message|
+  puts "Received: #{message.data}"
+end
+channel.publish 'example', 'message published successfully'</code></pre>
+<pre lang="java"><code lang="java">import io.ably.lib.realtime;
+AblyRealtime realtime = new AblyRealtime("{{API_KEY}}");
+Channel channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}");
+channel.subscribe(new MessageListener() {
+  @Override
+  public void onMessage(Message[] messages) {
+    System.out.println(messages.length + " new messages arrived");
+  }});
+end
+channel.publish("example", "message published successfully");</code></pre>
+<h2 id="channels">Channels</h2>
+<p>In order to publish, subscribe to, or be present on a channel, you must first obtain a channel instance and then attach to that channel. In most instances, as a convenience, it is unnecessary to explicitly attach a channel as it will implicitly attached when performing any operation on the channel such as publishing or subscribing.</p>
 <h3>Obtaining a channel instance</h3>
-<p>A <code>Channel</code> object is a reference to a single channel. A channel instance is obtained from the <a href="/realtime/usage/#channels"><code>channels</code> collection</a> of the Ably <span lang="ruby"><code>Realtime::Client</code></span><span lang="default"><code>Realtime</code></span> instance.</p>
-<pre class="code-editor open-jsbin open-jsbin-igidoq" lang="javascript"><code class="code-editor open-jsbin open-jsbin-igidoq" lang="javascript">var channel = realtime.channels.get('channelName');</code></pre>
-<pre class="code-editor open-jsbin open-jsbin-igidoq" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-igidoq" lang="nodejs">var channel = realtime.channels.get('channelName');</code></pre>
-<pre lang="java"><code lang="java">import io.ably.realtime.Channel;
+<p>A <code>Channel</code> object is a reference to a single channel. A channel instance is obtained from the <a href="/realtime/usage/#channels"><code>channels</code> collection</a> of the <span lang="ruby"><code>Realtime::Client</code></span><span lang="default"><code>Realtime</code></span> instance, and is uniquely identified by its unicode string name. Find out more about <a href="https://support.ably.io/solution/articles/3000046824-what-restrictions-exist-for-the-name-field-of-a-channel">channel naming</a></p>
+<pre class="code-editor open-jsbin open-jsbin-ugitul" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ugitul" lang="javascript">var channel = realtime.channels.get('channelName');</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-ugitul" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ugitul" lang="nodejs">var channel = realtime.channels.get('channelName');</code></pre>
+<pre lang="java"><code lang="java">import io.ably.lib.realtime.Channel;
 Channel channel = realtime.channels.get("channelName");</code></pre>
 <pre lang="ruby"><code lang="ruby">channel = realtime.channels.get('channelName')</code></pre>
 <p>A set of <a href="#channel-options">channel options</a> may also be passed when getting a channel instance.</p>
@@ -83,7 +127,7 @@ Channel channel = realtime.channels.get("channelName");</code></pre>
 var channel = realtime.channels.get('channelName', options);</code></pre>
 <pre lang="nodejs"><code lang="nodejs">var options = { encrypted: true, cipherParams: { key: 'privateKey' } };
 var channel = realtime.channels.get('channelName', options);</code></pre>
-<pre lang="java"><code lang="java">import io.ably.realtime.Channel;
+<pre lang="java"><code lang="java">import io.ably.lib.realtime.Channel;
 import io.ably.lib.types.ChannelOptions;
 import io.ably.lib.util.Crypto.CipherParams;
 CipherParams params = Crypto.getDefaultParams("privateKey");
@@ -93,8 +137,8 @@ options.cipherParams = params;
 Channel channel = realtime.channels.get("channelName", channelOpts);</code></pre>
 <pre lang="ruby"><code lang="ruby">options = { encrypted: true, cipherParams: { key: 'privateKey' } }
 channel = realtime.channels.get('channelName', options)</code></pre>
-<h3>Channel lifecycle</h3>
-<p>Channels are not pre-configured or provisioned in advance; they are created on demand when clients attach, and remain active until such time that there are no remaining attached clients. Applications do have, however, the ability to pre-configure one or more channel namespaces (ie name prefixes), and associate different attributes and access rights with those namespaces. Find out <a href="https://support.ably.io/solution/articles/3000030058-what-is-a-channel-namespace-and-how-can-i-use-them">more about channel namespaces</a>.</p>
+<h3 id="channel-lifecycle">Channel lifecycle</h3>
+<p>Channels are not pre-configured or provisioned by Ably in advance; they are created on demand when clients attach, and remain active until such time that there are no remaining attached clients. Within the <a href="https://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">dashboard for your app</a> however, you can pre-configure one or more <a href="#channel-namespaces">channel namespaces</a> (i.e. name prefixes), and associate different attributes and access rights with those namespaces. Find out more about <a href="#channel-namespaces">channel namespaces</a>.</p>
 <p>The following example explicitly attaches to a channel, which results in the channel being provisioned in Ably&#8217;s global realtime cluster. This channel will remain available globally until there are no more clients attached to the channel:</p>
 <pre lang="javascript"><code lang="javascript">realtime.channels.get('chatroom').attach(function() {
   console.log('"chatroom" exists and is now available globally in every data centre');
@@ -119,14 +163,14 @@ channel.on(new ChannelStateListener() {
 <p>Clients attach to a channel in order to participate on that channel in any way (either to publish, subscribe, or be present on the channel).</p>
 <h3>Implicit attach</h3>
 <p>Although the attach operation can be initiated explicitly by a client, it is more common for the client to perform a publish or subscribe operation, and the client library will initiate the attach if the channel is not already attached. The client library allows clients to begin publishing messages to a channel as soon as the channel has been created, and messages are queued until such time as the attach has succeeded or failed.</p>
-<pre class="code-editor open-jsbin open-jsbin-ayazac" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ayazac" lang="javascript">var channel = realtime.channels.get('chatroom');
+<pre class="code-editor open-jsbin open-jsbin-exebul" lang="javascript"><code class="code-editor open-jsbin open-jsbin-exebul" lang="javascript">var channel = realtime.channels.get('chatroom');
 channel.subscribe('action', function(message) { // implicit attach
-  console.log("Message received " + message.data);
+  console.log('Message received '' + message.data);
 });
 channel.publish('action', 'boom!');</code></pre>
-<pre class="code-editor open-jsbin open-jsbin-ayazac" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ayazac" lang="nodejs">var channel = realtime.channels.get('chatroom');
+<pre class="code-editor open-jsbin open-jsbin-exebul" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-exebul" lang="nodejs">var channel = realtime.channels.get('chatroom');
 channel.subscribe('action', function(message) { // implicit attach
-  console.log("Message received " + message.data);
+  console.log('Message received '' + message.data);
 });
 channel.publish('action', 'boom!');</code></pre>
 <pre lang="ruby"><code lang="ruby">channel = realtime.channels.get('chatroom')
@@ -145,529 +189,896 @@ channel.subscribe(new MessageListener() {
   }
 });
 channel.publish("action", "boom!");</code></pre>
-<h3>Channel failure handling</h3>
-<p>Channel attach and detach operations are synchronous &#8211; after initiating an attach request, the client must wait for a response that confirms that the channel is established on the service.</p>
-<p>There are cases where an attach will fail deterministically, such as if the client doesn&#8217;t have the necessary rights to access the channel.</p>
-<pre lang="javascript"><code lang="javascript">realtime.channels.get('private-chatroom').attach(function(err) {
-  if (err) {
-    console.error('Attach failed: ' + err);
-  }
-});</code></pre>
-<pre lang="nodejs"><code lang="nodejs">realtime.channels.get('private-chatroom').attach(function(err) {
-  if (err) {
-    console.error('Attach failed: ' + err);
-  }
-});</code></pre>
-<pre lang="ruby"><code lang="ruby">promise = realtime.channels.get('private-chatroom').attach
-promise.errback do |error|
-  puts "Attach failed: #{error}"
-end</code></pre>
-<pre lang="java"><code lang="java">Channel channel = realtime.channels.get("private-chatroom");
-channel.on(new ChannelStateListener() {
-  @Override
-  public void onChannelStateChanged(ChannelState state, ErrorInfo reason) {
-    switch (state.current) {
-      case failed: {
-        System.out.println("Attach failed: " + errorInfo.message);
-      }
-    }
-  }
-});</code></pre>
-<h3>Channel states</h3>
-<p>A number of states are therefore defined for a channel.</p>
+<h3 id="channel-states">Channel states</h3>
+<p>A channel can exist in any of the following states:</p>
 <dl>
 	<dt>initialised</dt>
-	<dd>A channel object having this state has been initialised but no attach has yet been attempted.</dd>
+	<dd>A <code>Channel</code> object having this state has been initialised but no attach has yet been attempted</dd>
 </dl>
 <dl>
 	<dt>attaching</dt>
-	<dd>An attach has been initiated by sending a request to the service. This is a transient state; it will be followed either<br />
-by a transition to attached or failed.</dd>
+	<dd>An attach has been initiated by sending a request to Ably. This is a transient state; it will be followed either by a transition to attached or failed</dd>
 </dl>
 <dl>
 	<dt>attached</dt>
-	<dd>Attach has succeeded. In the attached state a client may publish, and subscribe to, messages.</dd>
+	<dd>Attach has succeeded. In the attached state a client may publish and subscribe to messages, or be present</dd>
+</dl>
+<dl>
+	<dt>detaching</dt>
+	<dd>A detach has been initiated on the attached <code>Channel</code> by sending a request to Ably. This is a transient state; it will be followed either by a transition to detached or failed</dd>
 </dl>
 <dl>
 	<dt>detached</dt>
-	<dd>The channel, having previously been attached, has been detached.</dd>
+	<dd>The <code>Channel</code>, having previously been attached, has been detached</dd>
 </dl>
 <dl>
 	<dt>failed</dt>
-	<dd>An indefinite failure condition. This state is entered if a channel error has been received from the Ably service (such as an attempt to attach without the necessary access rights).</dd>
+	<dd>An indefinite failure condition. This state is entered if a <code>Channel</code> error has been received from the Ably service (such as an attempt to attach without the necessary access rights)</dd>
 </dl>
 <h3>Listening for state changes</h3>
-<p>The <code>channel</code> object is an <code>EventEmitter</code> and emits an event whose name is the new state whenever there is a channel state change. <span lang="javascript,nodejs">As with all events from an <code>EventEmitter</code> in the Ably library, <code>this</code> within the listener function is a reference to an event object whose <code>name</code> property is the name of the event that fired. This allows a listener to listen for all events with a single registration and know, which event fired when it is entered.</span></p>
+<p>The <code>Channel</code> object is an <code>EventEmitter</code> and emits an event whose name is the new state whenever there is a channel state change. <span lang="javascript,nodejs">As with all events from an <code>EventEmitter</code> in the Ably library, <code>this</code> within the listener function is a reference to an event object whose <code>event</code> property is the name of the event that fired. This allows a listener to listen for all events with a single registration and know, which event fired when it is entered.</span></p>
 <pre lang="javascript"><code lang="javascript">channel.on('attached', function() {
   console.log('channel ' + channel.name + ' is now attached');
 });</code></pre>
 <pre lang="nodejs"><code lang="nodejs">channel.on('attached', function() {
   console.log('channel ' + channel.name + ' is now attached');
 });</code></pre>
-<pre lang="ruby"><code lang="ruby">channel.on(:attached) do
+<pre lang="ruby"><code lang="ruby">channel.on(:attached) do |channel_state_change|
   puts "channel #{channel.name} is now attached"
 end</code></pre>
+<pre lang="java"><code lang="java">channel.on(ChannelState.attached, new ChannelStateListener() {
+  @Override
+  public void onChannelStateChanged(ChannelState state, ErrorInfo reason) {
+    System.out.println("channel " + channel.name + " is now attached");
+  }
+});</code></pre>
 <p>Alternatively a listener may be registered so that it receives all state change events.</p>
-<pre lang="javascript"><code lang="javascript">var myListener = function() {
-  console.log('New channel state is ' + this.name);
+<pre class="code-editor open-jsbin open-jsbin-aqotuc" lang="javascript"><code class="code-editor open-jsbin open-jsbin-aqotuc" lang="javascript">var myListener = function() {
+  console.log('channel state is ' + this.event);
 });
 channel.on(myListener);</code></pre>
-<pre lang="nodejs"><code lang="nodejs">var myListener = function() {
-  console.log('New channel state is ' + this.name);
+<pre class="code-editor open-jsbin open-jsbin-aqotuc" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-aqotuc" lang="nodejs">var myListener = function() {
+  console.log('channel state is ' + this.event);
 });
 channel.on(myListener);</code></pre>
-<pre lang="ruby"><code lang="ruby">channel.on do |channel_state_change"
-  puts "New channel state is #{channel_state_change.current}"
+<pre lang="ruby"><code lang="ruby">channel.on do |channel_state_change|
+  puts "channel state is #{channel_state_change.current}"
 end</code></pre>
+<pre lang="java"><code lang="java">channel.on(ChannelState.attached, new ChannelStateListener() {
+  @Override
+  public void onChannelStateChanged(ChannelState state, ErrorInfo reason) {
+    System.out.println("channel state is " + ChannelState.values()[state]);
+  }
+});</code></pre>
 <p>Previously registered listeners can be removed individually or all together.</p>
-<pre lang="javascript"><code lang="javascript">/* remove a listener registered for a single event */
+<pre lang="javascript"><code lang="javascript">/* remove the listener registered for a single event */
 channel.off('attached', myListener);
 
-/* remove a listener registered for all events */
+/* remove the listener registered for all events */
 channel.off(myListener);</code></pre>
-<pre lang="nodejs"><code lang="nodejs">/* remove a listener registered for a single event */
+<pre lang="nodejs"><code lang="nodejs">/* remove the listener registered for a single event */
 channel.off('attached', myListener);
 
-/* remove a listener registered for all events */
+/* remove the listener registered for all events */
 channel.off(myListener);</code></pre>
-<pre lang="ruby"><code lang="ruby">/* remove a listener registered for a single event */
+<pre lang="ruby"><code lang="ruby"># remove the listener proc registered for a single event
 channel.off(:attached, &amp;my_proc)
 
-/* remove a listener registered for all events */
+# remove the listener proc registered for all events
 channel.off(&amp;my_proc)</code></pre>
-<h3>Channel namespaces</h3>
-<p>One or more channel namespaces, or channel name prefixes, may be configured for an app. When a channel is created whose name is prefixed with one of the namespaces, the channel assumes certain configured attributes associated with that namespace.</p>
-<p>Namespace-prefixed names are delimited by a single colon &#8216;:&#8217;; the first component of the channel name (from the start up to and including the last character before the colon) is the namespace. A channel name may validly contain a colon even if the namespace component does not correspond to a namespace; also, a channel may contain multiple colons and only the component up to the first colon will be matched with a namespace. The only restriction on channel names is that a channel name may not start with a colon and may not be empty.</p>
-<p>Namespaces are defined and configured via the application dashboard. Namespace attributes that can be configured are:</p>
+<pre lang="java"><code lang="java">/* remove the listener registered for a single event */
+channel.off(ChannelState.attached, channelStateListener);
+
+/* remove the listener registered for all events */
+channel.off(channelStateListener);</code></pre>
+<h3>Channel failure handling</h3>
+<p>Channel attach and detach operations are synchronous &#8211; after initiating an attach request, the client must wait for a response from Ably that confirms that the channel is established on the service.</p>
+<p>There are cases where an attach will fail deterministically, such as if the client doesn&#8217;t have the necessary rights to access the channel.</p>
+<pre lang="javascript"><code lang="javascript">realtime.channels.get('private:chatroom').attach(function(err) {
+  if (err) {
+    console.error('Attach failed: ' + err);
+  }
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">realtime.channels.get('private:chatroom').attach(function(err) {
+  if (err) {
+    console.error('Attach failed: ' + err);
+  }
+});</code></pre>
+<pre lang="ruby"><code lang="ruby">promise = realtime.channels.get('private:chatroom').attach
+promise.errback do |error|
+  puts "Attach failed: #{error}"
+end</code></pre>
+<pre lang="java"><code lang="java">Channel channel = realtime.channels.get("private:chatroom");
+channel.on(new ChannelStateListener() {
+  @Override
+  public void onChannelStateChanged(ChannelState state, ErrorInfo reason) {
+    switch (state.current) {
+      case failed: {
+        System.out.println("Attach failed: " + reason.message);
+      }
+    }
+  }
+});</code></pre>
+<h3 id="channel-namespaces">Channel namespaces</h3>
+<p>One or more channel namespaces, or channel name prefixes, may be <a href="https://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">configured for an app in your dashboard</a>. When a channel is created whose name is prefixed with one of the namespaces, the channel assumes certain configured attributes associated with that namespace. For example, a channel namespace named &#8220;<code>private</code>&#8221; would match channels named &#8220;<code>private</code>&#8221;, &#8220;<code>private:chat</code>&#8221;, &#8220;<code>private:chat:mike</code>&#8221;.</p>
+<p>Namespace-prefixed channel names are delimited by a single colon <code>:</code>; the first component of the channel name (from the start up to and including the last character before the colon) is the namespace. A channel name may validly contain a colon even if the namespace component does not correspond to a namespace; also, a channel may contain multiple colons and only the component up to the first colon will be matched with a namespace. The only restriction on channel names is that a channel name may not start with a colon <code>:</code>, an open square bracket <code>[</code> and it may not be empty.</p>
+<p>Namespaces are defined and configured via the <a href="https://support.ably.io/solution/articles/3000030057-what-are-channel-rules-and-how-can-i-use-them-in-my-app">application dashboard settings</a>. The namespace attributes that can be configured are:</p>
 <ul>
-	<li>whether or not channels belonging to that namespace require clients to be authenticated;</li>
-	<li>whether or not channel messages are persisted;</li>
-	<li>whether or not clients are required to be connected over a TLS connection.</li>
+	<li><b>Persisted messages</b> &#8211; If enabled, all messages within this namespace will be stored according to the storage rules for your account. You can access stored messages via the <a href="/realtime/history">history API</a></li>
+	<li><b>Require identification</b> &#8211; if enabled, clients will not be permitted to subscribe to matching channels unless they are both authenticated and identified (they have an assigned client ID). Anonymous clients are not permitted to join these channels. Find out more about <a href="https://support.ably.io/solution/articles/3000038608-authenticated-clients">authenticated and identified clients</a></li>
+	<li><b>Require TLS</b> &#8211; if enabled, only clients who have connected to Ably over TLS will be allowed to join the channel</li>
 </ul>
-<p>Key or token capabilities can also specify access rights based on channel namespace.</p>
+<p>Key or token capabilities can also specify access rights based on channel namespace, find out more about <a href="/general/authentication">authentication</a></p>
 <h2>Messages</h2>
-<p>An Ably Realtime Message has a <code>data</code> member carrying the payload of the message. Various primitive and object types are portably defined and supported in all clients, enabling clients to be interoperable despite being hosted in different languages or environments.</p>
-<p>The supported payload types are primitive types (boolean, int32, double, string), JSON-encoded objects and arrays, and buffers containing arbitrary binary data. Client libraries detect the supplied message payload and encode the message appropriately.</p>
-<h3>Message subscription</h3>
-<p>A message sent via the Ably Realtime service contains a payload, the message <code>data</code>, and optionally also has an event <code>name</code>. The name does not affect the distribution of a channel message to clients but may be used as a subscription filter, allowing a client to register a listener that only sees a subset of the messages on the channel. When subscribing, a message listener can subscribe to see all messages on the channel or only a subset whose name matches a given <code>name</code> string.</p>
+<p>Each message published has an optional event <code>name</code> <span lang="default">property</span><span lang="java">member</span><span lang="ruby">attribute</span> and a <code>data</code> <span lang="default">property</span><span lang="java">member</span><span lang="ruby">attribute</span> carrying the payload of the message. Various primitive and object types are portably defined and supported in all clients, enabling clients to be interoperable despite being hosted in different languages or environments.</p>
+<p>The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and Null objects. Client libraries detect the supplied message payload and encode the message appropriately.</p>
+<h3 id="message-subscription">Subscribing to messages</h3>
+<p>The <code>name</code> <span lang="default">property</span><span lang="java">member</span><span lang="ruby">attribute</span> of published messages does not affect the distribution of a channel message to clients but may be used as a subscription filter, allowing a client to register a listener that only sees a subset of the messages received on the channel. When subscribing, a message listener can subscribe to see all messages on the channel or only a subset whose name matches a given <code>name</code> string.</p>
 <div lang="javascript,nodejs">
-<p>A client can subscribe to all messages on a channel by passing a listener function to the <code>subscribe</code> method.</p>
-<pre lang="javascript,nodejs"><code lang="javascript,nodejs">channel.subscribe(function(message) {
+<p>A client can subscribe to all messages on a channel by passing a listener function to the <code>subscribe</code> method. The listener is passed a <a href="#message"><code>Message</code></a> object for each message received.</p>
+<p></div><div lang="java"><br />
+A client can register for messages on a channel by implementing <a href="#message-listener">MessageListener</a> and calling the <code>subscribe(MessageListener listener)</code> or <code>subscribe(String name, MessageListener listener)</code> method. The listener is passed an array of one or more <a href="#message"><code>Message</code></a> objects when messages are received.</p>
+<p></div><div lang="ruby"><br />
+A client can subscribe to all messages on a channel by passing a block to the <code>subscribe</code> method. The block is passed a <a href="#message"><code>Message</code></a> object for each message are received.</p>
+</div>
+<pre class="code-editor open-jsbin open-jsbin-imamug" lang="javascript"><code class="code-editor open-jsbin open-jsbin-imamug" lang="javascript">channel.subscribe(function(message) {
   console.log('message received for event ' + message.name);
   console.log('message data:' + message.data);
-});
-</code></pre>
+});</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-imamug" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-imamug" lang="nodejs">channel.subscribe(function(message) {
+  console.log('message received for event ' + message.name);
+  console.log('message data:' + message.data);
+});</code></pre>
+<pre lang="java"><code lang="java">channel.subscribe(new MessageListener() {
+  @Override
+  public void onMessage(Message[] messages) {
+    System.out.println(messages.length + " new messages arrived");
+  }
+});</code></pre>
+<pre lang="ruby"><code lang="ruby">channel.subscribe do |message|
+  puts "message received for event #{message.name}"
+  puts "message data: #{message.data}"
+end</code></pre>
 <p>Alternatively a listener may be registered so that it is called only for messages having a specific event name.</p>
-<pre lang="javascript,nodejs"><code lang="javascript,nodejs">channel.subscribe('myEvent', function(message) {
+<pre lang="javascript"><code lang="javascript">channel.subscribe('myEvent', function(message) {
   console.log('message received for event ' + message.name);
   console.log('message data:' + message.data);
-});
-</code></pre>
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">channel.subscribe('myEvent', function(message) {
+  console.log('message received for event ' + message.name);
+  console.log('message data:' + message.data);
+});</code></pre>
+<pre lang="java"><code lang="java">channel.subscribe("myEvent", new MessageListener() {
+  @Override
+  public void onMessage(Message[] messages) {
+    System.out.println(messages.length " new messages arrived");
+  }
+});</code></pre>
+<pre lang="ruby"><code lang="ruby">channel.subscribe('myEvent') do |message|
+  puts "message received for event #{message.name}"
+  puts "message data: #{message.data}"
+end</code></pre>
 <p>Previously registered listeners can be removed individually or all together.</p>
-<pre lang="javascript,nodejs"><code lang="javascript,nodejs">/* remove a listener registered for a single event */
+<pre lang="javascript"><code lang="javascript">/* remove the listener registered for a single event */
 channel.unsubscribe('myEvent', myListener);
 
-/* remove a listener registered for all events */
-channel.unsubscribe(myListener);
-</code></pre>
-<p></div><div lang="java"><br />
-A client can register for messages on a channel by implementing <a href="#message-listener">MessageListener</a> and calling the <code>subscribe(MessageListener listener)</code> or <code>subscribe(String eventName, MessageListener listener)</code> method. The listener is passed the new <code>Message</code> on each message.</p>
-<pre lang="java"><code lang="java">channel.subscribe(new MessageListener() {
-	@Override
-	public void onMessage(Message[] messages) {
-		System.out.println(messages.length " new messages arrived");
-	}});
-</code></pre>
-<p>Alternatively a listener may be registered so that it is called only for messages having a specific event name.</p>
-<pre lang="java"><code lang="java">channel.subscribe("myEvent", new MessageListener() {
-	@Override
-	public void onMessage(Message[] messages) {
-		System.out.println(messages.length " new messages arrived");
-	}});
-</code></pre>
-<p>Previously registered listeners can be removed individually or all together.</p>
+/* remove the listener registered for all events */
+channel.unsubscribe(myListener);</code></pre>
+<pre lang="nodejs"><code lang="nodejs">/* remove the listener registered for a single event */
+channel.unsubscribe('myEvent', myListener);
+
+/* remove the listener registered for all events */
+channel.unsubscribe(myListener);</code></pre>
 <pre lang="java"><code lang="java">/* remove a single listener */
 channel.unsubscribe(myListener);
 
-/* remove a listener registered for all events */
-channel.unsubscribe("myEvent", myListener);
-</code></pre>
-</div>
-<h3>Publishing messages</h3>
+/* remove the listener registered for all events */
+channel.unsubscribe("myEvent", myListener);</code></pre>
+<pre lang="ruby"><code lang="ruby"># remove the listener proc registered for a single event
+channel.unsubscribe("myEvent", &amp;my_proc)
+
+# remove the listener proc registered for all events
+channel.unsubscribe(&amp;my_proc)</code></pre>
+<h3 id="message-publish">Publishing messages</h3>
 <p>Channels expose a <code>publish</code> method whereby a client can publish either a single message or an array of messages to a channel. A listener optionally passed in to the <code>publish</code> method enables the client to know whether or not the operation succeeded.</p>
-<pre lang="javascript"><code lang="javascript">channel.publish("myEvent", "This is my message", function(err) {
-  if(err)
+<pre class="code-editor open-jsbin open-jsbin-ugitul" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ugitul" lang="javascript">channel.publish('event', 'This is my payload', function(err) {
+  if(err) {
     console.log('Unable to publish message; err = ' + err.message);
-  else
+  } else {
     console.log('Message successfully sent');
+  }
 });</code></pre>
-<pre lang="nodejs"><code lang="nodejs">channel.publish("myEvent", "This is my message", function(err) {
-  if(err)
+<pre class="code-editor open-jsbin open-jsbin-ugitul" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ugitul" lang="nodejs">channel.publish('event', 'This is my payload', function(err) {
+  if(err) {
     console.log('Unable to publish message; err = ' + err.message);
-  else
+  } else {
     console.log('Message successfully sent');
+  }
 });</code></pre>
-<pre lang="java"><code lang="java">import io.ably.realtime.CompletionListener;
-channel.publish("myEvent", "This is my message", new CompletionListener() {
-	@Override
-	public void onError(ErrorInfo reason) {
-		System.out.println("Unable to publish message; err = " + reason.message);
-	}
-	@Override
-	public void onSuccess() {
-		System.out.println("Message successfully sent");
-	}
+<pre lang="ruby"><code lang="ruby">deferrable = channel.publish('event', 'This is my payload') do
+  puts 'Messages successfully sent'
+end
+deferrable.errback do |err|
+  puts "Unable to publish messages; err = #{err}"
+end</code></pre>
+<pre lang="java"><code lang="java">import io.ably.lib.realtime.CompletionListener;
+channel.publish("event", "This is my payload", new CompletionListener() {
+  @Override
+  public void onError(ErrorInfo reason) {
+    System.out.println("Unable to publish message; err = " + reason.message);
+  }
+  @Override
+  public void onSuccess() {
+    System.out.println("Message successfully sent");
+  }
 });</code></pre>
 <h3>Retrieving message history</h3>
-<p>Channels expose a <code>history</code> method whereby a client can obtain messages previously sent on the channel. It provides access to the persisted history, as with the REST API, but also enables access to instantaneous or &#8220;live&#8221; history for attached channels.</p>
-<p>This live history provides the ability to obtain continuous message history up to the point that a realtime channel was attached and also supports recent history for channels that do not have persistence enabled.</p>
-<p>History results are paginated and therefore accompanied with one or more relative links relating to the current query. Where the number of results returned exceeds the query limit &#8211; which is either the value of the <code>limit</code> param or the default limit of 100 &#8211; the query result contains pages with the limited number of records, and a relative link to the next page.</p>
-<pre lang="javascript"><code lang="javascript">var params = {direction: 'backwards', limit: '100'};
-channel.history(params, function(err, messages, rel) {
-  if(err) {
-    console.log('Unable to get channel history; err = ' + err.message);
-  } else {
-    console.log(messages.length + ' messages received in first result');
-    if(rel &amp;&amp; rel.next) {
-      channel.history(rel.next, function(...) { ... });
-    }
+<p>Channels expose a <code>history</code> method whereby a client can obtain messages previously sent on the channel. It provides access to instantaneous &#8220;live&#8221; history as well as the persisted history for attached channels.</p>
+<p>This live history provides the ability to obtain continuous message history up to the point that a realtime channel was attached and also supports recent history of up to around 2 minutes for channels that do not have persistence enabled. The persisted history allows clients to retrieve older messages that are no longer stored in memory. Persisted history is <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically kept for 24 &#8211; 72 hours</a>.</p>
+<p>The following example retrieves all historical messages published up until the point the channel was attached from the paginated history.</p>
+<pre lang="javascript"><code lang="javascript">channel.attach(function() {
+  channel.history({ untilAttach: true }, function(err, resultPage) {
+    if(err) {
+      console.log('Unable to get channel history; err = ' + err.message);
+    } else {
+      console.log(resultPage.items.length + ' messages received in first page');
+      if(resultPage.hasNext()) {
+        resultPage.next(function(err, resultPage) { ... });
+      }
+  });
 });</code></pre>
-<pre lang="nodejs"><code lang="nodejs">var params = {direction: 'backwards', limit: '100'};
-channel.history(params, function(err, messages, rel) {
-  if(err) {
-    console.log('Unable to get channel history; err = ' + err.message);
-  } else {
-    console.log(messages.length + ' messages received in first result');
-    if(rel &amp;&amp; rel.next) {
-      channel.history(rel.next, function(...) { ... });
-    }
+<pre lang="nodejs"><code lang="nodejs">channel.attach(function() {
+  channel.history({ untilAttach: true }, function(err, resultPage) {
+    if(err) {
+      console.log('Unable to get channel history; err = ' + err.message);
+    } else {
+      console.log(resultPage.items.length + ' messages received in first page');
+      if(resultPage.hasNext()) {
+        resultPage.next(function(err, resultPage) { ... });
+      }
+  });
 });</code></pre>
-<pre lang="java"><code lang="java">import io.ably.types.Message;
-import io.ably.types.Param;
-import io.ably.types.PaginatedResult;
-Param[] params = new Param[] {
-  new Param("direction", "backwards"),
-  new Param("limit", 100)
-};
-PaginatedResult&lt;Message&gt; messages = channel.history(params);
-System.out.println(messages.asArray().length + " messages received in first result");
-if(messages.getNext()) {
-  PaginatedResult&lt;Message&gt; nextPage = channel.history(messages.getNext());
+<pre lang="java"><code lang="java">import io.ably.lib.types.Message;
+import io.ably.lib.types.PaginatedResult;
+PaginatedResult&lt;Message&gt; resultPage = channel.history(null);
+System.out.println(messages.items().length + " messages received in first page");
+if(messages.hasNext()) {
+  resultPage = resultPage.next();
   System.out.println(...);
 }</code></pre>
+<pre lang="ruby"><code lang="ruby">channel.attach do
+  channel.history(until_attach: true) do |result_page|
+    puts "#{result_page.items.length} messages received in first page"
+    if result_page.has_next?
+      result_page.next { |result_page| ... }
+    end
+  end
+end</code></pre>
 <p>See the <a href="/realtime/history">history</a> documentation for further details of the supported query parameters.</p>
 <h2>Presence</h2>
 <p>Channels expose a <code>presence</code> member which a client can use to obtain channel presence information and to enter and leave the presence channel itself. See the <a href="/realtime/presence">presence</a> documentation for details.</p>
-<h1>API Reference</h1>
+<h1>Channel API Reference</h1>
 <div class="inline-toc">
-<ul><li>Channels and messages reference
+<ul><li>Channel reference
 <ul>
 <li>
 Methods
 <ul>
 <li><a href='#publish-data'>publish(name, data)</a></li>
-<li><a href='#publish-msg'>publish(message)</a></li>
 <li><a href='#publish-msg-array'>publish(messages)</a></li>
 <li><a href='#subscribe-listener'>subscribe(listener)</a></li>
 <li><a href='#subscribe-event'>subscribe(name, listener)</a></li>
 <li><a href='#subscribe-event-array'>subscribe(names, listener)</a></li>
-<li><a href='#unsubscribe-listener'>unsubscribe(listener)</a></li>
 <li><a href='#unsubscribe-event'>unsubscribe(name, listener)</a></li>
+<li><a href='#unsubscribe-listener'>unsubscribe(listener)</a></li>
+<li><a href='#unsubscribe-all'>unsubscribe()</a></li>
 <li><a href='#history'>history()</a></li>
 <li><a href='#attach'>attach()</a></li>
 <li><a href='#detach'>detach()</a></li>
+<li><a href='#on-state-listener'>on(state, listener)</a></li>
+<li><a href='#on-listener'>on(listener)</a></li>
+<li><a href='#once-state-listener'>once(state, listener)</a></li>
+<li><a href='#once-listener'>once(listener)</a></li>
+<li><a href='#off-state-listener'>off(state, listener)</a></li>
+<li><a href='#off-listener'>off(listener)</a></li>
 </ul>
 </li>
 <li>
 Members
 <ul>
-<li><a href='#members'>state</a></li>
-<li><a href='#members'>name</a></li>
-<li><a href='#members'>presence</a></li>
+<li><a href='#state'>state</a></li>
+<li><a href='#error-reason'>errorReason</a></li>
+<li><a href='#name'>name</a></li>
+<li><a href='#presence'>presence</a></li>
 </ul>
 </li>
 <li>
 Related types
 <ul>
+<li><a href='#channel-state'>ChannelState</a></li>
 <li><a href='#message'>Message</a></li>
-<li><a href='#message-listener'>MessageListener</a></li>
+<li><a href='#channel-options'>ChannelOptions</a></li>
+<li><a href='#channel-state-change'>ChannelStateChange</a></li>
 <li><a href='#channel-state-listener'>ChannelStateListener</a></li>
 <li><a href='#completion-listener'>CompletionListener</a></li>
-<li><a href='#channel-options'>ChannelOptions</a></li>
+<li><a href='#message-listener'>MessageListener</a></li>
+<li><a href='#paginated-result'>PaginatedResult</a></li>
 </ul>
 </li>
 </ul>
 </li></ul>
-</div><h2>Methods</h2>
+</div><h2 id="members"><span lang='default'>Channel Properties</span><span lang='ruby'>Ably::Realtime::Channel Attributes</span><span lang='java'>io.ably.lib.realtime.Channel Members</span></h2>
+<p>The <code>Channel</code> object exposes the following public <span lang="default">properties</span><span lang="ruby">attributes</span><span lang="java">members</span>:</p>
+<h6 id="state">state</h6>
+<p>The current <span lang="java"><a href="#channel-state"><code>io.ably.lib.realtime.ChannelState</code></a> <code>state</code></span><span lang="ruby"><a href="#channel-state"><code>Ably::Realtime::Channel::STATE</code></a> <code>state</code></span><span lang="default"><a href="#channel-state"><code>ChannelState</code></a></span> of this <code>Channel</code>. See the supported <a href="#channel-states">channel states</a> for more information.</p>
+<h6 id="error-reason"><span lang='default'>errorReason</span><span lang='java'>reason</span><span lang='ruby'>error_reason</span></h6>
+<p>When a channel failure occurs this <span lang="default,ruby">attribute</span><span lang="java">member</span><span lang="javascript,nodejs">property</span> contains the <span lang="java,ruby"><a href="/realtime/types#ably-exception"><code>AblyException</code></a></span><span lang="javascript,nodejs"><a href="/realtime/types#error-info"><code>ErrorInfo</code></a></span>.</p>
+<h6 id="name">name</h6>
+<p>The name String unique to this channel.</p>
+<h6 id="presence">presence</h6>
+<p>Provides access to the <a href="/realtime/presence">Presence</a> object for this channel which can be used to access members present on the channel, or participate in presence.</p>
+<h2>Methods</h2>
 <h6 id="publish">publish</h6>
+<p>There are two overloaded versions of this method:</p>
 <blockquote class="definition" id="publish-data">
-<p class="definition" id="publish-data"><span lang='default'>publish(name, data, callback)</span><span lang='ruby'>publish(name, data, &amp;callback)</span><span lang='java'>public void publish(String name, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+<p class="definition" id="publish-data"><span lang='default'>publish(String name, Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> publish(String name, Object data) &#8594; yields</span><span lang='java'>public void publish(String name, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
 </blockquote>
-<p>Publish a single message on this channel based on a given event name and payload. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
-<h4>Parameters</h4>
-<dl>
-	<dt><span lang="java">String</span>name</dt>
-	<dd>The event name.</dd>
-</dl>
-<dl>
-	<dt><span lang="java">Object</span>data</dt>
-	<dd>The payload of the message.</dd>
-</dl>
-<dl>
-	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>Callback to be called on completion.</dd>
-</dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>Listener to be notified on completion.</dd>
-</dl>
-<blockquote class="definition" id="publish-msg">
-<p class="definition" id="publish-msg"><span lang='default'>publish(message, callback)</span><span lang='java'>public void publish(Message message, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
-</blockquote>
-<p>Publish a single message object on this channel. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
-<h4>Parameters</h4>
-<dl>
-	<dt><span lang="java">Message</span>message</dt>
-	<dd>The message to send.</dd>
-</dl>
-<dl>
-	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>Callback to be called on completion.</dd>
-</dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>Listener to be notified on completion.</dd>
-</dl>
+<p>Publish a single message on this channel based on a given event name and payload. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success <span lang="default">or failure</span><span lang="ruby"></span> of the operation.</p>
 <blockquote class="definition" id="publish-msg-array">
-<p class="definition" id="publish-msg-array"><span lang='default'>publish(messages, callback)</span><span lang='java'>public void publish(Message[] messages, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+<p class="definition" id="publish-msg-array"><span lang='default'>publish(Object[] messages, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> publish(Message[] messages) &#8594; yields</span><span lang='java'>public void publish(Message[] messages, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
 </blockquote>
-<p>Publish several messages on this channel. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
+<p>Publish several messages on this channel. A <span lang="default">callback</span><span lang="java">listener</span><span lang="ruby">block</span> may optionally be passed in to this call to be notified of success <span lang="default">or failure</span><span lang="ruby"></span> of the operation.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><span lang="java">Message[]</span>messages</dt>
-	<dd>An array of messages to send.</dd>
+	<dt><div lang="default">String name</div></dt>
+	<dd>event name for the published message</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">Object data</div></dt>
+	<dd>data payload for the message. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
+	<dt><div lang="java">Object data</div></dt>
+	<dd>data payload for the message. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
+	<dt><div lang="ruby">Object data</div></dt>
+	<dd>data payload for the message. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
+</dl>
+<dl>
+	<dt><span lang="default"><a href="#message">Message</a>[] messages</span></dt>
+	<dd>An array of message objects to publish</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>Callback to be called on completion.</dd>
+	<dd>is a function of the form: <code>callback(err)</code></dd>
+	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
+	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields upon successfully publishing the message</dd>
 </dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>Listener to be notified on completion.</dd>
-</dl>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On successful publish of the message, <code>err</code> is null. On failure to publish the message, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object describing the failure reason.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<h4>Listener result</h4>
+<p>On successful publish of the message, the <code>onSuccess</code> method of the <a href="#completion-listener">CompletionListener</a> is called. On failure to publish the message, the <code>onError</code> method is called with an <a href="#error-info"><code>ErrorInfo</code></a> argument describing the failure reason.</p>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from the stats method.</p>
+<p>On successful publish of the message, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to the method yield. On failure to publish the message, the <code>errback</code> callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> are called with an <a href="#error-info"><code>ErrorInfo</code></a> argument describing the failure reason.</p>
+
+</div> <!-- /end ruby language block -->
+
 <h6 id="subscribe">subscribe</h6>
+<p>There are three overloaded versions of this method:</p>
 <blockquote class="definition" id="subscribe-listener">
-<p class="definition" id="subscribe-listener"><span lang='default'>subscribe(listener)</span><span lang='java'>public void subscribe(<a href="#message-listener">MessageListener</a> listener)</span></p>
+<p class="definition" id="subscribe-listener"><span lang='default'>subscribe(callback(<a href="#message">Message</a>))</span><span lang='java'>public void subscribe(<a href="#message-listener">MessageListener</a> listener)</span><span lang='ruby'>subscribe → yields <a href="#message">Message</a></span></p>
 </blockquote>
-<p>Subscribe to messages on this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the <a href="#message-listener">MessageListener</a> interface</span>, which is called each time one or more messages arrives on the channel.</p>
-<h4>Parameters</h4>
-<dl>
-	<dt><div lang="javascript,nodejs">listener</div></dt>
-	<dd>The listener function to call for each message.</dd>
-</dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>The <a href="#message-listener">MessageListener</a> to be notified on completion.</dd>
-</dl>
+<p>Subscribe to messages on this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the <a href="#message-listener">MessageListener</a> interface</span><span lang="ruby">a block</span>, which is called each time one or more messages arrives on the channel.</p>
 <blockquote class="definition" id="subscribe-event">
-<p class="definition" id="subscribe-event"><span lang='default'>subscribe(name, listener)</span><span lang='java'>public void subscribe(String name, <a href="#message-listener">MessageListener</a> listener)</span></p>
+<p class="definition" id="subscribe-event"><span lang='default'>subscribe(String name, callback(<a href="#message">Message</a>))</span><span lang='java'>public void subscribe(String name, <a href="#message-listener">MessageListener</a> listener)</span><span lang='ruby'>subscribe(String name) → yields <a href="#message">Message</a></span></p>
 </blockquote>
-<p>Subscribe to messages with a given event <code>name</code> on this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the <a href="#message-listener">MessageListener</a> interface</span>, which is called each time one or more matching messages arrives on the channel.</p>
+<p>Subscribe to messages with a given event <code>name</code> on this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the <a href="#message-listener">MessageListener</a> interface</span><span lang="ruby">a block</span>, which is called each time one or more matching messages arrives on the channel.</p>
 <blockquote class="definition" id="subscribe-event-array">
-<p class="definition" id="subscribe-event-array"><span lang='default'>subscribe(names, listener)</span><span lang='java'>public void subscribe(String[] names, <a href="#message-listener">MessageListener</a> listener)</span></p>
+<p class="definition" id="subscribe-event-array"><span lang='default'>subscribe(String[] names, callback(<a href="#message">Message</a>))</span><span lang='java'>public void subscribe(String[] names, <a href="#message-listener">MessageListener</a> listener)</span><span lang='ruby'>subscribe(String *name) → yields <a href="#message">Message</a></span></p>
 </blockquote>
-<p>Subscribe a single listener to messages on this channel for multiple event @name@s.</p>
+<p>Subscribe a single listener to messages on this channel for multiple event <code>name</code> values.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><span lang="java">String</span>name</dt>
-	<dd>The event name.</dd>
+	<dt>String name</dt>
+	<dd>The event name to subscribe to</dd>
 </dl>
 <dl>
-	<dt><div lang="javascript,nodejs">listener</div></dt>
-	<dd>The listener function to call for each message.</dd>
+	<dt>String[] names</dt>
+	<dd>An array of event names to subscribe to</dd>
 </dl>
 <dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>The <a href="#message-listener">MessageListener</a> to be notified on completion.</dd>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>is a function of the form <code>callback(message)</code> to be called for each message</dd>
+	<dt><div lang="java"><a href="#message-listener">MessageListener</a> listener</div></dt>
+	<dd>Message listener to be notified for matching messages</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields each matching message when received on the channel</dd>
 </dl>
 <h6 id="unsubscribe">unsubscribe</h6>
+<p>There are three overloaded versions of this method:</p>
+<blockquote class="definition" id="unsubscribe-event">
+<p class="definition" id="unsubscribe-event"><span lang='default'>unsubscribe(String name, listenerCallback)</span><span lang='java'>public void unsubscribe(String name, <a href="#message-listener">MessageListener</a> listener)</span><span lang='ruby'>unsubscribe(String name, &amp;listener_proc)</span></p>
+</blockquote>
+<p>Unsubscribe to messages on this channel for the specified event name. This removes an earlier event-specific subscription.</p>
 <blockquote class="definition" id="unsubscribe-listener">
-<p class="definition" id="unsubscribe-listener"><span lang='default'>unsubscribe(listener)</span><span lang='java'>public void unsubscribe(<a href="#message-listener">MessageListener</a> listener)</span></p>
+<p class="definition" id="unsubscribe-listener"><span lang='default'>unsubscribe(listenerCallback)</span><span lang='java'>public void unsubscribe(<a href="#message-listener">MessageListener</a> listener)</span><span lang='ruby'>unsubscribe(&amp;listener_proc)</span></p>
 </blockquote>
 <p>Unsubscribe to messages on this channel. This removes an earlier subscription.</p>
-<h4>Parameters</h4>
-<dl>
-	<dt><div lang="javascript,nodejs">listener</div></dt>
-	<dd>The listener function registered on subscription.</dd>
-</dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>The <a href="#message-listener">MessageListener</a> registered on subscription.</dd>
-</dl>
-<blockquote class="definition" id="unsubscribe-event">
-<p class="definition" id="unsubscribe-event"><span lang='default'>unsubscribe(name, listener)</span><span lang='java'>public void unsubscribe(String name, <a href="#message-listener">MessageListener</a> listener)</span></p>
+<blockquote class="definition" id="unsubscribe-all">
+<p class="definition" id="unsubscribe-all"><span lang='default'>unsubscribe()</span><span lang='java'>public void unsubscribe()</span></p>
 </blockquote>
-<p>Unsubscribe to messages on this channel. This removes an earlier event-specific subscription.</p>
+<p>Unsubscribes all listeners to messages on this channel. This removes all earlier subscriptions.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><span lang="java">String</span>name</dt>
-	<dd>The event name.</dd>
+	<dt>String name</dt>
+	<dd>The event name to subscribe to</dd>
 </dl>
 <dl>
-	<dt><div lang="javascript,nodejs">listener</div></dt>
-	<dd>The listener function registered on subscription.</dd>
-</dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>The <a href="#message-listener">MessageListener</a> registered on subscription.</dd>
+	<dt><div lang="javascript,nodejs">listenerCallback</div></dt>
+	<dd>is the callback listener function that was previously subscribed</dd>
+	<dt><div lang="java"><a href="#message-listener">MessageListener</a> listener</div></dt>
+	<dd>previously registered listener</dd>
+	<dt><div lang="ruby">&amp;listener_block</div></dt>
+	<dd>previously registered listener block</dd>
 </dl>
 <h6 id="history">history</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='nodejs'>channel.history(params, callback)</span><span lang='ruby'>channel.history(options) → json_result</span><span lang='java'>public PaginatedResult&lt;Message&gt; history(Param[] params)</span></p>
+<p class="definition"><span lang='default'>history(Object params, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#message">Message</a>&gt; resultPage))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> history(Hash options) &#8594; yields <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#message">Message</a>&gt;</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#message">Message</a>&gt; history(Param[] params)</span></p>
 </blockquote>
-<p>Get message history for this channel.</p>
+<p>Gets a paginated set of historical messages for this channel. If the <a href="https://support.ably.io/support/solutions/articles/3000030059-how-long-are-messages-stored-for">channel is configured to persist messags to disk</a>-, then message history will <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically go back 24 &#8211; 72 hours</a>. If not, messages are only retained in memory for two minutes.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt>params</dt>
-	<dd>an optional object containing the query parameters, as specified in the <a href="/realtime/history">history</a> API documentation.</dd>
-	<dt><div lang="nodejs,javascript">callback</div></dt>
-	<dd>is a function of the form: <code>callback(err, messages, relParams)</code><br />
-where:<br />
-<ul><br />
-<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
-<li>on success, <code>messages</code> contains the query result as an array of Message objects.</li><br />
-<li>where applicable, <code>relParams</code> is a map containing query params for each of the pagination links in the query response (see below).</li><br />
-</ul></dd>
+	<dt><div lang="default">params</div><span lang="java">Param[] </span></dt>
+	<dd>an optional object containing the query parameters, as specified in the <a href="/realtime/history">history API documentation</a>.</dd>
+	<dt><div lang="ruby">options</div></dt>
+	<dd>an optional set of key value pairs containing the query parameters, as specified in the <a href="/realtime/history">history API documentation</a>.</dd>
 </dl>
-<p>Further details of the supported query params are in the <a href="/realtime/history">history API</a> documentation.</p>
-<div lang="java">
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>is a function of the form: <code>callback(err, resultPage)</code></dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields a <code>PaginatedResult&lt;Message&gt;</code> array</dd>
+</dl>
+<p>Further details of the supported query params are in the <a href="/realtime/history">history API documentation</a>.</p>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On success, <code>resultPage</code> contains a <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulating an array of <a href="#message"><code>Message</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next()</code></a> and <a href="#paginated-result"><code>first()</code></a> methods.</p>
+<p>On failure to retrieve message history, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with the failure reason.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
 <h4>Returns</h4>
-<p>On success, the returned <a href="#paginated-result">PaginatedResult</a> encapsulates a collection of <code>Message</code> objects corresponding to the current page of results, and also provides query parameters for any applicable related (eg <code>first</code> or <code>next</code> result pages).</p>
-<p>Failure to retrieve the history will raise an <code>AblyException</code>.</p>
-<p></div><div lang="ruby"><br />
-h4. Returns</p>
-<p>On success, <code>json_result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api/#message-history">REST API</a>.</p>
-<p>Example <code>json_result</code>:</p>
-<pre lang="json"><code lang="json">[{
-  "name": "&lt;event name&gt;",
-  "channel": "&lt;channel id&gt;",
-  "data": "&lt;message payload&gt;",
-  "timestamp": "&lt;message timestamp&gt;"
-}]</code></pre>
-<p>Failure to retrieve the history will raise an exception &#8211; typical exceptions include:</p>
-<ul>
-	<li><code>Ably::NetworkUnavailableException</code></li>
-	<li><code>Ably::QuotaExceededException</code></li>
-	<li><code>Ably::AuthenticationFailureException</code></li>
-</ul>
-<p></div><div lang="nodejs,javascript"></p>
-<h4>Pagination</h4>
-<p>A paginated result is indicated in the <code>relParams</code> callback argument. For each available link, <code>relParams</code> contains a map of params to pass to a subsequent <code>history()</code> call.<br />
-  Example <code>relParams</code>:<br />
-  <pre lang="json"><code>[{
-    "first": {"start": 1380794880000, "end": 138079488105, ...},
-    "current": {"start": 1380794880000, "end": 138079488105, ...},
-    "next": {"start": 1380794880000, "end": 138079488105, ...}
-  }]</code></pre></p>
-<p>Further details of the paginated response are in the <a href="/realtime/history">history API</a> documentation.</p>
-</div>
+<p>On success, the returned <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulates an array of <a href="#message"><code>Message</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
+<p>Failure to retrieve the message history will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a></p>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from the message method.</p>
+<p>On success, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to the method yields a <a href="#paginated-result">PaginatedResult</a> that encapsulates an array of <a href="#message"><code>Message</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next()</code></a> and <a href="#paginated-result"><code>first()</code></a> methods.</p>
+<p>Failure to retrieve the message history will trigger the <code>errback</code> callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object with the failure reason.</p>
+
+</div> <!-- /end ruby language block -->
+
 <h6 id="attach">attach</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>attach()</span><span lang='java'>attach()</span></p>
+<p class="definition"><span lang='default'>attach(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='java'>public void attach()</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> attach &#8594; yields</span></p>
 </blockquote>
-<p>Attach to this channel. Any resulting channel state change will be indicated to any registered &#8220;ChannelStateListener&#8221;#channel-state-listener.</p>
-<p><code>attach()</code> will be called implicitly when required if the client calls either <code>publish()</code> or <code>subscribe()</code>.</p>
+<p>Attach to this channel ensuring the channel is created in the Ably system and all messages published on the channel will be received by any channel listeners registered using <code>subscribe()</code>. Any resulting channel state change will be emitted to any listeners registered using the <a href="#on"><code>on</code></a> or <a href="once"><code>once</code></a> methods.</p>
+<p>As a convenience, <code>attach()</code> will be called implicitly if either <a href="#publish"><code>publish()</code></a> or <a href="#subscribe"><code>subscribe()</code></a> for the <code>Channel</code> is called, or <a href="/realtime/presence#enter"><code>enter</code></a> or <a href="/realtime/presence#subscribe"><code>subscribe</code></a> is called on the <a href="/realtime/presence"><code>Presence</code></a> for this <code>Channel</code>.</p>
+<h4><span lang='jsall'>Parameters</span><span lang='ruby'>Parameters</span></h4>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>is a function of the form <code>callback(err)</code> and is called once the channel attach succeeds or fails</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields once the channel becomes attached</dd>
+</dl>
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from the attach method.</p>
+<p>On successful attachment, the success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> are called and any block provided to the method is yielded. Failure to attach will trigger the <code>errback</code> callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object with the failure reason.</p>
+
+</div> <!-- /end ruby language block -->
+
 <h6 id="detach">detach</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>detach()</span><span lang='java'>public void detach()</span></p>
+<p class="definition"><span lang='default'>detach(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='java'>public void detach()</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> detach &#8594; yields</span></p>
 </blockquote>
-<p>Detach from this channel. Any resulting channel state change will be indicated to any registered &#8220;ChannelStateListener&#8221;#channel-state-listener.</p>
-<h2 id="members">Public members</h2>
-<p>A <code>Channel</code> object exposes the following public members.</p>
+<p class="tip">Once all clients globally have detached from the channel, the channel will be released in the Ably service within two minutes.</p>
+<p>Detach from this channel. Any resulting channel state change will be emitted to any listeners registered using the <a href="#on"><code>on</code></a> or <a href="once"><code>once</code></a> methods.</p>
+<h4><span lang='jsall'>Parameters</span><span lang='ruby'>Parameters</span></h4>
 <dl>
-	<dt><span lang="java">public ChannelState</span>state</dt>
-	<dd>Indicates the current state of this channel.</dd>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>is a function of the form <code>callback(err)</code> and is called once the channel detach succeeds or fails</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields once the channel becomes detached</dd>
+</dl>
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from the detach method.</p>
+<p>On successful detachment, the success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> are called and any block provided to the method is yielded. Failure to detach will trigger the <code>errback</code> callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object with the failure reason.</p>
+
+</div> <!-- /end ruby language block -->
+
+<h6 id="on">on</h6>
+<p>There are two overloaded versions of this method:</p>
+<blockquote class="definition" id="on-state-listener">
+<p class="definition" id="on-state-listener"><span lang='default'>on(String state, listener())</span><span lang='ruby'>on(<a href="#channel-state">ChannelState</a> *state) &#8594; yields <a href="#channel-state-change">ChannelStateChange</a></span><span lang='java'>public void on(<a href="#channel-state">ChannelState</a> state, <a href="#channel-state-listener">ChannelStateListener</a> listener)</span></p>
+</blockquote>
+<p>Register the given listener <span lang="ruby">block</span> for the specified <a href="#channel-state">ChannelState</a> <span lang="default"><code>state</code></span><span lang="ruby"><code>state(s)</code></span><span lang="java"><code>state</code></span> changes on the <code>Channel</code>.<br />
+<span class="default">The listener is passed the current state<span lang="javascript,nodejs"> as the <code>event</code> property of <code>this</code></span>.</span><span lang="ruby">The listener is passed a <a href="#channel-state">ChannelState</a> object that contains the current state, previous state, and an optional reason for the state change</span>.</p>
+<blockquote class="definition" id="on-listener">
+<p class="definition" id="on-listener"><span lang='default'>on(listener())</span><span lang='ruby'>on &#8594; yields <a href="#channel-state-change">ChannelStateChange</a></span><span lang='java'>public void on(<a href="#channel-state-listener">ChannelStateListener</a> listener)</span></p>
+</blockquote>
+<p>Register the given listener <span lang="ruby">block</span> for all <a href="#channel-state">ChannelState</a> changes on the <code>Channel</code>.<br />
+<span class="default">The listener is passed the current state<span lang="javascript,nodejs"> as the <code>event</code> property of <code>this</code></span>.</span><span lang="ruby">The listener is passed a <a href="#channel-state">ChannelState</a> object that contains the current state, previous state, and an optional reason for the state change</span>.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><div lang="javascript,nodejs">String state</div></dt>
+	<dd>the channel state to subscribe to, see <a href="#channel-state">ChannelState</a> for supported channel states</dd>
+	<dt><div lang="java"><a href="#channel-state">ChannelState</a> state</div></dt>
+	<dd>the channel state to subscribe to</dd>
+	<dt><div lang="ruby"><a href="#channel-state">ChannelState</a> state</div></dt>
+	<dd>the channel state as a Symbol such as <code>:attached</code> or a <code>ChannelState</code> object to subscribe to</dd>
 </dl>
 <dl>
-	<dt><span lang="java">public String</span>name</dt>
-	<dd>The channel name of the this channel.</dd>
+	<dt><div lang="javascript,nodejs">listener</div></dt>
+	<dd>is a function of the form <code>listener()</code> to be notified for matching state changes. The current state is available as <code>this.event</code></dd>
+	<dt><div lang="java"><a href="#channel-state-listener">ChannelStateListener</a> listener</div></dt>
+	<dd>listener to be notified for matching state changes</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>listener block that is yielded to for matching state changes</dd>
+</dl>
+<h4>Example</h4>
+<p><a href="https://jsbin.ably.io:443/aqotuc/latest/edit?javascript,live" target="_blank">Browser <code>ChannelState</code> change example</a></p>
+<h6 id="once">once</h6>
+<p>There are two overloaded versions of this method:</p>
+<blockquote class="definition" id="once-state-listener">
+<p class="definition" id="once-state-listener"><span lang='default'>once(String state, listener())</span><span lang='ruby'>once(<a href="#channel-state">ChannelState</a> *state) &#8594; yields <a href="#channel-state-change">ChannelStateChange</a></span><span lang='java'>public void once(<a href="#channel-state">ChannelState</a> state, <a href="#channel-state-listener">ChannelStateListener</a> listener)</span></p>
+</blockquote>
+<p>Register the given listener <span lang="ruby">block</span> for a single occurence of the specified <a href="#channel-state">ChannelState</a> <span lang="default"><code>state</code></span><span lang="ruby"><code>state(s)</code></span><span lang="java"><code>state</code></span> change on the <code>Channel</code>. Once the listener has been called, it is removed as a registered listener and will not be called again.<br />
+<span class="default">The listener is passed the current state<span lang="javascript,nodejs"> as the <code>event</code> property of <code>this</code></span>.</span><span lang="ruby">The listener is passed a <a href="#channel-state">ChannelState</a> object that contains the current state, previous state, and an optional reason for the state change</span>.</p>
+<blockquote class="definition" id="once-listener">
+<p class="definition" id="once-listener"><span lang='default'>once(listener())</span><span lang='ruby'>once &#8594; yields <a href="#channel-state-change">ChannelStateChange</a></span><span lang='java'>public void once(<a href="#channel-state-listener">ChannelStateListener</a> listener)</span></p>
+</blockquote>
+<p>Register the given listener <span lang="ruby">block</span> for a single occurence of any <a href="#channel-state">ChannelState</a> change on the <code>Channel</code>. Once the listener has been called, it is removed as a registered listener and will not be called again.<br />
+<span class="default">The listener is passed the current state<span lang="javascript,nodejs"> as the <code>event</code> property of <code>this</code></span>.</span><span lang="ruby">The listener is passed a <a href="#channel-state">ChannelState</a> object that contains the current state, previous state, and an optional reason for the state change</span>.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><div lang="javascript,nodejs">String state</div></dt>
+	<dd>the channel state to subscribe to, see <a href="#channel-state">ChannelState</a> for supported channel states</dd>
+	<dt><div lang="java"><a href="#channel-state">ChannelState</a> state</div></dt>
+	<dd>the channel state to subscribe to</dd>
+	<dt><div lang="ruby"><a href="#channel-state">ChannelState</a> state</div></dt>
+	<dd>the channel state as a Symbol such as <code>:attached</code> or a <code>ChannelState</code> object to subscribe to</dd>
 </dl>
 <dl>
-	<dt><span lang="java">public Presence</span>presence</dt>
-	<dd>The <a href="/realtime/presence">presence</a> object for this channel.</dd>
+	<dt><div lang="javascript,nodejs">listener</div></dt>
+	<dd>is a function of the form <code>listener()</code> to be notified for a single occurence of a matching state change. The current state is available as <code>this.event</code></dd>
+	<dt><div lang="java"><a href="#channel-state-listener">ChannelStateListener</a> listener</div></dt>
+	<dd>listener to be notified for a single occurence of a matching state change</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>listener block that is yielded to for a single occurence of a matching state change</dd>
+</dl>
+<h6 id="off">off</h6>
+<p>There are two overloaded versions of this method:</p>
+<blockquote class="definition" id="off-state-listener">
+<p class="definition" id="off-state-listener"><span lang='default'>off(String state, listener)</span><span lang='ruby'>off(<a href="#channel-state">ChannelState</a> *state, &amp;block)</span><span lang='java'>public void off(<a href="#channel-state">ChannelState</a> state, <a href="#channel-state-listener">ChannelStateListener</a> listener)</span></p>
+</blockquote>
+<p>Remove the given listener <span lang="ruby">block</span> for the <a href="#channel-state">ChannelState</a> <span lang="default"><code>state</code></span><span lang="ruby"><code>state(s)</code></span><span lang="java"><code>state</code></span>.</p>
+<blockquote class="definition" id="off-listener">
+<p class="definition" id="off-listener"><span lang='default'>off(listener)</span><span lang='ruby'>off(&amp;block)</span><span lang='java'>public void off(<a href="#channel-state-listener">ChannelStateListener</a> listener)</span></p>
+</blockquote>
+<p>Remove the given listener <span lang="ruby">block</span> for all <a href="#channel-state">ChannelState</a> states.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><div lang="javascript,nodejs">String state</div></dt>
+	<dd>the channel state to unsubscribe from</dd>
+	<dt><div lang="java"><a href="#channel-state">ChannelState</a> state</div></dt>
+	<dd>the channel state to unsubscribe from</dd>
+	<dt><div lang="ruby"><a href="#channel-state">ChannelState</a> state</div></dt>
+	<dd>the channel state as a Symbol such as <code>:detached</code> or a <code>ChannelState</code> object to unsubscribe from</dd>
 </dl>
 <dl>
-	<dt><span lang="java">public ErrorInfo</span>reason</dt>
-	<dd>Information relating to the transition to the current state, as an Ably <code>ErrorInfo</code> object. This contains an error code and message and, in the failed state in particular, provides diagnostic error information.</dd>
+	<dt><div lang="javascript,nodejs">listener</div></dt>
+	<dd>is the listener function to be removed</dd>
+	<dt><div lang="java"><a href="#channel-state-listener">ChannelStateListener</a> listener</div></dt>
+	<dd>is the listener to be removed</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>is the listener block to be removed</dd>
+</dl>
+<h2 id="related-types">Related types</h2>
+<h3 id="channel-state"><span lang='default'>ChannelState</span><span lang='ruby'>Channel::STATE Enum</span><span lang='java'>io.ably.lib.realtime.ChannelState Enum</span></h3>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<p><code>ChannelState</code> is a String with a value matching any of the <a href="/realtime/channel#channel-states"><code>Realtime Channel</code> states</a>.</p>
+<pre lang="javascript"><code lang="javascript">var allChannelStates = [
+  'initialized',
+  'attaching',
+  'attached',
+  'detaching',
+  'detached',
+  'failed'
+]</code></pre>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>io.ably.lib.realtime.ChannelState</code> is an enum representing all the <a href="/realtime/channel#channel-states"><code>Realtime Channel</code> states</a>.</p>
+<pre lang="java"><code lang="java">public enum ChannelState {
+  initialised,  // 0
+  attaching,    // 1
+  attached,     // 2
+  detaching,    // 3
+  detached,     // 4
+  failed        // 5
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p><code>Ably::Realtime::Channel::STATE</code> is an enum-like value representing all the <a href="/realtime/channel#channel-states"><code>Realtime Channel</code> states</a>. <code>STATE</code> can be represented interchangeably as either symbols or constants.</p>
+<h4>Symbol states</h4>
+<pre lang="ruby"><code lang="ruby">:initialized # =&gt; 0
+:attaching # =&gt;   1
+:attached # =&gt;    2
+:detaching # =&gt;   3
+:detached # =&gt;    4
+:failed # =&gt;      5</code></pre>
+<h4>Constant states</h4>
+<pre lang="ruby"><code lang="ruby">Connection::STATE.Initialized # =&gt; 0
+Connection::STATE.Attaching # =&gt;   1
+Connection::STATE.Attached # =&gt;    2
+Connection::STATE.Detaching # =&gt;   3
+Connection::STATE.Detached # =&gt;    4
+Connection::STATE.Failed # =&gt;      5</code></pre>
+<h4>Example usage</h4>
+<pre lang="ruby"><code lang="ruby"># Example with symbols
+channel.on(:attached) { ... }
+
+# Example with constants
+channel.on(Ably::Realtime::Channel::STATE.Attached) { ... }
+
+# Interchangeable
+Ably::Realtime::Channel::STATE.Attached == :attached # =&gt; true</code></pre>
+
+</div> <!-- /end ruby language block -->
+
+<h3 id="message"><span lang='default'>Message</span><span lang='ruby'>Ably::Models::Message Enum</span><span lang='java'>io.ably.lib.types.Message</span></h3>
+<p>A <code>Message</code> represents an individual message that is sent to or received from Ably.</p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><code>name</code></dt>
+	<dd>Event name, if provided<br><i>Type: String</i></dd>
 </dl>
 <dl>
-	<dt><div lang="java">stateListeners</div></dt>
-	<dd>A collection of <a href="#channel-state-listener">ChannelStateListener</a> objects that will be notified of channel state changes.</dd>
-</dl>
-<h2 id="message">Message</h2>
-<p>A <code>Message</code> encapsulates an individual message sent or received in Ably. A message has the following members.</p>
-<dl>
-	<dt><span lang="java">String</span>name</dt>
-	<dd>The event name for the message. The name may be used to allow listeners to subscribed selectively for only a subset of the messages on the channel.</dd>
+	<dt><div lang="default"><code>data</code></div></dt>
+	<dd>The message payload, if provided<br><i>Type: String, StringBuffer, JSON Object</i></dd>
+	<dt><div lang="java"><code>data</code></div></dt>
+	<dd>The message payload, if provided<br><i>Type: String, ByteArray, JSONObject, JSONArray</i></dd>
+	<dt><div lang="ruby"><code>data</code></div></dt>
+	<dd>The message payload, if provided<br><i>Type: String, Binary (ASCII-8BIT String), Hash, Array</i></dd>
 </dl>
 <dl>
-	<dt><span lang="java">Object</span>data</dt>
-	<dd>The payload of the message. The data may be one of the supported payload datatypes.</dd>
+	<dt><code>id</code></dt>
+	<dd>Unique ID assigned by Ably to this message<br><i>Type: String</i></dd>
 </dl>
 <dl>
-	<dt><span lang="java">String</span>clientId</dt>
-	<dd>The clientId of the client that published the message. This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the clientId is known, for messages delivered to subscribers. It is not required to populate the clientId of a message before publishing it.</dd>
+	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span></dt>
+	<dd>The client ID of the publisher of this message<br><i>Type: String</i></dd>
 </dl>
 <dl>
-	<dt><span lang="java">long</span>timestamp</dt>
-	<dd>The system timestamp of the message, in milliseconds since the epoch. This <span lang="default">property</span><span lang="java">field</span> is populated by the system for messages delivered to subscribers. It is not required to populate the timestamp of a message before publishing it.</dd>
-</dl>
-<h2 id="message-listener">MessageListener</h2>
-<div lang="javascript,nodejs">
-<p>A <code>MessageListener</code> function may be subscribed for all messages, or messages having specific event names, received on the channel. The message is passed as the first argument to the listener, and the message event <code>name</code> will be the <code>name</code> property of <code>this</code> when the listener is called.</p>
-<p></div><div lang="java"><br />
-A implementation of the <code>MessageListener</code> interface may be registered to be notified of message arrival on the channel. A <code>Message[]</code> is passed as the first argument of the listener&#8217;s <code>onMessage</code> method whenever a message matching the listener&#8217;s registration is received on the channel.</p>
-</div>
-<h2 id="channel-state-listener">ChannelStateListener</h2>
-<div lang="javascript,nodejs">
-<p>The <code>Channel</code> instance is an <code>EventEmitter</code> and emits events corresponding to each of the channel states, ie <code>pending</code>, <code>attached</code>, <code>detached</code> or <code>failed</code>. A <code>ChannelStateListener</code> function may be registered for any of these events and will be notified on any transition to that state. A listener may register for multiple, or all, events, and the event name (thus the new channel state) will be the <code>name</code> property of <code>this</code> when the listener is called.</p>
-<p></div><div lang="java"><br />
-A implementation of the <code>ChannelStateListener</code> interface may be registered to be notified of channel state changes. Each time a listener is called it is passed a <code>ChannelState</code> indicating the new state.</p>
-</div>
-<h2 id="completion-listener">CompletionListener</h2>
-<p>Channel <code>publish</code> operations optionally take <span lang="default">callback</span><span lang="java">implementation of the <code>CompletionListener</code> interface</span> to be called on completion of the operation with an indication of success or failure.</p>
-<div lang="javascript,nodejs">
-<p>The callback is called with an optional error argument. An omitted or falsy error argument indicates success. On error, the error argument contains details of the error.</p>
-<p></div><div lang="java"><br />
-On success the listener&#8217;s <code>onSuccess()</code> method is called. If the operation failed, the listener&#8217;s <code>onError()</code> method is called with an <code>ErrorInfo</code> contains details of the error.</p>
-</div>
-<h2 id="channel-options">ChannelOptions</h2>
-<p>A <code>ChannelOptions</code> may optionally be specified when instancing a Channel, and this may be used to specify channel-specific options.</p>
-<p>Currently the only supported channel options are encryption-related.</p>
-<dl>
-	<dt><span lang="java">public boolean</span>encrypted</dt>
-	<dd>Requests encryption for this channel.</dd>
+	<dt><span lang="default"><code>connectionId</code></span><span lang="ruby"><code>connection_id</code></span></dt>
+	<dd>The connection ID of the publisher of this message<br><i>Type: String</i></dd>
 </dl>
 <dl>
-	<dt><span lang="java">public Object</span>cipherParams</dt>
-	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). Default cipher params for the implementation may be obtained by calling <code>Crypto.getDefaultParams()</code>.</dd>
+	<dt><code>timestamp</code></dt>
+	<dd>Timestamp when the presence update was received by the Ably the realtime service, as milliseconds since the epoch<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
 </dl>
-<div lang="java">
-<h2 id="paginated-result">PaginatedResult</h2>
-<p>A <code>PaginatedResult</code> is an interface that represents the result of a query that supports pagination. An instance of <code>PaginatedResult</code> encapsulates a collection of <code>Message</code> objects representing the current page of results, and provides the means &#8211; in the form of <code>Param[]</code> to perform queries for subsequent or related pages.</p>
 <dl>
-	<dt>public Message[] asArray()</dt>
-	<dd>Returns the current page of results as an Array.</dd>
-	<dt>public List&lt;Message&gt;</dt>
-	<dd>Returns the current page of results as a List.</dd>
-	<dt>public Param[] getFirst()</dt>
-	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the first call in this paginated sequence.</dd>
-	<dt>public Param[] getCurrent()</dt>
-	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the current call in this paginated sequence.</dd>
-	<dt>public Param[] getNext()</dt>
-	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the next call in this paginated sequence.</dd>
+	<dt><code>encoding</code></dt>
+	<dd>This will typically be empty as all messages received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: String</i></dd>
 </dl>
-</div>
+<h3 id="channel-options"><span lang='default'>ChannelOptions Object</span><span lang='ruby'>ChannelOptions Hash</span><span lang='java'>io.ably.lib.types.ChannelOptions</span></h3>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<p><code>ChannelOptions</code>, a plain Javascript object, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following attributes can be defined on the object:</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p><code>ChannelOptions</code>, a Hash object, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following key symbol values can be added to the Hash:</p>
+
+</div> <!-- /end ruby language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>io.ably.lib.types.ChannelOptions</code> may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options.</p>
+
+</div> <!-- /end java language block -->
+
+<p>Currently the supported channel options are only encryption-related.</p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><span lang="ruby"><code>:</code></span><code>encrypted</code></dt>
+	<dd>Requests encryption for this channel.<br><i>Type: Boolean</i></dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs"><code>cipherParams</code></div></dt>
+	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). When providing only the required <code>key</code> property, the default cipher <code>AES-CBC-128</code> will be used. The Javascript library currently supports <code>algorithm</code>, <code>key</code> and <code>iv</code> cipher params.  Additionally, the default cipher params for the Javascript implementation may be obtained by calling <code>Ably.Realtime.Crypto.getDefaultParams()</code>.<br><i>Type: Object</i></dd>
+	<dt><div lang="java"><code>cipherParams</code></div></dt>
+	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). When providing only the required <code>key</code> property, the default cipher <code>AES-CBC-128</code> will be used. The Java library currently supports <code>algorithm</code>, <code>key</code>, and <code>iv</code> cipher params.  Additionally, the default cipher params for the Java implementation may be obtained by calling <code>Crypto.getDefaultParams()</code>.<br><i>Type: Object</i></dd>
+	<dt><div lang="ruby"><code>:cipher_params</code></div></dt>
+	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). When providing only the required <code>key</code> property, the default cipher <code>AES-CBC-128</code> will be used. The Ruby library currently supports <code>algorithm</code>, <code>key</code>, <code>mode</code>, <code>key_length</code> and <code>iv</code> cipher params.<br><i>Type: Hash object</i></dd>
+</dl>
+<h3 id="channel-state-change"><span lang='ruby'>ChannelStateChange</span></h3>
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p>A <code>Ably::Models::ChannelStateChange</code> is a type encapsulating state change information emitted by the <a href="/realtime/channels-messages"><code>Channel</code></a> object. See <a href="/realtime/channels-messages#on"><code>Channel#on</code></a> to register a listener for one or more events.</p>
+<h4>Attributes</h4>
+<dl>
+	<dt><code>previous</code></dt>
+	<dd>the previous state<br><i>Type: <a href="/realtime/types#channel-state">Channel::STATE</a>&gt;</i></dd>
+	<dt><code>current</code></dt>
+	<dd>the new state<br><i>Type: <a href="/realtime/types#channel-state">Channel::STATE</a>&gt;</i></dd>
+	<dt><code>reason</code></dt>
+	<dd>an <a href="#error-info"><code>ErrorInfo</code></a> containing any information relating to the transition<br><i>Type: <a href="/realtime/types#error-info"><code>ErrorInfo</code></a></i></dd>
+</dl>
+
+</div> <!-- /end ruby language block -->
+
+<h3 id="channel-state-listener"><span lang='java'>io.ably.lib.realtime.ChannelStateListener</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p>A <span lang="java"><code>io.ably.lib.realtime.ChannelStateListener</code></span> is an interface allowing a client to be notified of state changes for a <a href="/realtime/channels-messages#channel"><code>Channel</code></a></p>
+<pre lang="java"><code lang="java">public interface ChannelStateListener {
+  // Called when the channel state changes
+  public void onChannelStateChanged(ChannelState state, ErrorInfo reason);
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+<h3 id="completion-listener"><span lang='java'>io.ably.lib.realtime.CompletionListener</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p>A <span lang="java"><code>io.ably.lib.realtime.CompletionListener</code></span> is an interface allowing a client to be notified of the outcome of an asynchronous operation.</p>
+<pre lang="java"><code lang="java">public interface CompletionListener {
+  // Called when the associated operation completes successfully,
+  public void onSuccess();
+
+  // Called when the associated operation completes with an error.
+  public void onError(ErrorInfo reason);
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+<h3 id="message-listener"><span lang='java'>io.ably.lib.realtime.Channel.MessageListener</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p>A <span lang="java"><code>io.ably.lib.realtime.Channel.MessageListener</code></span> is an interface allowing a client to be notified when messages are received on a channel using a <a href="/realtime/channels-messages#message-subscription">channel subscription</a>.</p>
+<pre lang="java"><code lang="java">public interface MessageListener {
+  // Called when one or more messages are received
+  public void onMessage(Message[] messages);
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+<h3 id="paginated-result"><span lang='default'>PaginatedResult</span><span lang='ruby'>Ably::Models::PaginatedResult</span><span lang='java'>io.ably.lib.types.PaginatedResult</span></h3>
+<p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">paginated REST API query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><code>items</code></dt>
+	<dd>contains a page of results (for example an Array of <a href="#message"><code>Message</code></a> or <a href="#presence-message"><code>PresenceMessage</code></a> objects for a channel history request)<br><i>Type: Array &lt;Message, Presence, Stats&gt;</i></dd>
+</dl>
+<dl>
+	<dt><div lang="default"><code>isLast</code></div></dt>
+	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
+	<dt><div lang="ruby"><code>last?</code></div></dt>
+	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
+</dl>
+<dl>
+	<dt><div lang="default"><code>hasNext</code></div></dt>
+	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
+	<dt><div lang="ruby"><code>has_next?</code></div></dt>
+	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
+</dl>
+<h4>Methods</h4>
+<h6>first</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>first(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))</span><span lang='ruby'><a href="/realtime/types#paginated-result">PaginatedResult</a> first</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a> first()</span></p>
+</blockquote>
+<p>Returns a new <code>PaginatedResult</code> for the first page of results. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</p>
+<h6>items</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>Object[] items()</span><span lang='ruby'>Object[] items</span><span lang='java'>public Object[] items()</span></p>
+</blockquote>
+<p>Returns the current page of results as an Array. The type of the objects in the Array is determined by the operation that provided the <code>PaginatedResult</code>. For example, a <a href="/realtime/channels-messages#history">Message#history</a> request will return an array of <code>Message</code> objects.</p>
+<h6>next</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>next(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))</span><span lang='ruby'><a href="/realtime/types#paginated-result">PaginatedResult</a> next</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a> next()</span></p>
+</blockquote>
+<p>Returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <span lang="default"><code>null</code></span><span lang="java"><code>Null</code></span><span lang="ruby"><code>nil</code></span> is returned. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</p>
+<h4>Example</h4>
+<pre lang="javascript"><code lang="javascript">channel.history(function(err, paginatedResult) {
+  console.log('Page 0 item 0:' + paginatedResult.items[0].data);
+  paginatedResult.next(function(err, nextPage) {
+    console.log('Page 1 item 1: ' + nextPage.items[1].data);
+    console.log('Last page?: ' + nextPage.isLast;
+  });
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">channel.history(function(err, paginatedResult) {
+  console.log('Page 0 item 0:' + paginatedResult.items[0].data);
+  paginatedResult.next(function(err, nextPage) {
+    console.log('Page 1 item 1: ' + nextPage.items[1].data);
+    console.log('Last page?: ' + nextPage.isLast;
+  });
+});</code></pre>
+<pre lang="java"><code lang="java">PaginatedResult firstPage = channel.history();
+System.out.println("Page 0 item 0:" + firstPage.items[0].data);
+if (firstPage.hasNext) {
+  PaginatedResult nextPage = firstPage.next();
+  System.out.println("Page 1 item 1:" + nextPage.items[1].data);
+  System.out.println("More pages?:" + Strong.valueOf(nextpage.hasNext()));
+});</code></pre>
+<pre lang="ruby"><code lang="ruby"># When using the REST sync library
+first_page = channel.history
+puts "Page 0 item 0: #{first_page.items[0].data}"
+if first_page.has_next?
+  next_page = first_page.next
+  puts "Page 1 item 1: #{next_page.items[1].data}"
+  puts "Last page?: #{next_page.is_last?}"
+end
+
+# When using the Realtime EventMachine library
+channel.history do |first_page|
+  puts "Page 0 item 0: #{first_page.items[0].data}"
+  if first_page.has_next?
+    first_page.next do |next_page|
+      puts "Page 1 item 1: #{next_page.items[1].data}"
+      puts "Last page?: #{next_page.is_last?}"
+    end
+  end
+end</code></pre>
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>
