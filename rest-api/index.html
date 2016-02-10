@@ -139,7 +139,7 @@
 </ul>
 <p>Specific request and response data types are documented in the context of each API or route.</p>
 <p>A response status code of 20X (200, 201 or 204) indicates success. A successful result will typically provide a response body but certain operations (such as DELETE) may respond with a 204 response and no response body.</p>
-<p>All other <a href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes">standard HTTP statusCodes</a> signify an error. Errors from all APIs are returned as an object of the form:</p>
+<p><a name="error-response">All other <a href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes">standard HTTP statusCodes</a> signify an error. Errors from all APIs are returned as an object of the form:</a></p>
 <pre lang="json"><code lang="json">{
   error: {
     code: &lt;ably error code&gt;,
@@ -420,7 +420,7 @@ X-Ably-ErrorMessage: &lt;string, equivalent to error.message&gt;</code></pre>
 <h5>Options</h5>
 <dl>
 	<dt>Request body</dt>
-	<dd>signed or unsigned token request</dd>
+	<dd>signed or unsigned token request. All token requests require values for <code>keyName</code> and <code>timestamp</code> attributes. In addition, signed token require values for attributes <code>nonce</code> and <code>mac</code>.</dd>
 	<dt>Content-Type</dt>
 	<dd><code>text/plain</code></dd>
 	<dt>Accept</dt>
