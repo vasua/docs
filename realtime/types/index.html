@@ -39,23 +39,29 @@
           <select id="jump-to-nav">
             <option>Jump to ...</option>
             <optgroup label='Data types'>
+<option id="anchor-ably-exception">AblyException</option>
+<option id="anchor-error-info">Error Info</option>
 <option id="anchor-message">Message</option>
 <option id="anchor-presence-message">Presence Message</option>
+<option id="anchor-presence-action">Presence action</option>
 <option id="anchor-paginated-result">Paginated Result</option>
-<option id="anchor-token-request">Token Request</option>
+<option id="anchor-param">Param</option>
 <option id="anchor-token-details">Token Details</option>
-<option id="anchor-error-info">Error Info</option>
-<option id="anchor-ably-exception">AblyException</option>
+<option id="anchor-token-request">Token Request</option>
+<option id="anchor-stats">Stats</option>
 </optgroup>
 <optgroup label='Other Types'>
+<option id="anchor-auth-options">Auth Options</option>
 <option id="anchor-client-options">Client Options</option>
 <option id="anchor-channel-state-listener">Channel State Listener</option>
 <option id="anchor-completion-listener">Completion Listener</option>
-<option id="anchor-connection-state">Connection State Enum</option>
+<option id="anchor-connection-state">Connection State</option>
 <option id="anchor-connection-state-listener">Connection State Listener</option>
 <option id="anchor-connection-state-change">Connection State Change</option>
 <option id="anchor-deferrable">Deferrable</option>
 <option id="anchor-message-listener">Message Listener</option>
+<option id="anchor-presence-listener">Presence Listener</option>
+<option id="anchor-token-params">Token Params</option>
 </optgroup>
           </select>
         </div>
@@ -72,6 +78,54 @@
     <article>
       <p>The Ably client library defines both data types and option types.  Data types are used to represent object such as messages; Option types are used in method arguments.</p>
 <h2>Data types</h2>
+<h3 id="ably-exception"><span lang='java'>io.ably.lib.types.AblyException</span><span lang='ruby'>Ably::Exceptions::BaseAblyException</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p>An <code>AblyException</code> is an exception encapsulating error information containing an Ably-specific error code and generic status code, where applicable.</p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><code>errorInfo</code></dt>
+	<dd><a href="/realtime/types#error-info">@ErrorInfo</a> corresponding to this exception, where applicable<br><i>Type: ErrorInfo</i></dd>
+</dl>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p>An <code>BaseAblyException</code> is an exception encapsulating error information containing an Ably-specific error code and generic status code, where applicable.</p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><code>code</code></dt>
+	<dd>Ably error code (see <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">ably-common/protocol/errors.json</a>)<br><i>Type: Integer</i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>statusCode</code></span><span lang="ruby"><code>status_code</code></span></dt>
+	<dd>HTTP Status Code corresponding to this error, where applicable<br><i>Type: Integer</i></dd>
+</dl>
+<dl>
+	<dt><code>message</code></dt>
+	<dd>Additional message information, where available<br><i>Type: String</i></dd>
+</dl>
+
+</div> <!-- /end ruby language block -->
+
+<h3 id="error-info"><span lang='default'>ErrorInfo</span><span lang='java'>io.ably.lib.types.ErrorInfo</span><span lang='ruby'>Ably::Models::ErrorInfo</span></h3>
+<p>An <code>ErrorInfo</code> is a type encapsulating error information containing an Ably-specific error code and generic status code.</p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><code>code</code></dt>
+	<dd>Ably error code (see <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">ably-common/protocol/errors.json</a>)<br><i>Type: Integer</i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>statusCode</code></span><span lang="ruby"><code>status_code</code></span></dt>
+	<dd>HTTP Status Code corresponding to this error, where applicable<br><i>Type: Integer</i></dd>
+</dl>
+<dl>
+	<dt><code>message</code></dt>
+	<dd>Additional message information, where available<br><i>Type: String</i></dd>
+</dl>
 <h3 id="message"><span lang='default'>Message</span><span lang='java'>io.ably.lib.types.Message</span><span lang='ruby'>Ably::Models::Message</span></h3>
 <p>A <code>Message</code> represents an individual message that is sent to or received from Ably.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
@@ -107,21 +161,78 @@
 	<dt><code>encoding</code></dt>
 	<dd>This will typically be empty as all messages received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: String</i></dd>
 </dl>
+<h3 id="presence-action"><span lang='default'>Presence action</span><span lang='java'>io.ably.lib.types.PresenceMessage.Action</span><span lang='ruby'>Ably::Models::PresenceMessage::ACTION</span></h3>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<p><code>Presence</code> <code>action</code> is a String with a value matching any of the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>.</p>
+<pre lang="javascript"><code lang="javascript">var allPresenceActions = [
+  'absent', // (reserved for internal use)
+  'present',
+  'enter',
+  'leave',
+  'update'
+]</code></pre>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>io.ably.lib.types.PresenceMessage.Action</code> is an enum representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>.</p>
+<pre lang="java"><code lang="java">public enum Action {
+  ABSENT,  // 0 (reserved for internal use)
+  PRESENT, // 1
+  ENTER,   // 2
+  LEAVE,   // 3
+  UPDATE   // 4
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p><code>Ably::Models::PresenceMessage::ACTION</code> is an enum-like value representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>. <code>ACTION</code> can be represented interchangeably as either symbols or constants.</p>
+<h4>Symbol states</h4>
+<pre lang="ruby"><code lang="ruby">:absent  # =&gt; 0 (reserved for internal use)
+:present # =&gt; 1
+:enter   # =&gt; 2
+:leave   # =&gt; 3
+:update  # =&gt; 4</code></pre>
+<h4>Constant states</h4>
+<pre lang="ruby"><code lang="ruby">PresenceMessage::ACTION.Absent  # =&gt; 0 (internal use)
+PresenceMessage::ACTION.Present # =&gt; 1
+PresenceMessage::ACTION.Enter   # =&gt; 2
+PresenceMessage::ACTION.Leave   # =&gt; 3
+PresenceMessage::ACTION.Update  # =&gt; 4</code></pre>
+<h4>Example usage</h4>
+<pre lang="ruby"><code lang="ruby"># Example with symbols
+presence.on(:attached) { ... }
+
+# Example with constants
+presence.on(Ably::Models::PresenceMessage::ACTION.Enter) { ... }
+
+# Interchangeable
+Ably::Models::PresenceMessage::ACTION.Enter == :enter # =&gt; true</code></pre>
+
+</div> <!-- /end ruby language block -->
+
 <h3 id="presence-message"><span lang='default'>PresenceMessage</span><span lang='java'>io.ably.lib.types.PresenceMessage</span><span lang='ruby'>Ably::Models::PresenceMessage</span></h3>
 <p>A <code>PresenceMessage</code> represents an individual presence update that is sent to or received from Ably.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><div lang="java"><code>action</code></div></dt>
-	<dd>the event signified by a PresenceMessage<br><i>Type: enum Action { ABSENT, PRESENT, ENTER, LEAVE, UPDATE }</i></dd>
-	<dt><div lang="javascript"><code>action</code></div></dt>
-	<dd>the event signified by a PresenceMessage<br><i>Type: Integer value for Action { &#8220;ABSENT&#8221; : 0, &#8220;PRESENT&#8221; : 1, &#8220;ENTER&#8221; : 2, &#8220;LEAVE&#8221; : 3, &#8220;UPDATE&#8221; : 4 }</i></dd>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage.action</code></a><br><i>Type: enum Action { ABSENT, PRESENT, ENTER, LEAVE, UPDATE }</i></dd>
+	<dt><div lang="javascript,nodejs"><code>action</code></div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>Presence action</code></a><br><i>Type: Integer value for Action { &#8220;ABSENT&#8221; : 0, &#8220;PRESENT&#8221; : 1, &#8220;ENTER&#8221; : 2, &#8220;LEAVE&#8221; : 3, &#8220;UPDATE&#8221; : 4 }</i></dd>
 	<dt><div lang="ruby"><code>action</code></div></dt>
-	<dd>the event signified by a PresenceMessage<br><i>Type: enum ACTION { :absent, :present, :enter, :leave, :update }</i></dd>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: enum ACTION { :absent, :present, :enter, :leave, :update }</i></dd>
 </dl>
 <dl>
 	<dt><div lang="java"><code>data</code></div></dt>
 	<dd>The presence update payload, if provided<br><i>Type: String, ByteArray, JSONObject, JSONArray</i></dd>
-	<dt><div lang="javascript"><code>data</code></div></dt>
+	<dt><div lang="javascript,nodejs"><code>data</code></div></dt>
 	<dd>The presence update payload, if provided<br><i>Type: String, StringBuffer, JSON Object</i></dd>
 	<dt><div lang="ruby"><code>data</code></div></dt>
 	<dd>The presence update payload, if provided<br><i>Type: String, Binary (ASCII-8BIT String), Hash, Array</i></dd>
@@ -222,25 +333,22 @@ channel.history do |first_page|
     end
   end
 end</code></pre>
-<h3 id="token-request"><span lang='default'>TokenRequest</span><span lang='java'>io.ably.lib.types.TokenRequest</span><span lang='ruby'>Ably::Models::TokenRequest</span></h3>
-<p><code>TokenRequest</code> is a type containing parameters for a token request. Tokens are requested using the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a>.</p>
-<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<h3 id="param"><span lang='java'>io.ably.lib.types.Param</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>Param</code> is a type encapsulating a key/value pair. This type is used frequently in method parameters allowing key/value pairs to be used more flexible, see <a href="/realtime/history#channel-history"><code>Channel#history</code></a> for an example.</p>
+<p>Please note that <code>key</code> and <code>value</code> attributes are always strings. If an <code>Integer</code> or other value type is expected, then you must coerce that type into a <code>String</code>.</p>
+<h4><span lang='java'>Members</span></h4>
 <dl>
-	<dt><span lang="default"><code>keyName</code></span><span lang="ruby"><code>key_name</code></span></dt>
-	<dd>The key name of the key against which this request is made. The key name is public, whereas the key secret is private<br><i>Type: String</i></dd>
-	<dt><code>ttl</code></dt>
-	<dd>Requested time to live for the token in <span lang="default">milliseconds</span><span lang="ruby">seconds</span>. If the token request is successful, the TTL of the returned token will be less than or equal to this value depending on application settings and the attributes of the issuing key.<br><i>Type: Integer</i></dd>
-	<dt><code>timestamp</code></dt>
-	<dd>The timestamp of this request in milliseconds<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
-	<dt><code>capability</code></dt>
-	<dd>Capability of the token. If the token request is successful, the capability of the returned token will be the intersection of this capability with the capability of the issuing key. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/realtime/authentication">Read more about authentication and capabilities</a><br><i>Type: String</i></dd>
-	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span></dt>
-	<dd>The client ID to associate with this token. When provided, the token may only be used to perform operations on behalf of that client ID<br><i>Type: String</i></dd>
-	<dt><code>nonce</code></dt>
-	<dd>An opaque nonce string of at least 16 characters<br><i>Type: String</i></dd>
-	<dt><code>mac</code></dt>
-	<dd>The Message Authentication Code for this request<br><i>Type: String</i></dd>
+	<dt><code>key</code></dt>
+	<dd>The key value<br><i>Type: String</i></dd>
+	<dt><code>value</code></dt>
+	<dd>The value associated with the <code>key</code><br><i>Type: String</i></dd>
 </dl>
+
+</div> <!-- /end java language block -->
+
 <h3 id="token-details"><span lang='default'>TokenDetails</span><span lang='java'>io.ably.lib.types.TokenDetails</span><span lang='ruby'>Ably::Models::TokenDetails</span></h3>
 <p><code>TokenDetails</code> is a type providing details of a token and its associated metadata, provided when the system successfully requests a token from the system.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
@@ -263,55 +371,105 @@ end</code></pre>
 	<dd>True when the token has expired<br><i>Type: Boolean</i><br />
 </div></dd>
 </dl>
-<h3 id="error-info"><span lang='default'>ErrorInfo</span><span lang='java'>io.ably.lib.types.ErrorInfo</span><span lang='ruby'>Ably::Models::ErrorInfo</span></h3>
-<p>An <code>ErrorInfo</code> is a type encapsulating error information containing an Ably-specific error code and generic status code.</p>
+<h3 id="token-request"><span lang='default'>TokenRequest</span><span lang='java'>io.ably.lib.types.TokenRequest</span><span lang='ruby'>Ably::Models::TokenRequest</span></h3>
+<p><code>TokenRequest</code> is a type containing parameters for a token request. Tokens are requested using the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a>.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
-	<dt><code>code</code></dt>
-	<dd>Ably error code (see <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">ably-common/protocol/errors.json</a>)<br><i>Type: Integer</i></dd>
+	<dt><span lang="default"><code>keyName</code></span><span lang="ruby"><code>key_name</code></span></dt>
+	<dd>The key name of the key against which this request is made. The key name is public, whereas the key secret is private<br><i>Type: String</i></dd>
+	<dt><code>ttl</code></dt>
+	<dd>Requested time to live for the token in <span lang="default">milliseconds</span><span lang="ruby">seconds</span>. If the token request is successful, the TTL of the returned token will be less than or equal to this value depending on application settings and the attributes of the issuing key.<br><i>Type: Integer</i></dd>
+	<dt><code>timestamp</code></dt>
+	<dd>The timestamp of this request in milliseconds<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+	<dt><code>capability</code></dt>
+	<dd>Capability of the token. If the token request is successful, the capability of the returned token will be the intersection of this capability with the capability of the issuing key. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/realtime/authentication">Read more about authentication and capabilities</a><br><i>Type: String</i></dd>
+	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span></dt>
+	<dd>The client ID to associate with this token. When provided, the token may only be used to perform operations on behalf of that client ID<br><i>Type: String</i></dd>
+	<dt><code>nonce</code></dt>
+	<dd>An opaque nonce string of at least 16 characters<br><i>Type: String</i></dd>
+	<dt><code>mac</code></dt>
+	<dd>The Message Authentication Code for this request<br><i>Type: String</i></dd>
 </dl>
-<dl>
-	<dt><span lang="default"><code>statusCode</code></span><span lang="ruby"><code>status_code</code></span></dt>
-	<dd>HTTP Status Code corresponding to this error, where applicable<br><i>Type: Integer</i></dd>
-</dl>
-<dl>
-	<dt><code>message</code></dt>
-	<dd>Additional message information, where available<br><i>Type: String</i></dd>
-</dl>
-<h3 id="ably-exception"><span lang='java'>io.ably.lib.types.AblyException</span><span lang='ruby'>Ably::Exceptions::BaseAblyException</span></h3>
-
-
-<div lang="java"> <!-- start java language block -->
-<p>An <code>AblyException</code> is an exception encapsulating error information containing an Ably-specific error code and generic status code, where applicable.</p>
+<h3 id="stats"><span lang='default'>Stats object</span><span lang='java'>io.ably.lib.types.Stats</span><span lang='ruby'>Ably::Models::Stats</span></h3>
+<p>A <code>Stats</code> object represents a application statistic for the specified interval and time period. Ably aggregates statistics globally for all accounts and applications, and makes these available both through our <a href="/realtime/statistics">statistics API</a> as well as your <a href="https://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>.</p>
+<p>Please note that most attributes of the <code>Stats</code> type below contain references to further stats types. This documentation is not exhaustive for all stats stypes, and as such, links to the stats types below will take you to the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats">Ruby library stats documentation</a> which contains exhaustive stats documentation. Ruby however uses <code>under_score</code> case instead of the default <code>camelCase</code> in most languages, so please bear that in mind.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
-	<dt><code>errorInfo</code></dt>
-	<dd><a href="/realtime/types#error-info">@ErrorInfo</a> corresponding to this exception, where applicable<br><i>Type: ErrorInfo</i></dd>
+	<dt><code>all</code></dt>
+	<dd>aggregate count of both <code>inbound</code> and <code>outbound</code> message stats<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">MessageTypes</a></i></dd>
+	<dt><span lang="default"><code>apiRequests</code></span><span lang="ruby"><code>api_requests</code></span></dt>
+	<dd>breakdown of API requests received via the REST API<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
+	<dt><code>channels</code></dt>
+	<dd>breakdown of channel related stats such as min, mean and peak channels<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ResourceCount">ResourceCount</a></i></dd>
+	<dt><code>connections</code></dt>
+	<dd>breakdown of connection related stats such as min, mean and peak channels for TLS and non-TLS connections<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ConnectionTypes">ConnectionTypes</a></i></dd>
+	<dt><code>inbound</code></dt>
+	<dd>statistics such as count and data for all inbound messages received over REST and Realtime connection, broken down by normal channel messages or presence messages<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTraffic">MessageTraffic</a></i></dd>
+	<dt><div lang="ruby"><code>interval_granularity</code></div></dt>
+	<dd>A <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats#GRANULARITY-constant"><code>GRANULARITY</code></a> constant representing the granularity (interval) of this statistic such as <code>:minute</code>, <code>:hour</code>, <code>:day</code>, <code>:month</code>.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats#GRANULARITY-constant"><code>Stats::GRANULARITY</code></a></i></dd>
+	<dt><span lang="default"><code>intervalId</code></span><span lang="ruby"><code>interval_id</code></span></dt>
+	<dd>the interval ID provides both the time from which the interval starts as well as the length of time that this statistic covers i.e. the period of time which the stats are aggregated for. For example, an interval ID value of &#8220;2016-03-01:10:02&#8221; represents a single minute interval for the UTC time presented in the string. However, an interval ID of &#8220;2016-03&#8221; represents a month interval for the entire month of March 2016 based on UTC time.<br><i>Type: String</i></dd>
+	<dt><div lang="ruby"><code>interval_time</code></div></dt>
+	<dd>A <code>Time</code> object representing the start of the interval</dd>
+	<dt><code>outbound</code></dt>
+	<dd>statistics such as count and data for all oubound messages retrieved via REST history requests, received over Realtime connections, or pushed with WebHooks, broken down by normal channel messages or presence messages<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTraffic">MessageTraffic</a></i></dd>
+	<dt><code>persisted</code></dt>
+	<dd>messages persisted and later retrieved via the <a href="/realtime/history">history API</a><br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">MessageTypes</a></i></dd>
+	<dt><span lang="default"><code>tokenRequests</code></span><span lang="ruby"><code>token_requests</code></span></dt>
+	<dd>breakdown of Token requests received via the REST API.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
 </dl>
+<h2>Other types</h2>
+<h3 id="auth-options"><span lang='default'>AuthOptions Object</span><span lang='ruby'>AuthOptions Hash</span><span lang='java'>io.ably.lib.rest.Auth.AuthOptions</span></h3>
 
-</div> <!-- /end java language block -->
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<p><code>AuthOptions</code> is a plain Javascript object and is used in the parameters of <a href="/realtime/authentication">authentication</a> requests.  The following attributes can be defined on the object:</p>
+
+</div> <!-- /end javascript,nodejs language block -->
 
 
 
 <div lang="ruby"> <!-- start ruby language block -->
-<p>An <code>BaseAblyException</code> is an exception encapsulating error information containing an Ably-specific error code and generic status code, where applicable.</p>
-<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
-<dl>
-	<dt><code>code</code></dt>
-	<dd>Ably error code (see <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">ably-common/protocol/errors.json</a>)<br><i>Type: Integer</i></dd>
-</dl>
-<dl>
-	<dt><span lang="default"><code>statusCode</code></span><span lang="ruby"><code>status_code</code></span></dt>
-	<dd>HTTP Status Code corresponding to this error, where applicable<br><i>Type: Integer</i></dd>
-</dl>
-<dl>
-	<dt><code>message</code></dt>
-	<dd>Additional message information, where available<br><i>Type: String</i></dd>
-</dl>
+<p><code>AuthOptions</code> is a Hash object and is used in the parameters of <a href="/realtime/authentication">authentication</a> requests.  The following key symbol values can be added to the Hash:</p>
 
 </div> <!-- /end ruby language block -->
 
-<h2>Other types</h2>
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>AuthOptions</code> is used in the parameters of <a href="/realtime/authentication">authentication</a> requests.</p>
+
+</div> <!-- /end java language block -->
+
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><span lang="default"><code>ttl</code></span><span lang="ruby"><code>:ttl</code></span></dt>
+	<dd><em>1 hour</em> Requested time to live for the token being created in <span lang="ruby">milliseconds</span><span lang="default">. When omitted, the REST API default of 60 minutes is applied by Ably<br><i>Type: <span class="default">long (milliseconds)</span><span class="ruby">Integer (seconds)</span></i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>capability</code></span><span lang="ruby"><code>:capability</code></span></dt>
+	<dd>JSON stringified capability of the token. If the token request is successful, the capability of the returned token will be the intersection of this capability with the capability of the issuing key.<i>Type: <span lang="default">Function</span><span lang="java"><code>TokenCallback</code></span><span lang="ruby">Proc / Lamda</span></i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>authUrl</code></span><span lang="ruby"><code>:auth_url</code></span></dt>
+	<dd>A URL that the library may use to obtain a token string (in plain text format), or a signed <a href="/realtime/types#token-request"><code>TokenRequest</code></a> or <a href="/realtime/types#token-details"><code>TokenDetails</code></a> (in JSON format). For example, this can be used by a client to obtain signed token requests from an application server.<br><i>Type: String</i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>authMethod</code></span><span lang="ruby"><code>:auth_method</code></span></dt>
+	<dd><em>GET</em> <em><span lang="default"><code>GET</code></span><span lang="ruby"><code>:get</code></span></em> The HTTP verb to use for the request, either <span lang="default"><code>GET</code></span><span lang="ruby"><code>:get</code></span> or <span lang="default"><code>POST</code></span><span lang="ruby"><code>:post</code></span><br><i>Type: <span lang="default">String</span><span lang="ruby">Symbol</span></i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>authHeaders</code></span><span lang="ruby"><code>:auth_headers</code></span></dt>
+	<dd>A set of key value pair headers to be added to any request made to the <code>authUrl</code>. Useful when an application requires these to be added to validate the request or implement the response.<br><i>Type: <span lang="default">Object</span><span lang="ruby">Hash</span><span lang="java">Param[]</span></i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>authParams</code></span><span lang="ruby"><code>:auth_params</code></span></dt>
+	<dd>A set of key value pair params to be added to any request made to the <code>authUrl</code>. When the <code>authMethod</code> is <code>GET</code>, query params are added to the URL, whereas when <code>authMethod</code> is <code>POST</code>, the params are sent as URL encoded form data. Useful when an application require these to be added to validate the request or implement the response.<br><i>Type: <span lang="default">Object</span><span lang="ruby">Hash</span><span lang="java">Param[]</span></i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>queryTime</code></span><span lang="ruby"><code>:query_time</code></span></dt>
+	<dd><em>false</em> If true, the library will query the Ably servers for the current time instead of relying on a locally-available time of day<br><i>Type: Boolean</i></dd>
+</dl>
 <h3 id="client-options"><span lang='default'>ClientOptions Object</span><span lang='ruby'>ClientOptions Hash</span><span lang='java'>io.ably.lib.types.ClientOptions</span></h3>
 
 
@@ -489,7 +647,7 @@ Note that the log level and log handler have global scope in the library and wil
 
 </div> <!-- /end java language block -->
 
-<h3 id="connection-state"><span lang='default'>ConnectionState</span><span lang='ruby'>Connection::STATE Enum</span><span lang='java'>io.ably.lib.realtime.ConnectionState Enum</span></h3>
+<h3 id="connection-state"><span lang='default'>ConnectionState</span><span lang='ruby'>Connection::STATE</span><span lang='java'>io.ably.lib.realtime.ConnectionState</span></h3>
 
 
 <div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
@@ -583,7 +741,19 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 	<dt><span lang="default"><code>retryIn</code></span><span lang="ruby"><code>retry_in</code></span></dt>
 	<dd>Duration upon which the library will retry a connection where applicable, as <span lang="default">milliseconds</span><span lang="ruby">seconds</span><br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Integer</span></i></dd>
 </dl>
-<h3 id="message-listener"><span lang='java'>io.ably.lib.realtime.MessageListener</span></h3>
+<h3 id="message-listener"><span lang='java'>io.ably.lib.realtime.Channel.MessageListener</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p>A <span lang="java"><code>io.ably.lib.realtime.Channel.MessageListener</code></span> is an interface allowing a client to be notified when messages are received on a channel using a <a href="/realtime/channels-messages#message-subscription">channel subscription</a>.</p>
+<pre lang="java"><code lang="java">public interface MessageListener {
+  // Called when one or more messages are received
+  public void onMessage(Message[] messages);
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+<h3 id="presence-listener"><span lang='java'>io.ably.lib.realtime.Presence.PresenceListener</span></h3>
 
 
 <div lang="java"> <!-- start java language block -->
@@ -625,7 +795,30 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 
 </div> <!-- /end ruby language block -->
 
-<p>&nbsp;</p>
+<h3 id="token-params"><span lang='default'>TokenParams Object</span><span lang='ruby'>TokenParams Hash</span><span lang='java'>io.ably.lib.rest.Auth.TokenParams</span></h3>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<p><code>TokenParams</code> is a plain Javascript object and is used in the parameters of <a href="/realtime/authentication">token authentication</a> requests. The following attributes can be defined on the object:</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p><code>TokenParams</code> is a Hash object and is used in the parameters of <a href="/realtime/authentication">token authentication</a> requests. The following key symbol values can be added to the Hash:</p>
+
+</div> <!-- /end ruby language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>TokenParams</code> is used in the parameters of <a href="/realtime/authentication">token authentication</a> requests.</p>
+
+</div> <!-- /end java language block -->
+
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<p>Coming soon&#8230;</p>
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>

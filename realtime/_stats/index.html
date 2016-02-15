@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Ably API Documentation - Quickstart Guide</title>
+    <title>Ably API Documentation - </title>
     <link rel="shortcut icon" href="/favicon.ico">
 
     <link rel="stylesheet" type="text/css" href="/vendor/prettify/prettify.css" media="screen">
@@ -37,67 +37,64 @@
     <header>
       
       
-        <h1 id="title">Quickstart Guide</h1>
+        <h1 id="title">Untitled</h1>
       
     </header>
     <article>
-      <p>Integrating Ably is simple.  In this guide we&#8217;ll run you through the basics.</p>
-<p>Whilst our client libraries do support <a href="https://www.ably.io/download">every popular language and platform</a>, for simplicity we have used Javascript as the primary language for this guide.</p>
-<h3>Adding the Ably realtime library</h3>
-<p>Simply include the Ably Javascript library within the <code>&lt;head&gt;</code> of your HTML page as follows:</p>
-<pre lang="html"><code lang="html">&lt;script src="http://cdn.ably.io/lib/ably.min.js"&gt;&lt;/script&gt;</code></pre>
-<h3>The basics: Receiving a message</h3>
-<p>To connect to Ably, you need an API key.  In this example we have provided a temporary API key, however if you are signed up and visit your <a href="https://www.ably.io/dashboard">application dashboard</a>, you will be able to use your own API key.  If you do not have an API key yet, why not <a href="https://www.ably.io/#signup">sign up now for a free app and API key</a>.</p>
-<pre class="code-editor open-jsbin open-jsbin-ezuzot" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ezuzot" lang="javascript">var ably = new Ably.Realtime('{{API_KEY}}');
-ably.connection.on('connected', function() {
-  alert("That was simple, you're now connected to Ably in realtime");
-});</code></pre>
-<p>Messages are broadcasted on channels.  Next we will subscribe to a channel and listen for messages that are sent to us from other connected clients or servers.</p>
-<pre class="code-editor open-jsbin open-jsbin-onocan" lang="javascript"><code class="code-editor open-jsbin open-jsbin-onocan" lang="javascript">var channel = ably.channels.get('quickstart');
-channel.subscribe('greeting', function(message) {
-  alert("Received a greeting message in realtime: " + message.data);
-});</code></pre>
-<h3>The basics: Sending a message</h3>
-<p>Publishing a message to a channel is extremely straightforward.  As this is commonly performed by both connected devices and servers, here are examples in multiple languages</p>
-<pre class="code-editor open-jsbin open-jsbin-onocan" lang="javascript"><code class="code-editor open-jsbin open-jsbin-onocan" lang="javascript">var channel = ably.channels.get('quickstart');
-channel.publish('greeting', 'hello!');</code></pre>
-<pre lang="csharp"><code lang="csharp">Channel channel = ably.channels.get('quickstart');
-channel.publish('greeting', 'hello!');</code></pre>
-<pre lang="java"><code lang="java">Channel channel = ably.channels.get('quickstart');
-channel.publish('greeting', 'hello!');</code></pre>
-<pre lang="python"><code lang="python">channel = ably.channels.get('quickstart')
-channel.publish('greeting', 'hello!')</code></pre>
-<pre lang="ruby"><code lang="ruby">channel = ably.channels.get('quickstart')
-channel.publish 'greeting', 'hello!'</code></pre>
-<pre lang="php"><code lang="php">$channel = $ably.channels.get('quickstart');
-$channels.get('quickstart').publish('greeting', 'hello!');</code></pre>
-<pre lang="ios"><code lang="ios">-(Channel) channel = ably.channels.get('quickstart');
-channels.get('quickstart').publish('greeting', 'hello!');</code></pre>
-<h3>Sending a message via the REST API</h3>
-<p>We recommend using our REST client libraries over direct REST API access.  However, if you want to comunnicate directly over HTTP with Ably it&#8217;s as simple as:</p>
-<pre lang="sh"><code lang="sh">curl https://rest.ably.io/channels/{{RANDOM_CHANNEL_NAME}}/publish \
-  --user "{{API_KEY}}" \
-  --data "name=greeting&amp;data=Hello"</code></pre>
-<p>Copy and paste the <code>curl</code> command above into your console and try it now.</p>
-<script type="text/javascript">
-function subscribeToCurlRequest(key) {
-  var ably = new Ably.Realtime(key),
-      channelName = '{{RANDOM_CHANNEL_NAME}}';
-  if (channelName === '{{RANDOM_CHANNEL' + '_NAME}}') { channelName = window.randomChannelName; }
-  ably.channels.get(channelName).subscribe('greeting', function(message) {
-    alert('That was easy, a message was just received from the REST API on channel "' + channelName + '".\n\nGreeting => ' + message.data);
-  });
-}
+      <h4>Parameters</h4>
+<dl>
+	<dt>options</dt>
+	<dd>an optional <span lang="default">object</span><span lang="ruby">Hash</span><span lang="java"><a href="#param"><code>Param</code></a>[] array</span> containing the query parameters</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>is a function of the form: <code>function(err, result)</code></dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields a <code>PaginatedResult&lt;Stats&gt;</code> array</dd>
+</dl>
+<h4><code>options</code> parameters</h4>
+<p>The following options, as defined in the <a href="/rest-api#stats">REST <code>/stats</code> API</a> endpoint, are permitted:</p>
+<dl>
+	<dt><span lang="ruby">:</span>start</dt>
+	<dd><em>beginning of time</em> earliest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: Long<span lang="ruby">, Time</span></i></dd>
+	<dt><span lang="ruby">:</span>end</dt>
+	<dd><em>current time</em> latest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: Long<span lang="ruby">, Time</span></i></dd>
+	<dt><span lang="ruby">:</span>direction</dt>
+	<dd><em>backwards</em> <span lang="ruby"><code>:</code></span><code>forwards</code> or <span lang="ruby"><code>:</code></span><code>backwards</code><br><i>Type: <span lang="default">String</span><span lang="ruby">Symbol</span></i></dd>
+	<dt><span lang="ruby">:</span>limit</dt>
+	<dd><em>100</em> maximum number of messages to retrieve up to 1,000<br><i>Type: Integer</i></dd>
+	<dt><span lang="ruby">:</span>unit</dt>
+	<dd><em>minute</em> <span lang="ruby"><code>:</code></span><code>minute</code>, <span lang="ruby"><code>:</code></span><code>hour</code>, <span lang="ruby"><code>:</code></span><code>day</code> or <span lang="ruby"><code>:</code></span><code>month</code>. Based on the unit selected, the given start or end times are rounded down to the start of the relevant interval depending on the unit granularity of the query<br><i>Type: <span lang="default">String</span><span lang="ruby">Symbol</span></i></dd>
+</dl>
 
-/* API_KEY variable is replaced inline on https://www.ably.io so
-  {{API_KEY}} will not equal '{{API_' + 'KEY}}'
-  On docs.ably.io, we rely on application.js to call the onApiKeyRetrieved method */
-if ('{{API_KEY}}' !== '{{API_' + 'KEY}}') {
-  subscribeToCurlRequest('{{API_KEY}}');
-} else {
-  window.onApiKeyRetrieved = subscribeToCurlRequest;
-}
-</script>
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On success, <code>result</code> contains a <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulating an array of <a href="/realtime/types#stats"><code>Stats</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
+<p>On failure to retrieve stats, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<h4>Returns</h4>
+<p>On success, the returned <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulates an array of <a href="/realtime/types#stats"><code>Stats</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
+<p>Failure to retrieve the stats will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a></p>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from the stats method.</p>
+<p>On success, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to the method yields a <a href="#paginated-result">PaginatedResult</a> that encapsulates an array of <a href="/realtime/types#stats"><code>Stats</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
+<p>Failure to retrieve the stats will trigger the errback callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object containing an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
+
+</div> <!-- /end ruby language block -->
+
+
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>
@@ -105,7 +102,7 @@ if ('{{API_KEY}}' !== '{{API_' + 'KEY}}') {
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/images/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
   <ul>
-<li class='selected'><a href='/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/quick-start-guide/'>Quickstart Guide</a></li>
 <li class=''><a href='/how-ably-works/'>How Ably works</a></li>
 </ul>
   <h2><a href="/realtime/">Realtime client lib</a></h2>

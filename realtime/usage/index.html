@@ -57,9 +57,6 @@
 <option id="anchor-stats">stats</option>
 <option id="anchor-time">time</option>
 </optgroup>
-<optgroup label='Related types'>
-<option id="anchor-client-options">ClientOptions</option>
-</optgroup>
           </select>
         </div>
       </nav>
@@ -115,8 +112,8 @@ var realtime = new Ably.Realtime({ key: apiKey });</code></pre>
 <div lang="java"> <!-- start java language block -->
 <p>The Realtime library for Java and Android is downloadable as a JAR from <a href="https://github.com/ably/ably-java/releases">https://github.com/ably/ably-java/releases</a> or via <a href="https://bintray.com/ably-io/ably">JCentre</a>.</p>
 <p>Ensure the JAR is included in your classpath as follows:</p>
-<pre lang="java"><code lang="java">import io.ably.lib.types;
-import io.ably.lib.realtime;
+<pre lang="java"><code lang="java">import io.ably.lib.types.*;
+import io.ably.lib.realtime.*;
 ClientOptions options = new ClientOptions(apiKey);
 AblyRealtime realtime = new AblyRealtime(options);</code></pre>
 
@@ -132,12 +129,12 @@ Methods
 <ul>
 <li><a href='#connect'>connect()</a></li>
 <li><a href='#close'>close()</a></li>
-<li><a href='#stats'>stats(params)</a></li>
+<li><a href='#stats'>stats(options)</a></li>
 <li><a href='#time'>time()</a></li>
 </ul>
 </li>
 <li>
-Members
+Properties
 <ul>
 <li><a href='#auth'>auth</a></li>
 <li><a href='#channels'>channels</a></li>
@@ -149,6 +146,8 @@ Members
 Related types
 <ul>
 <li><a href='#client-options'>ClientOptions</a></li>
+<li><a href='#params'>Params</a></li>
+<li><a href='#stats'>Stats</a></li>
 </ul>
 </li>
 </ul>
@@ -185,7 +184,7 @@ Related types
 <p>The <a href="#client-options"><code>ClientOptions#token</code></a> option takes a token string, and assumes the token has been obtained from some other instance that requested the token. Use the token option if you are provided with a token to use and you do not have a key (or do not have a key with the capabilities that you require).</p>
 <p>Since tokens are short-lived, it is rarely sufficient to start with a token without the means for refreshing it. The <span lang="default"><a href="#client-options"><code>authUrl</code> and <code>authCallback</code> options</a></span><span lang="ruby"><a href="#client-options"><code>:auth_url</code> and <code>:auth_callback</code> options</a></span> are provided to allow a user of the library to provide new tokens or token requests to the library as required; using these options allows the library to be instanced without a <code>key</code> or <code>token</code>, and an initial token will be obtained automatically when required.</p>
 <p>Read more on <a href="/realtime/authentication">authentication</a>.</p>
-<h2 id="members"><span lang='default'>AblyRealtime Properties</span><span lang='java'>io.ably.lib.AblyRealtime Members</span><span lang='ruby'>Ably::Realtime::Client Attributes</span></h2>
+<h2 id="properties"><span lang='default'>AblyRealtime Properties</span><span lang='java'>io.ably.lib.AblyRealtime Members</span><span lang='ruby'>Ably::Realtime::Client Attributes</span></h2>
 <p>The realtime client exposes the following public <span lang="default">attributes</span><span lang="java">members</span><span lang="javascript,nodejs">properties</span>:</p>
 <h6 id="auth">auth</h6>
 <p>A reference to the <a href="/realtime/authentication"><code>Auth</code></a> authentication object configured for this client library.</p>
@@ -203,7 +202,7 @@ Related types
 
 </div> <!-- /end ruby language block -->
 
-<h2 id="methods"><span lang='default'>AblyRealtime Methods</span><span lang='ruby'>Realtime::Client Methods</span><span lang='java'>io.ably.lib.AblyRealtime Methods</span><span lang='ruby'>Ably::Realtime::Client Methods</span></h2>
+<h2 id="methods"><span lang='default'>AblyRealtime Methods</span><span lang='java'>io.ably.lib.AblyRealtime Methods</span><span lang='ruby'>Ably::Realtime::Client Methods</span></h2>
 <h6 id="connect">connect</h6>
 <blockquote class="definition">
 <p class="definition"><span lang='default'>connect()</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> connect &#8594; yields <a href="/realtime/connection"><code>Connection</code></a></span><span lang='java'>public void connect()</span></p>
@@ -236,37 +235,34 @@ Related types
 
 <h6 id="stats">stats</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>stats(params, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt; results))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> stats(Hash options) &#8594; yields <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt;</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt; stats(Param[] params)</span></p>
+<p class="definition"><span lang='default'>stats(Object options, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="#stats">Stats</a>&gt; results))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> stats(Hash options) &#8594; yields <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="#stats">Stats</a>&gt;</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="#stats">Stats</a>&gt; stats(<a href="#param">Param</a>[] options)</span></p>
 </blockquote>
-<p>This call queries the <a href="/rest-api#stats">REST <code>/stats</code> API</a> and retrieves your application&#8217;s usage statistics. A <a href="/realtime/types#paginated-result">PaginatedResult</a> is returned, containing an array of <a href="/realtime/types#stats">Stats</a> for the first page of results. <a href="/realtime/types#paginated-result">PaginatedResult</a> objects are iterable providing a means to page through historical statistics.</p>
+<p>This call queries the <a href="/rest-api#stats">REST <code>/stats</code> API</a> and retrieves your application&#8217;s usage statistics. A <a href="/realtime/types#paginated-result">PaginatedResult</a> is returned, containing an array of <a href="#stats">Stats</a> for the first page of results. <a href="/realtime/types#paginated-result">PaginatedResult</a> objects are iterable providing a means to page through historical statistics. <a href="/general/statistics">See an example set of raw stats returned via the REST API</a>.</p>
+<p>See <a href="/realtime/statistics">statistics</a> for more information.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><div lang="default">params</div></dt>
-	<dd>an optional object containing the query parameters</dd>
-	<dt><div lang="ruby">options</div></dt>
-	<dd>an optional options Hash containing the query parameters</dd>
-	<dt><div lang="java">params</div></dt>
-	<dd>an optional array <code>Param</code> key value pairs containing the query parameters</dd>
+	<dt>options</dt>
+	<dd>an optional <span lang="default">object</span><span lang="ruby">Hash</span><span lang="java"><a href="#param"><code>Param</code></a>[] array</span> containing the query parameters</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>is a function of the form: <code>callback(err, result)</code></dd>
+	<dd>is a function of the form: <code>function(err, result)</code></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>yields a <code>PaginatedResult&lt;Stats&gt;</code> array</dd>
 </dl>
-<h4><span lang='default'>Params Keys</span><span lang='ruby'>Options Keys</span></h4>
-<p>The following <span lang="default">params</span><span lang="ruby">options</span>, as defined in the <a href="/rest-api#stats">REST <code>/stats</code> API</a> endpoint, are permitted:</p>
+<h4><code>options</code> parameters</h4>
+<p>The following options, as defined in the <a href="/rest-api#stats">REST <code>/stats</code> API</a> endpoint, are permitted:</p>
 <dl>
 	<dt><span lang="ruby">:</span>start</dt>
-	<dd>earliest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: Long<span lang="ruby">, Time</span></i></dd>
+	<dd><em>beginning of time</em> earliest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: Long<span lang="ruby">, Time</span></i></dd>
 	<dt><span lang="ruby">:</span>end</dt>
-	<dd>latest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: Long<span lang="ruby">, Time</span></i></dd>
+	<dd><em>current time</em> latest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: Long<span lang="ruby">, Time</span></i></dd>
 	<dt><span lang="ruby">:</span>direction</dt>
-	<dd><span lang="ruby"><code>:</code></span><code>forwards</code> or <span lang="ruby"><code>:</code></span><code>backwards</code>, defaults to <span lang="ruby"><code>:</code></span><code>backwards</code><br><i>Type: <span lang="default">String</span><span lang="ruby">Symbol</span></i></dd>
+	<dd><em>backwards</em> <span lang="ruby"><code>:</code></span><code>forwards</code> or <span lang="ruby"><code>:</code></span><code>backwards</code><br><i>Type: <span lang="default">String</span><span lang="ruby">Symbol</span></i></dd>
 	<dt><span lang="ruby">:</span>limit</dt>
-	<dd>maximum number of messages to retrieve up to 1,000, defaults to 100<br><i>Type: Integer</i></dd>
+	<dd><em>100</em> maximum number of messages to retrieve up to 1,000<br><i>Type: Integer</i></dd>
 	<dt><span lang="ruby">:</span>unit</dt>
-	<dd><span lang="ruby"><code>:</code></span><code>minute</code>, <span lang="ruby"><code>:</code></span><code>hour</code>, <span lang="ruby"><code>:</code></span><code>day</code> or <span lang="ruby"><code>:</code></span><code>month</code>. Defaults to <span lang="ruby"><code>:</code></span><code>minute</code><br><i>Type: <span lang="default">String</span><span lang="ruby">Symbol</span></i></dd>
+	<dd><em>minute</em> <span lang="ruby"><code>:</code></span><code>minute</code>, <span lang="ruby"><code>:</code></span><code>hour</code>, <span lang="ruby"><code>:</code></span><code>day</code> or <span lang="ruby"><code>:</code></span><code>month</code>. Based on the unit selected, the given start or end times are rounded down to the start of the relevant interval depending on the unit granularity of the query<br><i>Type: <span lang="default">String</span><span lang="ruby">Symbol</span></i></dd>
 </dl>
 
 
@@ -329,7 +325,8 @@ Related types
 
 </div> <!-- /end ruby language block -->
 
-<h2 id="client-options"><span lang='default'>ClientOptions</span><span lang='java'>io.ably.lib.types.ClientOptions</span></h2>
+<h2 id="related-types">Related types</h2>
+<h3 id="client-options"><span lang='default'>ClientOptions</span><span lang='java'>io.ably.lib.types.ClientOptions</span></h3>
 
 
 <div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
@@ -479,6 +476,51 @@ Note that the log level and log handler have global scope in the library and wil
 	<dt><span lang="default"><code>suspendedRetryTimeout</code></span><span lang="ruby"><code>:suspended_retry_timeout</code></span></dt>
 	<dd><em><span lang="default">30,000ms</span><span lang="ruby">30s</span></em> When the connection enters the <code>SUSPENDED</code> state, after this delay in <span lang="default">milliseconds</span><span lang="ruby">seconds</span>, if the state is still <code>SUSPENDED</code>, the client library will attempt to reconnect automatically<br><i>Type: Integer</i></dd>
 </dl>
+<h3 id="stats-type"><span lang='default'>Stats object</span><span lang='java'>io.ably.lib.types.Stats</span><span lang='ruby'>Ably::Models::Stats</span></h3>
+<p>A <code>Stats</code> object represents a application statistic for the specified interval and time period. Ably aggregates statistics globally for all accounts and applications, and makes these available both through our <a href="/realtime/statistics">statistics API</a> as well as your <a href="https://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>.</p>
+<p>Please note that most attributes of the <code>Stats</code> type below contain references to further stats types. This documentation is not exhaustive for all stats stypes, and as such, links to the stats types below will take you to the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats">Ruby library stats documentation</a> which contains exhaustive stats documentation. Ruby however uses <code>under_score</code> case instead of the default <code>camelCase</code> in most languages, so please bear that in mind.</p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><code>all</code></dt>
+	<dd>aggregate count of both <code>inbound</code> and <code>outbound</code> message stats<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">MessageTypes</a></i></dd>
+	<dt><span lang="default"><code>apiRequests</code></span><span lang="ruby"><code>api_requests</code></span></dt>
+	<dd>breakdown of API requests received via the REST API<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
+	<dt><code>channels</code></dt>
+	<dd>breakdown of channel related stats such as min, mean and peak channels<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ResourceCount">ResourceCount</a></i></dd>
+	<dt><code>connections</code></dt>
+	<dd>breakdown of connection related stats such as min, mean and peak channels for TLS and non-TLS connections<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ConnectionTypes">ConnectionTypes</a></i></dd>
+	<dt><code>inbound</code></dt>
+	<dd>statistics such as count and data for all inbound messages received over REST and Realtime connection, broken down by normal channel messages or presence messages<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTraffic">MessageTraffic</a></i></dd>
+	<dt><div lang="ruby"><code>interval_granularity</code></div></dt>
+	<dd>A <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats#GRANULARITY-constant"><code>GRANULARITY</code></a> constant representing the granularity (interval) of this statistic such as <code>:minute</code>, <code>:hour</code>, <code>:day</code>, <code>:month</code>.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats#GRANULARITY-constant"><code>Stats::GRANULARITY</code></a></i></dd>
+	<dt><span lang="default"><code>intervalId</code></span><span lang="ruby"><code>interval_id</code></span></dt>
+	<dd>the interval ID provides both the time from which the interval starts as well as the length of time that this statistic covers i.e. the period of time which the stats are aggregated for. For example, an interval ID value of &#8220;2016-03-01:10:02&#8221; represents a single minute interval for the UTC time presented in the string. However, an interval ID of &#8220;2016-03&#8221; represents a month interval for the entire month of March 2016 based on UTC time.<br><i>Type: String</i></dd>
+	<dt><div lang="ruby"><code>interval_time</code></div></dt>
+	<dd>A <code>Time</code> object representing the start of the interval</dd>
+	<dt><code>outbound</code></dt>
+	<dd>statistics such as count and data for all oubound messages retrieved via REST history requests, received over Realtime connections, or pushed with WebHooks, broken down by normal channel messages or presence messages<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTraffic">MessageTraffic</a></i></dd>
+	<dt><code>persisted</code></dt>
+	<dd>messages persisted and later retrieved via the <a href="/realtime/history">history API</a><br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">MessageTypes</a></i></dd>
+	<dt><span lang="default"><code>tokenRequests</code></span><span lang="ruby"><code>token_requests</code></span></dt>
+	<dd>breakdown of Token requests received via the REST API.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
+</dl>
+<h3 id="param"><span lang='java'>io.ably.lib.types.Param</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>Param</code> is a type encapsulating a key/value pair. This type is used frequently in method parameters allowing key/value pairs to be used more flexible, see <a href="/realtime/history#channel-history"><code>Channel#history</code></a> for an example.</p>
+<p>Please note that <code>key</code> and <code>value</code> attributes are always strings. If an <code>Integer</code> or other value type is expected, then you must coerce that type into a <code>String</code>.</p>
+<h4><span lang='java'>Members</span></h4>
+<dl>
+	<dt><code>key</code></dt>
+	<dd>The key value<br><i>Type: String</i></dd>
+	<dt><code>value</code></dt>
+	<dd>The value associated with the <code>key</code><br><i>Type: String</i></dd>
+</dl>
+
+</div> <!-- /end java language block -->
+
+
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>

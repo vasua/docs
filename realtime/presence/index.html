@@ -39,22 +39,27 @@
           <select id="jump-to-nav">
             <option>Jump to ...</option>
             <optgroup label='Help with'>
-<option id="anchor-title">Presence</option>
+<option id="anchor-getting-started">Getting started</option>
+<option id="anchor-presence">Presence &amp; events</option>
+<option id="anchor-member-data">Member data</option>
+<option id="anchor-member-list">Presence member list</option>
+<option id="anchor-presence-history">Presence history</option>
+<option id="anchor-presence-multiple-client-id">Multiple client IDs</option>
 </optgroup>
-<optgroup label='Presence API reference'>
+<optgroup label='Presence API properties'>
+<option id="anchor-sync-complete">syncComplete</option>
+</optgroup>
+<optgroup label='Presence API methods'>
 <option id="anchor-enter">enter</option>
-<option id="anchor-enter-client">enterClient</option>
-<option id="anchor-update">update</option>
-<option id="anchor-update-client">updateClient</option>
 <option id="anchor-leave">leave</option>
-<option id="anchor-leave-client">leaveClient</option>
+<option id="anchor-update">update</option>
+<option id="anchor-get">get</option>
+<option id="anchor-history">history</option>
 <option id="anchor-subscribe">subscribe</option>
 <option id="anchor-unsubscribe">unsubscribe</option>
-<option id="anchor-get">get</option>
-</optgroup>
-<optgroup label='Related types'>
-<option id="anchor-presence-message">PresenceMessage</option>
-<option id="anchor-presence-listener">PresenceListener</option>
+<option id="anchor-enter-client">enterClient</option>
+<option id="anchor-update-client">updateClient</option>
+<option id="anchor-leave-client">leaveClient</option>
 </optgroup>
           </select>
         </div>
@@ -69,185 +74,263 @@
       
     </header>
     <article>
-      <p>Presence provides awareness of other clients that are connected and present on a channel. Each member present on a channel has a unique client identifier and an optional payload that can be used to describe the member&#8217;s status or attributes. Presence allows you to quickly build apps such as chat rooms or multiplayer games as Ably will automatically keep track of who is present in real time across any device.</p>
-<h3>Broadcast your presence &amp; subcribe to presence events</h3>
-<p>Ably Channels support the concept of presence. Each channel may have a presence set associated with it, which is a set of clientIds for those clients that have announced their presence by entering the channel.</p>
-<pre lang="ruby"><code lang="ruby">EventMachine.run do
-  client = Ably::Realtime::Client.new(api_key: '', client_id: 'bob')
+      <p>Presence enables clients to be aware of other clients that are currently &#8220;present&#8221; on a channel. Each member present on a channel has a unique self-assigned client identifier and system-assigned connection identifier, along with an optional payload that can be used to describe the member&#8217;s status or attributes. Presence allows you to quickly build apps such as chat rooms and multiplayer games by automatically keeping track of who is present in real time across any device.</p>
+<h2 id="getting-started">Getting started</h2>
+<p>The <code>Presence</code> object provides a straightforward API to subscribe to presence events such as members entering or leaving, retrieve a list of members present, or register the connected client as &#8220;present&#8221; on a channel. Here is a simple presence example using the <a href="/realtime/channels-messages#presence"><code>presence</code></a> <span lang="default">property</span><span lang="java">field</span><span lang="ruby">attribute</span> of the <a href="/realtime/channels-messages"><code>Channel</code></a> object to enter a channel and subscribe to presence events.</p>
+<pre class="code-editor open-jsbin open-jsbin-ajaxip" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ajaxip" lang="javascript">var realtime = new Ably.Realtime({
+  key: '{{API_KEY}}',
+  clientId: 'bob' }
+);
+var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}');
+channel.presence.subscribe('enter', function(member) {
+  alert('Member ' + member.clientId + ' entered');
+});
+channel.presence.enter();</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-ajaxip" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ajaxip" lang="nodejs">var Ably = require('ably-js');
+var realtime = new Ably.Realtime({
+  key: '{{API_KEY}}',
+  clientId: 'bob' }
+);
+var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}');
+channel.presence.subscribe('enter', function(member) {
+  alert('Member ' + member.clientId + ' entered');
+});
+channel.presence.enter();</code></pre>
+<pre lang="ruby"><code lang="ruby">realtime = Ably::Realtime.new(key: '{{API_KEY}}', client_id: 'bob')
+channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}')
+channel.presence.subscribe(:enter) do |member|
+  puts "Member #{member.client_id} entered"
+end
+channel.presence.enter</code></pre>
+<pre lang="java"><code lang="java">ClientOptions options = new ClientOptions("{{API_KEY}}");
+options.clientId = "bob";
+AblyRealtime realtime = new AblyRealtime(options);
+Channel channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}");
+channel.presence.subscribe(new PresenceListener() {
+  @Override
+  public void onPresenceMessage(PresenceMessage[] messages) {
+    PresenceMessage member = messages[0]; // use only first for this example
+    System.out.println("Member " + member.clientId + " : " + member.action.toString());
+  }
+});
+channel.presence.enter(null, new CompletionListener());</code></pre>
+<h2 id="presence">Presence</h2>
+<p>In order to be present on a channel, a client must <a href="https://support.ably.io/solution/articles/3000038608-authenticated-and-identified-clients">be identified by having a client ID</a>, <a href="https://support.ably.io/solution/articles/3000048535-using-capabilities-to-manage-client-access-privileges-on-channels">have permission to be present</a>, and be attached to the channel. For simplicity, the library will implicitly attach to a channel when entering or subscribing to presence events. Clients are assigned a <span lang="default"><a href="/realtime/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/realtime/usage#client-id"><code>client_id</code></a></span> when using token authentication, <a href="/general/authentication#token-authentication">find out more about token authentication</a>.</p>
+<p>A single <span lang="default"><a href="/realtime/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/realtime/usage#client-id"><code>client_id</code></a></span> may be present multiple times on the same channel via different client connections. As far as Ably is concerned, these are different members of the presence set for the channel, however they will be differentiated by their unique <span lang="default"><a href="/realtime/connection#id"><code>connectionId</code></a></span><span lang="ruby"><a href="/realtime/connection/#id"><code>connection_id</code></a></span>. For example, if a client with ID &#8220;Sarah&#8221; is connected to a chat channel on both a desktop and a mobile device simultaneously, &#8220;Sarah&#8221; will be present twice in the presence member set with the same client ID, yet will have two unique connection IDs. A member of the presence set is therefore unique by the combination of the <span lang="default"><a href="/realtime/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/realtime/usage#client-id"><code>client_id</code></a></span> and <span lang="default"><a href="/realtime/connection#id"><code>connectionId</code></a></span><span lang="ruby"><a href="/realtime/connection/#id"><code>connection_id</code></a></span> strings.</p>
+<h3 id="presence-states">Presence states and events</h3>
+<p>Whenever a member enters or leaves a channel, or updates <a href="#member-data">their member data</a>, a presence event is emitted to all presence subscribers on that channel. Subscribing to presence events makes it incredibly easy to build an app that shows, in real time, any changes to clients connected to Ably and present on a channel.</p>
+<p>The following presence events are emitted:</p>
+<dl>
+	<dt><span lang="ruby"><code>:enter</code></span><span lang="java"><code>Action.ENTER</code></span><span lang="default"><code>enter</code></span></dt>
+	<dd>A new member has entered the channel</dd>
+</dl>
+<dl>
+	<dt><span lang="ruby"><code>:leave</code></span><span lang="java"><code>Action.LEAVE</code></span><span lang="default"><code>leave</code></span></dt>
+	<dd>A member who was present has now left the channel. This may be a result of an explicit request to leave or implicitly when detaching from the channel. Alternatively, if a member&#8217;s connection is abruptly disconnected and they do not resume their connection within a minute, Ably treats this as a leave event as the client is no longer present</dd>
+</dl>
+<dl>
+	<dt><span lang="ruby"><code>:update</code></span><span lang="java"><code>Action.UPDATE</code></span><span lang="default"><code>update</code></span></dt>
+	<dd>An already present member has updated their <a href="#member-data">member data</a>. Being notified of member data updates can be very useful, for example, it can be used to update the status of a user when they are typing a message</dd>
+</dl>
+<dl>
+	<dt><span lang="ruby"><code>:present</code></span><span lang="java"><code>Action.PRESENT</code></span><span lang="default"><code>present</code></span></dt>
+	<dd>When subscribing to presence events on a channel that already has members present, this event is emitted for every member already present on the channel before the subscribe listener was registered</dd>
+</dl>
+<p><a href="https://jsbin.ably.io:443/ovavik/1/edit?javascript,live">View a presence states and events example</a></p>
+<h3 id="member-data">Member data</h3>
+<p>In addition to the <span lang="default"><a href="/realtime/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/realtime/usage#client-id"><code>client_id</code></a></span> for members on a channel, it is also possible to include data when entering a channel. Clients can <a href="#update">update</a> their data at any point which will be broadcasted to all presence subscribers as an <span lang="ruby"><code>:update</code></span><span lang="java"><code>Action.UPDATE</code></span><span lang="default"><code>update</code></span> event.</p>
+<pre lang="javascript"><code lang="javascript">/* Subscribe to presence enter events */
+channel.presence.on('enter', function(member) {
+  console.log(member.data); // =&gt; not moving
+});
 
-  client.channel('realtime-chat').attach do |channel|
-    channel.presence.on(:enter) do |presence_message|
-      puts "#{presence_message.client_id} entered realtime-chat"
-    end
+/* Subscribe to presence update events */
+channel.presence.on('update', function(member) {
+  console.log(member.data); // =&gt; travelling North
+});
 
-    channel.presence.enter
-  end
+/* Enter this client with data and update once entered */
+channel.presence.enter('not moving', function(err) {
+  channel.presence.update('travelling North');
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">/* Subscribe to presence enter events */
+channel.presence.on('enter', function(member) {
+  console.log(member.data); // =&gt; not moving
+});
+
+/* Subscribe to presence update events */
+channel.presence.on('update', function(member) {
+  console.log(member.data); // =&gt; travelling North
+});
+
+/* Enter this client with data and update once entered */
+channel.presence.enter('not moving', function(err) {
+  channel.presence.update('travelling North');
+});</code></pre>
+<pre lang="java"><code lang="java">/* Subscribe to presence enter and update events */
+channel.presence.subscribe(new PresenceListener() {
+  @Override
+  public void onPresenceMessage(PresenceMessage[] messages) {
+    PresenceMessage member = messages[0]; // use only first for this example
+    switch (member.action) {
+      case ENTER: {
+        System.out.println(member.data); // =&gt; not moving
+        break;
+      }
+      case UPDATE: {
+        System.out.println(member.data); // =&gt; travelling North
+        break;
+      }
+    }
+  }
+});
+
+/* Enter this client with data and update once entered */
+channel.presence.enter("not moving", new CompletionListener() {
+  @Override
+  public void onSuccess() {
+    channel.presence.update("travelling North", new CompletionListener());
+  }
+});</code></pre>
+<pre lang="ruby"><code lang="ruby"># Subscribe to presence enter events
+channel.presence.subscribe(:enter) do |member|
+  puts member.data # =&gt; not moving
+end
+
+# Subscribe to presence update events
+channel.presence.subscribe(:update) do |member|
+  puts member.data # =&gt; travelling North
+end
+
+# Enter this client with data and update once entered
+channel.presence.enter(data: 'not moving') do
+  channel.presence.update(data: 'travelling North')
 end</code></pre>
-<pre lang="javascript"><code lang="javascript">var client = Ably.Realtime.Client({ key: '', clientId: 'bob' });
-
-client.channel('realtime-chat').attach(function(channel) {
-  channel.presence.on('enter', function(presenceMessage) {
-    console.log(presenceMessage.memberKey() + ' entered realtime-chat');
-  });
-
-  channel.presence.enter();
+<h3 id="member-list">Presence member list</h3>
+<p>The <code>Presence</code> object exposes a <a href="#get"><code>get</code></a> method allowing a client to retrieve an array of all members present on the channel. The Ably client is responsible for keeping track of the presence set from the time that the channel is attached; an up to date presence set is pushed to the client following attach and the presence set is updated on each subsequent presence event. Thus <code>get</code> returns the already-known presence set retained in memory and does not trigger a new request to the Ably service.</p>
+<pre lang="javascript"><code lang="javascript">channel.presence.get(function(err, members) {
+  console.log('There are ' + members.length + ' members on this channel');
+  console.log('The first member has client ID: ' + members[0].clientId);
 });</code></pre>
-<pre lang="nodejs"><code lang="nodejs">var client = Ably.Realtime.Client({ key: '', clientId: 'bob' });
-
-client.channel('realtime-chat').attach(function(channel) {
-  channel.presence.on('enter', function(presenceMessage) {
-    console.log(presenceMessage.memberKey() + ' entered realtime-chat');
-  });
-
-  channel.presence.enter();
+<pre lang="nodejs"><code lang="nodejs">channel.presence.get(function(err, members) {
+  console.log('There are ' + members.length + ' members on this channel');
+  console.log('The first member has client ID: ' + members[0].clientId);
 });</code></pre>
-<p>A client must be attached to a channel, and must have the relevant permission, in order to enter. Although, the library implicitly calls <span lang="ruby">#attach</span><span lang="javascript,nodejs">attach()</span> if the client is not attached at the time <span lang="javascript,nodejs">enter()</span> is called.</p>
-<p>A given <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span> might be present multiple times, via different connections. As far as Ably is concerned these are different members of the presence set. A member of the presence set is, therefore, the combination of a <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span> string and a <span lang="javascript,nodejs">connectionId</span><span lang="ruby">connection_id</span> string unique to a connection.</p>
-<h3>Managing multiple client ID</h3>
-<p>An Ably client instance might, if on an application server for example, publish messages on behalf of multiple distinct clientIds. The channel&#8217;s <code>presence</code> object therefore also supports methods that enable presence messages to be published for a clientId specified at the time of the call, rather than for a clientId specified when the library was instanced.</p>
-<p>In order to be able to publish presence changes for arbitrary clientIds, the client library must have been instanced either with a key, or with a token bound to the wildcard clientId.</p>
-<pre lang="ruby"><code lang="ruby">channel = client.channel('realtime-chat')
-
-channel.presence.on(:enter) do |presence_message|
-  puts "#{presence_message.client_id} entered realtime-chat"
-end
-
-channel.presence.enter_client('bob') # bob entered realtime-chat
-channel.presence.enter_client('mary') # mary entered realtime-chat</code></pre>
-<pre lang="javascript"><code lang="javascript">var channel = client.channel('realtime-chat');
-
-channel.presence.on('enter', function(presenceMessage) {
-  console.log(presenceMessage.client_id + 'entered realtime-chat');
-});
-
-channel.presence.enterClient('bob'); // bob entered realtime-chat
-channel.presence.enterClient('mary'); // mary entered realtime-chat</code></pre>
-<pre lang="nodejs"><code lang="nodejs">var channel = client.channel('realtime-chat');
-
-channel.presence.on('enter', function(presenceMessage) {
-  console.log(presenceMessage.client_id + 'entered realtime-chat');
-});
-
-channel.presence.enterClient('bob'); // bob entered realtime-chat
-channel.presence.enterClient('mary'); // mary entered realtime-chat</code></pre>
-<p>In this example, you have to connect with a different client ID. Submitting the same client ID wouldn&#8217;t submit any other <code>ENTER</code> event.</p>
-<pre lang="ruby"><code lang="ruby">channel.presence.on(:enter) do |presence_message|
-  puts "#{presence_message.client_id} entered realtime-chat"
-end
-
-channel.presence.enter_client('bob') # bob entered realtime-chat
-channel.presence.enter_client('bob') # (this prints nothing)</code></pre>
-<pre lang="javascript"><code lang="javascript">channel.presence.on('enter', function(presenceMessage) {
-  console.log(presenceMessage.clientId + " entered realtime-chat");
-});
-
-channel.presence.enterClient('bob'); // bob entered realtime-chat
-channel.presence.enterClient('bob'); // (this prints nothing)</code></pre>
-<pre lang="nodejs"><code lang="nodejs">channel.presence.on('enter', function(presenceMessage) {
-  console.log(presenceMessage.clientId + " entered realtime-chat");
-});
-
-channel.presence.enterClient('bob'); // bob entered realtime-chat
-channel.presence.enterClient('bob'); // (this prints nothing)</code></pre>
-<h3>Payload</h3>
-<p>In addition to the <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span> for members on a channel, it is also possible to include a data payload. Clients can <a href="#update">update</a> their data at any point whilst present on a channel.</p>
-<pre lang="ruby"><code lang="ruby">channel.presence.on(:enter) do |presence_message|
-  puts presence_message.client_id # =&gt; bob
-  puts presence_message.data      # =&gt; robert@example.com
-end
-
-channel.presence.enter(client_id: 'bob', data: 'robert@example.com')</code></pre>
-<pre lang="javascript"><code lang="javascript">channel.presence.on('enter', function(presenceMessage) {
-  console.log(presenceMessage.clientId); // =&gt; bob
-  console.log(presenceMessage.data);     // =&gt; robert@example.com
-});
-end
-
-channel.presence.enter({ clientId: 'bob', data: 'robert@example.com' })</code></pre>
-<pre lang="nodejs"><code lang="nodejs">channel.presence.on('enter', function(presenceMessage) {
-  console.log(presenceMessage.clientId); // =&gt; bob
-  console.log(presenceMessage.data);     // =&gt; robert@example.com
-});
-end
-
-channel.presence.enter({ clientId: 'bob', data: 'robert@example.com' })</code></pre>
-<p>A number of presence actions are therefore defined.</p>
-<dl>
-	<dt>enter</dt>
-	<dd>A clientId, or a clientId/connectionId combination, is entering the presence channel.</dd>
-</dl>
-<dl>
-	<dt>leave</dt>
-	<dd>A clientId, or a clientId/connectionId combination, is leaving the presence channel.</dd>
-</dl>
-<dl>
-	<dt>update</dt>
-	<dd>An already-present clientId or clientId/connectionId combination has been updated.</dd>
-</dl>
-<dl>
-	<dt>present</dt>
-	<dd>An already-present clientId or clientId/connectionId combination is signaling its presence on the channel. (happens only when a listener is bound to the channel)</dd>
-</dl>
-<h3>Presence list</h3>
-<p>A Channel&#8217;s <code>presence</code> <span lang="default">property</span><span lang="java">field</span> exposes a <code>get</code> method whereby a client can discover the set of all members present on the channel.</p>
 <pre lang="ruby"><code lang="ruby">channel.presence.get do |members|
   puts "There are #{members.size} members on this channel"
+  puts "The first member has client ID: #{members.first.client_id}"
 end</code></pre>
-<pre lang="javascript"><code lang="javascript">channel.presence.get(function(members) {
-  console.log("There are " + members.length + " members on this channel")
+<pre lang="java"><code lang="java">PresenceMessage[] members = channel.presence.get();
+System.out.println("There are " + members.length + " members on this channel");
+System.out.println("The first member has client ID: " + members[0].clientId);</code></pre>
+<h3 id="presence-history">Presence History</h3>
+<p>The <code>Presence</code> object exposes a <a href="#history"><code>history</code></a> method allowing a client to retrieve historical presence events on the channel. Presence history can be used to return continuous presence event history up to the exact point a realtime channel was attached.</p>
+<p>History provides access to instantaneous &#8220;live&#8221; history as well as the longer term persisted history for presence channels. If <a href="/realtime/history#persisted-history">persisted history</a> is enabled for the channel, then presence events will <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically be stored for 24 &#8211; 72 hours</a>. If persisted history is not enabled, Ably retains the last two minutes of presence event history in memory.</p>
+<p>The following example retrieves the first two pages of historical presence events published up until the point the channel was attached.</p>
+<pre lang="javascript"><code lang="javascript">channel.attach(function() {
+  var presence = channel.presence;
+  presence.history({ untilAttach: true }, function(err, resultPage) {
+    if(err) {
+      console.log('Unable to get presence history; err = ' + err.message);
+    } else {
+      console.log(resultPage.items.length + ' presence events received in first page');
+      if(resultPage.hasNext()) {
+        resultPage.next(function(err, nextPage) { ... });
+      }
+  });
 });</code></pre>
-<pre lang="nodejs"><code lang="nodejs">channel.presence.get(function(members) {
-  console.log("There are " + members.length + " members on this channel")
+<pre lang="nodejs"><code lang="nodejs">channel.attach(function() {
+  var presence = channel.presence;
+  presence.history({ untilAttach: true }, function(err, resultPage) {
+    if(err) {
+      console.log('Unable to get presence history; err = ' + err.message);
+    } else {
+      console.log(resultPage.items.length + ' presence events received in first page');
+      if(resultPage.hasNext()) {
+        resultPage.next(function(err, nextPage) { ... });
+      }
+  });
 });</code></pre>
-<p>The client keeps track of the presence set from the time that the channel is attached; a up to date presence set is delivered to the client following attach, and the presence set is updated on each message seen subsequently. Thus this <code>get</code> method synchronously returns the already-known presence set, and does not trigger a new request to the Ably service.</p>
-<h3>Presence History</h3>
-<p>The <code>Presence</code> API exposes a <code>history</code> method whereby a client can obtain presence updates previously sent on the channel. It provides access to the persisted history, as with the REST API, but also enables access to instantaneous or &#8220;live&#8221; history for attached channels.</p>
-<p>This live history provides the ability to obtain continuous presence history up to the point that a realtime channel was attached and also supports recent history for channels that do not have persistence enabled.</p>
-<p>History results are paginated and therefore accompanied with one or more relative links relating to the current query. Where the number of results returned exceeds the query limit &#8211; which is either the value of the <code>limit</code> param or the default limit of 100 &#8211; the query result contains pages with the limited number of records, and a relative link to the next page.</p>
-<pre lang="ruby"><code lang="ruby">channel.presence.history(direction: :backwards) do |messages|
-  messages.each do |presence_message|
-    puts "#{presence_message.action}: #{presence_message.client_id}"
+<pre lang="ruby"><code lang="ruby">channel.attach do
+  presence = channel.presence
+  presence.history(until_attach: true) do |result_page|
+    puts "#{result_page.items.length} presence events received in first page"
+    if result_page.has_next?
+      result_page.next { |next_page| ... }
+    end
   end
 end</code></pre>
-<pre lang="javascript"><code lang="javascript">var params = {direction: 'backwards', limit: '100'};
-
-channel.presence.history(params, function(err, messages, rel) {
-  if(err) {
-    console.log('Unable to get presence history; err = ' + err.message);
-  } else {
-    console.log(messages.length + ' presence messages received in first result');
-    if(rel &amp;&amp; rel.next) {
-      channel.presence.history(rel.next, function(...) { ... });
-    }
-});</code></pre>
-<pre lang="nodejs"><code lang="nodejs">var params = {direction: 'backwards', limit: '100'};
-
-channel.presence.history(params, function(err, messages, rel) {
-  if(err) {
-    console.log('Unable to get presence history; err = ' + err.message);
-  } else {
-    console.log(messages.length + ' presence messages received in first result');
-    if(rel &amp;&amp; rel.next) {
-      channel.presence.history(rel.next, function(...) { ... });
-    }
-});</code></pre>
-<pre lang="java"><code lang="java">import io.ably.lib.types.PresenceMessage;
-import io.ably.lib.types.Param;
-import io.ably.lib.types.PaginatedResult;
-
-Param[] params = new Param[] {
-  new Param("direction", "backwards"),
-  new Param("limit", 100)
-};
-
-PaginatedResult&lt;PresenceMessage&gt; messages = channel.presence.history(params);
-System.out.println(messages.asArray().length + " presence messages received in first result");
-
-if(messages.getNext()) {
-  PaginatedResult&lt;PresenceMessage&gt; nextPage = channel.presence.history(messages.getNext());
-  System.out.println(...);
+<pre lang="java"><code lang="java">PaginatedResult&lt;PresenceMessage&gt; resultPage = channel.presence.history(null);
+System.out.println(resultPage.items().length + " presence events received in first page");
+if(resultPage.hasNext()) {
+  PaginatedResult&lt;PresenceMessage&gt; nextPage = resultPage.next();
+  System.out.println(nextPage.items().length + " presence events received in 2nd page");
 }</code></pre>
-<p>See the <a href="/realtime/history">history</a> documentation for further details of the supported query parameters.</p>
+<p>See the <a href="/realtime/history#presence-history">presence history documentation</a> for further details of the supported query parameters.</p>
+<h3 id="presence-multiple-client-id">Managing multiple client IDs</h3>
+<p class="tip">Each unique <span lang="default"><a href="/realtime/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/realtime/usage#client-id"><code>client_id</code></a></span> may only be present once when entering on behalf of another client as the unique identifier for each member in a presence set is the combined <span lang="default"><a href="/realtime/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/realtime/usage#client-id"><code>client_id</code></a></span> and shared <span lang="default"><a href="/realtime/connection#id"><code>connectionId</code></a></span><span lang="ruby"><a href="/realtime/connection/#id"><code>connection_id</code></a></span></p>
+<p>An Ably client instance might, if on an application server for example, publish messages and be present on channels on behalf of multiple distinct <a href="/realtime/usage#client-id">client IDs</a>. The channel&#8217;s <code>Presence</code> object therefore also supports methods that enable presence messages to be emitted for a <span lang="default"><a href="/realtime/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/realtime/usage#client-id"><code>client_id</code></a></span> specified at the time of the call, rather than implicitly based on the <span lang="default"><a href="/realtime/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/realtime/usage#client-id"><code>client_id</code></a></span> <a href="/realtime/usage#client-id">specified when the library is instanced or authenticated</a>.</p>
+<p>In order to be able to publish presence changes for arbitrary client IDs, the client library must have been instanced either with an <a href="https://support.ably.io/solution/articles/3000030054-what-is-an-app-api-key">API key</a>, or with a <a href="https://support.ably.io/solution/articles/3000048586-can-a-client-emulate-any-client-id-i-e-use-a-wildcard-client-id">token bound to a wildcard client ID</a>.</p>
+<pre class="code-editor open-jsbin open-jsbin-epolus" lang="javascript"><code class="code-editor open-jsbin open-jsbin-epolus" lang="javascript">var rest = new Ably.Rest({ key: '{{API_KEY}}' });
+/* request a wildcard token */
+rest.auth.requestToken({ clientId: '*' }, function(err, token) {
+  var realtime = new Ably.Realtime({ token: token });
+  var channel = realtime.channels.get('realtime-chat');
+
+  channel.presence.subscribe('enter', function(member) {
+    console.log(member.client_id + 'entered realtime-chat');
+  });
+
+  channel.presence.enterClient('Bob'); // =&gt; Bob entered realtime-chat
+  channel.presence.enterClient('Mary'); // =&gt; Mary entered realtime-chat
+});</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-epolus" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-epolus" lang="nodejs">var rest = new Ably.Rest({ key: '{{API_KEY}}' });
+/* request a wildcard token */
+rest.auth.requestToken({ clientId: '*' }, function(err, token) {
+  var realtime = new Ably.Realtime({ token: token });
+  var channel = realtime.channels.get('realtime-chat');
+
+  channel.presence.subscribe('enter', function(member) {
+    console.log(member.client_id + 'entered realtime-chat');
+  });
+
+  channel.presence.enterClient('Bob'); // =&gt; Bob entered realtime-chat
+  channel.presence.enterClient('Mary'); // =&gt; Mary entered realtime-chat
+});</code></pre>
+<pre lang="ruby"><code lang="ruby">rest = Ably::Rest.new(key: '{{API_KEY}}')
+# request a wildcard token
+rest.auth.requestToken(clientId: '*') do |token|
+  realtime = Ably::Realtime.new(token: token)
+  channel = realtime.channels.get('realtime-chat')
+
+  channel.presence.subscribe(:enter) do |member|
+    puts "#{member.client_id} entered realtime-chat"
+  end
+
+  channel.presence.enter_client 'Bob' # =&gt; Bob entered realtime-chat
+  channel.presence.enter_client 'Mary' # =&gt; Mary entered realtime-chat
+end</code></pre>
+<pre lang="java"><code lang="java">/* request a wildcard token */
+AblyRest rest = new AblyRest('{{API_KEY}}');
+TokenParams params = new TokenParams();
+params.clientId = "*";
+ClientOptions options = new ClientOptions();
+options.tokenDetails = rest.auth.requestToken(null, params);
+
+AblyRealtime realtime = new AblyRealtime(options);
+Channel channel = realtime.channels.get("realtime-chat");
+
+channel.presence.subscribe(new PresenceListener() {
+  @Override
+  public void onPresenceMessage(PresenceMessage[] messages) {
+    PresenceMessage member = messages[0]; /* use only first for this example */
+    System.out.println(member.clientId + " entered realtime-chat");
+  }
+});
+
+CompletionListener noop = new CompletionListener();
+channel.presence.enterClient("Bob", noop); /* =&gt; Bob entered realtime-chat */
+channel.presence.enterClient('Mary', noop); /* =&gt; Mary entered realtime-chat */</code></pre>
 <h1>API Reference</h1>
 <div class="inline-toc">
 <ul><li>Presence reference
@@ -255,244 +338,686 @@ if(messages.getNext()) {
 <li>
 Methods
 <ul>
-<li><a href='#enter'>enter</a></li>
-<li><a href='#enter-client'>enterClient</a></li>
-<li><a href='#update'>update</a></li>
-<li><a href='#update-client'>updateClient</a></li>
-<li><a href='#leave'>leave</a></li>
-<li><a href='#leave-client'>leaveClient</a></li>
-<li><a href='#subscribe'>subscribe</a></li>
-<li><a href='#unsubscribe'>unsubscribe</a></li>
-<li><a href='#get'>get</a></li>
-<li><a href='#history'>history</a></li>
+<li><a href='#enter-none'>enter()</a></li>
+<li><a href='#enter-data'>enter(data)</a></li>
+<li><a href='#leave-none'>leave()</a></li>
+<li><a href='#leave-data'>leave(data)</a></li>
+<li><a href='#update-data'>update(data)</a></li>
+<li><a href='#get'>get(options)</a></li>
+<li><a href='#get'>history(options)</a></li>
+<li><a href='#subscribe-listener'>subscribe(listener)</a></li>
+<li><a href='#subscribe-event'>subscribe(name, listener)</a></li>
+<li><a href='#subscribe-event-array'>subscribe(names, listener)</a></li>
+<li><a href='#unsubscribe-event'>unsubscribe(name, listener)</a></li>
+<li><a href='#unsubscribe-listener'>unsubscribe(listener)</a></li>
+<li><a href='#unsubscribe-all'>unsubscribe()</a></li>
+<li><a href='#enter-client-none'>enterClient(clientId)</a></li>
+<li><a href='#enter-client-data'>enterClient(clientId, data)</a></li>
+<li><a href='#leave-client-none'>leaveClient(clientId)</a></li>
+<li><a href='#leave-client-data'>leaveClient(clientId, data)</a></li>
+<li><a href='#update-client-data'>updateClient(clientId, data)</a></li>
+</ul>
+</li>
+<li>
+Properties
+<ul>
+<li><a href='#sync-complete'>syncComplete</a></li>
 </ul>
 </li>
 <li>
 Related types
 <ul>
 <li><a href='#presence-message'>PresenceMessage</a></li>
+<li><a href='#presence-action'>Presence action</a></li>
+<li><a href='#completion-listener'>CompletionListener</a></li>
+<li><a href='#paginated-result'>PaginatedResult</a></li>
 <li><a href='#presence-listener'>PresenceListener</a></li>
+<li><a href='#param'>Param</a></li>
 </ul>
 </li>
 </ul>
 </li></ul>
-</div><h2>Methods</h2>
-<h6 lang="default" id="enter">enter(clientData, callback)</h6>
-<h6 lang="java" id="enter">public void enter(Object clientData, CompletionListener listener)</h6>
-<p>Enter this presence channel. The Ably library must have been initialised with a <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span>, and must have been supplied either with a key, or a token bound to that <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span>.</p>
-<p>This method sends a <code>PresenceMessage</code> for the client&#8217;s <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span> and optional <span lang="javascript,nodejs">clientData</span><span lang="ruby">client_data</span>. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
+</div><h2 id="properties"><span lang='default'>Presence Properties</span><span lang='ruby'>Ably::Realtime::Presence Attributes</span><span lang='java'>io.ably.lib.realtime.Presence Members</span></h2>
+<p>The <code>Presence</code> object exposes the following public <span lang="default">properties</span><span lang="ruby">attributes</span><span lang="java">members</span>:</p>
+<h6 id="sync-complete"><span lang='default'>syncComplete</span><span lang='ruby'>sync_complete?</span></h6>
+<p>A <code>boolean</code> field indicating whether the presence member set is synchronised with server after a channel attach.<br />
+When a channel is attached, the Ably service immediately synchronises the presence member set with the client. Typically this process completes in milliseconds, however when the presence member set is very large, bandwidth constraints may slow this synchronisation process down.</p>
+<h2>Methods</h2>
+<h6 id="enter">enter</h6>
+<p>In order to enter and be present on a channel, the client must <a href="https://support.ably.io/solution/articles/3000038608-authenticated-and-identified-clients">be identified by having a client ID</a>, <a href="https://support.ably.io/solution/articles/3000048535-using-capabilities-to-manage-client-access-privileges-on-channels">have permission to be present</a>, and be attached to the channel. For simplicity, the library will implicitly attach to a channel when entering. Entering when already entered is treated as an <a href="#update">update</a>.</p>
+<p>There are two overloaded versions of this method. With both versions, a <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to enter.</p>
+<blockquote class="definition" id="enter-none">
+<p class="definition" id="enter-none"><span lang='default'>enter(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter() &#8594; yields</span><span lang='java'>public void enter(<a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Enter a presence channel without any data.</p>
+<blockquote class="definition" id="enter-data">
+<p class="definition" id="enter-data"><span lang='default'>enter(Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter(Object data) &#8594; yields</span><span lang='java'>public void enter(Object data, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Enter a presence channel and provide data that is associated with the current present member.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><span lang="java">Object</span>clientData</dt>
-	<dd>An optional payload for the message.</dd>
+	<dt><div lang="javascript,nodejs">Object data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
+	<dt><div lang="java">Object data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
+	<dt><div lang="ruby">Object data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>Callback to be called on completion.</dd>
+	<dd>is a function of the form <code>function(err)</code> which is called upon completion</dd>
+	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
+	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields upon successfully entering the channel</dd>
 </dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>Listener to be notified on completion.</dd>
-</dl>
-<h6 lang="default" id="enter-client">enterClient(clientId, clientData, callback)</h6>
-<h6 lang="java" id="enter-client">public void enter(String clientId, Object clientData, CompletionListener listener)</h6>
-<p>Enter this presence channel for the given clientId. This method is provided to support connections (eg connections from application server instances) that act on behalf of multiple clientIds. In order to be able to enter the channel with this method, the Ably library must have been instanced either with a key, or with a token bound to the wildcard clientId.</p>
-<p>This method sends a <code>PresenceMessage</code> for the given <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span> and optional <span lang="javascript,nodejs">clientData</span><span lang="ruby">client_data</span>. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On successfully entering the channel, <code>err</code> is null. On failure to enter, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object describing the failure reason.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<h4>Listener result</h4>
+<p>On successfully entering the channel, the <code>onSuccess</code> method of the <a href="#completion-listener">CompletionListener</a> is called. On failure to enter, the <code>onError</code> method is called with an <a href="#error-info"><code>ErrorInfo</code></a> argument describing the failure reason.</p>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from the method.</p>
+<p>On successfully entering the channel, the registered success blocks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to the method are executed. On failure to enter, the <code>errback</code> callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> are called with an <a href="#error-info"><code>ErrorInfo</code></a> argument describing the failure reason.</p>
+
+</div> <!-- /end ruby language block -->
+
+<h6 id="leave">leave</h6>
+<p>In order to leave the presence set of a channel, the client must have already <a href="#enter">entered and been present</a>.</p>
+<p>There are two overloaded versions of this method. With both versions, a <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to leave.</p>
+<blockquote class="definition" id="leave-none">
+<p class="definition" id="leave-none"><span lang='default'>leave(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> leave() &#8594; yields</span><span lang='java'>public void leave(<a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Leave a presence channel without emitting any data.</p>
+<blockquote class="definition" id="leave-data">
+<p class="definition" id="leave-data"><span lang='default'>leave(Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> leave(Object data) &#8594; yields</span><span lang='java'>public void leave(Object data, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Leave a presence channel and emit data that is associated with the current leaving member.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><span lang="java">String</span>clientId</dt>
-	<dd>The clientId for the message.</dd>
-</dl>
-<dl>
-	<dt><span lang="java">Object</span>clientData</dt>
-	<dd>An optional payload for the message.</dd>
+	<dt><div lang="javascript,nodejs">Object data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
+	<dt><div lang="java">Object data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
+	<dt><div lang="ruby">Object data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>Callback to be called on completion.</dd>
+	<dd>is a function of the form <code>function(err)</code> which is called upon completion</dd>
+	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
+	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields upon successfully leaving the channel</dd>
 </dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>Listener to be notified on completion.</dd>
-</dl>
-<h6 lang="default" id="update">update(clientData, callback)</h6>
-<h6 lang="java" id="update">public void update(Object clientData, CompletionListener listener)</h6>
-<p>Update the presence data for this client. The Ably library must have been initialised with a <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span>, and must have been supplied either with a key, or a token bound to that <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span>.</p>
-<p>This method sends a <code>PresenceMessage</code> for the client&#8217;s <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span> and optional <span lang="javascript,nodejs">clientData</span><span lang="ruby">client_data</span>. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
+<h6 id="update">update</h6>
+<p>Clients can update their member data on the channel which will trigger a broadcast of this update to all presence subscribers. The <a href="#enter">pre-requisites for <code>update</code></a> are the same as for <a href="#enter"><code>enter</code></a>. If an attempt to <code>update</code> is made before the client has entered the channel, the update is treated as an <code>enter</code>.</p>
+<p>A <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to update the member data.</p>
+<blockquote class="definition" id="update-data">
+<p class="definition" id="update-data"><span lang='default'>update(Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> update(Object data) &#8594; yields</span><span lang='java'>public void update(Object data, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Update the current member&#8217;s data and broadcast an update event to all subscribers. <code>data</code> may be <code>null</code>.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><span lang="java">Object</span>clientData</dt>
-	<dd>An optional payload for the message.</dd>
+	<dt><div lang="javascript,nodejs">Object data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
+	<dt><div lang="java">Object data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
+	<dt><div lang="ruby">Object data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>Callback to be called on completion.</dd>
+	<dd>is a function of the form <code>function(err)</code> which is called upon completion</dd>
+	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
+	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields upon successfully updating the member data</dd>
 </dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>Listener to be notified on completion.</dd>
-</dl>
-<h6 lang="default" id="update-client">updateClient(clientId, clientData, callback)</h6>
-<h6 lang="java" id="update-client">public void updateClient(String clientId, Object clientData, CompletionListener listener)</h6>
-<p>Enter update the <span lang="javascript,nodejs">clientData</span><span lang="ruby">client_data</span> for the given present clientId on this presence channel. This is the analogue of <span lang="javascript,nodejs">enterClient</span><span lang="ruby">enter_client</span>, for the update action.</p>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On successfully updating the data, <code>err</code> is null. On failure to update, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object describing the failure reason.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<h4>Listener result</h4>
+<p>On successfully updating the data, the <code>onSuccess</code> method of the <a href="#completion-listener">CompletionListener</a> is called. On failure to update, the <code>onError</code> method is called with an <a href="#error-info"><code>ErrorInfo</code></a> argument describing the failure reason.</p>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from the method.</p>
+<p>On successfully updating the data, the registered success blocks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to the method are executed. On failure to update, the <code>errback</code> callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> are called with an <a href="#error-info"><code>ErrorInfo</code></a> argument describing the failure reason.</p>
+
+</div> <!-- /end ruby language block -->
+
+<h6 id="get">get</h6>
+<p>Get the current presence member set for this channel. Typically, this method returns the member set immediately as the member set is retained in memory by the client. However, by default this method will wait until the presence member set is synchronised, so if the synchronisation is not yet complete following a channel being attached, this method will wait until the presence member set is synchronised.</p>
+<p>When a channel is attached, the Ably service immediately synchronises the presence member set with the client. Typically this process completes in milliseconds, however when the presence member set is very large, bandwidth constraints may slow this synchronisation process down.</p>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>get(Object options, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#presence-message">PresenceMessage[]</a> members))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> get(Hash options) &#8594; yields <a href="#presence-message">PresenceMessage[]</a></span><span lang='java'>public <a href="#presence-message">PresenceMessage[]</a> get(<a href="#param">Param</a>[] options)</span></p>
+</blockquote>
+<p>Gets an array of members present on the channel as <a href="#presence-message">PresenceMessage</a> objects.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><span lang="java">String</span>clientId</dt>
-	<dd>The clientId for the message.</dd>
-</dl>
-<dl>
-	<dt><span lang="java">Object</span>clientData</dt>
-	<dd>An optional payload for the message.</dd>
+	<dt><span lang="default">options</span><span lang="java"><a href="#param">Param</a>[] options</span><span lang="ruby">options</span></dt>
+	<dd><span lang="default">an optional object containing query parameters</span><span lang="ruby">an optional set of symbol key and value pairs containing the query parameters</span> as specified below.</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>Callback to be called on completion.</dd>
+	<dd>is a function of the form: <code>function(err, "PresenceMessage[]":#presence-message members)</code></dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields a <a href="#presence-message"><code>PresenceMessage[]</code></a> array</dd>
 </dl>
+<h4><code>options</code> parameters</h4>
 <dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>Listener to be notified on completion.</dd>
+	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>:client_id</code></span></dt>
+	<dd>when provided, will filter array of members returned that match the provided <span lang="default"><a href="/realtime/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/realtime/usage#client-id"><code>client_id</code></a></span> string</dd>
+	<dt><span lang="default"><code>connectionId</code></span><span lang="ruby"><code>:connection_id</code></span></dt>
+	<dd>when provided, will filter array of members returned that match the provided <span lang="default"><a href="/realtime/connection#id"><code>connectionId</code></a></span><span lang="ruby"><a href="/realtime/connection/#id"><code>connection_id</code></a></span> string</dd>
+	<dt><span lang="default"><code>waitForSync</code></span><span lang="ruby"><code>:wait_for_sync</code></span></dt>
+	<dd><em>true</em> A boolean value that by default waits for the initial presence synchronisation following channel attachment to complete before returning the members present. When false, the current list of members is returned without waiting for a complete synchronisation</dd>
 </dl>
-<h6 lang="default" id="leave">leave(callback)</h6>
-<h6 lang="java" id="leave">public void leave(CompletionListener listener)</h6>
-<p>Leave this presence channel. This is subject to the same authentication requirements as the <a href="#enter">enter</a> method above.</p>
-<p>This method sends a <code>PresenceMessage</code> for the client&#8217;s <span lang="javascript,nodejs">clientId</span><span lang="ruby">client_id</span> and optional <span lang="javascript,nodejs">clientData</span><span lang="ruby">client_data</span>. A <span lang="default">callback</span><span lang="java">listener</span> may optionally be passed in to this call to be notified of success or failure of the operation.</p>
-<h4>Parameters</h4>
-<dl>
-	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>Callback to be called on completion.</dd>
-</dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>Listener to be notified on completion.</dd>
-</dl>
-<h6 lang="default" id="leave-client">leaveClient(clientId, callback)</h6>
-<h6 lang="java" id="leave-client">public void leaveClient(String clientId, CompletionListener listener)</h6>
-<p>This is the analogue of <a href="#enter-client">enterClient</a>, for the <code>leave</code> action.</p>
-<h4>Parameters</h4>
-<dl>
-	<dt><span lang="java">String</span>clientId</dt>
-	<dd>The clientId for the message.</dd>
-</dl>
-<dl>
-	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>Callback to be called on completion.</dd>
-</dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>Listener to be notified on completion.</dd>
-</dl>
-<h6 lang="default" id="subscribe">subscribe(listener)</h6>
-<h6 lang="java" id="subscribe">public void subscribe(PresenceListener listener)</h6>
-<p>Subscribe to presence messages for this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the PresenceListener interface</span>, which is called each time one or more messages arrives on the channel.</p>
-<h4>Parameters</h4>
-<dl>
-	<dt><div lang="javascript,nodejs">listener</div></dt>
-	<dd>The listener function to call for each message.</dd>
-</dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>The MessageListener to be notified on completion.</dd>
-</dl>
-<h6 lang="default" id="unsubscribe">unsubscribe(listener)</h6>
-<h6 lang="java" id="unsubscribe">public void unsubscribe(PresenceListener listener)</h6>
-<p>Unsubscribe a previously subscribed listener.</p>
-<h4>Parameters</h4>
-<dl>
-	<dt><div lang="javascript,nodejs">listener</div></dt>
-	<dd>The listener function registered on subscription.</dd>
-</dl>
-<dl>
-	<dt><div lang="java">listener</div></dt>
-	<dd>The PresenceListener registered on subscription.</dd>
-</dl>
-<h6 lang="default" id="get">get()</h6>
-<h6 lang="java" id="get">public PresenceMessage[] get()</h6>
-<p>Get the current presence set for this channel. This returns synchronously with the presence set already known by the client.</p>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On success, <code>members</code> contains an array of <a href="#presence-message"><code>PresenceMessage</code></a> objects corresponding to the current set of present members on the channel.</p>
+<p>On failure to retrieve the current presence member set, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with the failure reason.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<h4>Returns</h4>
+<p>On success, the returned array of <a href="#presence-message"><code>PresenceMessage</code></a> objects corresponds to the current set of present members on the channel.</p>
+<p>Failure to retrieve the current presence member set will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a></p>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from the method.</p>
+<p>On success, the registered success blocks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to the method yield an array of <a href="#presence-message"><code>PresenceMessage</code></a> objects to the current set of present members on the channel.</p>
+<p>Failure to retrieve the current presence member set will trigger the <code>errback</code> callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object with the failure reason.</p>
+
+</div> <!-- /end ruby language block -->
+
 <h6 id="history">history</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>presence.history(params, callback)</span><span lang='ruby'>presence.history(options) → json_result</span><span lang='java'>public PaginatedResult&lt;PresenceMessage&gt; history(Param[] params)</span></p>
+<p class="definition"><span lang='default'>history(Object option, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; resultPage))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> history(Hash option) &#8594; yields <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt;</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(<a href="#param">Param</a>[] option)</span></p>
 </blockquote>
-<p>Get presence history for this channel.</p>
+<p>Gets a <a href="#paginated-result">paginated</a> set of historical presence message events for this channel. If the <a href="https://support.ably.io/support/solutions/articles/3000030059-how-long-are-messages-stored-for">channel is configured to persist messages to disk</a>, then the presence message event history will <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically go back 24 &#8211; 72 hours</a>. If not, presence message events are only retained in memory by the Ably service for two minutes.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt>params</dt>
-	<dd>an optional object containing the query parameters, as specified in the <a href="/realtime/history">history</a> API documentation.</dd>
+	<dt><span lang="default">option</span><span lang="java"><a href="#param">Param</a>[] option</span></dt>
+	<dd><span lang="default">an optional object containing query parameters</span><span lang="ruby">an optional set of key value pairs containing query parameters</span>, as specified in the <a href="/realtime/history#presence-history">presence history API documentation</a>.</dd>
+</dl>
+<dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>is a function of the form: <code>callback(err, messages, relParams)</code><br />
-where:<br />
-<ul><br />
-<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
-<li>on success, <code>messages</code> contains the query result as an array of PresenceMessage objects.</li><br />
-<li>where applicable, <code>relParams</code> is a map containing query params for each of the pagination links in the query response (see below).</li><br />
-</ul></dd>
+	<dd>is a function of the form: <code>function(err, resultPage)</code></dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields a <code>PaginatedResult&lt;Message&gt;</code> array</dd>
 </dl>
-<p>Further details of the supported query params are in the <a href="/realtime/history">history API</a> documentation.</p>
-<div lang="java">
+<p>Further details of the supported <code>option</code> params, see <a href="/realtime/history#presence-history">presence history API documentation</a>.</p>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On success, <code>resultPage</code> contains a <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulating an array of <a href="#presence-message"><code>PresenceMessage</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next()</code></a> and <a href="#paginated-result"><code>first()</code></a> methods.</p>
+<p>On failure to retrieve message history, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with the failure reason.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
 <h4>Returns</h4>
-<p>On success, the returned <a href="#paginated-result">PaginatedResult</a> encapsulates a collection of <code>PresenceMessage</code> objects corresponding to the current page of results, and also provides query parameters for any applicable related (eg <code>first</code> or <code>next</code> result pages).</p>
-<p>Failure to retrieve the history will raise an <code>AblyException</code>.</p>
-<p></div><div lang="ruby"><br />
-h4. Returns</p>
-<p>On success, <code>json_result</code> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api/#message-history">REST API</a>.</p>
-<p>Example <code>json_result</code>:</p>
-<pre lang="json"><code lang="json">[{
-  "name": "&lt;event name&gt;",
-  "channel": "&lt;channel id&gt;",
-  "data": "&lt;message payload&gt;",
-  "timestamp": "&lt;message timestamp&gt;"
-}]</code></pre>
-<p>Failure to retrieve the history will raise an exception &#8211; typical exceptions include:</p>
-<ul>
-	<li><code>Ably::NetworkUnavailableException</code></li>
-	<li><code>Ably::QuotaExceededException</code></li>
-	<li><code>Ably::AuthenticationFailureException</code></li>
-</ul>
-<p></div><div lang="javascript,nodejs"></p>
-<h4>Pagination</h4>
-<p>A paginated result is indicated in the <code>relParams</code> callback argument. For each available link, <code>relParams</code> contains a map of params to pass to a subsequent <code>history()</code> call.<br />
-  Example <code>relParams</code>:</p>
-<pre lang="json"><code lang="json">[{
-  "first": {"start": 1380794880000, "end": 138079488105, ...},
-  "current": {"start": 1380794880000, "end": 138079488105, ...},
-  "next": {"start": 1380794880000, "end": 138079488105, ...}
-}]</code></pre>
-<p>Further details of the paginated response are in the <a href="/realtime/history">history API</a> documentation.</p>
-</div>
-<h2 id="presence-message">PresenceMessage</h2>
-<p>A <code>PresenceMessage</code> encapsulates an individual presence update sent or received in Ably. A presence message has the following members.</p>
+<p>On success, the returned <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulates an array of <a href="#presence-message"><code>PresenceMessage</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
+<p>Failure to retrieve the message history will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a></p>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from the method.</p>
+<p>On success, the registered success blocks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to the method yield a <a href="#paginated-result">PaginatedResult</a> that encapsulates an array of <a href="#presence-message"><code>PresenceMessage</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next()</code></a> and <a href="#paginated-result"><code>first()</code></a> methods.</p>
+<p>Failure to retrieve the message history will trigger the <code>errback</code> callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object with the failure reason.</p>
+
+</div> <!-- /end ruby language block -->
+
+<h6 id="subscribe">subscribe</h6>
+<p>There are three overloaded versions of this method:</p>
+<blockquote class="definition" id="subscribe-listener">
+<p class="definition" id="subscribe-listener"><span lang='default'>subscribe(listener(<a href="#presence-message">PresenceMessage</a>))</span><span lang='java'>public void subscribe(<a href="#presence-listener">PresenceListener</a> listener)</span><span lang='ruby'>subscribe → yields <a href="#presence-message">PresenceMessage</a></span></p>
+</blockquote>
+<p>Subscribe to presence message events on this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the <a href="#presence-listener">PresenceListener</a> interface</span><span lang="ruby">a block</span>, which is called each time one or more presence events occurs such as a member entering or leaving a channel.</p>
+<blockquote class="definition" id="subscribe-event">
+<p class="definition" id="subscribe-event"><span lang='default'>subscribe(String <a href="#presence-action">action</a>, listener(<a href="#presence-message">PresenceMessage</a>))</span><span lang='java'>public void subscribe(<a href="#presence-action">PresenceMessage.Action</a> action, <a href="#presence-listener">PresenceListener</a> listener)</span><span lang='ruby'>subscribe(<a href="#presence-action">PresenceMessage::ACTION</a> action) → yields <a href="#presence-message">PresenceMessage</a></span></p>
+</blockquote>
+<p>Subscribe to presence message events with a given <a href="#presence-action"><code>action</code></a> on this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the <a href="#presence-listener">PresenceListener</a> interface</span><span lang="ruby">a block</span>, which is called each time one or more presence events occurs such as a member entering or leaving a channel.</p>
+<blockquote class="definition" id="subscribe-event-array">
+<p class="definition" id="subscribe-event-array"><span lang='default'>subscribe(String[] <a href="#presence-action">actions</a>, listener(<a href="#presence-message">PresenceMessage</a>))</span><span lang='java'>public void subscribe(<a href="#presence-action">PresenceMessage.Action[]</a> actions, <a href="#presence-listener">PresenceListener</a> listener)</span><span lang='ruby'>subscribe(<a href="#presence-action">PresenceMessage::ACTION</a> *actions) → yields <a href="#presence-message">PresenceMessage</a></span></p>
+</blockquote>
+<p>Subscribe a single listener to messages on this channel for multiple <code>name</code> values.</p>
+<h4>Parameters</h4>
 <dl>
-	<dt><span lang="java">String</span>clientId</dt>
-	<dd>The id of the client associated with the update. This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the clientId is known, for messages delivered to subscribers. It is not required to populate the clientId of a message before publishing it.</dd>
+	<dt>String action</dt>
+	<dd>The presence <a href="#presence-action"><code>action</code> event</a> to subscribe to</dd>
 </dl>
 <dl>
-	<dt><span lang="java">String</span>connectionId</dt>
-	<dd>A unique id for the client associated with the update, to disambiguate in the case that a single clientId is simultaneously present multiple times (eg on different connections). This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the connectionId is known, for messages delivered to subscribers.</dd>
+	<dt><span lang="default">String[] </span><span lang="ruby">*</span>actions</dt>
+	<dd>An <span lang="ruby">argument</span> array of <a href="#presence-action"><code>action</code> events</a> to subscribe to</dd>
 </dl>
 <dl>
-	<dt><span lang="java">Object</span>clientData</dt>
-	<dd>An optional message payload for a status line or other data associated with the presence update. The data may be one of the supported payload datatypes.</dd>
+	<dt><div lang="javascript,nodejs">listener</div></dt>
+	<dd>is a function of the form <code>function(message)</code> to be called for each amtching presence message event</dd>
+	<dt><div lang="java"><a href="#presence-listener">PresenceListener</a> listener</div></dt>
+	<dd>Message listener to be notified for matching presence message event</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields matching presence message event when received on the channel</dd>
 </dl>
-<h2 id="presence-listener">PresenceListener</h2>
-<div lang="javascript,nodejs">
-<p>A <code>PresenceListener</code> function may be subscribed for all presence messages received on the channel. The message is passed as the first argument to the listener.</p>
-<p></div><div lang="java"><br />
-A implementation of the <code>PresenceListener</code> interface may be registered to be notified of  arrival of presence messages on the channel. A <code>PresenceMessage[]</code> is passed as the first argument of the listener&#8217;s <code>onPresenceMessage</code> method whenever a presence message is received on the channel.</p>
-<p></div><div lang="java"><br />
-h2(#paginated-result). PaginatedResult</p>
-<p>A <code>PaginatedResult</code> is an interface that represents the result of a query that supports pagination. An instance of <code>PaginatedResult</code> encapsulates a collection of <code>PresenceMessage</code> objects representing the current page of results, and provides the means &#8211; in the form of <code>Param[]</code> to perform queries for subsequent or related pages.</p>
+<h6 id="unsubscribe">unsubscribe</h6>
+<p>There are three overloaded versions of this method:</p>
+<blockquote class="definition" id="unsubscribe-event">
+<p class="definition" id="unsubscribe-event"><span lang='default'>unsubscribe(String action, listenerCallback)</span><span lang='java'>public void unsubscribe(<a href="#presence-action">PresenceMessage.Action</a> action, <a href="#presence-listener">PresenceListener</a> listener)</span><span lang='ruby'>unsubscribe(<a href="#presence-action">PresenceMessage::ACTION</a> action, &amp;listener_proc)</span></p>
+</blockquote>
+<p>Unsubscribe to presence message events on this channel for the given <a href="#presence-action"><code>action</code></a>. This removes an earlier event-specific subscription.</p>
+<blockquote class="definition" id="unsubscribe-listener">
+<p class="definition" id="unsubscribe-listener"><span lang='default'>unsubscribe(listenerCallback)</span><span lang='java'>public void unsubscribe(<a href="#presence-listener">PresenceListener</a> listener)</span><span lang='ruby'>unsubscribe(&amp;listener_proc)</span></p>
+</blockquote>
+<p>Unsubscribe to presence message events on this channel. This removes an earlier subscription.</p>
+<blockquote class="definition" id="unsubscribe-all">
+<p class="definition" id="unsubscribe-all"><span lang='default'>unsubscribe()</span><span lang='java'>public void unsubscribe()</span></p>
+</blockquote>
+<p>Unsubscribes all listeners to presence message events on this channel. This removes all earlier subscriptions.</p>
+<h4>Parameters</h4>
 <dl>
-	<dt>public PresenceMessage[] asArray()</dt>
-	<dd>Returns the current page of results as an Array.</dd>
-	<dt>public List&lt;PresenceMessage&gt;</dt>
-	<dd>Returns the current page of results as a List.</dd>
-	<dt>public Param[] getFirst()</dt>
-	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the first call in this paginated sequence.</dd>
-	<dt>public Param[] getCurrent()</dt>
-	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the current call in this paginated sequence.</dd>
-	<dt>public Param[] getNext()</dt>
-	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the next call in this paginated sequence.</dd>
+	<dt>String action</dt>
+	<dd>The presence <a href="#presence-action"><code>action</code> event</a> to unsubscribe from</dd>
 </dl>
-</div>
+<dl>
+	<dt><div lang="javascript,nodejs">listenerCallback</div></dt>
+	<dd>is the callback listener function that was previously subscribed</dd>
+	<dt><div lang="java"><a href="#presence-listener">PresenceListener</a> listener</div></dt>
+	<dd>previously registered listener</dd>
+	<dt><div lang="ruby">&amp;listener_block</div></dt>
+	<dd>previously registered listener block</dd>
+</dl>
+<h6 id="enter-client"><span lang='default'>enterClient</span><span lang='ruby'>enter_client</span></h6>
+<p>Enter this presence channel for the given <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span>. This method is provided to support typically server instances that act on behalf of multiple client IDs. See <a href="#presence-multiple-client-id">Managing multiple client IDs</a> for more info. In order to be able to publish presence changes for arbitrary client IDs, the client library must have been instanced either with an <a href="https://support.ably.io/solution/articles/3000030054-what-is-an-app-api-key">API key</a>, or with a <a href="https://support.ably.io/solution/articles/3000048586-can-a-client-emulate-any-client-id-i-e-use-a-wildcard-client-id">token bound to a wildcard client ID</a>. The connec</p>
+<p>There are two overloaded versions of this method. With both versions, a <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to enter.</p>
+<blockquote class="definition" id="enter-client-none">
+<p class="definition" id="enter-client-none"><span lang='default'>enterClient(String clientId, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter_client(String client_id) &#8594; yields</span><span lang='java'>public void enterClient(String clientId, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Enter a presence channel on behalf of the provided <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> without any data.</p>
+<blockquote class="definition" id="enter-client-data">
+<p class="definition" id="enter-client-data"><span lang='default'>enterClient(String clientId, Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter_client(String client_id, Object data) &#8594; yields</span><span lang='java'>public void enterClient(String clientId, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Enter a presence channel and provide data that is associated with the current present member.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><div lang="javascript,nodejs">Object data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
+	<dt><div lang="java">Object data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
+	<dt><div lang="ruby">Object data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>is a function of the form <code>function(err)</code> which is called upon completion</dd>
+	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
+	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields upon successfully entering the channel</dd>
+</dl>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On successfully entering the channel, <code>err</code> is null. On failure to enter, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object describing the failure reason.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<h4>Listener result</h4>
+<p>On successfully entering the channel, the <code>onSuccess</code> method of the <a href="#completion-listener">CompletionListener</a> is called. On failure to enter, the <code>onError</code> method is called with an <a href="#error-info"><code>ErrorInfo</code></a> argument describing the failure reason.</p>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from the method.</p>
+<p>On successfully entering the channel, the registered success blocks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to the method are executed. On failure to enter, the <code>errback</code> callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> are called with an <a href="#error-info"><code>ErrorInfo</code></a> argument describing the failure reason.</p>
+
+</div> <!-- /end ruby language block -->
+
+<h6 id="leave-client"><span lang='default'>leaveClient</span><span lang='ruby'>leave_client</span></h6>
+<p>Leave this presence channel for the given <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span>. This method is provided to support typically server instances that act on behalf of multiple client IDs. See <a href="#presence-multiple-client-id">Managing multiple client IDs</a> for more info. In order to leave the presence set of a channel, the client must have already <a href="#enter-client">entered and been present</a>.</p>
+<p>There are two overloaded versions of this method. With both versions, a <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to leave.</p>
+<blockquote class="definition" id="leave-client-none">
+<p class="definition" id="leave-client-none"><span lang='default'>leaveClient(String clientId, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> leave_client(String client_id) &#8594; yields</span><span lang='java'>public void leaveClient(String clientId, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Leave a presence channel on behalf of the provided <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> without emitting any data.</p>
+<blockquote class="definition" id="leave-client-data">
+<p class="definition" id="leave-client-data"><span lang='default'>leaveClient(String clientId, Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> leave_client(String client_id, Object data) &#8594; yields</span><span lang='java'>public void leaveClient(String clientId, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Leave a presence channel on behalf of the provided <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> and emit data that is associated with the current leaving member.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><div lang="javascript,nodejs">Object data</div></dt>
+	<dd>data payload for the present member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
+	<dt><div lang="java">Object data</div></dt>
+	<dd>data payload for the present member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
+	<dt><div lang="ruby">Object data</div></dt>
+	<dd>data payload for the present member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>is a function of the form <code>function(err)</code> which is called upon completion</dd>
+	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
+	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields upon successfully leaving the channel</dd>
+</dl>
+<h6 id="update-client"><span lang='default'>updateClient</span><span lang='ruby'>update_client</span></h6>
+<p>Clients can update the member data on behalf of the given <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> which will trigger a broadcast of this update to all presence subscribers. This method is provided to support typically server instances that act on behalf of multiple client IDs. See <a href="#presence-multiple-client-id">Managing multiple client IDs</a> for more info. If an attempt to update is made before the member has entered the channel, the update is treated as an enter.</p>
+<p>A <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to update the member data.</p>
+<blockquote class="definition" id="update-client-data">
+<p class="definition" id="update-client-data"><span lang='default'>updateClient(String clientId, Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> update_client(String client_id, Object data) &#8594; yields</span><span lang='java'>public void updateClient(String clientId, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span></p>
+</blockquote>
+<p>Update the member data on behalf of the provided <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> and broadcast an update event to all subscribers. <code>data</code> may be <code>null</code>.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt><div lang="javascript,nodejs">Object data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
+	<dt><div lang="java">Object data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
+	<dt><div lang="ruby">Object data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
+</dl>
+<dl>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>is a function of the form <code>function(err)</code> which is called upon completion</dd>
+	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
+	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="ruby">&amp;block</div></dt>
+	<dd>yields upon successfully updating the member data</dd>
+</dl>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On successfully updating the data, <code>err</code> is null. On failure to update, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object describing the failure reason.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<h4>Listener result</h4>
+<p>On successfully updating the data, the <code>onSuccess</code> method of the <a href="#completion-listener">CompletionListener</a> is called. On failure to update, the <code>onError</code> method is called with an <a href="#error-info"><code>ErrorInfo</code></a> argument describing the failure reason.</p>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<h4>Returns</h4>
+<p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from the method.</p>
+<p>On successfully updating the data, the registered success blocks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to the method are executed. On failure to update, the <code>errback</code> callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> are called with an <a href="#error-info"><code>ErrorInfo</code></a> argument describing the failure reason.</p>
+
+</div> <!-- /end ruby language block -->
+
+<h2 id="related-types">Related types</h2>
+<h3 id="presence-message"><span lang='default'>PresenceMessage</span><span lang='ruby'>Ably::Models::PresenceMessage</span><span lang='java'>io.ably.lib.types.PresenceMessage</span></h3>
+<p>A <code>PresenceMessage</code> represents an individual presence update that is sent to or received from Ably.</p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><div lang="java"><code>action</code></div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage.action</code></a><br><i>Type: enum Action { ABSENT, PRESENT, ENTER, LEAVE, UPDATE }</i></dd>
+	<dt><div lang="javascript,nodejs"><code>action</code></div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>Presence action</code></a><br><i>Type: Integer value for Action { &#8220;ABSENT&#8221; : 0, &#8220;PRESENT&#8221; : 1, &#8220;ENTER&#8221; : 2, &#8220;LEAVE&#8221; : 3, &#8220;UPDATE&#8221; : 4 }</i></dd>
+	<dt><div lang="ruby"><code>action</code></div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: enum ACTION { :absent, :present, :enter, :leave, :update }</i></dd>
+</dl>
+<dl>
+	<dt><div lang="java"><code>data</code></div></dt>
+	<dd>The presence update payload, if provided<br><i>Type: String, ByteArray, JSONObject, JSONArray</i></dd>
+	<dt><div lang="javascript,nodejs"><code>data</code></div></dt>
+	<dd>The presence update payload, if provided<br><i>Type: String, StringBuffer, JSON Object</i></dd>
+	<dt><div lang="ruby"><code>data</code></div></dt>
+	<dd>The presence update payload, if provided<br><i>Type: String, Binary (ASCII-8BIT String), Hash, Array</i></dd>
+</dl>
+<dl>
+	<dt><code>id</code></dt>
+	<dd>Unique ID assigned by Ably to this presence update<br><i>Type: String</i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span></dt>
+	<dd>The client ID of the publisher of this presence update<br><i>Type: String</i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>connectionId</code></span><span lang="ruby"><code>connection_id</code></span></dt>
+	<dd>The connection ID of the publisher of this presence update<br><i>Type: String</i></dd>
+</dl>
+<dl>
+	<dt><code>timestamp</code></dt>
+	<dd>Timestamp when the presence update was received by the Ably the realtime service, as milliseconds since the epoch<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+</dl>
+<dl>
+	<dt><code>encoding</code></dt>
+	<dd>This will typically be empty as all presence updates received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: String</i></dd>
+</dl>
+<h3 id="presence-action"><span lang='default'>Presence action</span><span lang='java'>io.ably.lib.types.PresenceMessage.Action</span><span lang='ruby'>Ably::Models::PresenceMessage::ACTION</span></h3>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<p><code>Presence</code> <code>action</code> is a String with a value matching any of the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>.</p>
+<pre lang="javascript"><code lang="javascript">var allPresenceActions = [
+  'absent', // (reserved for internal use)
+  'present',
+  'enter',
+  'leave',
+  'update'
+]</code></pre>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>io.ably.lib.types.PresenceMessage.Action</code> is an enum representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>.</p>
+<pre lang="java"><code lang="java">public enum Action {
+  ABSENT,  // 0 (reserved for internal use)
+  PRESENT, // 1
+  ENTER,   // 2
+  LEAVE,   // 3
+  UPDATE   // 4
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p><code>Ably::Models::PresenceMessage::ACTION</code> is an enum-like value representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>. <code>ACTION</code> can be represented interchangeably as either symbols or constants.</p>
+<h4>Symbol states</h4>
+<pre lang="ruby"><code lang="ruby">:absent  # =&gt; 0 (reserved for internal use)
+:present # =&gt; 1
+:enter   # =&gt; 2
+:leave   # =&gt; 3
+:update  # =&gt; 4</code></pre>
+<h4>Constant states</h4>
+<pre lang="ruby"><code lang="ruby">PresenceMessage::ACTION.Absent  # =&gt; 0 (internal use)
+PresenceMessage::ACTION.Present # =&gt; 1
+PresenceMessage::ACTION.Enter   # =&gt; 2
+PresenceMessage::ACTION.Leave   # =&gt; 3
+PresenceMessage::ACTION.Update  # =&gt; 4</code></pre>
+<h4>Example usage</h4>
+<pre lang="ruby"><code lang="ruby"># Example with symbols
+presence.on(:attached) { ... }
+
+# Example with constants
+presence.on(Ably::Models::PresenceMessage::ACTION.Enter) { ... }
+
+# Interchangeable
+Ably::Models::PresenceMessage::ACTION.Enter == :enter # =&gt; true</code></pre>
+
+</div> <!-- /end ruby language block -->
+
+<h3 id="completion-listener"><span lang='java'>io.ably.lib.realtime.CompletionListener</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p>A <span lang="java"><code>io.ably.lib.realtime.CompletionListener</code></span> is an interface allowing a client to be notified of the outcome of an asynchronous operation.</p>
+<pre lang="java"><code lang="java">public interface CompletionListener {
+  // Called when the associated operation completes successfully,
+  public void onSuccess();
+
+  // Called when the associated operation completes with an error.
+  public void onError(ErrorInfo reason);
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+<h3 id="paginated-result"><span lang='default'>PaginatedResult</span><span lang='ruby'>Ably::Models::PaginatedResult</span><span lang='java'>io.ably.lib.types.PaginatedResult</span></h3>
+<p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">paginated REST API query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><code>items</code></dt>
+	<dd>contains a page of results (for example an Array of <a href="#message"><code>Message</code></a> or <a href="#presence-message"><code>PresenceMessage</code></a> objects for a channel history request)<br><i>Type: Array &lt;Message, Presence, Stats&gt;</i></dd>
+</dl>
+<dl>
+	<dt><div lang="default"><code>isLast</code></div></dt>
+	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
+	<dt><div lang="ruby"><code>last?</code></div></dt>
+	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
+</dl>
+<dl>
+	<dt><div lang="default"><code>hasNext</code></div></dt>
+	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
+	<dt><div lang="ruby"><code>has_next?</code></div></dt>
+	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
+</dl>
+<h4>Methods</h4>
+<h6>first</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>first(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))</span><span lang='ruby'><a href="/realtime/types#paginated-result">PaginatedResult</a> first</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a> first()</span></p>
+</blockquote>
+<p>Returns a new <code>PaginatedResult</code> for the first page of results. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</p>
+<h6>items</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>Object[] items()</span><span lang='ruby'>Object[] items</span><span lang='java'>public Object[] items()</span></p>
+</blockquote>
+<p>Returns the current page of results as an Array. The type of the objects in the Array is determined by the operation that provided the <code>PaginatedResult</code>. For example, a <a href="/realtime/channels-messages#history">Message#history</a> request will return an array of <code>Message</code> objects.</p>
+<h6>next</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>next(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))</span><span lang='ruby'><a href="/realtime/types#paginated-result">PaginatedResult</a> next</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a> next()</span></p>
+</blockquote>
+<p>Returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <span lang="default"><code>null</code></span><span lang="java"><code>Null</code></span><span lang="ruby"><code>nil</code></span> is returned. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</p>
+<h4>Example</h4>
+<pre lang="javascript"><code lang="javascript">channel.history(function(err, paginatedResult) {
+  console.log('Page 0 item 0:' + paginatedResult.items[0].data);
+  paginatedResult.next(function(err, nextPage) {
+    console.log('Page 1 item 1: ' + nextPage.items[1].data);
+    console.log('Last page?: ' + nextPage.isLast;
+  });
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">channel.history(function(err, paginatedResult) {
+  console.log('Page 0 item 0:' + paginatedResult.items[0].data);
+  paginatedResult.next(function(err, nextPage) {
+    console.log('Page 1 item 1: ' + nextPage.items[1].data);
+    console.log('Last page?: ' + nextPage.isLast;
+  });
+});</code></pre>
+<pre lang="java"><code lang="java">PaginatedResult firstPage = channel.history();
+System.out.println("Page 0 item 0:" + firstPage.items[0].data);
+if (firstPage.hasNext) {
+  PaginatedResult nextPage = firstPage.next();
+  System.out.println("Page 1 item 1:" + nextPage.items[1].data);
+  System.out.println("More pages?:" + Strong.valueOf(nextpage.hasNext()));
+});</code></pre>
+<pre lang="ruby"><code lang="ruby"># When using the REST sync library
+first_page = channel.history
+puts "Page 0 item 0: #{first_page.items[0].data}"
+if first_page.has_next?
+  next_page = first_page.next
+  puts "Page 1 item 1: #{next_page.items[1].data}"
+  puts "Last page?: #{next_page.is_last?}"
+end
+
+# When using the Realtime EventMachine library
+channel.history do |first_page|
+  puts "Page 0 item 0: #{first_page.items[0].data}"
+  if first_page.has_next?
+    first_page.next do |next_page|
+      puts "Page 1 item 1: #{next_page.items[1].data}"
+      puts "Last page?: #{next_page.is_last?}"
+    end
+  end
+end</code></pre>
+<h3 id="param"><span lang='java'>io.ably.lib.types.Param</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>Param</code> is a type encapsulating a key/value pair. This type is used frequently in method parameters allowing key/value pairs to be used more flexible, see <a href="/realtime/history#channel-history"><code>Channel#history</code></a> for an example.</p>
+<p>Please note that <code>key</code> and <code>value</code> attributes are always strings. If an <code>Integer</code> or other value type is expected, then you must coerce that type into a <code>String</code>.</p>
+<h4><span lang='java'>Members</span></h4>
+<dl>
+	<dt><code>key</code></dt>
+	<dd>The key value<br><i>Type: String</i></dd>
+	<dt><code>value</code></dt>
+	<dd>The value associated with the <code>key</code><br><i>Type: String</i></dd>
+</dl>
+
+</div> <!-- /end java language block -->
+
+<h3 id="presence-listener"><span lang='java'>io.ably.lib.realtime.PresenceListener</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p>A <span lang="java"><code>io.ably.lib.realtime.Presence.PresenceListener</code></span> is an interface allowing a client to be notified when presence message events are received on a presence channel using a <a href="/realtime/presence#presence-states">presence subscription</a>.</p>
+<pre lang="java"><code lang="java">public interface PresenceListener {
+  // Called when one or more presence messages are received
+  public void onPresenceMessage(PresenceMessage[] messages);
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>

@@ -44,6 +44,7 @@
 <option id="anchor-selecting-auth">Selecting auth</option>
 <option id="anchor-basic-authentication">Basic authentication</option>
 <option id="anchor-token-authentication">Token authentication</option>
+<option id="anchor-understanding-capabilities">Understanding capabilities</option>
 <option id="anchor-token-request-spec">Token request spec</option>
 </optgroup>
           </select>
@@ -57,9 +58,9 @@
       
     </header>
     <article>
-      <p>Both the REST API and the Realtime API use common authentication mechanisms.</p>
-<p>Each is based on having a series of API keys set up for each application. Each key is <a href="https://support.ably.io/support/solutions/articles/3000030502-setting-up-and-managing-api-keys">configured via the dashboard</a> and exposed as a single string such as <code>{{API_KEY}}</code> which contains information that identifies the key as well as containing the &#8220;secret&#8221; key value.</p>
-<p>If you are using an Ably client library then the key can be considered to be an opaque string supplied when the library is instanced. If you are using the <a href="/rest-api/">Ably REST API endpoint</a> directly, then the API key string can be used in the <a href="/rest-api/#basic-authentication">basic authorization header</a></p>
+      <p>Both the <a href="/rest/authentication">REST API</a> and the <a href="/realtime/authentication">Realtime API</a> use common authentication mechanisms. The two schemes supported by Ably are <a href="#basic-authentication">Basic Authentication</a>, which uses your <a href="https://support.ably.io/solution/articles/3000030054-what-is-an-app-api-key">API key</a>, and <a href="#token-authentication">Token Authentication</a>, which relies on a token you obtain from Ably, or a token request that you sign and issue to your clients. <a href="#token-authentication">Token Authentication</a>, in most cases, is the recommended strategy as it provides robust access control and stringent security measures.</p>
+<p>Both types of authentication rely on a series of API keys set up for each application. Each key is <a href="https://support.ably.io/support/solutions/articles/3000030502-setting-up-and-managing-api-keys">configured via the dashboard</a> and exposed as a single string such as <code>{{API_KEY}}</code> which contains information that identifies the key as well as containing the &#8220;secret&#8221; key value.</p>
+<p>If you are using an Ably client library then the key can be considered to be an opaque string supplied when the library is instanced. If you are using the <a href="/rest-api/">Ably REST API endpoint</a> directly, then the API key string can be used in the <a href="/rest-api/#basic-authentication">basic authorisation header</a></p>
 <p>A key is associated with a set of capabilities &#8211; i.e. an explicit indication of which operations (such as publish, subscribe or presence) are allowable using that key. Additionally, the capabilities can be restricted to a set of a resources (which is either a channel namespace or a specific channel). View <a href="#capabilities">all supported capabilities</a>.</p>
 <h2 id="getting-started">Getting started</h2>
 <p>The simplest method for authentication with Ably is to use an API key string when instancing the client library. This method is simple and authenticates with Ably using basic authentication. However, this method suffers from a number of problems that might make it unsuitable for certain use cases:</p>
@@ -70,6 +71,7 @@
 	<li>clients are permitted to use any <code>client ID</code> in all operations with Ably. As such, a <code>client ID</code> in messages and presence cannot be trusted as any client using Basic Authentication can masquerade with any <code>client ID</code></li>
 </ul>
 <p>These issues are addressed with the <a href="#token-authentication">token-based authentication method</a>. Tokens are authentication credentials that only have a short lifetime, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of access rights, or being limited to use by a specific <code>client ID</code> &#8211; and therefore token-based authentication provides the flexibility to implement access control policies in the application. Tokens may be obtained using the <a href="/rest/authentication">client library authentication API</a> or directly via the Ably <a href="/rest-api/#requestToken">REST API tokenRequest endpoint</a>.</p>
+<p>See <a href="#understanding-capabilities">understanding capabilities and token security</a> below.</p>
 <h2 id="selecting-auth">Selecting an authentication mechanism</h2>
 <p>The following guidance aims to help you choose which system to use in any given situation. When deciding, it is recommended to bear in mind the <a href="http://en.wikipedia.org/wiki/Principle_of_least_privilege">principle of least privilege</a>: a client should ideally only possess the credentials and rights that it needs to accomplish what it wants; this way, if the credentials are compromised, the rights that can be abused by an attacker are minimised.</p>
 <p>Basic authentication is appropriate where:</p>
@@ -138,6 +140,15 @@ ably.requestToken({ clientId: 'client@example.com' }, function(err, token) {
        "issued": 1449741687315,
      } */
 });</code></pre>
+<h3 id="understanding-capabilities">Capabilities and Token Security</h3>
+<p><a href="https://support.ably.io/solution/articles/3000030054-what-is-an-app-api-key">API keys</a>, like tokens, have a set of capabilities assigned to them that specify which operations on what channels a client can perform operations such as subscribe or publish to a channel. However, unlike tokens, API keys are intended to be secret and not to be shared with remote clients, and tend to be long-lived. API keys and their capabilities are <a href="https://support.ably.io/support/solutions/articles/3000030502-setting-up-and-managing-api-keys">configured using the dashboard</a>, that is they cannot be added or removed programatically.</p>
+<p>Tokens on the other hand are designed to be configured and issued programatically for the purpose of sharing with clients, primarily because:</p>
+<ul>
+	<li>All tokens are short lived, typically for one hour, and as such, they significantly reduce the risks associated with them should they be compromised;</li>
+	<li>Tokens can be revoked (details coming soon, <a href="https://www.ably.io/contact">get in touch</a> if you require this functionality now);</li>
+	<li>A <code>clientId</code> can be configured for the token thus <a href="/realtime/authentication#identified-clients">identifying the user</a> and ensuring all operations by that client are trusted to be that <code>clientId</code> and restricted from emulating any other <code>clientId</code>;</li>
+	<li>A set of capabilities (privileges) can be assigned to tokens that explicitly specify what operations a client can perform on which channels</li>
+</ul>
 <h2 id="token-request-spec">Token request spec</h2>
 <p>The <a href="https://www.ably.io/download/">Ably REST and Realtime client libraries</a> aim to make things as simple as possible so it is not necessary to understand all of the details of token requests to interact with the service and issue tokens for clients. If you wish to issue tokens or token requests, we recommend you read the <a href="/rest/authentication">client library authentication documentation</a>.</p>
 <p>However, if you are using the <a href="/rest-api/#requesttoken">REST token endpoint directly</a>, or if you are creating token requests without the use of our client libraries, then the following specification will give you an in-depth understanding of how token requests work.</p>
@@ -191,7 +202,7 @@ with the following constraints:<br />
 <li>operations are listed in forward lexicographic order</li>
 <li>there is no trailing comma on any list of array or object elements</li>
 <li>all strings are quoted and escaped as per the JSON standard.</li>
-<li>the wildcard @*@ can be used for resource or operation fields</li>
+<li>the wildcard <code>*</code> can be used for resource or operation fields</li>
 </ul>
 </dd>
 	<dt><code>clientId</code></dt>
@@ -215,6 +226,7 @@ with the following constraints:<br />
 	<dt>stats</dt>
 	<dd>can retrieve current and historical usage statistics for an app</dd>
 </dl>
+<p>See <a href="#understanding-capabilities">understanding capabilities and token security</a> above to get a more thorough overview of how capabilities can be used to secure your application along with working examples.</p>
 <h3>HMAC calculation</h3>
 <p>First the canonicalised request text, constructed as follows:</p>
 <ul>

@@ -96,7 +96,7 @@ puts "There are #{members.size} members present"</code></pre>
 <h3>Retrieving presence history</h3>
 <p>The <code>Presence</code> API exposes a <code>history</code> method whereby a client can can obtain presence updates previously sent on those channels that have persistence enabled.</p>
 <p>History results are paginated and therefore accompanied with one or more relative links relating to the current query. Where the number of results returned exceeds the query limit &#8211; which is either the value of the <code>limit</code> param or the default limit of 100 &#8211; the query result contains pages with the limited number of records, and a relative link to the next page.</p>
-<pre lang="ruby"><code lang="ruby"> presence_messages = client.channel('realtime-chat').presence.history(direction: :backwards)
+<pre lang="ruby"><code lang="ruby"> presence_messages = client.channels.get('realtime-chat').presence.history(direction: :backwards)
 presence_messages.each do |presence_message|
   puts "#{presence_message.action}: #{presence_message.member_key}"
 end</code></pre>

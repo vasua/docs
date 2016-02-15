@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Ably API Documentation - Quickstart Guide</title>
+    <title>Ably API Documentation - </title>
     <link rel="shortcut icon" href="/favicon.ico">
 
     <link rel="stylesheet" type="text/css" href="/vendor/prettify/prettify.css" media="screen">
@@ -33,79 +33,41 @@
     <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/images/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
-    
-    <header>
-      
-      
-        <h1 id="title">Quickstart Guide</h1>
-      
-    </header>
-    <article>
-      <p>Integrating Ably is simple.  In this guide we&#8217;ll run you through the basics.</p>
-<p>Whilst our client libraries do support <a href="https://www.ably.io/download">every popular language and platform</a>, for simplicity we have used Javascript as the primary language for this guide.</p>
-<h3>Adding the Ably realtime library</h3>
-<p>Simply include the Ably Javascript library within the <code>&lt;head&gt;</code> of your HTML page as follows:</p>
-<pre lang="html"><code lang="html">&lt;script src="http://cdn.ably.io/lib/ably.min.js"&gt;&lt;/script&gt;</code></pre>
-<h3>The basics: Receiving a message</h3>
-<p>To connect to Ably, you need an API key.  In this example we have provided a temporary API key, however if you are signed up and visit your <a href="https://www.ably.io/dashboard">application dashboard</a>, you will be able to use your own API key.  If you do not have an API key yet, why not <a href="https://www.ably.io/#signup">sign up now for a free app and API key</a>.</p>
-<pre class="code-editor open-jsbin open-jsbin-ezuzot" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ezuzot" lang="javascript">var ably = new Ably.Realtime('{{API_KEY}}');
-ably.connection.on('connected', function() {
-  alert("That was simple, you're now connected to Ably in realtime");
-});</code></pre>
-<p>Messages are broadcasted on channels.  Next we will subscribe to a channel and listen for messages that are sent to us from other connected clients or servers.</p>
-<pre class="code-editor open-jsbin open-jsbin-onocan" lang="javascript"><code class="code-editor open-jsbin open-jsbin-onocan" lang="javascript">var channel = ably.channels.get('quickstart');
-channel.subscribe('greeting', function(message) {
-  alert("Received a greeting message in realtime: " + message.data);
-});</code></pre>
-<h3>The basics: Sending a message</h3>
-<p>Publishing a message to a channel is extremely straightforward.  As this is commonly performed by both connected devices and servers, here are examples in multiple languages</p>
-<pre class="code-editor open-jsbin open-jsbin-onocan" lang="javascript"><code class="code-editor open-jsbin open-jsbin-onocan" lang="javascript">var channel = ably.channels.get('quickstart');
-channel.publish('greeting', 'hello!');</code></pre>
-<pre lang="csharp"><code lang="csharp">Channel channel = ably.channels.get('quickstart');
-channel.publish('greeting', 'hello!');</code></pre>
-<pre lang="java"><code lang="java">Channel channel = ably.channels.get('quickstart');
-channel.publish('greeting', 'hello!');</code></pre>
-<pre lang="python"><code lang="python">channel = ably.channels.get('quickstart')
-channel.publish('greeting', 'hello!')</code></pre>
-<pre lang="ruby"><code lang="ruby">channel = ably.channels.get('quickstart')
-channel.publish 'greeting', 'hello!'</code></pre>
-<pre lang="php"><code lang="php">$channel = $ably.channels.get('quickstart');
-$channels.get('quickstart').publish('greeting', 'hello!');</code></pre>
-<pre lang="ios"><code lang="ios">-(Channel) channel = ably.channels.get('quickstart');
-channels.get('quickstart').publish('greeting', 'hello!');</code></pre>
-<h3>Sending a message via the REST API</h3>
-<p>We recommend using our REST client libraries over direct REST API access.  However, if you want to comunnicate directly over HTTP with Ably it&#8217;s as simple as:</p>
-<pre lang="sh"><code lang="sh">curl https://rest.ably.io/channels/{{RANDOM_CHANNEL_NAME}}/publish \
-  --user "{{API_KEY}}" \
-  --data "name=greeting&amp;data=Hello"</code></pre>
-<p>Copy and paste the <code>curl</code> command above into your console and try it now.</p>
-<script type="text/javascript">
-function subscribeToCurlRequest(key) {
-  var ably = new Ably.Realtime(key),
-      channelName = '{{RANDOM_CHANNEL_NAME}}';
-  if (channelName === '{{RANDOM_CHANNEL' + '_NAME}}') { channelName = window.randomChannelName; }
-  ably.channels.get(channelName).subscribe('greeting', function(message) {
-    alert('That was easy, a message was just received from the REST API on channel "' + channelName + '".\n\nGreeting => ' + message.data);
-  });
-}
-
-/* API_KEY variable is replaced inline on https://www.ably.io so
-  {{API_KEY}} will not equal '{{API_' + 'KEY}}'
-  On docs.ably.io, we rely on application.js to call the onApiKeyRetrieved method */
-if ('{{API_KEY}}' !== '{{API_' + 'KEY}}') {
-  subscribeToCurlRequest('{{API_KEY}}');
-} else {
-  window.onApiKeyRetrieved = subscribeToCurlRequest;
-}
-</script>
-    </article>
-    <hr class="back">
-    <a href="#documentation">Back to top</a>
+    <p>A <code>Stats</code> object represents a application statistic for the specified interval and time period. Ably aggregates statistics globally for all accounts and applications, and makes these available both through our <a href="/realtime/statistics">statistics API</a> as well as your <a href="https://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>.</p>
+<p>Please note that most attributes of the <code>Stats</code> type below contain references to further stats types. This documentation is not exhaustive for all stats stypes, and as such, links to the stats types below will take you to the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats">Ruby library stats documentation</a> which contains exhaustive stats documentation. Ruby however uses <code>under_score</code> case instead of the default <code>camelCase</code> in most languages, so please bear that in mind.</p>
+<p>h4.<br />
+  default: Properties<br />
+  java:    Members<br />
+  ruby:    Attributes</p>
+<dl>
+	<dt><code>all</code></dt>
+	<dd>aggregate count of both <code>inbound</code> and <code>outbound</code> message stats<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">MessageTypes</a></i></dd>
+	<dt><span lang="default"><code>apiRequests</code></span><span lang="ruby"><code>api_requests</code></span></dt>
+	<dd>breakdown of API requests received via the REST API<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
+	<dt><code>channels</code></dt>
+	<dd>breakdown of channel related stats such as min, mean and peak channels<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ResourceCount">ResourceCount</a></i></dd>
+	<dt><code>connections</code></dt>
+	<dd>breakdown of connection related stats such as min, mean and peak channels for TLS and non-TLS connections<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ConnectionTypes">ConnectionTypes</a></i></dd>
+	<dt><code>inbound</code></dt>
+	<dd>statistics such as count and data for all inbound messages received over REST and Realtime connection, broken down by normal channel messages or presence messages<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTraffic">MessageTraffic</a></i></dd>
+	<dt><div lang="ruby"><code>interval_granularity</code></div></dt>
+	<dd>A <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats#GRANULARITY-constant"><code>GRANULARITY</code></a> constant representing the granularity (interval) of this statistic such as <code>:minute</code>, <code>:hour</code>, <code>:day</code>, <code>:month</code>.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats#GRANULARITY-constant"><code>Stats::GRANULARITY</code></a></i></dd>
+	<dt><span lang="default"><code>intervalId</code></span><span lang="ruby"><code>interval_id</code></span></dt>
+	<dd>the interval ID provides both the time from which the interval starts as well as the length of time that this statistic covers i.e. the period of time which the stats are aggregated for. For example, an interval ID value of &#8220;2016-03-01:10:02&#8221; represents a single minute interval for the UTC time presented in the string. However, an interval ID of &#8220;2016-03&#8221; represents a month interval for the entire month of March 2016 based on UTC time.<br><i>Type: String</i></dd>
+	<dt><div lang="ruby"><code>interval_time</code></div></dt>
+	<dd>A <code>Time</code> object representing the start of the interval</dd>
+	<dt><code>outbound</code></dt>
+	<dd>statistics such as count and data for all oubound messages retrieved via REST history requests, received over Realtime connections, or pushed with WebHooks, broken down by normal channel messages or presence messages<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTraffic">MessageTraffic</a></i></dd>
+	<dt><code>persisted</code></dt>
+	<dd>messages persisted and later retrieved via the <a href="/realtime/history">history API</a><br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">MessageTypes</a></i></dd>
+	<dt><span lang="default"><code>tokenRequests</code></span><span lang="ruby"><code>token_requests</code></span></dt>
+	<dd>breakdown of Token requests received via the REST API.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
+</dl>
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/images/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
   <ul>
-<li class='selected'><a href='/quick-start-guide/'>Quickstart Guide</a></li>
+<li class=''><a href='/quick-start-guide/'>Quickstart Guide</a></li>
 <li class=''><a href='/how-ably-works/'>How Ably works</a></li>
 </ul>
   <h2><a href="/realtime/">Realtime client lib</a></h2>

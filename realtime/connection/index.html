@@ -41,7 +41,6 @@
             <optgroup label='Help with'>
 <option id="anchor-title">Getting started</option>
 <option id="anchor-connection-state-explained">Connection state explained</option>
-<option id="anchor-connection-states">Available connection states</option>
 <option id="anchor-connection-state-recovery">Connection state recovery</option>
 </optgroup>
 <optgroup label='Connection API properties'>
@@ -60,12 +59,6 @@
 <option id="anchor-off">off</option>
 <option id="anchor-ping">ping</option>
 </optgroup>
-<optgroup label='Related types'>
-<option id="anchor-completion-listener">Completion listener</option>
-<option id="anchor-connection-state">Connection state</option>
-<option id="anchor-connection-state-listener">Connection state listener</option>
-<option id="anchor-connection-state-change">Connection state change</option>
-</optgroup>
           </select>
         </div>
       </nav>
@@ -81,12 +74,13 @@
     <article>
       <p>The Ably Realtime library establishes and maintains a connection to the Ably service, using the most efficient transport available, typically WebSockets. The Ably realtime protocol operates and multiplexes all channel traffic over that connection.</p>
 <h3 id="getting-started">Getting started</h3>
-<p>The Ably Realtime library will open and maintain a connection to the Ably realtime servers as soon as it is instanced. The <code>Connection</code> object provides a straightforward API to monitor and manage connection state. The following example simply connects to Ably:</p>
-<pre class="code-editor open-jsbin open-jsbin-ihibil" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ihibil" lang="javascript">var ably = new Ably.Realtime('{{API_KEY}}');
+<p>The Ably Realtime library will open and maintain a connection to the Ably realtime servers as soon as it is instanced. The <code>Connection</code> object provides a straightforward API to monitor and manage connection state.</p>
+<p>The following example relies on the default auto-connect behaviour of the library, and then subscribes to the connection&#8217;s <code>connected</code> event.</p>
+<pre class="code-editor open-jsbin open-jsbin-aredoz" lang="javascript"><code class="code-editor open-jsbin open-jsbin-aredoz" lang="javascript">var ably = new Ably.Realtime('{{API_KEY}}');
 ably.connection.on('connected', function() {
   alert('Connected, that was easy');
 })</code></pre>
-<pre class="code-editor open-jsbin open-jsbin-ihibil" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ihibil" lang="nodejs">var Ably = require('ably-js');
+<pre class="code-editor open-jsbin open-jsbin-aredoz" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-aredoz" lang="nodejs">var Ably = require('ably-js');
 var ably = new Ably.Realtime('{{API_KEY}}');
 ably.connection.on('connected', function() {
   alert('Connected, that was easy');
@@ -95,8 +89,7 @@ ably.connection.on('connected', function() {
 ably.connection.on(:connected) do |message|
   puts "Connected, that was easy"
 end</code></pre>
-<pre lang="java"><code lang="java">import io.ably.lib.realtime;
-AblyRealtime ably = new AblyRealtime("{{API_KEY}}");
+<pre lang="java"><code lang="java">AblyRealtime ably = new AblyRealtime("{{API_KEY}}");
 ably.connection.on('connected', new ConnectionStateListener() {
   @Override
   public void onConnectionStateChanged(ConnectionStateChange change) {
@@ -289,7 +282,7 @@ Methods
 </ul>
 </li>
 <li>
-Members
+Properties
 <ul>
 <li><a href='#id'>id</a></li>
 <li><a href='#state'>state</a></li>
@@ -310,7 +303,7 @@ Related types
 </li>
 </ul>
 </li></ul>
-</div><h2 id="members"><span lang='default'>Connection Properties</span><span lang='ruby'>Ably::Realtime::Connection Attributes</span><span lang='java'>io.ably.lib.realtime.Connection Members</span></h2>
+</div><h2 id="properties"><span lang='default'>Connection Properties</span><span lang='ruby'>Ably::Realtime::Connection Attributes</span><span lang='java'>io.ably.lib.realtime.Connection Members</span></h2>
 <p>The <code>Connection</code> object exposes the following public <span lang="default">properties</span><span lang="ruby">attributes</span><span lang="java">members</span>:</p>
 <h6 id="id">id</h6>
 <p>A unique public identifier <code>String</code> for this connection, used to identify this member in presence events and messages.</p>
@@ -335,7 +328,7 @@ Related types
 <div lang="ruby"> <!-- start ruby language block -->
 <h4>Returns</h4>
 <p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from this method.</p>
-<p>On successfully connecting to Ably, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields a <a href="/realtime/connection"><code>Connection</code></a> object.</p>
+<p>On successfully connecting to Ably, the registered success blocks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields a <a href="/realtime/connection"><code>Connection</code></a> object.</p>
 <p>Failure to connect will trigger the errback callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object containing an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
 
 </div> <!-- /end ruby language block -->
@@ -350,7 +343,7 @@ Related types
 <div lang="ruby"> <!-- start ruby language block -->
 <h4>Returns</h4>
 <p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from this method.</p>
-<p>On successfully closing the connection, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields a <a href="/realtime/connection"><code>Connection</code></a> object.</p>
+<p>On successfully closing the connection, the registered success blocks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields a <a href="/realtime/connection"><code>Connection</code></a> object.</p>
 <p>Failure to close the connection will trigger the errback callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object containing an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
 
 </div> <!-- /end ruby language block -->
@@ -376,7 +369,7 @@ Related types
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">listener</div></dt>
-	<dd>is a function of the form <code>listener(stateChange)</code> to be notified for matching state changes</dd>
+	<dd>is a function of the form <code>function(stateChange)</code> to be notified for matching state changes</dd>
 	<dt><div lang="java"><a href="#connection-state-listener">ConnectionStateListener</a> listener</div></dt>
 	<dd>listener to be notified for matching state changes</dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
@@ -405,7 +398,7 @@ Related types
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">listener</div></dt>
-	<dd>is a function of the form <code>listener(stateChange)</code> to be notified for a single occurence of a matching state change</dd>
+	<dd>is a function of the form <code>function(stateChange)</code> to be notified for a single occurence of a matching state change</dd>
 	<dt><div lang="java"><a href="#connection-state-listener">ConnectionStateListener</a> listener</div></dt>
 	<dd>listener to be notified for a single occurence of a matching state change</dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
@@ -448,7 +441,7 @@ Related types
 <div lang="ruby"> <!-- start ruby language block -->
 <h4>Returns</h4>
 <p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from this method.</p>
-<p>On successfully echoing a heartbeat from Ably, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields an Integer representing the time in milliseconds for the heartbeat ping request to be echoed.</p>
+<p>On successfully echoing a heartbeat from Ably, the registered success blocks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields an Integer representing the time in milliseconds for the heartbeat ping request to be echoed.</p>
 <p>Failure to receive a heartbeat ping will trigger the errback callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object containing an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
 
 </div> <!-- /end ruby language block -->
@@ -563,7 +556,6 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 	<dt><span lang="default"><code>retryIn</code></span><span lang="ruby"><code>retry_in</code></span></dt>
 	<dd>Duration upon which the library will retry a connection where applicable, as <span lang="default">milliseconds</span><span lang="ruby">seconds</span><br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Integer</span></i></dd>
 </dl>
-<p>&nbsp;</p>
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>
