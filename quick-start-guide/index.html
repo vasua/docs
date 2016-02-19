@@ -26,7 +26,7 @@
     <div class="canonical-notice">
       <img src="/images/icon-alert.png">
       <span class="canonical-notice-text">
-        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+        You are viewing our bleeding edge unstable documentation. We recommend you use our <a href="https://www.ably.io/documentation">stable documentation »</a>
       </span>
       <img src="/images/icon-alert.png">
     </div>
@@ -45,7 +45,7 @@
 <p>Whilst our client libraries do support <a href="https://www.ably.io/download">every popular language and platform</a>, for simplicity we have used Javascript as the primary language for this guide.</p>
 <h3>Adding the Ably realtime library</h3>
 <p>Simply include the Ably Javascript library within the <code>&lt;head&gt;</code> of your HTML page as follows:</p>
-<pre lang="html"><code lang="html">&lt;script src="http://cdn.ably.io/lib/ably.min.js"&gt;&lt;/script&gt;</code></pre>
+<pre lang="html"><code lang="html">&lt;script src="//cdn.ably.io/lib/ably.min.js"&gt;&lt;/script&gt;</code></pre>
 <h3>The basics: Receiving a message</h3>
 <p>To connect to Ably, you need an API key.  In this example we have provided a temporary API key, however if you are signed up and visit your <a href="https://www.ably.io/dashboard">application dashboard</a>, you will be able to use your own API key.  If you do not have an API key yet, why not <a href="https://www.ably.io/#signup">sign up now for a free app and API key</a>.</p>
 <pre class="code-editor open-jsbin open-jsbin-ezuzot" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ezuzot" lang="javascript">var ably = new Ably.Realtime('{{API_KEY}}');
@@ -79,7 +79,7 @@ channels.get('quickstart').publish('greeting', 'hello!');</code></pre>
   --user "{{API_KEY}}" \
   --data "name=greeting&amp;data=Hello"</code></pre>
 <p>Copy and paste the <code>curl</code> command above into your console and try it now.</p>
-<script type="text/javascript">
+<script src="//cdn.ably.io/lib/ably.min.js"></script><script type="text/javascript">
 function subscribeToCurlRequest(key) {
   var ably = new Ably.Realtime(key),
       channelName = '{{RANDOM_CHANNEL_NAME}}';
@@ -116,6 +116,7 @@ if ('{{API_KEY}}' !== '{{API_' + 'KEY}}') {
 <li class=''><a href='/realtime/presence/'>Presence</a></li>
 <li class=''><a href='/realtime/authentication/'>Authentication</a></li>
 <li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/encryption/'>Encryption</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 <li class=''><a href='/realtime/types/'>Types</a></li>
 </ul>

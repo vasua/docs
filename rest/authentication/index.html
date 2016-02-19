@@ -26,7 +26,7 @@
     <div class="canonical-notice">
       <img src="/images/icon-alert.png">
       <span class="canonical-notice-text">
-        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+        You are viewing our bleeding edge unstable documentation. We recommend you use our <a href="https://www.ably.io/documentation">stable documentation »</a>
       </span>
       <img src="/images/icon-alert.png">
     </div>
@@ -73,11 +73,11 @@
 </ul>
 <pre lang="ruby"><code lang="ruby">client = Ably::Rest::Client.new(api_key: '')</code></pre>
 <h3>Token Authentication</h3>
-<p><strong>Token Authentication</strong> uses a token obtained via the REST API <a href="#requesttoken"><code>requestToken</code></a> endpoint. Tokens are authentication tokens that only have a short lifetime, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of access rights, or being limited to use by a specific client &#8211; and therefore token-based authentication provides the flexibility to implement access control policies in the application. See <a href="/general/authentication">Authentication</a> for more details.</p>
+<p><strong>Token Authentication</strong> uses a token obtained via the REST API <a href="#request-token"><code>requestToken</code></a> endpoint. Tokens are authentication tokens that only have a short lifetime, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of access rights, or being limited to use by a specific client &#8211; and therefore token-based authentication provides the flexibility to implement access control policies in the application. See <a href="/general/authentication">Authentication</a> for more details.</p>
 <p>Both the <a href="/rest/usage#constructor">REST</a> and <a href="/realtime/usage#constructor">Realtime</a>, libraries would typically be instanced with either a <code>key</code> or a <code>token</code> option, and these given credentials are used to authenticate requests made by the library. In this situation, the library assumes responsibility for authentication operations, calling any <code>authUrl</code> or <code>authCallback</code> as needed. REST operations and Realtime connections can then proceed using the given credentials with no need to make further calls to the authentication-specific functionality in the library.</p>
 <p>The principal use-case for <code>auth</code> object is to make requests for tokens to issue to other clients. A subsidiary use-case is to preemptively trigger renewal of a token or to acquire a new token with a revised set of capabilities.</p>
-<p>The REST client library provides the ability to issue tokens using the <a href="/rest-api#requesttoken"><code>requestToken</code> API endpoint</a>, and also provides a number of helper functions to simplify the use of the authentication API.</p>
-<p>The <a href="#requesttoken"><code>requestToken</code></a> endpoint may itself be used without explicit authentication, relying on the implicit authentication of submitting a validly signed token request.</p>
+<p>The REST client library provides the ability to issue tokens using the <a href="/rest-api#request-token"><code>requestToken</code> API endpoint</a>, and also provides a number of helper functions to simplify the use of the authentication API.</p>
+<p>The <a href="#request-token"><code>requestToken</code></a> endpoint may itself be used without explicit authentication, relying on the implicit authentication of submitting a validly signed token request.</p>
 <h1>API Reference</h1>
 <div class="inline-toc">
 <ul><li>Auth object reference
@@ -107,8 +107,8 @@ Related types
 <blockquote class="definition">
 <p class="definition"><span lang='nodejs'>auth.requestToken(options, callback)</span><span lang='ruby'>auth.request_token(options) → json_result</span><span lang='java'>auth.requestToken(AuthOptions options, TokenParams params) → TokenDetails</span></p>
 </blockquote>
-<h6 lang="java" id="requesttoken">public TokenDetails requestToken(AuthOptions options, TokenParams params)</h6>
-<p>Calls the <a href="/rest-api#requesttoken"><code>requestToken</code> API endpoint</a> to obtain a token according to the specified <span lang="default">options</span><span lang="java">authOptions and tokenParams</span>. If the request is successful the resulting <a href="#token-details">TokenDetails</a> instance <span lang="java">is returned</span><span lang="default">is passed back in the callback</span>. If the request is unsuccessful <span lang="java">an appropriate Exception is thrown</span><span lang="default">an appropriate error object is passed to the callback</span>.</p>
+<h6 lang="java" id="request-token">public TokenDetails requestToken(AuthOptions options, TokenParams params)</h6>
+<p>Calls the <a href="/rest-api#request-token"><code>requestToken</code> API endpoint</a> to obtain a token according to the specified <span lang="default">options</span><span lang="java">authOptions and tokenParams</span>. If the request is successful the resulting <a href="#token-details">TokenDetails</a> instance <span lang="java">is returned</span><span lang="default">is passed back in the callback</span>. If the request is unsuccessful <span lang="java">an appropriate Exception is thrown</span><span lang="default">an appropriate error object is passed to the callback</span>.</p>
 <pre lang="javascript"><code lang="javascript">client.auth.requestToken(options, function(err, tokenDetails){
   if(err)
     console.log('An error occurred; err = ' + err.message);
@@ -153,7 +153,7 @@ where:<br />
 <blockquote class="definition">
 <p class="definition"><span lang='nodejs'>auth.authorise(options, callback)</span><span lang='ruby'>auth.authorise(options) → json_result</span><span lang='java'>auth.authorise(AuthOptions options, TokenParams params, boolean force) → TokenDetails</span></p>
 </blockquote>
-<p>Ensures valid auth credentials are present for the library instance. This may rely on an already-known and valid token, and will obtain a new token if necessary or explicitly requested via the <a href="/rest-api#requesttoken"><code>requestToken</code> API endpoint</a>.</p>
+<p>Ensures valid auth credentials are present for the library instance. This may rely on an already-known and valid token, and will obtain a new token if necessary or explicitly requested via the <a href="/rest-api#request-token"><code>requestToken</code> API endpoint</a>.</p>
 <p>In the event that a new token request is made, the specified <span lang="default">options</span><span lang="java">authOptions and tokenParams</span> are used. If the check or a subsequent request is successful the resulting <a href="#token-details">TokenDetails</a> instance <span lang="java">is returned</span><span lang="default">is passed back in the callback</span>. If the request is unsuccessful <span lang="java">an appropriate Exception is thrown</span><span lang="default">an appropriate error object is passed to the callback</span>.</p>
 <pre lang="javascript"><code lang="javascript">client.auth.authorise(options, function(err, tokenDetails){
   if(err)
@@ -341,6 +341,7 @@ Options specified in this way will supplement or override the corresponding opti
 <li class=''><a href='/realtime/presence/'>Presence</a></li>
 <li class=''><a href='/realtime/authentication/'>Authentication</a></li>
 <li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/encryption/'>Encryption</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 <li class=''><a href='/realtime/types/'>Types</a></li>
 </ul>

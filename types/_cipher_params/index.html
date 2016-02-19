@@ -33,24 +33,27 @@
     <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/images/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
-    <p>blang[jsall].<br />
-  <code>ChannelOptions</code>, a plain Javascript object, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following attributes can be defined on the object:</p>
-<p>blang[ruby].<br />
-  <code>ChannelOptions</code>, a Hash object, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following key symbol values can be added to the Hash:</p>
-<p>blang[java].<br />
-  <code>io.ably.lib.types.ChannelOptions</code> may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options.</p>
-<p>Currently the supported channel options are only used for <a href="/realtime/encryption">configuring encryption</a>.</p>
+    <p>A <code>CipherParams</code> contains configuration options for a channel cipher, including algorithm, mode, key length and key. Ably client libraries currently support AES with CBC, PKCS#7 with a default key length of 128 bits. All implementations also support AES256.</p>
+<p>Individual client libraries may support the client instancing a <code>CipherParams</code> directly, using the default values obtained from a <span lang="default"><a href="/realtime/encryption#get-default-params"><code>Crypto.getDefaultParams()</code></a></span><span lang="ruby"><a href="/realtime/encryption#get-default-params"><code>Crypto.get_default_params()</code></a></span>, or relying on the defaults provided a channel when encryption is enabled.</p>
 <p>h4.<br />
   default: Properties<br />
   java:    Members<br />
   ruby:    Attributes</p>
 <dl>
-	<dt><span lang="ruby"><code>:</code></span><code>encrypted</code></dt>
-	<dd>Requests encryption for this channel when true<br><i>Type: Boolean</i></dd>
+	<dt><div lang="jsall,ruby"><span lang="ruby">:</span>key</div></dt>
+	<dd>A string <span lang="jsall">or buffer</span>containing the secret key used for encryption and decryption</dd>
 </dl>
 <dl>
-	<dt><span lang="default"><code>cipherParams</code></span><span lang="ruby"><code>:cipher_params</code></span></dt>
-	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#get-default-params">an encryption example using <code>CipherParams</code></a><br><i>Type: <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a></i></dd>
+	<dt><span lang="ruby">:</span>algorithm</dt>
+	<dd><em>AES</em> The name of the algorithm in the default system provider, or the lower-cased version of it; eg &#8220;aes&#8221; or &#8220;AES&#8221;<br><i>Type: String</i></dd>
+	<dt><span lang="ruby">:key_length</span><span lang="default">keyLength</span></dt>
+	<dd><em>128</em> The key length of the cipher, either 128 or 256<br><i>Type: Integer</i></dd>
+	<dt><span lang="ruby">:</span>mode</dt>
+	<dd><em>CBC</em> The cipher mode<br><i>Type: String</i></dd>
+</dl>
+<dl>
+	<dt><div lang="java">keySpec</div></dt>
+	<dd>A <code>KeySpec</code> for the cipher key<br><i>Type: SecretKeySpec</i></dd>
 </dl>
   </div>
   <div id="sidebar">

@@ -26,29 +26,29 @@
     <div class="canonical-notice">
       <img src="/images/icon-alert.png">
       <span class="canonical-notice-text">
-        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+        You are viewing our bleeding edge unstable documentation. We recommend you use our <a href="https://www.ably.io/documentation">stable documentation »</a>
       </span>
       <img src="/images/icon-alert.png">
     </div>
     <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/images/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
-    <p><code>TokenDetails</code> is a type providing details of a token and its associated metadata, provided when the system successfully requests a token from the system.</p>
+    <p><code>TokenDetails</code> is a type providing details of the token string and its associated metadata.</p>
 <p>h4.<br />
   default: Properties<br />
   java:    Members<br />
   ruby:    Attributes</p>
 <dl>
 	<dt><code>token</code></dt>
-	<dd>The token itself<br><i>Type: String</i></dd>
+	<dd>The token itself. A typical token string may appear like <code>{{TOKEN}}</code><br><i>Type: String</i></dd>
 	<dt><code>expires</code></dt>
-	<dd><span lang="default">The time (in millis since the epoch)</span><span lang="ruby">The time</span> at which this token expires<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby">The time</span> at which this token expires<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
 	<dt><code>issued</code></dt>
-	<dd><span lang="default">The time (in millis since the epoch)</span><span lang="ruby">The time</span> at which this token was issued<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby">The time</span> at which this token was issued<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
 	<dt><code>capability</code></dt>
-	<dd>The capability associated with this token. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/realtime/authentication">Read more about authentication and capabilities</a><br><i>Type: String</i></dd>
+	<dd>The capability associated with this token. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/general/authentication/#capabilities-explained">Read more about authentication and capabilities</a><br><i>Type: String</i></dd>
 	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span></dt>
-	<dd>The client ID, if any, bound to this token. If a client ID is included, then the token authenticates its bearer as that client ID, and the token may only be used to perform operations on behalf of that client ID.<br><i>Type: String</i></dd>
+	<dd>The client ID, if any, bound to this token. If a client ID is included, then the token authenticates its bearer as that client ID, and the token may only be used to perform operations on behalf of that client ID. The client is then considered to be an <a href="/realtime/authentication#identified-clients">identified client</a><br><i>Type: String</i></dd>
 </dl>
 <div lang="Ruby">
 <h3>Methods</h3>
@@ -72,6 +72,7 @@
 <li class=''><a href='/realtime/presence/'>Presence</a></li>
 <li class=''><a href='/realtime/authentication/'>Authentication</a></li>
 <li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/encryption/'>Encryption</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 <li class=''><a href='/realtime/types/'>Types</a></li>
 </ul>

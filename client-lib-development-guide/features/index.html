@@ -26,7 +26,7 @@
     <div class="canonical-notice">
       <img src="/images/icon-alert.png">
       <span class="canonical-notice-text">
-        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+        You are viewing our bleeding edge unstable documentation. We recommend you use our <a href="https://www.ably.io/documentation">stable documentation »</a>
       </span>
       <img src="/images/icon-alert.png">
     </div>
@@ -557,7 +557,7 @@
 		<ul>
 			<li><a id='RTL6c1' name='RTL6c1' href='#RTL6c1'><code>(RTL6c1)</code></a> If the connection is <code>CONNECTED</code> then the messages are published immediately</li>
 			<li><a id='RTL6c2' name='RTL6c2' href='#RTL6c2'><code>(RTL6c2)</code></a> If the connection is <code>CONNECTING</code> or <code>DISCONNECTED</code>, and <code>ClientOptions#queueMessages</code> has not been explicitly set to false, then the message will be queued and delivered as soon as the connection state returns to <code>CONNECTED</code></li>
-			<li><a id='RTL6c3' name='RTL6c3' href='#RTL6c3'><code>(RTL6c3)</code></a> Implicitly attaches the <code>Channel</code>. However, if the channel is in the <code>FAILED</code> state, the <code>publish</code> request results in an error</li>
+			<li><a id='RTL6c3' name='RTL6c3' href='#RTL6c3'><code>(RTL6c3)</code></a> Implicitly attaches the <code>Channel</code>. However, if the channel is in or moves to the <code>FAILED</code> state before the operation succeeds, it will result in an error</li>
 		</ul></li>
 		<li><a id='RTL6d' name='RTL6d' href='#RTL6d'><code>(RTL6d)</code></a> Messages are delivered using a single <code>ProtocolMessage</code> where possible by bundling in all messages for that channel into the <code>ProtocolMessage#messages</code> array. However, a yet to be implemented feature should limit the total number of messages bundled per <code>ProtocolMessage</code> based on the default max message size, and would reject the publish and indicate an error if any single message exceeds that limit</li>
 		<li><a id='RTL6e' name='RTL6e' href='#RTL6e'><code>(RTL6e)</code></a> Unidentified clients using <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">Basic Auth</a> (i.e. any <code>clientId</code> is permitted as no <code>clientId</code> specified):
@@ -582,7 +582,7 @@
 	<ul>
 		<li><a id='RTL7a' name='RTL7a' href='#RTL7a'><code>(RTL7a)</code></a> Subscribe with no arguments subscribes a listener to all messages</li>
 		<li><a id='RTL7b' name='RTL7b' href='#RTL7b'><code>(RTL7b)</code></a> Subscribe with a single name argument subscribes a listener to only messages whose <code>name</code> member matches the string name</li>
-		<li><a id='RTL7c' name='RTL7c' href='#RTL7c'><code>(RTL7c)</code></a> Implicitly attaches the <code>Channel</code>. However, if the channel is in the <code>FAILED</code> state, the <code>subscribe</code> request result in an error</li>
+		<li><a id='RTL7c' name='RTL7c' href='#RTL7c'><code>(RTL7c)</code></a> Implicitly attaches the <code>Channel</code>. However, if the channel is in or moves to the <code>FAILED</code> state before the operation succeeds, it will result in the listener not being registered and an error being indicated, typically to the optional callback where the language permits</li>
 		<li><a id='RTL7d' name='RTL7d' href='#RTL7d'><code>(RTL7d)</code></a> Messages delivered are automatically decoded based on the <code>encoding</code> attribute; see REST <code>Channel</code> encoding features. If there is an error decoding a message, the message is still delivered, but in addition to sending an error message to the logger, an <code>ErrorInfo</code> error object is emitted as an error on the <code>Channel</code>. Tests should exist to publish and subscribe to encoded messages using the <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-128.json">AES 128</a> and <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-256.json">AES 256</a> fixture test data</li>
 		<li><a id='RTL7e' name='RTL7e' href='#RTL7e'><code>(RTL7e)</code></a> If a message cannot be decoded or decrypted successfully, it should be delivered to the listener with the <code>encoding</code> attribute set indicating the residual encoding state, and an error should be emitted on the channel</li>
 		<li><a id='RTL7f' name='RTL7f' href='#RTL7f'><code>(RTL7f)</code></a> A test should exist ensuring published messages are not echoed back to the subscriber when <code>echoMessages</code> is set to false in the <code>Realtime</code> library constructor</li>
@@ -626,7 +626,7 @@
 	<ul>
 		<li><a id='RTP6a' name='RTP6a' href='#RTP6a'><code>(RTP6a)</code></a> Subscribe with no arguments subscribes a listener to all presence messages</li>
 		<li><a id='RTP6b' name='RTP6b' href='#RTP6b'><code>(RTP6b)</code></a> Subscribe with a single action argument &#8211; such as <code>ENTER</code>, <code>LEAVE</code>, <code>UPDATE</code> or <code>PRESENT</code> &#8211; subscribes a listener to receive only presence messages with that action</li>
-		<li><a id='RTP6c' name='RTP6c' href='#RTP6c'><code>(RTP6c)</code></a> Implicitly attaches the <code>Channel</code>. However, if the channel is in the <code>FAILED</code> state, the <code>subscribe</code> request results in an error</li>
+		<li><a id='RTP6c' name='RTP6c' href='#RTP6c'><code>(RTP6c)</code></a> Implicitly attaches the <code>Channel</code>. However, if the channel is in or moves to the <code>FAILED</code> state before the operation succeeds, it will result in the listener not being registered and an error being indicated, typically to the optional callback where the language permits</li>
 	</ul></li>
 	<li><a id='RTP7' name='RTP7' href='#RTP7'><code>(RTP7)</code></a> <code>Presence#unsubscribe</code> function:
 	<ul>
@@ -664,7 +664,7 @@
 	<li><a id='RTP11' name='RTP11' href='#RTP11'><code>(RTP11)</code></a> <code>Presence#get</code> function:
 	<ul>
 		<li><a id='RTP11a' name='RTP11a' href='#RTP11a'><code>(RTP11a)</code></a> Returns the list of current members on the channel in a callback. By default, will wait for the <code>SYNC</code> to be completed, see <a href="#RTP11c1">RTP11c1</a></li>
-		<li><a id='RTP11b' name='RTP11b' href='#RTP11b'><code>(RTP11b)</code></a> Implicitly attaches the <code>Channel</code>. However, if the channel is in the <code>FAILED</code> state, it will result in an error</li>
+		<li><a id='RTP11b' name='RTP11b' href='#RTP11b'><code>(RTP11b)</code></a> Implicitly attaches the <code>Channel</code>. However, if the channel is in or moves to the <code>FAILED</code> state before the operation succeeds, it will result in an error</li>
 		<li><a id='RTP11c' name='RTP11c' href='#RTP11c'><code>(RTP11c)</code></a> An optional set of params can be provided:
 		<ul>
 			<li><a id='RTP11c1' name='RTP11c1' href='#RTP11c1'><code>(RTP11c1)</code></a> <code>waitForSync</code> (default <code>true</code>). When <code>true</code>, method will wait until <code>SYNC</code> is complete before returning a list of members. When <code>false</code>, known set of presence members is returned immediately, which may be incomplete if the <code>SYNC</code> is not finished</li>
@@ -693,7 +693,7 @@
 		<li><a id='RTP15b' name='RTP15b' href='#RTP15b'><code>(RTP15b)</code></a> Tests should use <code>enterClient</code>, <code>updateClient</code> and <code>leaveClient</code> for many members from one <code>Realtime</code> client and check that the operations are reflected in the presence map and the expected events are emitted on a separate client</li>
 		<li><a id='RTP15c' name='RTP15c' href='#RTP15c'><code>(RTP15c)</code></a> Tests should also ensure that using these methods has no side effects on a client that has entered normally using <code>Presence#enter</code></li>
 		<li><a id='RTP15d' name='RTP15d' href='#RTP15d'><code>(RTP15d)</code></a> A callback can be provided that will be called upon success or failure</li>
-		<li><a id='RTP15e' name='RTP15e' href='#RTP15e'><code>(RTP15e)</code></a> Implicitly attaches the <code>Channel</code>. However, if the channel is in the <code>FAILED</code> state, it will result in an error</li>
+		<li><a id='RTP15e' name='RTP15e' href='#RTP15e'><code>(RTP15e)</code></a> Implicitly attaches the <code>Channel</code>. However, if the channel is in or moves to the <code>FAILED</code> state before the operation succeeds, it will result in an error</li>
 		<li><a id='RTP15f' name='RTP15f' href='#RTP15f'><code>(RTP15f)</code></a> If the client is identified and has a valid <code>clientId</code>, and the <code>clientId</code> argument does not match the client&#8217;s <code>clientId</code>, then it should indicate an error. The connection and channel remain available for further operations</li>
 	</ul></li>
 </ul>
@@ -774,7 +774,7 @@
 </ul>
 <h4>TokenRequest</h4>
 <ul>
-	<li><a id='TE1' name='TE1' href='#TE1'><code>(TE1)</code></a> <code>TokenRequest</code> is a type containing the token request details sent to the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a></li>
+	<li><a id='TE1' name='TE1' href='#TE1'><code>(TE1)</code></a> <code>TokenRequest</code> is a type containing the token request details sent to the <a href="/rest-api/#request-token">REST requestToken endpoint</a></li>
 	<li><a id='TE2' name='TE2' href='#TE2'><code>(TE2)</code></a> String attributes <code>keyName</code>, <code>clientId</code>, <code>nonce</code> and <code>mac</code></li>
 	<li><a id='TE3' name='TE3' href='#TE3'><code>(TE3)</code></a> <code>capability</code> is a string attribute containing capabilities JSON stringified</li>
 	<li><a id='TE5' name='TE5' href='#TE5'><code>(TE5)</code></a> <code>timestamp</code> long &#8211; The timestamp (in milliseconds since the epoch) of this request. Timestamps, in conjunction with the <code>nonce</code>, are used to prevent requests from being replayed</li>
@@ -782,7 +782,7 @@
 </ul>
 <h4>TokenDetails</h4>
 <ul>
-	<li><a id='TD1' name='TD1' href='#TD1'><code>(TD1)</code></a> <code>TokenDetails</code> is a type containing the token request response from the <a href="/rest-api/#requesttoken">REST requestToken endpoint</a></li>
+	<li><a id='TD1' name='TD1' href='#TD1'><code>(TD1)</code></a> <code>TokenDetails</code> is a type containing the token request response from the <a href="/rest-api/#request-token">REST requestToken endpoint</a></li>
 	<li><a id='TD2' name='TD2' href='#TD2'><code>(TD2)</code></a> <code>TokenDetails#token</code> attribute contains the token string</li>
 	<li><a id='TD3' name='TD3' href='#TD3'><code>(TD3)</code></a> <code>TokenDetails#expires</code> attribute contains the expiry time in milliseconds.  Where idiomatic in the language, this can be a Date/Time object</li>
 	<li><a id='TD4' name='TD4' href='#TD4'><code>(TD4)</code></a> <code>TokenDetails#issued</code> attribute contains the time the token was issued in milliseconds.  Where idiomatic in the language, this can be a Date/Time object</li>
@@ -1068,17 +1068,17 @@ class RestChannel:
     direction: .Backwards | .Forwards api-default .Backwards, // RSL2b2
     limit: int api-default 100 // RSL2b3
   ) =&gt; io PaginatedResult&lt;Message&gt; // RSL2a
-  publish([Message]) =&gt; io Error? // RSL1, RTL6
-  publish(name: String?, data: Data?) =&gt; io Error? // RSL1, RTL6
-  publish(name: String?, data: Data?, clientId: String) =&gt; io Error? // RSL1h, RTL6h
+  publish([Message]) =&gt; io // RSL1
+  publish(name: String?, data: Data?) =&gt; io // RSL1
+  publish(name: String?, data: Data?, clientId: String) =&gt; io // RSL1h
 
-class RealtimeChannel extends RestChannel:
+class RealtimeChannel:
   embeds EventEmitter&lt;ChannelState, ErrorInfo?&gt; // RTL2
   errorReason: ErrorInfo? // RTL4e
   state: ChannelState // RTL2b
   presence: RealtimePresence // RTL9
-  attach() =&gt; io ErrorInfo? // RTL4d
-  detach() =&gt; io ErrorInfo? // RTL5e
+  attach() =&gt; io // RTL4d
+  detach() =&gt; io // RTL5e
   history(
     start: Time, // RTL10a
     end: Time api-default now(), // RTL10a
@@ -1086,8 +1086,11 @@ class RealtimeChannel extends RestChannel:
     limit: int api-default 100, // RTL10a
     untilAttach: Bool default false // RTL10b
   ) =&gt; io PaginatedResult&lt;Message&gt; // RSL2a
-  subscribe((Message) -&gt;) // RTL7a
-  subscribe(String, (Message) -&gt;) // RTL7b
+  publish([Message]) =&gt; io // RTL6i
+  publish(name: String?, data: Data?) =&gt; io // RTL6i
+  publish(name: String?, data: Data?, clientId: String) =&gt; io // RTL6h
+  subscribe((Message) -&gt;) =&gt; io // RTL7a
+  subscribe(String, (Message) -&gt;) =&gt; io // RTL7b
   unsubscribe() // RTL8a, RTE5
   unsubscribe((Message) -&gt;) // RTL8a
   unsubscribe(String, (Message) -&gt;) // RTL8a
@@ -1140,18 +1143,18 @@ class RealtimePresence:
     limit: int api-default 100, // RTP12a
     untilAttach: Bool default false // RTP12b
   ) =&gt; io PaginatedResult&lt;PresenceMessage&gt; // RTP12c
-  subscribe((PresenceMessage) -&gt;) // RTP6a
-  subscribe(PresenceAction, (PresenceMessage) -&gt;) // RTP6b
+  subscribe((PresenceMessage) -&gt;) =&gt; io // RTP6a
+  subscribe(PresenceAction, (PresenceMessage) -&gt;) =&gt; io // RTP6b
   unsubscribe() // RTP7a, RTE5
   unsubscribe((PresenceMessage) -&gt;) // RTP7a
   unsubscribe(PresenceAction, (PresenceMessage) -&gt;) // RTP7b
   // presence state modifiers
-  enter(Data?) =&gt; io ErrorInfo? // RTP8
-  update(Data?) =&gt; io ErrorInfo? // RTP9
-  leave(Data?) =&gt; io ErrorInfo? // RTP10
-  enterClient(clientId: String, Data?) =&gt; io ErrorInfo? // RTP4, RTP14, RTP15
-  updateClient(clientId: String, Data?) =&gt; io ErrorInfo? // RTP15
-  leaveClient(clientId: String, Data?) =&gt; io ErrorInfo? // RTP15
+  enter(Data?) =&gt; io // RTP8
+  update(Data?) =&gt; io // RTP9
+  leave(Data?) =&gt; io // RTP10
+  enterClient(clientId: String, Data?) =&gt; io // RTP4, RTP14, RTP15
+  updateClient(clientId: String, Data?) =&gt; io // RTP15
+  leaveClient(clientId: String, Data?) =&gt; io // RTP15
 
 enum PresenceAction:
   ABSENT // TP2
@@ -1312,6 +1315,7 @@ class PaginatedResult&lt;T&gt;:
 <li class=''><a href='/realtime/presence/'>Presence</a></li>
 <li class=''><a href='/realtime/authentication/'>Authentication</a></li>
 <li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/encryption/'>Encryption</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 <li class=''><a href='/realtime/types/'>Types</a></li>
 </ul>

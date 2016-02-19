@@ -26,7 +26,7 @@
     <div class="canonical-notice">
       <img src="/images/icon-alert.png">
       <span class="canonical-notice-text">
-        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+        You are viewing our bleeding edge unstable documentation. We recommend you use our <a href="https://www.ably.io/documentation">stable documentation »</a>
       </span>
       <img src="/images/icon-alert.png">
     </div>
@@ -116,17 +116,18 @@ channel.publish("example", "message data");</code></pre>
 <pre class="code-editor open-jsbin open-jsbin-acerec" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-acerec" lang="nodejs">var channel = realtime.channels.get('channelName');</code></pre>
 <pre lang="java"><code lang="java">Channel channel = realtime.channels.get("channelName");</code></pre>
 <pre lang="ruby"><code lang="ruby">channel = realtime.channels.get('channelName')</code></pre>
-<p>A set of <a href="#channel-options">channel options</a> may also be passed when getting a channel instance.</p>
-<pre lang="javascript"><code lang="javascript">var options = { encrypted: true, cipherParams: { key: 'privateKey' } };
+<h4>Setting channel options and encryption</h4>
+<p>A set of <a href="#channel-options">channel options</a> may also be passed to configure a channel for encryption. Find out more about <a href="/realtime/encryption">symmetrical message encryption</a>.</p>
+<pre lang="javascript"><code lang="javascript">var options = { encrypted: true, cipherParams: { key: 'A__SECRET__KEY__' } };
 var channel = realtime.channels.get('channelName', options);</code></pre>
-<pre lang="nodejs"><code lang="nodejs">var options = { encrypted: true, cipherParams: { key: 'privateKey' } };
+<pre lang="nodejs"><code lang="nodejs">var options = { encrypted: true, cipherParams: { key: 'A__SECRET__KEY__' } };
 var channel = realtime.channels.get('channelName', options);</code></pre>
-<pre lang="java"><code lang="java">CipherParams params = Crypto.getDefaultParams("privateKey");
+<pre lang="java"><code lang="java">CipherParams params = Crypto.getDefaultParams("A__SECRET__KEY__");
 ChannelOptions options = new ChannelOptions();
 options.encrypted = true;
 options.cipherParams = params;
 Channel channel = realtime.channels.get("channelName", channelOpts);</code></pre>
-<pre lang="ruby"><code lang="ruby">options = { encrypted: true, cipherParams: { key: 'privateKey' } }
+<pre lang="ruby"><code lang="ruby">options = { encrypted: true, cipherParams: { key: 'A__SECRET__KEY__' } }
 channel = realtime.channels.get('channelName', options)</code></pre>
 <h3 id="channel-lifecycle">Channel lifecycle</h3>
 <p>Channels are not pre-configured or provisioned by Ably in advance; they are created on demand when clients attach, and remain active until such time that there are no remaining attached clients. Within the <a href="https://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">dashboard for your app</a> however, you can pre-configure one or more <a href="#channel-namespaces">channel namespaces</a> (i.e. name prefixes), and associate different attributes and access rights with those namespaces. Find out more about <a href="#channel-namespaces">channel namespaces</a>.</p>
@@ -920,19 +921,15 @@ Ably::Realtime::Channel::STATE.Attached == :attached # =&gt; true</code></pre>
 
 </div> <!-- /end java language block -->
 
-<p>Currently the supported channel options are only encryption-related.</p>
+<p>Currently the supported channel options are only used for <a href="/realtime/encryption">configuring encryption</a>.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><span lang="ruby"><code>:</code></span><code>encrypted</code></dt>
-	<dd>Requests encryption for this channel.<br><i>Type: Boolean</i></dd>
+	<dd>Requests encryption for this channel when true<br><i>Type: Boolean</i></dd>
 </dl>
 <dl>
-	<dt><div lang="javascript,nodejs"><code>cipherParams</code></div></dt>
-	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). When providing only the required <code>key</code> property, the default cipher <code>AES-CBC-128</code> will be used. The Javascript library currently supports <code>algorithm</code>, <code>key</code> and <code>iv</code> cipher params.  Additionally, the default cipher params for the Javascript implementation may be obtained by calling <code>Ably.Realtime.Crypto.getDefaultParams()</code>.<br><i>Type: Object</i></dd>
-	<dt><div lang="java"><code>cipherParams</code></div></dt>
-	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). When providing only the required <code>key</code> property, the default cipher <code>AES-CBC-128</code> will be used. The Java library currently supports <code>algorithm</code>, <code>key</code>, and <code>iv</code> cipher params.  Additionally, the default cipher params for the Java implementation may be obtained by calling <code>Crypto.getDefaultParams()</code>.<br><i>Type: Object</i></dd>
-	<dt><div lang="ruby"><code>:cipher_params</code></div></dt>
-	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). When providing only the required <code>key</code> property, the default cipher <code>AES-CBC-128</code> will be used. The Ruby library currently supports <code>algorithm</code>, <code>key</code>, <code>mode</code>, <code>key_length</code> and <code>iv</code> cipher params.<br><i>Type: Hash object</i></dd>
+	<dt><span lang="default"><code>cipherParams</code></span><span lang="ruby"><code>:cipher_params</code></span></dt>
+	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#get-default-params">an encryption example using <code>CipherParams</code></a><br><i>Type: <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a></i></dd>
 </dl>
 <h3 id="channel-state-change"><span lang='ruby'>ChannelStateChange</span></h3>
 
@@ -1101,6 +1098,7 @@ end</code></pre>
 <li class=''><a href='/realtime/presence/'>Presence</a></li>
 <li class=''><a href='/realtime/authentication/'>Authentication</a></li>
 <li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/encryption/'>Encryption</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 <li class=''><a href='/realtime/types/'>Types</a></li>
 </ul>

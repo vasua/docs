@@ -26,7 +26,7 @@
     <div class="canonical-notice">
       <img src="/images/icon-alert.png">
       <span class="canonical-notice-text">
-        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+        You are viewing our bleeding edge unstable documentation. We recommend you use our <a href="https://www.ably.io/documentation">stable documentation »</a>
       </span>
       <img src="/images/icon-alert.png">
     </div>
@@ -371,7 +371,7 @@ Related types
 </dl>
 <dl>
 	<dt><span lang="default"><code>authCallback</code></span><span lang="ruby"><code>:auth_callback</code></span></dt>
-	<dd>A <span lang="default">function</span><span lang="java"><code>TokenCallback</code> instance</span><span lang="ruby">proc / lambda</span> to call when a new token is required. The role of the callback is to either generate a signed <a href="/realtime/types#token-request"><code>TokenRequest</code></a> which may then be submitted automatically by the library to the <a href="/rest-api#requesttoken"><code>requestToken</code> REST API</a>; or to provide a valid token in as a <a href="/realtime/types#token-details"><code>TokenDetails</code></a> object. See <a href="/rest/authentication">authentication</a> for details of the token request format and associated API calls.<br><i>Type: <span lang="default">Function</span><span lang="java"><code>TokenCallback</code></span><span lang="ruby">Proc / Lamda</span></i></dd>
+	<dd>A <span lang="default">function</span><span lang="java"><code>TokenCallback</code> instance</span><span lang="ruby">proc / lambda</span> to call when a new token is required. The role of the callback is to either generate a signed <a href="/realtime/types#token-request"><code>TokenRequest</code></a> which may then be submitted automatically by the library to the <a href="/rest-api#request-token"><code>requestToken</code> REST API</a>; or to provide a valid token in as a <a href="/realtime/types#token-details"><code>TokenDetails</code></a> object. See <a href="/rest/authentication">authentication</a> for details of the token request format and associated API calls.<br><i>Type: <span lang="default">Function</span><span lang="java"><code>TokenCallback</code></span><span lang="ruby">Proc / Lamda</span></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>authUrl</code></span><span lang="ruby"><code>:auth_url</code></span></dt>
@@ -539,6 +539,7 @@ Note that the log level and log handler have global scope in the library and wil
 <li class=''><a href='/realtime/presence/'>Presence</a></li>
 <li class=''><a href='/realtime/authentication/'>Authentication</a></li>
 <li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/encryption/'>Encryption</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 <li class=''><a href='/realtime/types/'>Types</a></li>
 </ul>

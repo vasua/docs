@@ -26,7 +26,7 @@
     <div class="canonical-notice">
       <img src="/images/icon-alert.png">
       <span class="canonical-notice-text">
-        You are viewing our bleeding edge unstable documentation. We recommend you use of our <a href="https://www.ably.io/documentation">stable documentation »</a>
+        You are viewing our bleeding edge unstable documentation. We recommend you use our <a href="https://www.ably.io/documentation">stable documentation »</a>
       </span>
       <img src="/images/icon-alert.png">
     </div>
@@ -92,8 +92,8 @@
   <img src="/images/diagrams/signed-token-request-auth-process.png" style="width: 100%" alt="Signed token request from your server concept diagram"><br />
 </a></p>
 <h5 id="client-identity">Client identity and access control</h5>
-<p>A client using token authentication is either anonymous, or identified if a client ID exists in the token. All messages, presence state and connection state for identified clients contain the trusted client ID and are accessible by other clients. As a private key is needed to generate a token for a client with a client ID, the client ID can be trusted by other clients.</p>
-<p>Tokens are limited to the capabilities of the API key used to create the token. When requesting a token, the capabilities may be limited further using fine-grained permissions using a combination of the operation (such as publish, subscribe, presence) and the channel(s).</p>
+<p>A client using token authentication is considered to either anonymous, or identified if a client ID exists in the token. All messages, presence state and connection state for <a href="/realtime/authentication#identified-clients">identified clients</a> contain the trusted client ID and are accessible by other clients. As a private key is needed to generate a token for a client with a client ID, the client ID can be trusted by other clients. Find out <a href="/realtime/authentication#identified-clients">more on identified clients</a>.</p>
+<p>Tokens are limited to the capabilities of the API key used to create the token. When requesting a token, the capabilities may be limited further using fine-grained permissions using a combination of the operation (such as publish, subscribe, presence) and the channel(s). Find out <a href="/general/authentication#capabilities-explained">more on token capabilities</a>.</p>
 <h3 id="global-message-routing">Global message routing</h3>
 <p>The Ably service, running in <a href="https://support.ably.io/solution/articles/3000029525-where-are-ably-s-servers-located-around-the-world">over 20 data centres globally</a>, provides a true mesh distributed system ensuring that there is both no single point of congestion and no single point of failure. Ably is designed to always route messages using the least number of network hops minimising latency and ensuring maximum performance for clients no matter their location.</p>
 <p>The diagram below explains how Ably solves the challenge of efficient global routing at all times:</p>
@@ -176,6 +176,7 @@
 <li class=''><a href='/realtime/presence/'>Presence</a></li>
 <li class=''><a href='/realtime/authentication/'>Authentication</a></li>
 <li class=''><a href='/realtime/history/'>History</a></li>
+<li class=''><a href='/realtime/encryption/'>Encryption</a></li>
 <li class=''><a href='/realtime/statistics/'>Statistics</a></li>
 <li class=''><a href='/realtime/types/'>Types</a></li>
 </ul>
