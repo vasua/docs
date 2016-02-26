@@ -92,7 +92,7 @@ console.log('There are ' + members.length + ' members present');</code></pre>
 System.out.println("There are " + members.length + " members present");</code></pre>
 <pre lang="ruby"><code lang="ruby">members = channel.presence.get
 puts "There are #{members.size} members present"</code></pre>
-<p>In the REST client library this method directly queries the REST presence <a href="/rest-api/presence#history">history</a> API. No presence state is cached in the library itself, unlike in the Realtime client library.</p>
+<p>In the REST client library this method directly queries the REST presence <a href="/rest/presence#history">history</a> API. No presence state is cached in the library itself, unlike in the Realtime client library.</p>
 <h3>Retrieving presence history</h3>
 <p>The <code>Presence</code> API exposes a <code>history</code> method whereby a client can can obtain presence updates previously sent on those channels that have persistence enabled.</p>
 <p>History results are paginated and therefore accompanied with one or more relative links relating to the current query. Where the number of results returned exceeds the query limit &#8211; which is either the value of the <code>limit</code> param or the default limit of 100 &#8211; the query result contains pages with the limited number of records, and a relative link to the next page.</p>
@@ -156,7 +156,7 @@ Related types
 </div><h2>Methods</h2>
 <h6 lang="default" id="get">get()</h6>
 <h6 lang="java" id="get">public PresenceMessage[] get()</h6>
-<p>Get the current presence set for this channel. This call queries the REST <a href="/rest-api/presence#get"><code>/channels/&lt;channel id&gt;/presence</code></a> API.</p>
+<p>Get the current presence set for this channel. This call queries the REST <a href="/rest/presence#get"><code>/channels/&lt;channel id&gt;/presence</code></a> API.</p>
 <h6 id="history">history</h6>
 <blockquote class="definition">
 <p class="definition"><span lang='nodejs'>presence.history(params, callback)</span><span lang='ruby'>presence.history(options) → json_result</span><span lang='java'>public PaginatedResult&lt;PresenceMessage&gt; history(Param[] params)</span></p>

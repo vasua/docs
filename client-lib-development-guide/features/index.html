@@ -148,7 +148,7 @@
 	<ul>
 		<li><a id='RSA3a' name='RSA3a' href='#RSA3a'><code>(RSA3a)</code></a> Can be used over HTTP or HTTPs</li>
 		<li><a id='RSA3b' name='RSA3b' href='#RSA3b'><code>(RSA3b)</code></a> For REST requests, the token string is Base64 encoded and used in the <code>Authorization: Bearer</code> header</li>
-		<li><a id='RSA3c' name='RSA3c' href='#RSA3c'><code>(RSA3c)</code></a> For Realtime connections, the querystring param <code>access_token</code> is appended to the URL endpoint</li>
+		<li><a id='RSA3c' name='RSA3c' href='#RSA3c'><code>(RSA3c)</code></a> For Realtime connections, the querystring param <code>accessToken</code> is appended to the URL endpoint</li>
 	</ul></li>
 	<li><a id='RSA4' name='RSA4' href='#RSA4'><code>(RSA4)</code></a> Token Auth is used if <code>useTokenAuth</code> is set to true, or if <code>useTokenAuth</code> is unspecified and any one of the following conditions are met: a <code>clientId</code> is specified; <code>authUrl</code> or <code>authCallback</code> is provided; an explicit <code>token</code> or <code>TokenDetails</code> is provided</li>
 	<li><a id='RSA14' name='RSA14' href='#RSA14'><code>(RSA14)</code></a> If Token Auth is selected, yet a token is not provided and there is no means to generate a token, then this will result in an error. For example, if only the option <code>useTokenAuth</code> is specified, and a <code>key</code> is not provided, then the client library is unable to authenticate or issue a token</li>
@@ -305,7 +305,7 @@
 	</ul></li>
 	<li><a id='RSL5' name='RSL5' href='#RSL5'><code>(RSL5)</code></a> Message payload encryption
 	<ul>
-		<li><a id='RSL5a' name='RSL5a' href='#RSL5a'><code>(RSL5a)</code></a> When a <code>Channel</code> is instanced with the option <code>encrypted</code> true, message payloads will be automtically encrypted when sent to Ably and decrypted when received on this channel. The cipher configuration is set with the <code>cipherParams</code></li>
+		<li><a id='RSL5a' name='RSL5a' href='#RSL5a'><code>(RSL5a)</code></a> When a <code>Channel</code> is instanced with a (non-null) <code>cipher</code> channelOption, message payloads will be automatically encrypted when sent to Ably and decrypted when received on this channel, using the <code>cipher</code> configuration</li>
 		<li><a id='RSL5b' name='RSL5b' href='#RSL5b'><code>(RSL5b)</code></a> AES 256 and 128 CBC encryption must be supported</li>
 		<li><a id='RSL5c' name='RSL5c' href='#RSL5c'><code>(RSL5c)</code></a> Tests must exist that encrypt and decrypt the following fixture data for <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-128.json">AES 128</a> and <a href="https://github.com/ably/ably-common/blob/master/test-resources/crypto-data-256.json">AES 256</a> to ensure the client library encryption is compatible across libraries</li>
 	</ul></li>
@@ -339,6 +339,22 @@
 		</ul></li>
 	</ul></li>
 	<li><a id='RSP5' name='RSP5' href='#RSP5'><code>(RSP5)</code></a> Presence Messages retrieved are decoded in the same way that messages are decoded</li>
+</ul>
+<h3 id="rest-encryption">Encryption</h3>
+<ul>
+	<li><a id='RSE1' name='RSE1' href='#RSE1'><code>(RSE1)</code></a> <code>Crypto::getDefaultParams</code> function:
+	<ul>
+		<li><a id='RSE1a' name='RSE1a' href='#RSE1a'><code>(RSE1a)</code></a> Returns a complete <code>CipherParams</code> instance, using the default values for any field not supplied</li>
+		<li><a id='RSE1b' name='RSE1b' href='#RSE1b'><code>(RSE1b)</code></a> Takes a hashmap (or language equivalent) consisting of any subset of <code>CipherParams</code> fields that includes a <code>key</code></li>
+		<li><a id='RSE1c' name='RSE1c' href='#RSE1c'><code>(RSE1c)</code></a> The <code>key</code> must be either a binary (e.g. a byte array, depending on the language), or a base64-encoded string. If the key is a string, the function should base64-decode it into a binary. Since the conversion to base64 is not under Ably control, this should be done leniently &#8212; in particular, it should work with base64url (RFC 4648 s.5, which uses <code>-</code> and <code>_</code> instead of <code>+</code> and <code>/</code>) as well as base64 (RFC 4648 s.4)</li>
+		<li><a id='RSE1d' name='RSE1d' href='#RSE1d'><code>(RSE1d)</code></a> Calculates a <code>keyLength</code> from the key (its size in bits).</li>
+		<li><a id='RSE1e' name='RSE1e' href='#RSE1e'><code>(RSE1e)</code></a> Checks that the provided options are valid and self-consistent as best it can, raises an exception if not. At a minimum, this should include checking the calculated <code>keyLength</code> is a valid key length for the encryption algorithm (for example, 128 or 256 for <code>AES</code>)</li>
+	</ul></li>
+	<li><a id='RSE2' name='RSE2' href='#RSE2'><code>(RSE2)</code></a> <code>Crypto::generateRandomKey</code> function
+	<ul>
+		<li><a id='RSE2a' name='RSE2a' href='#RSE2a'><code>(RSE2a)</code></a> Takes an optional <code>keyLength</code> parameter, which is the length in bits of the key to be generated. If unspecified, this is equal to the default <code>keyLength</code> of the default algorithm: for <code>AES</code>, 256 bits.</li>
+		<li><a id='RSE2b' name='RSE2b' href='#RSE2b'><code>(RSE2b)</code></a> Returns (or calls back with, if the language cryptographic randomness primitives are blocking or async) the key as a binary (e.g. a byte array, depending on the language)</li>
+	</ul></li>
 </ul>
 <h2 id="realtime">Realtime client library features</h2>
 <p>The Ably Realtime client libraries establish and maintain a persistent connection to Ably and provide methods to publish and subscribe to messages over a low latency realtime connection.</p>
@@ -450,7 +466,7 @@
 		<li><a id='RTN15b' name='RTN15b' href='#RTN15b'><code>(RTN15b)</code></a> In order for a connection to be resumed and connection state to be recovered, the client library reconnects to the websocket endpoint with two additional querystring params:
 		<ul>
 			<li><a id='RTN15b1' name='RTN15b1' href='#RTN15b1'><code>(RTN15b1)</code></a> <code>resume</code> is the private connection key assigned to the connection when the first <code>CONNECTED</code> <code>ProtocolMessage</code> was received</li>
-			<li><a id='RTN15b2' name='RTN15b2' href='#RTN15b2'><code>(RTN15b2)</code></a> <code>connection_serial</code> is the most recent <code>ProtocolMessage#connectionSerial</code> received from Ably or <code>Connection#serial</code> which should be identical</li>
+			<li><a id='RTN15b2' name='RTN15b2' href='#RTN15b2'><code>(RTN15b2)</code></a> <code>connectionSerial</code> is the most recent <code>ProtocolMessage#connectionSerial</code> received from Ably or <code>Connection#serial</code> which should be identical</li>
 		</ul></li>
 		<li><a id='RTN15c' name='RTN15c' href='#RTN15c'><code>(RTN15c)</code></a> The system&#8217;s response to a resume request will be one of the following:
 			<ul>
@@ -569,7 +585,7 @@
 			<li><a id='RTL6g1' name='RTL6g1' href='#RTL6g1'><code>(RTL6g1)</code></a> When publishing a <code>Message</code> with the <code>clientId</code> attribute set to <code>null</code>:
 			<ul>
 				<li><a id='RTL6g1a' name='RTL6g1a' href='#RTL6g1a'><code>(RTL6g1a)</code></a> It is unnecessary for the client to set the <code>clientId</code> of the <code>Message</code> before publishing</li>
-				<li><a id='RTL6g1b' name='RTL6g1b' href='#RTL6g1b'><code>(RTL6g1b)</code></a> Ably will not assign a <code>clientId</code> upon receiving the <code>Message</code>. A test should assert that the <code>clientId</code> value is <code>null</code> for the <code>Message</code> when received</li>
+				<li><a id='RTL6g1b' name='RTL6g1b' href='#RTL6g1b'><code>(RTL6g1b)</code></a> Ably will assign a <code>clientId</code> upon receiving the <code>Message</code>. A test should assert that the <code>clientId</code> value is populated for the <code>Message</code> when received</li>
 			</ul></li>
 			<li><a id='RTL6g2' name='RTL6g2' href='#RTL6g2'><code>(RTL6g2)</code></a> When publishing a <code>Message</code> with the <code>clientId</code> attribute value set to the identified client&#8217;s <code>clientId</code>, Ably will accept the message and publish it. A test should assert that the <code>clientId</code> value is populated for the <code>Message</code> when received</li>
 			<li><a id='RTL6g3' name='RTL6g3' href='#RTL6g3'><code>(RTL6g3)</code></a> When publishing a <code>Message</code> with a different <code>clientId</code> attribute value from the identified client&#8217;s <code>clientId</code>, the client library should reject that publish operation immediately. The message should not be sent to Ably and it should result in an error, typically in the form of an error callback. The connection and channel must remain available for further operations</li>
@@ -599,7 +615,7 @@
 	<li><a id='RTL10' name='RTL10' href='#RTL10'><code>(RTL10)</code></a> <code>Channel#history</code> function:
 	<ul>
 		<li><a id='RTL10a' name='RTL10a' href='#RTL10a'><code>(RTL10a)</code></a> Supports all the same params as REST <code>Channel#history</code></li>
-		<li><a id='RTL10b' name='RTL10b' href='#RTL10b'><code>(RTL10b)</code></a> Additionally supports the param <code>untilAttach</code>, which if true, will only retrive messages prior to the moment that the channel was attached. This bound is specified by passing the querystring param <code>from_serial</code> with the serial number assigned to the channel in the <code>ATTACHED</code> <code>ProtocolMessage</code>. If the <code>untilAttach</code> param is specified when the channel is not attached, it results in an error</li>
+		<li><a id='RTL10b' name='RTL10b' href='#RTL10b'><code>(RTL10b)</code></a> Additionally supports the param <code>untilAttach</code>, which if true, will only retrive messages prior to the moment that the channel was attached. This bound is specified by passing the querystring param <code>fromSerial</code> with the serial number assigned to the channel in the <code>ATTACHED</code> <code>ProtocolMessage</code>. If the <code>untilAttach</code> param is specified when the channel is not attached, it results in an error</li>
 		<li><a id='RTL10c' name='RTL10c' href='#RTL10c'><code>(RTL10c)</code></a> Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the history request</li>
 		<li><a id='RTL10d' name='RTL10d' href='#RTL10d'><code>(RTL10d)</code></a> A test should exist that publishes messages from one client, and upon confirmation of message delivery, a history request should be made on another client to ensure all messages are available</li>
 	</ul></li>
@@ -675,7 +691,7 @@
 	<li><a id='RTP12' name='RTP12' href='#RTP12'><code>(RTP12)</code></a> <code>Presence#history</code> function:
 	<ul>
 		<li><a id='RTP12a' name='RTP12a' href='#RTP12a'><code>(RTP12a)</code></a> Supports all the same params as REST <code>Presence#history</code></li>
-		<li><a id='RTP12b' name='RTP12b' href='#RTP12b'><code>(RTP12b)</code></a> Additionally supports the param <code>untilAttach</code>, which if true, will only retrive messages up to the moment that the channel was attached. This bound is specified by passing the querystring param <code>from_serial</code> with the serial number assigned to the channel in the <code>ATTACHED</code> <code>ProtocolMessage</code>. If the <code>untilAttach</code> param is specified when the channel is not attached, it will result in an error</li>
+		<li><a id='RTP12b' name='RTP12b' href='#RTP12b'><code>(RTP12b)</code></a> Additionally supports the param <code>untilAttach</code>, which if true, will only retrive messages up to the moment that the channel was attached. This bound is specified by passing the querystring param <code>fromSerial</code> with the serial number assigned to the channel in the <code>ATTACHED</code> <code>ProtocolMessage</code>. If the <code>untilAttach</code> param is specified when the channel is not attached, it will result in an error</li>
 		<li><a id='RTP12c' name='RTP12c' href='#RTP12c'><code>(RTP12c)</code></a> Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the history request</li>
 		<li><a id='RTP12d' name='RTP12d' href='#RTP12d'><code>(RTP12d)</code></a> A test should exist that registers presence with a few clients, and upon confirmation of entering the channel for all clients, a presence history request should be made using another client to ensure all presence events are available</li>
 	</ul></li>
@@ -911,24 +927,23 @@
 	<li><a id='TB1' name='TB1' href='#TB1'><code>(TB1)</code></a> options provided when instancing a channel, see <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/types/ChannelOptions.java">Java ChannelOptions</a> as a reference</li>
 	<li><a id='TB2' name='TB2' href='#TB2'><code>(TB2)</code></a> The attributes of <code>ChannelOptions</code> consist of:
 	<ul>
-		<li><a id='TB2a' name='TB2a' href='#TB2a'><code>(TB2a)</code></a> <code>encrypted</code> boolean &#8211; when true, enables automatic encryption &amp; decryption of all messages</li>
-		<li><a id='TB2b' name='TB2b' href='#TB2b'><code>(TB2b)</code></a> <code>cipherParams</code> <code>CipherParams</code> &#8211; when encrypted is true, the cipher params are required</li>
+		<li><a id='TB2b' name='TB2b' href='#TB2b'><code>(TB2b)</code></a> <code>cipher</code>, which is either:
+		<ul>
+			<li><a id='TB2b1' name='TB2b1' href='#TB2b1'><code>(TB2b1)</code></a> A <code>CipherParams</code> instance, or</li>
+			<li><a id='TB2b2' name='TB2b2' href='#TB2b2'><code>(TB2b2)</code></a> an options hash (or language equivalent) consisting of any subset of <code>CipherParams</code> fields that includes a <code>key</code>. In this case, the client library should call `getDefaultParams`, passing it the options hash, to obtain a <code>CipherParams</code> instance</li>
+		</ul></li>
 	</ul></li>
+	<li><a id='TB3' name='TB3' href='#TB3'><code>(TB3)</code></a> The client lib may optionally provide an alternative constructor <code>withCipherKey</code> for ChannelOptions that takes a <code>key</code> only. (This must be differentiated from the normal constructor such that it is clear that the value being passed in is a key). (This is intended for languages where requiring a hash map is unidiomatic)</li>
 </ul>
 <h4>CipherParams</h4>
 <ul>
 	<li><a id='TZ1' name='TZ1' href='#TZ1'><code>(TZ1)</code></a> params to configure encryption for a channel, see <a href="https://github.com/ably/ably-java/blob/8a151b4edfa228ddef806fa10d2f9ce2be1ac09c/lib/src/main/java/io/ably/lib/util/Crypto.java">Java CipherParams class</a> as a reference</li>
-	<li><a id='TZ2' name='TZ2' href='#TZ2'><code>(TZ2)</code></a> The attributes of <code>CipherParams</code> consist of anything necessary to implement the supported algorithms (eg key and iv), in addition to the following standardised attributes:
+	<li><a id='TZ2' name='TZ2' href='#TZ2'><code>(TZ2)</code></a> The attributes of <code>CipherParams</code> consist of anything necessary to implement the supported algorithms, in addition to the following standardised attributes:
 	<ul>
 		<li><a id='TZ2a' name='TZ2a' href='#TZ2a'><code>(TZ2a)</code></a> <code>algorithm</code> string &#8211; Default is <code>AES</code>. Optionally specify the algorithm to use for encryption, currently only <code>AES</code> is supported</li>
-		<li><a id='TZ2b' name='TZ2b' href='#TZ2b'><code>(TZ2b)</code></a> <code>keyLength</code> integer &#8211; An integer, from an algorithm-dependent range of possible values. If unspecified, an algorithm-dependent default is used. For AES the allowed values at least include 128 and 256, with a default of 128</li>
-		<li><a id='TZ2d' name='TZ2d' href='#TZ2d'><code>(TZ2d)</code></a> <code>key</code> string / byte array &#8211; private key used to encrypt and decrypt payloads</li>
+		<li><a id='TZ2b' name='TZ2b' href='#TZ2b'><code>(TZ2b)</code></a> <code>keyLength</code> integer &#8211; the length in bits of the <code>key</code></li>
+		<li><a id='TZ2d' name='TZ2d' href='#TZ2d'><code>(TZ2d)</code></a> <code>key</code> binary &#8211; private key used to encrypt and decrypt payloads</li>
 		<li><a id='TZ2c' name='TZ2c' href='#TZ2c'><code>(TZ2c)</code></a> <code>mode</code> string &#8211; Default is <code>CBC</code>. Optionally specify cipher mode, currently only <code>CBC</code> is supported</li>
-	</ul></li>
-	<li><a id='TZ3' name='TZ3' href='#TZ3'><code>(TZ3)</code></a> <code>Crypto#getDefaultParams</code> function
-	<ul>
-		<li><a id='TZ3a' name='TZ3a' href='#TZ3a'><code>(TZ3a)</code></a> returns a complete <code>CipherParams</code> instance with randomly generated key and iv</li>
-		<li><a id='TZ3b' name='TZ3b' href='#TZ3b'><code>(TZ3b)</code></a> takes an optional key parameter, returning a <code>CipherParams</code> instance created with that key and with a keyLength calculated from that key</li>
 	</ul></li>
 </ul>
 <h3 id="defaults">Client Library defaults</h3>
@@ -1104,17 +1119,18 @@ enum ChannelState:
   FAILED
 
 class ChannelOptions:
-  cipherParams: CipherParams? // RSL5a, TB2b
-  encrypted: Bool // RSL5a, TB2a
+  +withCipherKey(key: Binary | String)? -&gt; ChannelOptions // TB3
+  cipher: (CipherParams | Params)? // RSL5a, TB2b
 
 class CipherParams:
   algorithm: String default "AES" // TZ2a
-  key: String // TZ2d
-  keyLength: Int? // TZ2b
+  key: Binary // TZ2d
+  keyLength: Int // TZ2b
   mode: String default "CBC" // TZ2c
 
 class Crypto:
-  +getDefaultParams(key: String?) -&gt; CipherParams // TZ3
+  +getDefaultParams(Params) -&gt; CipherParams // RSE1
+  +generateRandomKey(keyLength: Int?) =&gt; io Binary // RSE2
 
 class RestPresence:
   get(

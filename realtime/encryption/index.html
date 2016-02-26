@@ -44,6 +44,7 @@
 </optgroup>
 <optgroup label='API Reference'>
 <option id="anchor-get-default-params">getDefaultParams</option>
+<option id="anchor-generate-random-key">generateRandomKey</option>
 </optgroup>
 <optgroup label='Related types'>
 <option id="anchor-channel-options">Channel Options</option>
@@ -65,28 +66,25 @@
       <p>Ably client libraries support built-in symmetrical encryption of message content, making it easier to build apps that encrypt content fully end-to-end. Whilst <a href="https://support.ably.io/solution/articles/3000045208-are-messages-sent-to-and-received-from-ably-sent-securely-using-tls">TLS is enabled by default</a> and ensures that data is securely sent to and received from Ably, messages are not encrypted within the Ably system. Using the encryption feature of our client libraries ensures that message payloads are opaque, can never be decrypted by Ably, and can only be decrypted by other clients that share your secret key.</p>
 <h2 id="getting-started">Getting started</h2>
 <p><a href="/realtime/channels-messages">Channels</a> can be easily configured to automatically encrypt and decrypt all message payloads using the secret <code>key</code> provided in the <a href="/realtime/types#channel-options">channel options</a>. Below is a simple example:</p>
-<pre class="code-editor open-jsbin open-jsbin-odabuj" lang="javascript"><code class="code-editor open-jsbin open-jsbin-odabuj" lang="javascript">var channelOpts = { encrypted: true, cipherParams: { key: 'A__SECRET__KEY__' } };
+<pre class="code-editor open-jsbin open-jsbin-odabuj" lang="javascript"><code class="code-editor open-jsbin open-jsbin-odabuj" lang="javascript">var channelOpts = { cipher: { key: &lt;key&gt; } };
 var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}', channelOpts);
 channel.subscribe(function(message) {
   alert('Decrypted data: ' + message.data);
 });
 channel.publish('example', 'secret payload');</code></pre>
-<pre class="code-editor open-jsbin open-jsbin-odabuj" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-odabuj" lang="nodejs">var channelOpts = { encrypted: true, cipherParams: { key: 'A__SECRET__KEY__' } };
+<pre class="code-editor open-jsbin open-jsbin-odabuj" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-odabuj" lang="nodejs">var channelOpts = { cipher: { key: &lt;key&gt; } };
 var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}', channelOpts);
 channel.subscribe(function(message) {
   alert('Decrypted data: ' + message.data);
 });
 channel.publish('example', 'secret payload');</code></pre>
-<pre lang="ruby"><code lang="ruby">channel_opts = { encrypted: true, cipher_params: { key: 'A__SECRET__KEY__' } }
+<pre lang="ruby"><code lang="ruby">channel_opts = { cipher: { key: &lt;key&gt; } }
 channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}', channel_opts)
 channel.subscribe do |message|
   puts "Decrypted data: #{message.data}"
 end
 channel.publish 'example', 'secret payload'</code></pre>
-<pre lang="java"><code lang="java">CipherParams params = Crypto.getDefaultParams("A__SECRET__KEY__");
-ChannelOptions options = new ChannelOptions();
-options.encrypted = true;
-options.cipherParams = params;
+<pre lang="java"><code lang="java">ChannelOptions options = ChannelOptions.withCipherKey(&lt;key&gt;);
 Channel channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}", options);
 channel.subscribe(new MessageListener() {
   @Override
@@ -95,6 +93,7 @@ channel.subscribe(new MessageListener() {
   }});
 end
 channel.publish("example", "message data");</code></pre>
+<p>Note that the <code>key</code> should not be a passphrase, but a cryptographic key &#8211; generated from a secure random source, 128 or 256 bits long, binary or base64-encoded. If you wish to encrypt messages with a passphrase (for example, one entered by a user), you should use a <a href="https://en.wikipedia.org/wiki/Key_derivation_function">key derivation function</a> to transform that into a key. The client libraries are also capable of <a href="#generate-random-key">generating a random key</a> for you.</p>
 <h2>Understanding encryption</h2>
 <p>The libraries support encryption purely as a convenience; the libraries ensure interoperability between environments by having compatible implementations of encryption algorithms and by making common choices on format, mode, padding etc. However,  Ably intentionally does not manage the distribution of keys between clients, and end-to-end encryption is enabled without exposing keys to the Ably service at all. This has the advantage that Ably demonstrably has no access to the unencrypted contents of your messages, but also means that each app is responsible for enabling the distribution of keys to clients independently of Ably.</p>
 <p>The client library support for encryption supports symmetric encryption only, and requires each participating client to each specify the correct <code>cipherParams</code> secret <code>key</code> when creating a <code>Channel</code> instance. Clients that do not specify a key will be delivered the still-encrypted message payloads that they may then still wish to decrypt offline.</p>
@@ -111,6 +110,7 @@ channel.publish("example", "message data");</code></pre>
 Methods
 <ul>
 <li><a href='#get-default-params'>getDefaultParams</a></li>
+<li><a href='#generate-random-key'>generateRandomKey</a></li>
 </ul>
 </li>
 <li>
@@ -126,23 +126,50 @@ Related types
 <h2 id="methods">Methods</h2>
 <h6 id="get-default-params"><span lang='default'>getDefaultParams</span><span lang='ruby'>get_default_params</span></h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>Crypto.getDefaultParams(String key?, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#cipher-params">CipherParams</a> cipherParams))</span><span lang='ruby'><a href="#cipher-params">CipherParams</a> Crypto.get_default_params(String key?)</span><span lang='java'>public <a href="#cipher-params">CipherParams</a> Crypto.getDefaultParams(String key?)</span></p>
+<p class="definition"><span lang='javascript'><a href="#cipher-params">CipherParams</a> Crypto.getDefaultParams(Object params)</span><span lang='nodejs'><a href="#cipher-params">CipherParams</a> Crypto.getDefaultParams(Object params)</span><span lang='ruby'><a href="#cipher-params">CipherParams</a> Crypto.get_default_params(Hash params)</span><span lang='java'>public <a href="#cipher-params">CipherParams</a> Crypto.getDefaultParams(Param[] params)</span></p>
 </blockquote>
-<p>This call obtains a <a href="#cipher-params"><code>CipherParams</code></a> object with default values for the implementation, either taking a supplied cipher key or generating a secure random key.</p>
+This call obtains a <a href="#cipher-params"><code>CipherParams</code></a> object using the values passed in (which must be a subset of <code>CipherParams</code> fields that at a minimum includes a <code>key</code>), filling in any unspecified fields with default values, and checks that the result is a valid and self-consistent.
+<p>You will rarely need to call this yourself, since the client library will handle it for you if you specify <code>cipher</code> params when initialising a channel (as in the example <a href="#getting-started">at the top</a>)<span lang="javascript,nodejs"> or when setting channel options with <code>channel#setOptions</code></span>.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt>key</dt>
-	<dd>an optional <span lang="java"><code>byte[]</code></span><span lang=default><code>String</code></span> containing the secret key. If not provided, a secure random key is generated</dd>
+	<dt>params</dt>
+	<dd>The cipher params that you want to specify. It must at a minimum include a <code>key</code>, which should be either a binary (<span lang="java"><code>byte[]</code></span><span lang="javascript"><code>ArrayBuffer</code> or <code>WordArray</code></span><span lang="nodejs"><code>Buffer</code></span><span lang="ruby">byte array</span>) or a base64-encoded <code>String</code>.</dd>
+</dl>
+<h4>Returns</h4>
+On success, the method returns a complete <a href="#cipher-params"><code>CipherParams</code></a> object. Failure will raise an <span lang="ruby,java"><a href="/realtime/types/#ably-exception"><code>AblyException</code></a> </span><span lang="javascript,nodejs">exception</span>.
+<h4>Example</h4>
+<pre class="code-editor open-jsbin open-jsbin-odabuj" lang="javascript"><code class="code-editor open-jsbin open-jsbin-odabuj" lang="javascript">var cipherParams = Ably.Realtime.Crypto.getDefaultParams({key: &lt;key&gt;});
+var channelOpts = { cipher: cipherParams };
+var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}', channelOpts);</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-odabuj" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-odabuj" lang="nodejs">var cipherParams = Ably.Realtime.Crypto.getDefaultParams({key: &lt;key&gt;});
+var channelOpts = { cipher: cipherParams };
+var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}', channelOpts);</code></pre>
+<pre lang="ruby"><code lang="ruby">cipher_params = Ably::Util::Crypto.get_default_params({key: &lt;key&gt;})
+channel_opts = { cipher: cipher_params }
+channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}', channel_opts)</code></pre>
+<pre lang="java"><code lang="java">CipherParams params = Crypto.getDefaultParams(new Param[]{ new Param("key", &lt;key&gt;) });
+ChannelOptions options = new ChannelOptions();
+options.cipher = params;
+Channel channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}", options);</code></pre>
+<h6 id="generate-random-key"><span lang='default'>generateRandomKey</span><span lang='ruby'>generate_random_key</span></h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>Crypto.generateRandomKey(Int keyLength?, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <code>Buffer</code> key))</span><span lang='ruby'>byte array Crypto.generate_random_key(Int key_length?)</span><span lang='java'><code>byte[]</code> Crypto.generateRandomKey(Int keyLength?)</span></p>
+</blockquote>
+<p>This call obtains a randomly-generated binary key of the specified key length.</p>
+<h4>Parameters</h4>
+<dl>
+	<dt>keyLength</dt>
+	<dd>Optional <code>Int</code> with the length of key to generate. For AES, this should be either 128 or 256. If unspecified, defaults to 256.</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>is a function of the form <code>function(err, cipherParams)</code> which is called upon completion</dd>
+	<dd>is a function of the form <code>function(err, key)</code> which is called upon completion</dd>
 </dl>
 
 
 <div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
 <h4>Callback result</h4>
-<p>On successfully creating default cipher params, the callback is called with the default <a href="#cipher-params"><code>CipherParams</code></a> object and <code>err</code> is <code>null</code>. On failure to create default cipher params, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object describing the failure reason.</p>
+<p>On successfully generating a key, the callback is called with that key as a <span lang=javascript><code>WordArray</code></span><span lang=nodejs><code>Buffer</code></span>, and <code>err</code> is <code>null</code>. On failure to create a key, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object describing the failure reason.</p>
 
 </div> <!-- /end javascript,nodejs language block -->
 
@@ -150,27 +177,33 @@ Related types
 
 <div lang="java,ruby"> <!-- start java,ruby language block -->
 <h4>Returns</h4>
-<p>On success, the method returns the default <a href="#cipher-params"><code>CipherParams</code></a>. Failure to create default cipher params will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a></p>
+<p>On success, the method returns the generated key as a <span lang="java"><code>byte[]</code> array</span><span lang=ruby>byte array</span>. Failure will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a> .</p>
 
 </div> <!-- /end java,ruby language block -->
 
 <h4>Example</h4>
-<pre class="code-editor open-jsbin open-jsbin-odabuj" lang="javascript"><code class="code-editor open-jsbin open-jsbin-odabuj" lang="javascript">var cipherParams = Ably.Realtime.Crypto.getDefaultParams('A__SECRET__KEY__');
-var channelOpts = { encrypted: true, cipherParams: cipherParams };
-var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}', channelOpts);</code></pre>
-<pre class="code-editor open-jsbin open-jsbin-odabuj" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-odabuj" lang="nodejs">var cipherParams = Ably.Realtime.Crypto.getDefaultParams('A__SECRET__KEY__');
-var channelOpts = { encrypted: true, cipherParams: cipherParams };
-var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}', channelOpts);</code></pre>
-<pre lang="ruby"><code lang="ruby">cipher_params = Ably::Util::Crypto.get_default_params('A__SECRET__KEY__')
-channel_opts = { encrypted: true, cipher_params: cipher_params }
-channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}', channel_opts)</code></pre>
-<pre lang="java"><code lang="java">CipherParams params = Crypto.getDefaultParams("A__SECRET__KEY__");
-ChannelOptions options = new ChannelOptions();
-options.encrypted = true;
-options.cipherParams = params;
+<pre lang="javascript"><code lang="javascript">Ably.Realtime.Crypto.generateRandomKey(128, function(err, key) {
+  if(err) {
+    console.log("Key generation failed: " + err.toString());
+  } else {
+    var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}', {cipher: {key: key}});
+  }
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">Ably.Realtime.Crypto.generateRandomKey(128, function(err, key) {
+  if(err) {
+    console.log("Key generation failed: " + err.toString());
+  } else {
+    var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}', {cipher: {key: key}});
+  }
+});</code></pre>
+<pre lang="ruby"><code lang="ruby">key = Ably::Util::Crypto.generate_random_key(128)
+channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}', {cipher: {key: key}})</code></pre>
+<pre lang="java"><code lang="java">byte[] key = Crypto.generateRandomKey(128);
+ChannelOptions options = ChannelOptions.withCipher(key);
 Channel channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}", options);</code></pre>
 <h2 id="related-types">Related types</h2>
 <h3 id="channel-options"><span lang='default'>ChannelOptions Object</span><span lang='ruby'>ChannelOptions Hash</span><span lang='java'>io.ably.lib.types.ClientOptions</span></h3>
+<p>Currently the supported channel options are only used for <a href="/realtime/encryption">configuring encryption</a>.</p>
 
 
 <div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
@@ -192,29 +225,39 @@ Channel channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}", options);</co
 
 </div> <!-- /end java language block -->
 
-<p>Currently the supported channel options are only used for <a href="/realtime/encryption">configuring encryption</a>.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
-	<dt><span lang="ruby"><code>:</code></span><code>encrypted</code></dt>
-	<dd>Requests encryption for this channel when true<br><i>Type: Boolean</i></dd>
+	<dt><span lang="default"><code>cipher</code></span><span lang="ruby"><code>:cipher_params</code></span></dt>
+	<dd>Requests encryption for this channel when not null, and specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#getting-started">an example</a><br><i>Type: either <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a><span lang="javascript,nodejs,ruby,">, or <span lang="javascript,nodejs">an options object</span><span lang="java">a Param[] list</span><span lang="ruby">an options hash</span> containing at a minimum a <code>key</code> key</span></i></dd>
 </dl>
+<div lang="java">
+<h4>Static methods</h4>
+<h6 id="with-cipher-key">withCipherKey</h6>
+<blockquote class="definition">
+<p class="definition">public static ChannelOptions.withCipherKey(Byte[] or String key)</p>
+</blockquote>
+<p>A helper method to generate a <code>ChannelOptions</code> for the simple case where you only specify a key.</p>
+<h4>Parameters</h4>
 <dl>
-	<dt><span lang="default"><code>cipherParams</code></span><span lang="ruby"><code>:cipher_params</code></span></dt>
-	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#get-default-params">an encryption example using <code>CipherParams</code></a><br><i>Type: <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a></i></dd>
+	<dt>key</dt>
+	<dd>A binary <code>Byte[]</code> array or a base64-encoded <code>String</code>.</dd>
 </dl>
+<h4>Returns</h4>
+<p>On success, the method returns a complete <code>ChannelOptions</code> object. Failure will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a>.</p>
+</div>
 <h3 id="cipher-params"><span lang='default'>CipherParams</span><span lang='ruby'>CipherParams Hash</span><span lang='java'>io.ably.lib.util.Crypto.CipherParams</span></h3>
-<p>A <code>CipherParams</code> contains configuration options for a channel cipher, including algorithm, mode, key length and key. Ably client libraries currently support AES with CBC, PKCS#7 with a default key length of 128 bits. All implementations also support AES256.</p>
-<p>Individual client libraries may support the client instancing a <code>CipherParams</code> directly, using the default values obtained from a <span lang="default"><a href="/realtime/encryption#get-default-params"><code>Crypto.getDefaultParams()</code></a></span><span lang="ruby"><a href="/realtime/encryption#get-default-params"><code>Crypto.get_default_params()</code></a></span>, or relying on the defaults provided a channel when encryption is enabled.</p>
+<p>A <code>CipherParams</code> contains configuration options for a channel cipher, including algorithm, mode, key length and key. Ably client libraries currently support AES with CBC, PKCS#7 with a default key length of 256 bits. All implementations also support AES128.</p>
+<p>Individual client libraries may support either instancing a <code>CipherParams</code> directly, using <span lang="default"><a href="/realtime/encryption#get-default-params"><code>Crypto.getDefaultParams()</code></a></span><span lang="ruby"><a href="/realtime/encryption#get-default-params"><code>Crypto.get_default_params()</code></a></span>, or generating one automatically when initialising a channel, as in <a href="/realtime/encryption#getting-started">this example</a>.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><div lang="javascript,nodejs,,ruby"><span lang="ruby">:</span>key</div></dt>
-	<dd>A string <span lang="javascript,nodejs">or buffer</span>containing the secret key used for encryption and decryption</dd>
+	<dd>A binary (<span lang="java"><code>byte[]</code></span><span lang="javascript"><code>ArrayBuffer</code> or <code>WordArray</code></span><span lang="nodejs"><code>Buffer</code></span><span lang="ruby">byte array</span>) containing the secret key used for encryption and decryption</dd>
 </dl>
 <dl>
 	<dt><span lang="ruby">:</span>algorithm</dt>
 	<dd><em>AES</em> The name of the algorithm in the default system provider, or the lower-cased version of it; eg &#8220;aes&#8221; or &#8220;AES&#8221;<br><i>Type: String</i></dd>
 	<dt><span lang="ruby">:key_length</span><span lang="default">keyLength</span></dt>
-	<dd><em>128</em> The key length of the cipher, either 128 or 256<br><i>Type: Integer</i></dd>
+	<dd><em>128</em> The key length in bits of the cipher, either 128 or 256<br><i>Type: Integer</i></dd>
 	<dt><span lang="ruby">:</span>mode</dt>
 	<dd><em>CBC</em> The cipher mode<br><i>Type: String</i></dd>
 </dl>

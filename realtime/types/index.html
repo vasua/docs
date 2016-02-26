@@ -635,6 +635,7 @@ Note that the log level and log handler have global scope in the library and wil
 	<dd><em><span lang="default">30,000ms</span><span lang="ruby">30s</span></em> When the connection enters the <code>SUSPENDED</code> state, after this delay in <span lang="default">milliseconds</span><span lang="ruby">seconds</span>, if the state is still <code>SUSPENDED</code>, the client library will attempt to reconnect automatically<br><i>Type: Integer</i></dd>
 </dl>
 <h3 id="channel-options"><span lang='default'>ChannelOptions Object</span><span lang='ruby'>ChannelOptions Hash</span><span lang='java'>io.ably.lib.types.ClientOptions</span></h3>
+<p>Currently the supported channel options are only used for <a href="/realtime/encryption">configuring encryption</a>.</p>
 
 
 <div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
@@ -656,16 +657,26 @@ Note that the log level and log handler have global scope in the library and wil
 
 </div> <!-- /end java language block -->
 
-<p>Currently the supported channel options are only used for <a href="/realtime/encryption">configuring encryption</a>.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
-	<dt><span lang="ruby"><code>:</code></span><code>encrypted</code></dt>
-	<dd>Requests encryption for this channel when true<br><i>Type: Boolean</i></dd>
+	<dt><span lang="default"><code>cipher</code></span><span lang="ruby"><code>:cipher_params</code></span></dt>
+	<dd>Requests encryption for this channel when not null, and specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#getting-started">an example</a><br><i>Type: either <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a><span lang="javascript,nodejs,ruby,">, or <span lang="javascript,nodejs">an options object</span><span lang="java">a Param[] list</span><span lang="ruby">an options hash</span> containing at a minimum a <code>key</code> key</span></i></dd>
 </dl>
+<div lang="java">
+<h4>Static methods</h4>
+<h6 id="with-cipher-key">withCipherKey</h6>
+<blockquote class="definition">
+<p class="definition">public static ChannelOptions.withCipherKey(Byte[] or String key)</p>
+</blockquote>
+<p>A helper method to generate a <code>ChannelOptions</code> for the simple case where you only specify a key.</p>
+<h4>Parameters</h4>
 <dl>
-	<dt><span lang="default"><code>cipherParams</code></span><span lang="ruby"><code>:cipher_params</code></span></dt>
-	<dd>Specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#get-default-params">an encryption example using <code>CipherParams</code></a><br><i>Type: <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a></i></dd>
+	<dt>key</dt>
+	<dd>A binary <code>Byte[]</code> array or a base64-encoded <code>String</code>.</dd>
 </dl>
+<h4>Returns</h4>
+<p>On success, the method returns a complete <code>ChannelOptions</code> object. Failure will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a>.</p>
+</div>
 <h3 id="channel-state-listener"><span lang='java'>io.ably.lib.realtime.ChannelStateListener</span></h3>
 
 
@@ -679,18 +690,18 @@ Note that the log level and log handler have global scope in the library and wil
 </div> <!-- /end java language block -->
 
 <h3 id="cipher-params"><span lang='default'>CipherParams</span><span lang='ruby'>CipherParams Hash</span><span lang='java'>io.ably.lib.util.Crypto.CipherParams</span></h3>
-<p>A <code>CipherParams</code> contains configuration options for a channel cipher, including algorithm, mode, key length and key. Ably client libraries currently support AES with CBC, PKCS#7 with a default key length of 128 bits. All implementations also support AES256.</p>
-<p>Individual client libraries may support the client instancing a <code>CipherParams</code> directly, using the default values obtained from a <span lang="default"><a href="/realtime/encryption#get-default-params"><code>Crypto.getDefaultParams()</code></a></span><span lang="ruby"><a href="/realtime/encryption#get-default-params"><code>Crypto.get_default_params()</code></a></span>, or relying on the defaults provided a channel when encryption is enabled.</p>
+<p>A <code>CipherParams</code> contains configuration options for a channel cipher, including algorithm, mode, key length and key. Ably client libraries currently support AES with CBC, PKCS#7 with a default key length of 256 bits. All implementations also support AES128.</p>
+<p>Individual client libraries may support either instancing a <code>CipherParams</code> directly, using <span lang="default"><a href="/realtime/encryption#get-default-params"><code>Crypto.getDefaultParams()</code></a></span><span lang="ruby"><a href="/realtime/encryption#get-default-params"><code>Crypto.get_default_params()</code></a></span>, or generating one automatically when initialising a channel, as in <a href="/realtime/encryption#getting-started">this example</a>.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><div lang="javascript,nodejs,,ruby"><span lang="ruby">:</span>key</div></dt>
-	<dd>A string <span lang="javascript,nodejs">or buffer</span>containing the secret key used for encryption and decryption</dd>
+	<dd>A binary (<span lang="java"><code>byte[]</code></span><span lang="javascript"><code>ArrayBuffer</code> or <code>WordArray</code></span><span lang="nodejs"><code>Buffer</code></span><span lang="ruby">byte array</span>) containing the secret key used for encryption and decryption</dd>
 </dl>
 <dl>
 	<dt><span lang="ruby">:</span>algorithm</dt>
 	<dd><em>AES</em> The name of the algorithm in the default system provider, or the lower-cased version of it; eg &#8220;aes&#8221; or &#8220;AES&#8221;<br><i>Type: String</i></dd>
 	<dt><span lang="ruby">:key_length</span><span lang="default">keyLength</span></dt>
-	<dd><em>128</em> The key length of the cipher, either 128 or 256<br><i>Type: Integer</i></dd>
+	<dd><em>128</em> The key length in bits of the cipher, either 128 or 256<br><i>Type: Integer</i></dd>
 	<dt><span lang="ruby">:</span>mode</dt>
 	<dd><em>CBC</em> The cipher mode<br><i>Type: String</i></dd>
 </dl>
