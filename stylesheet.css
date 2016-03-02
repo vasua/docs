@@ -415,8 +415,8 @@ hr.back {
       content: "Ruby"; }
     #documentation pre[lang][lang=nodejs]::before {
       content: "Node.js"; }
-    #documentation pre[lang][lang=ios]::before {
-      content: "iOS"; }
+    #documentation pre[lang][lang=objc]::before {
+      content: "Obj-C"; }
     #documentation pre[lang][lang=swift]::before {
       content: "Swift"; }
     #documentation pre[lang][lang=go]::before {

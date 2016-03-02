@@ -77,7 +77,8 @@
 <div lang="javascript"> <!-- start javascript language block -->
 <p>The Realtime library for browser Javascript environments should be loaded from the Ably CDN as follows:</p>
 <pre lang="javascript"><code lang="javascript">&lt;script lang="text/javascript" src="//cdn.ably.io/lib/ably.min.js" /&gt;</code></pre>
-<p>The script contains both the Realtime and REST libraries as well as all their dependencies. To instance the Realtime library:</p>
+<p>You can also obtain the library as an <a href="https://www.npmjs.com/package/ably">NPM module</a>.</p>
+<p>The script and module both contain the Realtime and REST libraries as well as all their dependencies. To instance the Realtime library:</p>
 <pre lang="javascript"><code lang="javascript">var realtime = new Ably.Realtime({ key: apiKey });</code></pre>
 <p>When referencing the client library from our CDN, we recommend that you include a major version number in the URL so that breaking changes, according to the <a href="http://semver.org/">semantic versioning scheme</a>, are never mistakenly used. For example, if you want to ensure that you only use the <code>MAJOR</code> version <code>0</code>, then use <a href="https://cdn.ably.io/lib/ably.min-0.js"><code>https://cdn.ably.io/lib/ably.min-0.js</code></a>. If you want to ensure that the <code>MINOR</code> version <code>0.8</code> is used, then use <a href="https://cdn.ably.io/lib/ably.min-0.8.js"><code>https://cdn.ably.io/lib/ably.min-0.8.js</code></a>. Additionally, the <code>.min</code> suffix can be dropped if you specifically want to use the non-minified version for debugging.</p>
 <p><a href="https://github.com/ably/ably-js/releases">View a complete list of the Javascript library releases</a></p>
