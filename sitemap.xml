@@ -26,7 +26,17 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>http://ably.github.com/rest/types/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://ably.github.com/code-index/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/rest/_stats/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -36,12 +46,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/types/_param/</loc>
+    <loc>http://ably.github.com/rest/history/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/rest/history/</loc>
+    <loc>http://ably.github.com/types/_param/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -56,7 +66,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/realtime/usage/</loc>
+    <loc>http://ably.github.com/realtime/types/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -66,17 +76,22 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/realtime/types/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/rest/statistics/</loc>
+    <loc>http://ably.github.com/realtime/usage/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>http://ably.github.com/realtime/_stats/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/code/rest/stats/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/rest/statistics/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -96,12 +111,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/realtime/presence/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/general/migrating/</loc>
+    <loc>http://ably.github.com/types/_deferrable/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -111,12 +121,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/types/_error_info/</loc>
+    <loc>http://ably.github.com/realtime/presence/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/types/_deferrable/</loc>
+    <loc>http://ably.github.com/types/_error_info/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -126,7 +136,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/types/_token_params/</loc>
+    <loc>http://ably.github.com/realtime/connection/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -136,22 +146,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/realtime/connection/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/code/realtime/stats/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>http://ably.github.com/types/_auth_options/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/realtime/statistics/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -161,7 +156,22 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/types/_token_request/</loc>
+    <loc>http://ably.github.com/realtime/statistics/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/code/realtime/stats/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/types/_token_params/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/types/_channel_state/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -176,12 +186,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/types/_channel_state/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/types/_ably_exception/</loc>
+    <loc>http://ably.github.com/types/_token_request/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -196,7 +201,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/general/authentication/</loc>
+    <loc>http://ably.github.com/types/_ably_exception/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -206,7 +211,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/types/_presence_action/</loc>
+    <loc>http://ably.github.com/general/authentication/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -216,7 +221,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/types/_message_listener/</loc>
+    <loc>http://ably.github.com/types/_presence_action/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -226,12 +231,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/types/_connection_state/</loc>
+    <loc>http://ably.github.com/shared/_presence_states/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/realtime/authentication/</loc>
+    <loc>http://ably.github.com/types/_message_listener/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -241,7 +246,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/types/_presence_listener/</loc>
+    <loc>http://ably.github.com/realtime/authentication/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/types/_connection_state/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -251,7 +261,37 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>http://ably.github.com/types/_presence_listener/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/code/rest/channel-history/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/code/rest/channel-publish/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/general/push-notifications/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/shared/_channel_namespaces/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://ably.github.com/realtime/channels-messages/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/types/_rest_client_options/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -276,17 +316,17 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/code/realtime/auth-client-id/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>http://ably.github.com/code/realtime/channel-states/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/code/realtime/channel-history/</loc>
+    <loc>http://ably.github.com/code/realtime/auth-client-id/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/types/_channel_state_listener/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -301,12 +341,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/types/_channel_state_listener/</loc>
+    <loc>http://ably.github.com/code/realtime/presence-events/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/code/realtime/presence-events/</loc>
+    <loc>http://ably.github.com/code/realtime/channel-history/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -316,7 +356,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/code/quick-start-guide/connect/</loc>
+    <loc>http://ably.github.com/types/_connection_state_change/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -326,12 +366,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/types/_connection_state_change/</loc>
+    <loc>http://ably.github.com/types/_realtime_client_options/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/code/realtime/connection-states/</loc>
+    <loc>http://ably.github.com/code/quick-start-guide/connect/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -341,12 +381,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/general/channel-rules-namespaces/</loc>
+    <loc>http://ably.github.com/code/realtime/connection-states/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/code/website-examples/ember-todo/</loc>
+    <loc>http://ably.github.com/general/channel-rules-namespaces/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -356,7 +396,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/code/authentication/request-token/</loc>
+    <loc>http://ably.github.com/code/website-examples/ember-todo/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -371,6 +411,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>http://ably.github.com/code/authentication/request-token/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://ably.github.com/client-lib-development-guide/comet/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -381,22 +426,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/code/quick-start-guide/send-message/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>http://ably.github.com/code/website-examples/backbone-todo/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/client-lib-development-guide/features/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>http://ably.github.com/client-lib-development-guide/protocol/</loc>
+    <loc>http://ably.github.com/code/quick-start-guide/send-message/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -406,7 +441,17 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>http://ably.github.com/client-lib-development-guide/protocol/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>http://ably.github.com/client-lib-development-guide/test-api/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>http://ably.github.com/client-lib-development-guide/features/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -446,12 +491,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/client-lib-development-guide/connection-recovery/</loc>
+    <loc>http://ably.github.com/client-lib-development-guide/connection-fallback/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://ably.github.com/client-lib-development-guide/connection-fallback/</loc>
+    <loc>http://ably.github.com/client-lib-development-guide/connection-recovery/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

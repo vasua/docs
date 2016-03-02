@@ -64,12 +64,12 @@
 <p>The Ably service aggregates your application statistics by minute, hour, day and month, both at an application level and at an account level. Account level statistics are not available via the client library APIs and must be viewed using your <a href="https://support.ably.io/solution/articles/3000048664-how-do-i-access-my-account-dashboard">account dashboard</a>. Your monthly quota and any potential overages are calculated using the account level statistics. <a href="https://support.ably.io/solution/articles/3000044717-what-happens-if-i-exceed-my-package-limits">Find out what happens if you exceed your package limits</a>.</p>
 <h2 id="getting-started">Getting started</h2>
 <p>The Ably Realtime client library provides a straightforward API for retrieving application statistics:</p>
-<pre class="code-editor open-jsbin open-jsbin-ewedom" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ewedom" lang="javascript">var realtime = new Ably.Realtime('{{API_KEY}}');
+<pre class="code-editor open-jsbin open-jsbin-ixowal" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ixowal" lang="javascript">var realtime = new Ably.Realtime('{{API_KEY}}');
 realtime.stats({ unit: 'hour' }, function(err, resultPage) {
   var thisHour = resultPage.items[0];
   console.log(this.hour) // =&gt; {all: a, inbound: f, outbound: f, …}
 );</code></pre>
-<pre class="code-editor open-jsbin open-jsbin-ewedom" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ewedom" lang="nodejs">var realtime = new Ably.Realtime('{{API_KEY}}');
+<pre class="code-editor open-jsbin open-jsbin-ixowal" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ixowal" lang="nodejs">var realtime = new Ably.Realtime('{{API_KEY}}');
 realtime.stats({ unit: 'hour' }, function(err, resultPage) {
   var thisHour = resultPage.items[0];
   console.log(this.hour) // =&gt; {all: a, inbound: f, outbound: f, …}
@@ -120,7 +120,7 @@ System.out.println("Published this hour " + thisHour.inbound.all.all.count);</co
 <div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
 <h4>Callback result</h4>
 <p>On success, <code>result</code> contains a <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulating an array of <a href="/realtime/types#stats"><code>Stats</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
-<p>On failure to retrieve stats, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
+<p>On failure to retrieve stats, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with an error response as defined in the <a href="/rest-api#common">Ably REST API</a> documentation.</p>
 
 </div> <!-- /end javascript,nodejs language block -->
 
@@ -139,7 +139,7 @@ System.out.println("Published this hour " + thisHour.inbound.all.all.count);</co
 <h4>Returns</h4>
 <p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from the stats method.</p>
 <p>On success, the registered success callbacks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to the method yields a <a href="#paginated-result">PaginatedResult</a> that encapsulates an array of <a href="/realtime/types#stats"><code>Stats</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
-<p>Failure to retrieve the stats will trigger the errback callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object containing an error response as defined in the <a href="/rest-api#common">REST API</a> documentation.</p>
+<p>Failure to retrieve the stats will trigger the errback callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object containing an error response as defined in the <a href="/rest-api#common">Ably REST API</a> documentation.</p>
 
 </div> <!-- /end ruby language block -->
 
@@ -152,7 +152,7 @@ System.out.println("Published this hour " + thisHour.inbound.all.all.count);</co
 	<dt><code>all</code></dt>
 	<dd>aggregate count of both <code>inbound</code> and <code>outbound</code> message stats<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">MessageTypes</a></i></dd>
 	<dt><span lang="default"><code>apiRequests</code></span><span lang="ruby"><code>api_requests</code></span></dt>
-	<dd>breakdown of API requests received via the REST API<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
+	<dd>breakdown of API requests received via the Ably REST API<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
 	<dt><code>channels</code></dt>
 	<dd>breakdown of channel related stats such as min, mean and peak channels<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ResourceCount">ResourceCount</a></i></dd>
 	<dt><code>connections</code></dt>
@@ -170,7 +170,7 @@ System.out.println("Published this hour " + thisHour.inbound.all.all.count);</co
 	<dt><code>persisted</code></dt>
 	<dd>messages persisted and later retrieved via the <a href="/realtime/history">history API</a><br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">MessageTypes</a></i></dd>
 	<dt><span lang="default"><code>tokenRequests</code></span><span lang="ruby"><code>token_requests</code></span></dt>
-	<dd>breakdown of Token requests received via the REST API.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
+	<dd>breakdown of Token requests received via the Ably REST API.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
 </dl>
 <h3 id="param"><span lang='java'>io.ably.lib.types.Param</span></h3>
 
@@ -218,8 +218,9 @@ System.out.println("Published this hour " + thisHour.inbound.all.all.count);</co
 <li class=''><a href='/rest/presence/'>Presence</a></li>
 <li class=''><a href='/rest/authentication/'>Authentication</a></li>
 <li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
 <li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/types/'>Types</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
@@ -228,9 +229,9 @@ System.out.println("Published this hour " + thisHour.inbound.all.all.count);</co
 <ul>
 <li class=''><a href='/general/authentication/'>Authentication</a></li>
 <li class=''><a href='/general/channel-rules-namespaces/'>Channel Rules and Namespaces</a></li>
-<li class=''><a href='/general/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/general/push-notifications/'>Mobile push notifications</a></li>
+<li class=''><a href='/general/webhooks/'>Receiving WebHooks</a></li>
 <li class=''><a href='/general/statistics/'>Application Statistics</a></li>
-<li class=''><a href='/general/migrating/'>Migrating to Ably</a></li>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>

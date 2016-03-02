@@ -41,8 +41,17 @@
             <optgroup label='Help with'>
 <option id="anchor-title">Usage</option>
 </optgroup>
-<optgroup label='API reference'>
-<option id="anchor-constructor">Constructor</option>
+<optgroup label='REST API reference'>
+<option id="anchor-constructor">constructor</option>
+</optgroup>
+<optgroup label='Attributes'>
+<option id="anchor-auth">auth</option>
+<option id="anchor-channels">channels</option>
+<option id="anchor-client-id">client_id</option>
+</optgroup>
+<optgroup label='Methods'>
+<option id="anchor-stats">stats</option>
+<option id="anchor-time">time</option>
 </optgroup>
           </select>
         </div>
@@ -57,179 +66,366 @@
       
     </header>
     <article>
-      <p>The REST client library provides access to the Ably REST API. The library is available is available for <a href="https://www.ably.io/download/rest-client-libraries">several popular environments</a>, with the same functionality and similar API supported across all languages. You can view this documentation in each of the supported languages using the language selector navigation.</p>
-<div lang="nodejs">
-<p>The REST library for Javascript targets node.js clients and servers. It is obtainable as a module direcly from npm using</p>
+      <p>The Ably REST client libraries offer a convenient and simple API to interact directly with the <a href="/rest-api/">Ably REST API</a> providing <a href="/rest/channels-messages">publish</a> and <a href="/rest/history">historical message retrieval</a>, <a href="/rest/authentication">basic and token authentication</a>, <a href="https://support.ably.io/solution/articles/3000044636-routing-around-network-and-dns-issues">automatic handling of changing network conditions</a>, optional <a href="/rest/encryption">symmetrical encryption</a> and access to <a href="/rest/history">channel, presence and metrics history</a>.</p>
+<p>The Ably REST client library is available for <a href="https://www.ably.io/download/rest-client-libraries">most popular languages and platforms</a> with a consistent API across all platforms. You can view this documentation with your preferred language API and code examples using the language selector navigation above. If your preferred language is not listed in the language selector, please <a href="https://www.ably.io/download/rest-client-libraries">download the library in your preferred language</a> and use that as a reference.</p>
+
+
+<div lang="javascript"> <!-- start javascript language block -->
+<p>The REST library for browser Javascript environments should be loaded from the Ably CDN as follows:</p>
+<pre lang="javascript"><code lang="javascript">&lt;script lang="text/javascript" src="//cdn.ably.io/lib/ably.min.js" /&gt;</code></pre>
+<p>The script contains both the Realtime and REST libraries as well as all their dependencies. To instance the REST library:</p>
+<pre lang="javascript"><code lang="javascript">var rest = new Ably.Rest({ key: apiKey });</code></pre>
+<p>When referencing the client library from our CDN, we recommend that you include a major version number in the URL so that breaking changes, according to the <a href="http://semver.org/">semantic versioning scheme</a>, are never mistakenly used. For example, if you want to ensure that you only use the <code>MAJOR</code> version <code>0</code>, then use <a href="https://cdn.ably.io/lib/ably.min-0.js"><code>https://cdn.ably.io/lib/ably.min-0.js</code></a>. If you want to ensure that the <code>MINOR</code> version <code>0.8</code> is used, then use <a href="https://cdn.ably.io/lib/ably.min-0.8.js"><code>https://cdn.ably.io/lib/ably.min-0.8.js</code></a>. Additionally, the <code>.min</code> suffix can be dropped if you specifically want to use the non-minified version for debugging.</p>
+<p><a href="https://github.com/ably/ably-js/releases">View a complete list of the Javascript library releases</a></p>
+
+</div> <!-- /end javascript language block -->
+
+
+
+<div lang="nodejs"> <!-- start nodejs language block -->
+<p>The REST library for Node.js is suitable for clients and servers and is obtainable as an NPM module <a href="https://npmjs.org/package/ably">directly from npm</a>. Install with:</p>
 <pre lang="sh"><code lang="sh">npm install ably-js</code></pre>
-<p>The ably-js module contains both REST and Realtime libraries, and the REST library is a subset of Realtime; however, each is exported separately by the module:</p>
-<pre lang="javascript"><code lang="javascript">var Ably = require('ably-js');</code></pre>
-<p>The REST constructor is <a href="#constructor"><code>Ably.Rest</code></a>; the Realtime constructor is <a href="/realtime"><code>Ably.Realtime</code></a>.</p>
-<p></div><div lang="ruby"></p>
-<p>The REST library for Ruby is obtainable as a RubyGem direcly using</p>
+<p>The Ably Node.js module contains both the REST and Realtime libraries; each is exported separately by the module. To instance the REST library:</p>
+<pre lang="nodejs"><code lang="nodejs">var Ably = require('ably-js');
+var rest = new Ably.Rest({ key: apiKey });</code></pre>
+
+</div> <!-- /end nodejs language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p>The REST library for Ruby is <a href="https://rubygems.org/gems/ably-rest">published as a RubyGem</a> and can be installed as follows:</p>
 <pre lang="sh"><code lang="sh">gem install ably-rest</code></pre>
 <p>If using bundler, simply add the following to your Gemfile and run <code>bundle install</code>:</p>
 <pre lang="ruby"><code lang="ruby">gem 'ably-rest'</code></pre>
-<p></div><div lang="java"></p>
-<p>The REST library for Java is downloadable as a JAR from <a href="https://github.com/ably/ably-java/bin">https://github.com/ably/ably-java/bin</a></p>
-<p>Ensure this JAR is included in your class path.</p>
-<pre lang="java"><code lang="java">import io.ably.lib.rest.AblyRest;</code></pre>
-</div>
-<p><em>Note: Since the REST client library is a direct subset of the Realtime client library, all <a href="/realtime">Realtime client libraries</a> also provide access to the functionality of the REST client library.</em></p>
-<h1>API Reference</h1>
-<h6 lang="javascript">AblyRest(keyStr)</h6>
-<h6 lang="nodejs">AblyRest(keyStr)</h6>
-<h6 lang="ruby">Ably::Rest.new(keyStr)</h6>
-<h6 lang="java">AblyRest(String keyStr)</h6>
-<p>Instance the library passing only a key string. All other options assume default values.</p>
-<h6 lang="javascript">AblyRest(options)</h6>
-<h6 lang="nodejs">AblyRest(options)</h6>
-<h6 lang="ruby">Ably::Rest.new(options)</h6>
-<h6 lang="java">AblyRest(Options options)</h6>
-<p>Instance the library specifying an <a href="#options">Options</a> instance.</p>
-<p>The Rest constructor is used to instance the library.The Rest library may be instanced multiple times with different <code>options</code> in any given context. Except where specified otherwise, instances operate independently of one another.</p>
-<p>The Rest library needs to know the application identifier, or <code>appId</code>, and also requires credentials or other information required to be able to authenticate to the Ably service. The application id can be specified explicitly with an <code>appId</code> option, or is more typically given implicitly by passing a <code>key</code> or <code>token</code> option when constructing the library.</p>
-<p>The <code>key</code> option takes a key string, as obtained from the <a href="https://www.ably.io/dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or if you want to be able to request tokens without needing to defer to<br />
-a separate entity to sign token requests. Note that initialising the library with a <code>key</code> does not necessarily mean that the library will use Basic auth; but knowing the key it is able to create and sign token requests and use token authentication when necessary.</p>
-<p>The <code>token</code> option takes a token string, and assumes the token has been obtained from some other instance that requested the token. Use the token option if you are provided with a token to use and you do not have a key (or do not have a key with the capabilities that you require).</p>
-<p>Since tokens are short-lived, it is rarely sufficient to start with a token, without the means for refreshing it. The <code>authUrl</code> and <code>authCallback</code> options are provided to allow a user of the library to issue new token requests as required; these options even permit the library to be instanced without either <code>key</code> or <code>token</code>, and an initial token<br />
-will be obtained when required.</p>
-<p>See <a href="#options">Options</a> for the full set of initialisation options.</p>
-<h2 id="methods">Methods</h2>
+<p>The <a href="https://rubygems.org/gems/ably-rest">Ably Ruby REST gem</a> contains only the REST library and its dependencies. However, <a href="https://rubygems.org/gems/ably">Ably Ruby gem</a> contains both the REST and Realtime libraries including the <a href="https://github.com/eventmachine/eventmachine">EventMachine</a> depdendency. To instance the REST library:</p>
+<pre lang="ruby"><code lang="ruby">ably = Ably::Rest.new(key: api_key)</code></pre>
+
+</div> <!-- /end ruby language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<p>The REST library for Java and Android is downloadable as a JAR from <a href="https://github.com/ably/ably-java/releases">https://github.com/ably/ably-java/releases</a> or via <a href="https://bintray.com/ably-io/ably">JCentre</a>.</p>
+<p>Ensure the JAR is included in your classpath as follows:</p>
+<pre lang="java"><code lang="java">import io.ably.lib.types.*;
+import io.ably.lib.rest.*;
+ClientOptions options = new ClientOptions(apiKey);
+AblyRest rest = new AblyRest(options);</code></pre>
+
+</div> <!-- /end java language block -->
+
+<p>The supported <a href="#client-options">client options are described below</a>.</p>
+<h1><span lang='default'>REST API Reference</span><span lang='ruby'>REST::Client API reference</span></h1>
+<div class="inline-toc">
+<ul><li>REST API reference
+<ul>
+<li>
+Methods
+<ul>
+<li><a href='#stats'>stats(options)</a></li>
+<li><a href='#time'>time()</a></li>
+</ul>
+</li>
+<li>
+Properties
+<ul>
+<li><a href='#auth'>auth</a></li>
+<li><a href='#channels'>channels</a></li>
+<li><a href='#client-id'>clientId</a></li>
+</ul>
+</li>
+<li>
+Related types
+<ul>
+<li><a href='#client-options'>ClientOptions</a></li>
+<li><a href='#params'>Params</a></li>
+<li><a href='#stats'>Stats</a></li>
+</ul>
+</li>
+</ul>
+</li></ul>
+</div><h2 id="constructor">Constructor</h2>
+<p>The Ably REST library constructor is overloaded allowing it to be instanced using a <a href="#client-options"><code>ClientOptions</code></a> object, or more simply using a string containing an <a href="/general/authentication/#basic-authentication">API key</a> or <a href="/general/authentication/#token-authentication">Token</a>.</p>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>new Ably.Rest(String keyOrTokenId)</span><span lang='ruby'>Ably::Rest.new(String key_or_token_id)</span><span lang='java'>new io.ably.lib.AblyRest(String keyOrTokenIdString)</span></p>
+</blockquote>
+<p>This will instance the REST library with the provided API key or Token ID string.</p>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>new Ably.Rest(<a href="#client-options">ClientOptions</a> clientOptions)</span><span lang='ruby'>Ably::Rest.new(<a href="#client-options">ClientOptions</a> client_options)</span><span lang='java'>new io.ably.lib.AblyRest(<a href="#client-options">ClientOptions</a> clientOptions)</span></p>
+</blockquote>
+
+
+<div lang="default"> <!-- start default language block -->
+<p>This will instance the library using the specified <a href="#client-options">ClientOptions</a>.</p>
+
+</div> <!-- /end default language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p>This will instance the library and create a new <code>Ably::Rest::Client</code> using the specified <a href="#client-options"><code>ClientOptions</code></a>.</p>
+
+</div> <!-- /end ruby language block -->
+
+<p>The Rest constructor is used to instance the library. The Rest library may be instanced multiple times with the same or different <a href="#client-options"><code>ClientOptions</code></a> in any given context. Except where specified otherwise, instances operate independently of one another.</p>
+<h3 id="authentication">Authentication</h3>
+<p>The REST library needs to have credentials to be able to authenticate with the Ably service. Ably supports both Basic and Token based authentication schemes. Read more on <a href="/rest/authentication">authentication</a>.</p>
+<h4>Basic Authentication</h4>
+<p>A private API key string for <a href="#client-options"><code>ClientOptions#key</code></a> or the constructor, as obtained from the <a href="http://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>, is required for <a href="/general/authentication/#basic-authentication">Basic Authentication</a>. Use this option if you wish to use <a href="/general/authentication/#basic-authentication">Basic authentication</a>, or if you want to be able to <a href="/rest/authentication/#request-token">request tokens</a> without needing to defer to a separate entity to sign token requests. Note that initialising the library with a <code>key</code> does not necessarily mean that the library will use Basic auth; using the private key it is also able to create and sign token requests and use token authentication when necessary.</p>
+<h4>Token Authentication</h4>
+<p>The <a href="#client-options"><code>ClientOptions#token</code></a> option takes a token string, and assumes the token has been obtained from some other instance that requested the token. Use the token option if you are provided with a token to use and you do not have a key (or do not have a key with the capabilities that you require).</p>
+<p>Since tokens are short-lived, it is rarely sufficient to start with a token without the means for refreshing it. The <span lang="default"><a href="#client-options"><code>authUrl</code> and <code>authCallback</code> options</a></span><span lang="ruby"><a href="#client-options"><code>:auth_url</code> and <code>:auth_callback</code> options</a></span> are provided to allow a user of the library to provide new tokens or token requests to the library as required; using these options allows the library to be instanced without a <code>key</code> or <code>token</code>, and an initial token will be obtained automatically when required.</p>
+<p>Read more on <a href="/rest/authentication">authentication</a>.</p>
+<h2 id="properties"><span lang='default'>AblyRest Properties</span><span lang='java'>io.ably.lib.AblyRest Members</span><span lang='ruby'>Ably::Rest::Client Attributes</span></h2>
+<p>The REST client exposes the following public <span lang="default">attributes</span><span lang="java">members</span><span lang="javascript,nodejs">properties</span>:</p>
+<h6 id="auth">auth</h6>
+<p>A reference to the <a href="/rest/authentication"><code>Auth</code></a> authentication object configured for this client library.</p>
+<h6 id="channels">channels</h6>
+<p>A reference to the <a href="/realtime/channels-messages"><code>Channel</code> collection</a> instance for this library indexed by the channel name. See <a href="/rest/channels-messages/">channels and messages</a> for more information.</p>
+<h6 id="client-id"><span lang='default'>clientId</span><span lang='ruby'>client_id</span></h6>
+<p>The client ID string, if any, configured for this client connection. See <a href="/rest/authentication">authentication</a> for more information on authentication and using a client ID.</p>
+<h2 id="methods"><span lang='default'>AblyRest Methods</span><span lang='java'>io.ably.lib.AblyRest Methods</span><span lang='ruby'>Ably::Rest::Client Methods</span></h2>
 <h6 id="stats">stats</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='nodejs'>rest.stats(options, callback)</span><span lang='ruby'>rest.stats(options) → json_result</span><span lang='java'>public PaginatedResult&lt;Stats&gt; stats(Param[] params)</span></p>
+<p class="definition"><span lang='default'>stats(Object options, callback(<a href="/rest/types#error-info">ErrorInfo</a> err, <a href="/rest/types#paginated-result">PaginatedResult</a>&lt;<a href="#stats">Stats</a>&gt; results))</span><span lang='ruby'><a href="/rest/types#paginated-result">PaginatedResult</a>&lt;<a href="#stats">Stats</a>&gt; stats(Hash options)</span><span lang='java'>public <a href="/rest/types#paginated-result">PaginatedResult</a>&lt;<a href="#stats">Stats</a>&gt; stats(<a href="#param">Param</a>[] options)</span></p>
 </blockquote>
-<p>This call queries the REST <a href="/rest-api#stats"><code>/stats</code></a> API.</p>
+<p>This call queries the <a href="/rest-api#stats">REST <code>/stats</code> API</a> and retrieves your application&#8217;s usage statistics. A <a href="/rest/types#paginated-result">PaginatedResult</a> is returned, containing an array of <a href="#stats">Stats</a> for the first page of results. <a href="/rests/types#paginated-result">PaginatedResult</a> objects are iterable providing a means to page through historical statistics. <a href="/general/statistics">See an example set of raw stats returned via the REST API</a>.</p>
+<p>See <a href="/rest/statistics">statistics</a> for more information.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt>params</dt>
-	<dd>an optional object containing the query parameters, as specified in the <a href="/rest/stats">stats</a> API documentation.</dd>
+	<dt>options</dt>
+	<dd>an optional <span lang="default">object</span><span lang="ruby">Hash</span><span lang="java"><a href="#param"><code>Param</code></a>[] array</span> containing the query parameters</dd>
+</dl>
+<dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>is a function of the form: <code>callback(err, stats, relParams)</code><br />
-where:<br />
-<ul><br />
-<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
-<li>on success, <code>stats</code> contains the query result as an array of Stats objects.</li><br />
-<li>where applicable, <code>relParams</code> is a map containing query params for each of the pagination links in the query response (see below).</li><br />
-</ul></dd>
+	<dd>is a function of the form: <code>function(err, result)</code></dd>
 </dl>
-<p>Further details of the supported query params are in the <a href="/rest/stats">stats API</a> documentation.</p>
-<div lang="java">
+<h4><code>options</code> parameters</h4>
+<p>The following options, as defined in the <a href="/rest-api#stats">REST <code>/stats</code> API</a> endpoint, are permitted:</p>
+<dl>
+	<dt><span lang="ruby">:</span>start</dt>
+	<dd><em>beginning of time</em> earliest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: Long<span lang="ruby">, Time</span></i></dd>
+	<dt><span lang="ruby">:</span>end</dt>
+	<dd><em>current time</em> latest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: Long<span lang="ruby">, Time</span></i></dd>
+	<dt><span lang="ruby">:</span>direction</dt>
+	<dd><em>backwards</em> <span lang="ruby"><code>:</code></span><code>forwards</code> or <span lang="ruby"><code>:</code></span><code>backwards</code><br><i>Type: <span lang="default">String</span><span lang="ruby">Symbol</span></i></dd>
+	<dt><span lang="ruby">:</span>limit</dt>
+	<dd><em>100</em> maximum number of messages to retrieve up to 1,000<br><i>Type: Integer</i></dd>
+	<dt><span lang="ruby">:</span>unit</dt>
+	<dd><em>minute</em> <span lang="ruby"><code>:</code></span><code>minute</code>, <span lang="ruby"><code>:</code></span><code>hour</code>, <span lang="ruby"><code>:</code></span><code>day</code> or <span lang="ruby"><code>:</code></span><code>month</code>. Based on the unit selected, the given start or end times are rounded down to the start of the relevant interval depending on the unit granularity of the query<br><i>Type: <span lang="default">String</span><span lang="ruby">Symbol</span></i></dd>
+</dl>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On success, <code>result</code> contains a <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulating an array of <a href="/rest/types#stats"><code>Stats</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
+<p>On failure to retrieve stats, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with an error response as defined in the <a href="/rest-api#common">Ably REST API</a> documentation.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java,ruby"> <!-- start java,ruby language block -->
 <h4>Returns</h4>
-<p>On success, the returned <a href="#paginated-result">PaginatedResult</a> encapsulates a collection of <code>Stats</code> objects corresponding to the current page of results, and also provides query parameters for any applicable related (eg <code>first</code> or <code>next</code> result pages).</p>
-<p>Failure to retrieve the stats will raise an <code>AblyException</code>.</p>
-<p></div><div lang="ruby"><br />
-h4. Returns</p>
-<p>On success, <span lang="ruby"><code>json_result</code></span> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api/#stats">REST API</a>.</p>
-<p>Example <span lang="ruby"><code>json_result</code></span>:</p>
-<pre lang="json"><code lang="json">[{
-  "name": "&lt;event name&gt;",
-  "channel": "&lt;channel id&gt;",
-  "data": "&lt;message payload&gt;",
-  "timestamp": "&lt;message timestamp&gt;"
-}]</code></pre>
-<p>Failure to retrieve the history will raise an exception &#8211; typical exceptions include:<br />
-  <div lang="ruby"></p>
-<ul>
-	<li><code>Ably::NetworkUnavailableException</code></li>
-	<li><code>Ably::QuotaExceededException</code></li>
-	<li><code>Ably::AuthenticationFailureException</code><br />
-  </div></li>
-</ul>
-<p></div><div lang="javascript,nodejs"></p>
-<h4>Pagination</h4>
-<p>A paginated result is indicated in the <code>relParams</code> callback argument. For each available link, <code>relParams</code> contains a map of params to pass to a subsequent <code>stats()</code> call.<br />
-  Example <code>relParams</code>:<br />
-  <pre lang="json"><code>[{
-    "first": {"start": 1380794880000, "end": 138079488105, ...},
-    "current": {"start": 1380794880000, "end": 138079488105, ...},
-    "next": {"start": 1380794880000, "end": 138079488105, ...}
-  }]</code></pre></p>
-<p>Further details of the paginated response are in the <a href="/rest/statistics">stats API</a> documentation.</p>
-</div>
-<h2 id="members">Public members</h2>
-<p>The Realtime object exposes the following public <span lang="default">properties</span><span lang="java">fields</span>.</p>
+<p>On success, the returned <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulates an array of <a href="/rest/types#stats"><code>Stats</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
+<p>Failure to retrieve the stats will raise an <a href="/rest/types#ably-exception"><code>AblyException</code></a></p>
+
+</div> <!-- /end java,ruby language block -->
+
+<h6 id="time">time</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>time(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, Number time))</span><span lang='ruby'>Time time</span><span lang='java'>public long time()</span></p>
+</blockquote>
+<p>Obtains the time from the Ably service. This may be required on clients that do not have access to a sufficiently well maintained time source and wish to issue token requests with a more accurate timestamp.</p>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On success, <code>time</code> is a number containing the millisecond since the epoch.</p>
+<p>On failure to retrieve the Ably server time, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with an error response as defined in the <a href="/rest-api#common">Ably REST API</a> documentation.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java,ruby"> <!-- start java,ruby language block -->
+<h4>Returns</h4>
+<p>On success, <span lang="java">millisecond since epoch</span><span lang="ruby">the <code>Time</code></span> is returned.</p>
+<p>Failure to retrieve the Ably server time will raise an <a href="/rest/types#ably-exception"><code>AblyException</code></a>.</p>
+
+</div> <!-- /end java,ruby language block -->
+
+<h2 id="related-types">Related types</h2>
+<h3 id="client-options"><span lang='default'>ClientOptions</span><span lang='java'>io.ably.lib.types.ClientOptions</span></h3>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<p><code>ClientOptions</code> is a plain Javascript object and is used in the <code>Ably.Realtime</code> constructor&#8217;s <code>options</code> argument.  The following attributes can be defined on the object:</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p><code>ClientOptions</code> is a Hash object and is used in the <code>Ably::Realtime</code> constructor&#8217;s <code>options</code> argument.  The following key symbol values can be added to the Hash:</p>
+
+</div> <!-- /end ruby language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>ClientOptions</code> is used in the <code>AblyRealtime</code> constructor&#8217;s <code>options</code> argument.</p>
+
+</div> <!-- /end java language block -->
+
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
-	<dt><span lang="java">public final</span>channels</dt>
-	<dd>The collection of channels instanced, indexed by channel name. See <a href="/realtime/channels-messages/">channels and messages</a> for more information.</dd>
-</dl>
-<h2 id="options">Options</h2>
-<div lang="java">
-<p>The Ably constructor&#8217;s <code>Options</code> argument is an instance of <code>io.ably.lib.types.Options</code>, constructed either with the default no-argument constructor or with a key string. The following options may be specified.</p>
-<p></div><div lang="default"><br />
-The Ably constructor&#8217;s <code>Options</code> argument is an object with one or more of the following properties.</p>
-</div>
-<dl>
-	<dt>appId</dt>
-	<dd>The application id. This option is only required if the application id cannot be inferred either from a <code>key</code> or <code>token</code> option. If given, it is the application id as indicated on the <a href="https://www.ably.io/dashboard">application dashboard</a>.</dd>
-</dl>
-<dl>
-	<dt>key</dt>
-	<dd>The full key string, as obtained from the <a href="https://www.ably.io/dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or wish to be able to issue tokens without needing to defer to a separate entity to sign token requests.</dd>
-</dl>
-<dl>
-	<dt>token</dt>
-	<dd>A token string, as the value of the <code>id</code> property of a <code>token_details</code> component of a token response.</dd>
-</dl>
-<dl>
-	<dt>authCallback</dt>
-	<dd>A <span lang="default">function</span><span lang="java">TokenCallback instance</span> to call when a new token is required.</span>. The role of the callback is to generate a signed <code>token request</code> which may then be submitted by the library to the <code>requestToken</code> API. See <a href="/rest/authentication">authentication</a> for details of the token request format and associated API calls.</dd>
+	<dt><span lang="default"><code>key</code></span><span lang="ruby"><code>:key</code></span></dt>
+	<dd>The full key string, as obtained from the <a href="http://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>. Use this option if you wish to use Basic authentication, or wish to be able to issue tokens without needing to defer to a separate entity to sign token requests. Read more about <a href="/general/authentication#basic-authentication">Basic authentication</a><br><i>Type: String</i></dd>
 </dl>
 <dl>
-	<dt>authUrl</dt>
-	<dd>A URL that the library may use to obtain a signed token request. For example, this can be used by a client to obtain signed token requests from an application server.</dd>
+	<dt><span lang="default"><code>token</code></span><span lang="ruby"><code>:token</code></span></dt>
+	<dd>An authenticated token string that is most commonly obtained from the <code>token</code> property of a <a href="/realtime/types#token-details"><code>TokenDetails</code></a> component of a token request response. Use this option if you wish to use Token authentication. Read more about <a href="/general/authentication#token-authentication">Token authentication</a><br><i>Type: String</i></dd>
 </dl>
 <dl>
-	<dt>authHeaders</dt>
-	<dd>A set of headers to be added to any request made to the <code>authUrl</code>.  Useful when an application requires these to be added to validate the request or implement the response.</dd>
+	<dt><span lang="default"><code>tokenDetails</code></span><span lang="ruby"><code>:token_details</code></span></dt>
+	<dd>An authenticated <a href="/realtime/types/#token-details"><code>TokenDetails</code></a> object that is most commonly obtained from of a token request response. Use this option if you wish to use Token authentication. Read more about <a href="/general/authentication#token-authentication">Token authentication</a><br><i>Type: String</i></dd>
 </dl>
 <dl>
-	<dt>authParams</dt>
-	<dd>A set of <code>POST</code> params to be added to any request made to the <code>authUrl</code>.  Useful when an application require these to be added to validate the request or implement the response.</dd>
+	<dt><span lang="default"><code>tls</code></span><span lang="ruby"><code>:tls</code></span></dt>
+	<dd><em>true</em> A boolean value, indicating whether or not a TLS (&#8220;SSL&#8221;) secure connection should be used. An insecure connection cannot be used with Basic authentication ensuring private keys are compromised in transit. <a href="https://support.ably.io/solution/articles/3000045208-are-messages-sent-to-and-received-from-ably-sent-security-using-tls">Find out more about TLS</a><br><i>Type: Boolean</i></dd>
 </dl>
 <dl>
-	<dt>tls</dt>
-	<dd><em>true</em> A boolean value, indicating whether or not a TLS (&#8220;SSL&#8221;) secure connection should be used.</dd>
+	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>:client_id</code></span></dt>
+	<dd>A client ID, used for identifying this client when publishing messages or for presence purposes. The <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> can be any non-empty string. This option is primarily intended to be used in situations where the library is instanced with a key; note that a <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> may also be implicit in a token used to instance the library; an error will be raised if a <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> specified here conflicts with the <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> implicit in the token. <a href="/how-ably-works#client-identity">Find out more about client identities</a><br><i>Type: String</i></dd>
 </dl>
 <dl>
-	<dt>clientId</dt>
-	<dd>A client id, used for identifying this client for presence purposes. The clientId can be any string. This option is primarily intended to be used in situations where the library is instanced with a key; note that a clientId may also be implicit in a token used to instance the library; an error will be raised if a clientId specified here conflicts with the clientId implicit in the token.</dd>
+	<dt><span lang="default"><code>authCallback</code></span><span lang="ruby"><code>:auth_callback</code></span></dt>
+	<dd>A <span lang="default">function</span><span lang="java"><code>TokenCallback</code> instance</span><span lang="ruby">proc / lambda</span> to call when a new token is required. The role of the callback is to either generate a signed <a href="/realtime/types#token-request"><code>TokenRequest</code></a> which may then be submitted automatically by the library to the <a href="/rest-api#request-token">Ably REST API <code>requestToken</code></a>; or to provide a valid token in as a <a href="/realtime/types#token-details"><code>TokenDetails</code></a> object. See <a href="/rest/authentication">authentication</a> for details of the token request format and associated API calls.<br><i>Type: <span lang="default">Function</span><span lang="java"><code>TokenCallback</code></span><span lang="ruby">Proc / Lamda</span></i></dd>
 </dl>
 <dl>
-	<dt><div lang="javascript,nodejs,,ruby">log</div></dt>
+	<dt><span lang="default"><code>authUrl</code></span><span lang="ruby"><code>:auth_url</code></span></dt>
+	<dd>A URL that the library may use to obtain a token string (in plain text format), or a signed <a href="/realtime/types#token-request"><code>TokenRequest</code></a> or <a href="/realtime/types#token-details"><code>TokenDetails</code></a> (in JSON format). For example, this can be used by a client to obtain signed token requests from an application server.<br><i>Type: String</i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>authMethod</code></span><span lang="ruby"><code>:auth_method</code></span></dt>
+	<dd><em><span lang="default"><code>GET</code></span><span lang="ruby"><code>:get</code></span></em> The HTTP verb to use for the request, either <span lang="default"><code>GET</code></span><span lang="ruby"><code>:get</code></span> or <span lang="default"><code>POST</code></span><span lang="ruby"><code>:post</code></span><br><i>Type: <span lang="default">String</span><span lang="ruby">Symbol</span></i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>authHeaders</code></span><span lang="ruby"><code>:auth_headers</code></span></dt>
+	<dd>A set of key value pair headers to be added to any request made to the <code>authUrl</code>. Useful when an application requires these to be added to validate the request or implement the response.<br><i>Type: <span lang="default">Object</span><span lang="ruby">Hash</span><span lang="java">Param[]</span></i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>authParams</code></span><span lang="ruby"><code>:auth_params</code></span></dt>
+	<dd>A set of key value pair params to be added to any request made to the <code>authUrl</code>. When the <code>authMethod</code> is <code>GET</code>, query params are added to the URL, whereas when <code>authMethod</code> is <code>POST</code>, the params are sent as URL encoded form data. Useful when an application require these to be added to validate the request or implement the response.<br><i>Type: <span lang="default">Object</span><span lang="ruby">Hash</span><span lang="java">Param[]</span></i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>useTokenAuth</code></span><span lang="ruby"><code>:use_token_auth</code></span></dt>
+	<dd>When true, forces <a href="/general/authentication#token-authentication">Token authentication</a> to be used by the libary.<br><i>Type: Boolean</i></dd>
+</dl>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<dl>
+	<dt><code>log</code></dt>
 	<dd>Parameters to control the log output of the library. The supplied value must be an object that may contain one or both of the following entries:<br />
-<ul><li><code>level</code>: a number controlling the verbosity of the output from 1 (minimum, errors only) to 4 (most verbose);</li><br />
-<li><code>handler</code>: a function to handle each line of log output. If <code>handler</code> is not specified, <code>console.log</code> is used.</li></ul><br />
-Note that the log level and log handler have global scope in the library and will thus not act independently between library instances when multiple library instances are existing concurrently.</dd>
+<ul><br />
+  <li><code>level</code>: a number controlling the verbosity of the output from 1 (minimum, errors only) to 5 (most verbose);</li><br />
+  <li><code>handler</code>: a function to handle each line of log output. If <code>handler</code> is not specified, <code>console.log</code> is used.</li><br />
+</ul><br />
+Note that the log level and log handler have global scope in the library and will thus not act independently between library instances when multiple library instances exist concurrently.<br><i>Type: Object</i></dd>
 </dl>
 <dl>
-	<dt><div lang="java">logLevel</div></dt>
-	<dd>An int controlling the verbosity of the output from 1 (minimum, errors only) to 4 (most verbose). Note that the <code>logLevel</code> is a static variable in the library and will thus not act independently between library instances when multiple library instances are existing concurrently.</dd>
+	<dt><code>transports</code></dt>
+	<dd>An optional array of transports to use, in descending order of preference. <span lang="javascript">In the browser environment the available transports are: <code>web_socket</code>, <code>xhr</code>, <code>jsonp</code>.</span><span lang="nodejs">The transports available in the Node.js client library are: <code>web_socket</code>, <code>xhr</code>, <code>comet</code>.</span><br><i>Type: String Array</i></dd>
+</dl>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<dl>
+	<dt><code>logLevel</code></dt>
+	<dd><em>5</em> A number controlling the verbosity of the output from 2 (maximum, verbose) to 6 (errors only). A special value of 99 will silence all logging. Note that the <code>logLevel</code> is a static variable in the library and will thus not act independently between library instances when multiple library instances exist concurrently.<br><i>Type: Integer</i></dd>
 </dl>
 <dl>
-	<dt><div lang="java">logHandler</div></dt>
-	<dd>A <code>PrintStream</code> to handle each line of log output. If <code>logHandler</code> is not specified, <code>System.out</code> is used. Note that the <code>logHandler</code> is a static variable in the library and will thus not act independently between library instances when multiple library instances are existing concurrently.</dd>
+	<dt><code>logHandler</code></dt>
+	<dd><em><code>System.out PrintStream</code></em> A <code>LogHandler</code> interface can be specified to handle each line of log output. If <code>logHandler</code> is not specified, <code>System.out</code> is used. Note that the <code>logHandler</code> is a static variable in the library and will thus not act independently between library instances when multiple library instances exist concurrently.<br><i>Type: PrintStream</i></dd>
+</dl>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<dl>
+	<dt><code>:log_level</code></dt>
+	<dd><em><code>:error</code></em> Log level for the standard Logger that outputs to <code>STDOUT</code>. Can be set to <code>:fatal</code>, <code>:error</code>, <code>:warn</code>, <code>:info</code>, <code>:debug</code> or <code>:none</code>. Alternatively a <a href="http://ruby-doc.org/stdlib-2.2.0/libdoc/logger/rdoc/Logger.html#class-Logger-label-Description"><code>Logger</code> severity constant</a> can be specified.<br><i>Type: Symbol, <a href="http://ruby-doc.org/stdlib-2.2.0/libdoc/logger/rdoc/Logger.html#class-Logger-label-Description">Logger::SEVERITY</a></i></dd>
 </dl>
 <dl>
-	<dt>useTextProtocol</dt>
-	<dd><em>false</em> The browser client library detects whether or not the browser has the capability to use the binary protocol, and enables this option if the browser requires the use of the text protocol.</dd>
+	<dt><code>:logger</code></dt>
+	<dd><em><code>STDOUT Logger</code></em> A <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/logger/rdoc/Logger.html">Ruby <code>Logger</code></a> compatible object to handle each line of log output. If <code>loggger</code> is not specified, <code>STDOUT</code> is used.<br><i>Type: Ruby Logger</i></dd>
 </dl>
-<div lang="java">
-<h2 id="paginated-result">PaginatedResult</h2>
-<p>A <code>PaginatedResult</code> is an interface that represents the result of a query that supports pagination. An instance of <code>PaginatedResult</code> encapsulates a collection of <code>Stats</code> objects representing the current page of results, and provides the means &#8211; in the form of <code>Param[]</code> to perform queries for subsequent or related pages.</p>
+
+</div> <!-- /end ruby language block -->
+
 <dl>
-	<dt>public Stats[] asArray()</dt>
-	<dd>Returns the current page of results as an Array.</dd>
-	<dt>public List&lt;Stats&gt;</dt>
-	<dd>Returns the current page of results as a List.</dd>
-	<dt>public Param[] getFirst()</dt>
-	<dd>Returns the params to pass to a <code>stats()</code> call to reproduce the first call in this paginated sequence.</dd>
-	<dt>public Param[] getCurrent()</dt>
-	<dd>Returns the params to pass to a <code>stats()</code> call to reproduce the current call in this paginated sequence.</dd>
-	<dt>public Param[] getNext()</dt>
-	<dd>Returns the params to pass to a <code>stats()</code> call to reproduce the next call in this paginated sequence.</dd>
+	<dt><span lang="default"><code>useBinaryProtocol</code></span><span lang="ruby"><code>:use_binary_protocol</code></span></dt>
+	<dd><em>true</em> If set to false, will forcibly disable the binary protocol. The binary protocol is used by default unless it is not supported. Find out more about the <a href="https://support.ably.io/solution/articles/3000047365-do-you-binary-encode-your-messages-for-greater-efficiency">benefits of binary encoding</a><br><i>Type: Boolean</i></dd>
+	<dt><span lang="default"><code>queryTime</code></span><span lang="ruby"><code>:query_time</code></span></dt>
+	<dd><em>false</em> If true, the library will query the Ably servers for the current time instead of relying on a locally-available time of day<br><i>Type: Boolean</i></dd>
 </dl>
-</div>
+<dl>
+	<dt><span lang="default"><code>defaultTokenParams</code></span><span lang="ruby"><code>:default_token_params</code></span></dt>
+	<dd>When a <a href="/rest/types#token-params">TokenParams</a> object is provided, it will override the client library defaults when issuing new tokens or token requests<br>__Type: <a href="/rest/types#token-params">TokenParams</a>_</dd>
+</dl>
+<h3 id="stats-type"><span lang='default'>Stats object</span><span lang='java'>io.ably.lib.types.Stats</span><span lang='ruby'>Ably::Models::Stats</span></h3>
+<p>A <code>Stats</code> object represents a application statistic for the specified interval and time period. Ably aggregates statistics globally for all accounts and applications, and makes these available both through our <a href="/realtime/statistics">statistics API</a> as well as your <a href="https://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>.</p>
+<p>Please note that most attributes of the <code>Stats</code> type below contain references to further stats types. This documentation is not exhaustive for all stats stypes, and as such, links to the stats types below will take you to the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats">Ruby library stats documentation</a> which contains exhaustive stats documentation. Ruby however uses <code>under_score</code> case instead of the default <code>camelCase</code> in most languages, so please bear that in mind.</p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><code>all</code></dt>
+	<dd>aggregate count of both <code>inbound</code> and <code>outbound</code> message stats<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">MessageTypes</a></i></dd>
+	<dt><span lang="default"><code>apiRequests</code></span><span lang="ruby"><code>api_requests</code></span></dt>
+	<dd>breakdown of API requests received via the Ably REST API<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
+	<dt><code>channels</code></dt>
+	<dd>breakdown of channel related stats such as min, mean and peak channels<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ResourceCount">ResourceCount</a></i></dd>
+	<dt><code>connections</code></dt>
+	<dd>breakdown of connection related stats such as min, mean and peak channels for TLS and non-TLS connections<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ConnectionTypes">ConnectionTypes</a></i></dd>
+	<dt><code>inbound</code></dt>
+	<dd>statistics such as count and data for all inbound messages received over REST and Realtime connection, broken down by normal channel messages or presence messages<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTraffic">MessageTraffic</a></i></dd>
+	<dt><div lang="ruby"><code>interval_granularity</code></div></dt>
+	<dd>A <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats#GRANULARITY-constant"><code>GRANULARITY</code></a> constant representing the granularity (interval) of this statistic such as <code>:minute</code>, <code>:hour</code>, <code>:day</code>, <code>:month</code>.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats#GRANULARITY-constant"><code>Stats::GRANULARITY</code></a></i></dd>
+	<dt><span lang="default"><code>intervalId</code></span><span lang="ruby"><code>interval_id</code></span></dt>
+	<dd>the interval ID provides both the time from which the interval starts as well as the length of time that this statistic covers i.e. the period of time which the stats are aggregated for. For example, an interval ID value of &#8220;2016-03-01:10:02&#8221; represents a single minute interval for the UTC time presented in the string. However, an interval ID of &#8220;2016-03&#8221; represents a month interval for the entire month of March 2016 based on UTC time.<br><i>Type: String</i></dd>
+	<dt><div lang="ruby"><code>interval_time</code></div></dt>
+	<dd>A <code>Time</code> object representing the start of the interval</dd>
+	<dt><code>outbound</code></dt>
+	<dd>statistics such as count and data for all oubound messages retrieved via REST history requests, received over Realtime connections, or pushed with WebHooks, broken down by normal channel messages or presence messages<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTraffic">MessageTraffic</a></i></dd>
+	<dt><code>persisted</code></dt>
+	<dd>messages persisted and later retrieved via the <a href="/realtime/history">history API</a><br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">MessageTypes</a></i></dd>
+	<dt><span lang="default"><code>tokenRequests</code></span><span lang="ruby"><code>token_requests</code></span></dt>
+	<dd>breakdown of Token requests received via the Ably REST API.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
+</dl>
+<h3 id="param"><span lang='java'>io.ably.lib.types.Param</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>Param</code> is a type encapsulating a key/value pair. This type is used frequently in method parameters allowing key/value pairs to be used more flexible, see <a href="/realtime/history#channel-history"><code>Channel#history</code></a> for an example.</p>
+<p>Please note that <code>key</code> and <code>value</code> attributes are always strings. If an <code>Integer</code> or other value type is expected, then you must coerce that type into a <code>String</code>.</p>
+<h4><span lang='java'>Members</span></h4>
+<dl>
+	<dt><code>key</code></dt>
+	<dd>The key value<br><i>Type: String</i></dd>
+	<dt><code>value</code></dt>
+	<dd>The value associated with the <code>key</code><br><i>Type: String</i></dd>
+</dl>
+
+</div> <!-- /end java language block -->
+
+
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>
@@ -259,8 +455,9 @@ Note that the log level and log handler have global scope in the library and wil
 <li class=''><a href='/rest/presence/'>Presence</a></li>
 <li class=''><a href='/rest/authentication/'>Authentication</a></li>
 <li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
 <li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/types/'>Types</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
@@ -269,9 +466,9 @@ Note that the log level and log handler have global scope in the library and wil
 <ul>
 <li class=''><a href='/general/authentication/'>Authentication</a></li>
 <li class=''><a href='/general/channel-rules-namespaces/'>Channel Rules and Namespaces</a></li>
-<li class=''><a href='/general/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/general/push-notifications/'>Mobile push notifications</a></li>
+<li class=''><a href='/general/webhooks/'>Receiving WebHooks</a></li>
 <li class=''><a href='/general/statistics/'>Application Statistics</a></li>
-<li class=''><a href='/general/migrating/'>Migrating to Ably</a></li>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>

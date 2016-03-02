@@ -44,19 +44,61 @@
       <p>Integrating Ably is simple.  In this guide we&#8217;ll run you through the basics.</p>
 <p>Whilst our client libraries do support <a href="https://www.ably.io/download">every popular language and platform</a>, for simplicity we have used Javascript as the primary language for this guide.</p>
 <h3>Adding the Ably realtime library</h3>
-<p>Simply include the Ably Javascript library within the <code>&lt;head&gt;</code> of your HTML page as follows:</p>
+<p>When using Ably in a browser, simply include the Ably Javascript library within the <code>&lt;head&gt;</code> of your HTML page as follows:</p>
 <pre lang="html"><code lang="html">&lt;script src="//cdn.ably.io/lib/ably.min.js"&gt;&lt;/script&gt;</code></pre>
+<p>If you are using Ably on another platform, follow the package instructions from your chosen platform, see the <a href="https://www.ably.io/download">download page</a>.</p>
 <h3>The basics: Receiving a message</h3>
-<p>To connect to Ably, you need an API key.  In this example we have provided a temporary API key, however if you are signed up and visit your <a href="https://www.ably.io/dashboard">application dashboard</a>, you will be able to use your own API key.  If you do not have an API key yet, why not <a href="https://www.ably.io/#signup">sign up now for a free app and API key</a>.</p>
+<p>To connect to Ably, you need an API key.  In this example we have provided a temporary API key, however if you registered and visit your <a href="https://www.ably.io/dashboard">application dashboard</a>, you will be able to use your own API key.  If you do not have an API key yet, you can <a href="https://www.ably.io/#signup">sign up now for a free account with Ably</a>.</p>
 <pre class="code-editor open-jsbin open-jsbin-ezuzot" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ezuzot" lang="javascript">var ably = new Ably.Realtime('{{API_KEY}}');
 ably.connection.on('connected', function() {
   alert("That was simple, you're now connected to Ably in realtime");
 });</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-ezuzot" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ezuzot" lang="nodejs">var ably = new Ably.Realtime('{{API_KEY}}');
+ably.connection.on('connected', function() {
+  alert("That was simple, you're now connected to Ably in realtime");
+});</code></pre>
+<pre lang="java"><code lang="java">ClientOptions options = new ClientOptions("{{API_KEY}}");
+AblyRealtime ably = new AblyRealtime(options);
+ably.connection.on(ConnectionState.connected, new ConnectionStateListener() {
+  @Override
+  public void onConnectionStateChanged(ConnectionStateChange state) {
+    System.out.println("That was simple, you're now connected to Ably in realtime");
+  }
+});</code></pre>
+<pre lang="ruby"><code lang="ruby">ably = Ably::Realtime.new(api_key)
+ably.connection.on(:connected) do
+  puts "That was simple, you're now connected to Ably in realtime"
+}
+end</code></pre>
+<pre lang="swift"><code lang="swift">let ably = ARTRealtime(key: "{{API_KEY}}")
+ably.connection.on(:connected) do
+  print("That was simple, you're now connected to Ably in realtime")
+}</code></pre>
 <p>Messages are broadcasted on channels.  Next we will subscribe to a channel and listen for messages that are sent to us from other connected clients or servers.</p>
 <pre class="code-editor open-jsbin open-jsbin-onocan" lang="javascript"><code class="code-editor open-jsbin open-jsbin-onocan" lang="javascript">var channel = ably.channels.get('quickstart');
 channel.subscribe('greeting', function(message) {
   alert("Received a greeting message in realtime: " + message.data);
 });</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-onocan" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-onocan" lang="nodejs">var channel = ably.channels.get('quickstart');
+channel.subscribe('greeting', function(message) {
+  alert("Received a greeting message in realtime: " + message.data);
+});</code></pre>
+<pre lang="ruby"><code lang="ruby">channel = ably.channels.get('quickstart')
+channel.subscribe('greeting') do |message|
+  puts "Received a greeting message in realtime: #{message.data}"
+end</code></pre>
+<pre lang="java"><code lang="java">Channel channel = ably.channels.get("quickstart");
+channel.subscribe(new MessageListener() {
+  @Override
+  public void onMessage(Message message) {
+    System.out.println("Received a greeting message in realtime: " + message.data);
+  }
+});
+channel.publish("example", "message data");</code></pre>
+<pre lang="swift"><code lang="swift">let channel = ably.channels.get("quickstart")
+channel.subscribe("greeting") { message in
+  print("Received a greeting message in realtime: #{message.data}")
+}</code></pre>
 <h3>The basics: Sending a message</h3>
 <p>Publishing a message to a channel is extremely straightforward.  As this is commonly performed by both connected devices and servers, here are examples in multiple languages</p>
 <pre class="code-editor open-jsbin open-jsbin-onocan" lang="javascript"><code class="code-editor open-jsbin open-jsbin-onocan" lang="javascript">var channel = ably.channels.get('quickstart');
@@ -71,8 +113,8 @@ channel.publish('greeting', 'hello!')</code></pre>
 channel.publish 'greeting', 'hello!'</code></pre>
 <pre lang="php"><code lang="php">$channel = $ably.channels.get('quickstart');
 $channels.get('quickstart').publish('greeting', 'hello!');</code></pre>
-<pre lang="ios"><code lang="ios">-(Channel) channel = ably.channels.get('quickstart');
-channels.get('quickstart').publish('greeting', 'hello!');</code></pre>
+<pre lang="swift"><code lang="swift">channel = ably.channels.get('quickstart')
+channels.get('quickstart').publish('greeting', 'hello!')</code></pre>
 <h3>Sending a message via the REST API</h3>
 <p>We recommend using our REST client libraries over direct REST API access.  However, if you want to comunnicate directly over HTTP with Ably it&#8217;s as simple as:</p>
 <pre lang="sh"><code lang="sh">curl https://rest.ably.io/channels/{{RANDOM_CHANNEL_NAME}}/publish \
@@ -127,8 +169,9 @@ if ('{{API_KEY}}' !== '{{API_' + 'KEY}}') {
 <li class=''><a href='/rest/presence/'>Presence</a></li>
 <li class=''><a href='/rest/authentication/'>Authentication</a></li>
 <li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
 <li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/types/'>Types</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
@@ -137,9 +180,9 @@ if ('{{API_KEY}}' !== '{{API_' + 'KEY}}') {
 <ul>
 <li class=''><a href='/general/authentication/'>Authentication</a></li>
 <li class=''><a href='/general/channel-rules-namespaces/'>Channel Rules and Namespaces</a></li>
-<li class=''><a href='/general/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/general/push-notifications/'>Mobile push notifications</a></li>
+<li class=''><a href='/general/webhooks/'>Receiving WebHooks</a></li>
 <li class=''><a href='/general/statistics/'>Application Statistics</a></li>
-<li class=''><a href='/general/migrating/'>Migrating to Ably</a></li>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>

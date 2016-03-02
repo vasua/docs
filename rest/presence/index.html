@@ -39,15 +39,14 @@
           <select id="jump-to-nav">
             <option>Jump to ...</option>
             <optgroup label='Help with'>
-<option id="anchor-title">Presence</option>
+<option id="anchor-presence">Presence</option>
+<option id="anchor-member-data">Member data</option>
+<option id="anchor-member-list">Presence member list</option>
+<option id="anchor-presence-history">Presence history</option>
 </optgroup>
 <optgroup label='Presence API reference'>
 <option id="anchor-get">get</option>
 <option id="anchor-history">history</option>
-</optgroup>
-<optgroup label='Related types'>
-<option id="anchor-presence-message">PresenceMessage</option>
-<option id="anchor-presence-listener">PresenceListener</option>
 </optgroup>
           </select>
         </div>
@@ -62,78 +61,97 @@
       
     </header>
     <article>
-      <p>Ably Channels support the concept of presence. Each channel may have a presence set associated with it, which is a set of clientIds for those clients that have announced their presence by entering the channel.</p>
-<p>Using the Ably REST API it is possible to obtain the set of clientIds that are currently present on a channel. It is also possible to obtain the presence history for the channel, if persistence is enabled for that channel.</p>
-<p>Since the REST API is stateless, and REST clients do not have realtime connections to the Ably service, it is not possible to enter or leave a channel via the REST API.</p>
-<p>A given <code>clientId</code> might be present multiple times, via different connections. As far as Ably is concerned these are different members of the presence set. A member of the presence set is, therefore, the combination of a <code>clientId</code> string and a <code>connectionId</code> string unique to a connection.</p>
-<p>Each member entering a presence channel may include a payload in the <code>clientData</code> attribute of the <code>PresenceMessage</code> and this is then included in the presence updates broadcast to subscribed clients. Clients can update this <code>clientData</code> whilst being members of the channel.</p>
-<p>A number of presence actions are therefore defined.</p>
+      <p>Presence enables clients to be aware of other clients that are currently &#8220;present&#8221; on a channel. Each member present on a channel has a unique self-assigned client identifier and system-assigned connection identifier, along with an optional payload that can be used to describe the member&#8217;s status or attributes. Presence allows you to quickly build apps such as chat rooms and multiplayer games by automatically keeping track of who is present in real time across any device.</p>
+<h2 id="presence">Presence</h2>
+<p>Using the <a href="/rest-api">Ably REST API</a> it is possible to obtain the set of members currently present on a channel, or obtain the presence history for the channel, if persistence is enabled for that channel.</p>
+<p>Since the <a href="/rest-api">Ably REST API</a> is stateless, and REST clients do not have realtime connections to the Ably service, it is not possible to enter or leave a channel via the REST API. Find out more about <a href="/realtime/presence">using presence with the Realtime API</a>.</p>
+<p>A single <span lang="default"><a href="/rest/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/rest/usage#client-id"><code>client_id</code></a></span> may be present multiple times on the same channel via different client connections. As far as Ably is concerned, these are different members of the presence set for the channel, however they will be differentiated by their unique <span lang="default"><a href="/realtime/connection#id"><code>connectionId</code></a></span><span lang="ruby"><a href="/realtime/connection/#id"><code>connection_id</code></a></span>. For example, if a client with ID &#8220;Sarah&#8221; is connected to a chat channel on both a desktop and a mobile device simultaneously, &#8220;Sarah&#8221; will be present twice in the presence member set with the same client ID, yet will have two unique connection IDs. A member of the presence set is therefore unique by the combination of the <span lang="default"><a href="/rest/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/rest/usage#client-id"><code>client_id</code></a></span> and <span lang="default"><a href="/realtime/connection#id"><code>connectionId</code></a></span><span lang="ruby"><a href="/realtime/connection/#id"><code>connection_id</code></a></span> strings.</p>
+<h3 id="presence-states">Presence states and events</h3>
+<p>Whenever a member enters or leaves a channel, or updates <a href="#member-data">their member data</a>, a presence event is emitted to all presence subscribers on that channel. Subscribing to presence events makes it incredibly easy to build an app that shows, in real time, any changes to clients connected to Ably and present on a channel.</p>
+<p>The following presence events are emitted:</p>
 <dl>
-	<dt>enter</dt>
-	<dd>A clientId, or a clientId/connectionId combination, is entering the presence channel.</dd>
+	<dt><span lang="ruby"><code>:enter</code></span><span lang="java"><code>Action.ENTER</code></span><span lang="default"><code>enter</code></span></dt>
+	<dd>A new member has entered the channel</dd>
 </dl>
 <dl>
-	<dt>leave</dt>
-	<dd>A clientId, or a clientId/connectionId combination, is leaving the presence channel.</dd>
+	<dt><span lang="ruby"><code>:leave</code></span><span lang="java"><code>Action.LEAVE</code></span><span lang="default"><code>leave</code></span></dt>
+	<dd>A member who was present has now left the channel. This may be a result of an explicit request to leave or implicitly when detaching from the channel. Alternatively, if a member&#8217;s connection is abruptly disconnected and they do not resume their connection within a minute, Ably treats this as a leave event as the client is no longer present</dd>
 </dl>
 <dl>
-	<dt>update</dt>
-	<dd>An already-present clientId or clientId/connectionId combination has been updated.</dd>
+	<dt><span lang="ruby"><code>:update</code></span><span lang="java"><code>Action.UPDATE</code></span><span lang="default"><code>update</code></span></dt>
+	<dd>An already present member has updated their <a href="#member-data">member data</a>. Being notified of member data updates can be very useful, for example, it can be used to update the status of a user when they are typing a message</dd>
 </dl>
-<h2>Presence Messages</h2>
-<p>An Ably REST <code>PresenceMessage</code> has an <code>action</code>, a <code>clientId</code>, and optionally a <code>clientData</code> member carrying a status message or other data associated with the action. As with Message payloads, various primitive and object types are portably defined and supported in all clients, enabling clients to be interoperable across languages and environments.</p>
-<h3>Getting channel presence state</h3>
-<p>A Channel&#8217;s <code>presence</code> <span lang="default">property</span><span lang="java">field</span> exposes a <code>get</code> method whereby a client can discover the set of all members present on the channel.</p>
-<pre lang="javascript"><code lang="javascript">var members = channel.presence.get();
-console.log('There are ' + members.length + ' members present');</code></pre>
-<pre lang="nodejs"><code lang="nodejs">var members = channel.presence.get();
-console.log('There are ' + members.length + ' members present');</code></pre>
-<pre lang="java"><code lang="java">PresenceMessage[] members = channel.presence.get();
-System.out.println("There are " + members.length + " members present");</code></pre>
-<pre lang="ruby"><code lang="ruby">members = channel.presence.get
-puts "There are #{members.size} members present"</code></pre>
-<p>In the REST client library this method directly queries the REST presence <a href="/rest/presence#history">history</a> API. No presence state is cached in the library itself, unlike in the Realtime client library.</p>
-<h3>Retrieving presence history</h3>
-<p>The <code>Presence</code> API exposes a <code>history</code> method whereby a client can can obtain presence updates previously sent on those channels that have persistence enabled.</p>
-<p>History results are paginated and therefore accompanied with one or more relative links relating to the current query. Where the number of results returned exceeds the query limit &#8211; which is either the value of the <code>limit</code> param or the default limit of 100 &#8211; the query result contains pages with the limited number of records, and a relative link to the next page.</p>
-<pre lang="ruby"><code lang="ruby"> presence_messages = client.channels.get('realtime-chat').presence.history(direction: :backwards)
-presence_messages.each do |presence_message|
-  puts "#{presence_message.action}: #{presence_message.member_key}"
+<dl>
+	<dt><span lang="ruby"><code>:present</code></span><span lang="java"><code>Action.PRESENT</code></span><span lang="default"><code>present</code></span></dt>
+	<dd>When subscribing to presence events on a channel that already has members present, this event is emitted for every member already present on the channel before the subscribe listener was registered</dd>
+</dl>
+<p><a href="https://jsbin.ably.io:443/ovavik/1/edit?javascript,live">View a realtime presence states and events example</a></p>
+<h3 id="member-data">Member data</h3>
+<p>In addition to the <span lang="default"><a href="/rest/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/rest/usage#client-id"><code>client_id</code></a></span> for members on a channel, it is also possible to include data when entering a channel. Clients can <a href="#update">update</a> their data at any point which will be broadcasted to all presence subscribers as an <span lang="ruby"><code>:update</code></span><span lang="java"><code>Action.UPDATE</code></span><span lang="default"><code>update</code></span> event.</p>
+<p>See the <a href="/realtime/presence#member-data">Realtime Presence Member data documentation</a> for more info.</p>
+<h3 id="member-list">Presence member list</h3>
+<p>The <code>Presence</code> object exposes a <a href="#get"><code>get</code></a> method allowing a client to retrieve an array of all members currently present on the channel. In the REST client library this method directly queries <a href="/rest-api#presence">Ably&#8217;s REST presence API</a>. No presence state is cached in the library itself, unlike in the <a href="/realtime">Realtime client library</a>.</p>
+<pre lang="javascript"><code lang="javascript">channel.presence.get(function(err, membersPage) {
+  console.log(membersPage.items.length + ' presence members in first page');
+  if(membersPage.hasNext()) {
+    membersPage.next(function(err, nextPage) { ... });
+  }
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">channel.presence.get(function(err, membersPage) {
+  console.log(membersPage.items.length + ' presence members in first page');
+  if(membersPage.hasNext()) {
+    membersPage.next(function(err, nextPage) { ... });
+  }
+});</code></pre>
+<pre lang="ruby"><code lang="ruby">members_page = channel.presence.get
+puts "#{result_page.items.length} presence members in first page"
+if result_page.has_next?
+  next_page = result_page.next
 end</code></pre>
-<pre lang="javascript"><code lang="javascript">var params = {direction: 'backwards', limit: '100'};
-channel.presence.history(params, function(err, messages, rel) {
-  if(err) {
-    console.log('Unable to get presence history; err = ' + err.message);
-  } else {
-    console.log(messages.length + ' presence messages received in first result');
-    if(rel &amp;&amp; rel.next) {
-      channel.presence.history(rel.next, function(...) { ... });
-    }
-});</code></pre>
-<pre lang="nodejs"><code lang="nodejs">var params = {direction: 'backwards', limit: '100'};
-channel.presence.history(params, function(err, messages, rel) {
-  if(err) {
-    console.log('Unable to get presence history; err = ' + err.message);
-  } else {
-    console.log(messages.length + ' presence messages received in first result');
-    if(rel &amp;&amp; rel.next) {
-      channel.presence.history(rel.next, function(...) { ... });
-    }
-});</code></pre>
-<pre lang="java"><code lang="java">import io.ably.lib.types.PresenceMessage;
-import io.ably.lib.types.Param;
-import io.ably.lib.types.PaginatedResult;
-Param[] params = new Param[] {
-  new Param("direction", "backwards"),
-  new Param("limit", 100)
-};
-PaginatedResult&lt;PresenceMessage&gt; messages = channel.presence.history(params);
-System.out.println(messages.asArray().length + " presence messages received in first result");
-if(messages.getNext()) {
-  PaginatedResult&lt;PresenceMessage&gt; nextPage = channel.presence.history(messages.getNext());
-  System.out.println(...);
+<pre lang="java"><code lang="java">PaginatedResult&lt;PresenceMessage&gt; membersPage = channel.presence.get(null);
+System.out.println(membersPage.items().length + " members in first page");
+if(membersPage.hasNext()) {
+  PaginatedResult&lt;PresenceMessage&gt; nextPage = membersPage.next();
+  System.out.println(nextPage.items().length + " members on 2nd page");
 }</code></pre>
-<p>See the <a href="/rest/history">history</a> documentation for further details of the supported query parameters.</p>
+<h3 id="presence-history">Presence History</h3>
+<p>The <code>Presence</code> object exposes a <a href="#history"><code>history</code></a> method allowing a client to retrieve historical presence events on the channel.</p>
+<p>History provides access to instantaneous &#8220;live&#8221; history as well as the longer term persisted history for presence channels. If <a href="/realtime/history#persisted-history">persisted history</a> is enabled for the channel, then presence events will <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically be stored for 24 &#8211; 72 hours</a>. If persisted history is not enabled, Ably retains the last two minutes of presence event history in memory.</p>
+<p>The following example retrieves the first two pages of historical presence events published.</p>
+<pre lang="javascript"><code lang="javascript">var presence = channel.presence;
+presence.history(function(err, resultPage) {
+  if(err) {
+    console.log('Unable to get presence history; err = ' + err.message);
+  } else {
+    console.log(resultPage.items.length + ' presence events received in first page');
+    if(resultPage.hasNext()) {
+      resultPage.next(function(err, nextPage) { ... });
+    }
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">var presence = channel.presence;
+presence.history(function(err, resultPage) {
+  if(err) {
+    console.log('Unable to get presence history; err = ' + err.message);
+  } else {
+    console.log(resultPage.items.length + ' presence events received in first page');
+    if(resultPage.hasNext()) {
+      resultPage.next(function(err, nextPage) { ... });
+    }
+});</code></pre>
+<pre lang="ruby"><code lang="ruby">presence = channel.presence
+presence.history do |result_page|
+  puts "#{result_page.items.length} presence events received in first page"
+  if result_page.has_next?
+    result_page.next { |next_page| ... }
+  end
+end</code></pre>
+<pre lang="java"><code lang="java">PaginatedResult&lt;PresenceMessage&gt; resultPage = channel.presence.history(null);
+System.out.println(resultPage.items().length + " presence events received in first page");
+if(resultPage.hasNext()) {
+  PaginatedResult&lt;PresenceMessage&gt; nextPage = resultPage.next();
+  System.out.println(nextPage.items().length + " presence events received in 2nd page");
+}</code></pre>
+<p>See the <a href="/rest/history#presence-history">presence history documentation</a> for further details of the supported query parameters.</p>
 <h1>API Reference</h1>
 <div class="inline-toc">
 <ul><li>Presence reference
@@ -141,104 +159,285 @@ if(messages.getNext()) {
 <li>
 Methods
 <ul>
-<li><a href='#get'>get</a></li>
-<li><a href='#history'>history</a></li>
+<li><a href='#get'>get(options)</a></li>
+<li><a href='#get'>history(options)</a></li>
 </ul>
 </li>
 <li>
 Related types
 <ul>
 <li><a href='#presence-message'>PresenceMessage</a></li>
+<li><a href='#presence-action'>Presence action</a></li>
+<li><a href='#paginated-result'>PaginatedResult</a></li>
+<li><a href='#param'>Param</a></li>
 </ul>
 </li>
 </ul>
 </li></ul>
 </div><h2>Methods</h2>
-<h6 lang="default" id="get">get()</h6>
-<h6 lang="java" id="get">public PresenceMessage[] get()</h6>
-<p>Get the current presence set for this channel. This call queries the REST <a href="/rest/presence#get"><code>/channels/&lt;channel id&gt;/presence</code></a> API.</p>
-<h6 id="history">history</h6>
+<h6 id="get">get</h6>
+<p>Get the current presence member set for this channel.  In the REST client library this method directly queries <a href="/rest-api#presence">Ably&#8217;s REST presence API</a></p>
 <blockquote class="definition">
-<p class="definition"><span lang='nodejs'>presence.history(params, callback)</span><span lang='ruby'>presence.history(options) → json_result</span><span lang='java'>public PaginatedResult&lt;PresenceMessage&gt; history(Param[] params)</span></p>
+<p class="definition"><span lang='default'>get(Object options, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; resultPage))</span><span lang='ruby'><a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; get(Hash options)</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; get(<a href="#param">Param</a>[] options)</span></p>
 </blockquote>
-<p>Get presence history for this channel.</p>
+<p>Gets an array of members present on the channel as <a href="#presence-message">PresenceMessage</a> objects.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt>params</dt>
-	<dd>an optional object containing the query parameters, as specified in the <a href="/realtime/history">history</a> API documentation.</dd>
+	<dt><span lang="default">options</span><span lang="java"><a href="#param">Param</a>[] options</span><span lang="ruby">options</span></dt>
+	<dd><span lang="default">an optional object containing query parameters</span><span lang="ruby">an optional set of symbol key and value pairs containing the query parameters</span> as specified below.</dd>
+</dl>
+<dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
-	<dd>is a function of the form: <code>callback(err, messages, relParams)</code><br />
-where:<br />
-<ul><br />
-<li><code>err</code> contains an error value on the case of an error response as defined in the <a href="/rest-api#common">REST API</a> documentation</li><br />
-<li>on success, <code>messages</code> contains the query result as an array of PresenceMessage objects.</li><br />
-<li>where applicable, <code>relParams</code> is a map containing query params for each of the pagination links in the query response (see below).</li><br />
-</ul></dd>
+	<dd>is a function of the form: <code>function(err, "PaginatedResult":#paginated-result&lt;"PresenceMessage":#presence-message&gt; resultPage)</code></dd>
 </dl>
-<p>Further details of the supported query params are in the <a href="/realtime/history">history API</a> documentation.</p>
-<div lang="java">
+<h4><code>options</code> parameters</h4>
+<dl>
+	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>:client_id</code></span></dt>
+	<dd>when provided, will filter array of members returned that match the provided <span lang="default"><a href="/rest/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/rest/usage#client-id"><code>client_id</code></a></span> string</dd>
+	<dt><span lang="default"><code>connectionId</code></span><span lang="ruby"><code>:connection_id</code></span></dt>
+	<dd>when provided, will filter array of members returned that match the provided <span lang="default"><a href="/realtime/connection#id"><code>connectionId</code></a></span><span lang="ruby"><a href="/realtime/connection/#id"><code>connection_id</code></a></span> string</dd>
+</dl>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On success, <code>resultPage</code> contains a <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulating an array of <a href="#presence-message"><code>PresenceMessage</code></a> objects corresponding to the current page of members currently present on the channel. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next()</code></a> and <a href="#paginated-result"><code>first()</code></a> methods.</p>
+<p>On failure to retrieve the current presence member set, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with the failure reason.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java,ruby"> <!-- start java,ruby language block -->
 <h4>Returns</h4>
-<p>On success, the returned <a href="#paginated-result">PaginatedResult</a> encapsulates a collection of <code>PresenceMessage</code> objects corresponding to the current page of results, and also provides query parameters for any applicable related (eg <code>first</code> or <code>next</code> result pages).</p>
-<p>Failure to retrieve the history will raise an <code>AblyException</code>.</p>
-<p></div><div lang="ruby"><br />
-h4. Returns</p>
-<p>On success, <span lang="ruby"><code>json_result</code></span> contains an array of results whose type corresponds to the result type for the request granularity as specified in <a href="/rest-api/#message-history">REST API</a>.</p>
-<p>Example <span lang="ruby"><code>json_result</code></span>:</p>
-<pre lang="json"><code lang="json">[{
-  "name": "&lt;event name&gt;",
-  "channel": "&lt;channel id&gt;",
-  "data": "&lt;message payload&gt;",
-  "timestamp": "&lt;message timestamp&gt;"
-}]</code></pre>
-<p>Failure to retrieve the history will raise an exception &#8211; typical exceptions include:<br />
-  <div lang="ruby"></p>
-<ul>
-	<li><code>Ably::NetworkUnavailableException</code></li>
-	<li><code>Ably::QuotaExceededException</code></li>
-	<li><code>Ably::AuthenticationFailureException</code><br />
-  </div></li>
-</ul>
-<p></div><div lang="javascript,nodejs"></p>
-<h4>Pagination</h4>
-<p>A paginated result is indicated in the <code>relParams</code> callback argument. For each available link, <code>relParams</code> contains a map of params to pass to a subsequent <code>history()</code> call.<br />
-  Example <code>relParams</code>:<br />
-  <pre lang="json"><code>[{
-    "first": {"start": 1380794880000, "end": 138079488105, ...},
-    "current": {"start": 1380794880000, "end": 138079488105, ...},
-    "next": {"start": 1380794880000, "end": 138079488105, ...}
-  }]</code></pre></p>
-<p>Further details of the paginated response are in the <a href="/realtime/history">history API</a> documentation.</p>
-</div>
-<h2 id="presence-message">PresenceMessage</h2>
-<p>A <code>PresenceMessage</code> encapsulates an individual presence update sent or received in Ably. A presence message has the following members.</p>
+<p>On success, the returned <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulates an array of <a href="#presence-message"><code>PresenceMessage</code></a> objects corresponding to the current page of members currently present on the channel. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
+<p>Failure to retrieve the current presence member set will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a></p>
+
+</div> <!-- /end java,ruby language block -->
+
+<h6 id="history">history</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>history(Object option, callback(<a href="/rest/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; resultPage))</span><span lang='ruby'><a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(Hash option)</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(<a href="#param">Param</a>[] option)</span></p>
+</blockquote>
+<p>Gets a <a href="#paginated-result">paginated</a> set of historical presence message events for this channel. If the <a href="https://support.ably.io/support/solutions/articles/3000030059-how-long-are-messages-stored-for">channel is configured to persist messages to disk</a>, then the presence message event history will <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically be available for 24 &#8211; 72 hours</a>. If not, presence message events are only retained in memory by the Ably service for two minutes.</p>
+<h4>Parameters</h4>
 <dl>
-	<dt><span lang="java">String</span>clientId</dt>
-	<dd>The id of the client associated with the update. This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the clientId is known, for messages delivered to subscribers. It is not required to populate the clientId of a message before publishing it.</dd>
+	<dt><span lang="default">option</span><span lang="java"><a href="#param">Param</a>[] option</span></dt>
+	<dd><span lang="default">an optional object containing query parameters</span><span lang="ruby">an optional set of key value pairs containing query parameters</span>, as specified in the <a href="/rest/history#presence-history">presence history API documentation</a>.</dd>
 </dl>
 <dl>
-	<dt><span lang="java">String</span>connectionId</dt>
-	<dd>A unique id for the client associated with the update, to disambiguate in the case that a single clientId is simultaneously present multiple times (eg on different connections). This <span lang="default">property</span><span lang="java">field</span> is populated by the system, where the connectionId is known, for messages delivered to subscribers.</dd>
+	<dt><div lang="javascript,nodejs">callback</div></dt>
+	<dd>is a function of the form: <code>function(err, resultPage)</code></dd>
+</dl>
+<p>Further details of the supported <code>option</code> params, see <a href="/rest/history#presence-history">presence history API documentation</a>.</p>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<h4>Callback result</h4>
+<p>On success, <code>resultPage</code> contains a <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulating an array of <a href="#presence-message"><code>PresenceMessage</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next()</code></a> and <a href="#paginated-result"><code>first()</code></a> methods.</p>
+<p>On failure to retrieve message history, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with the failure reason.</p>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java,ruby"> <!-- start java,ruby language block -->
+<h4>Returns</h4>
+<p>On success, the returned <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulates an array of <a href="#presence-message"><code>PresenceMessage</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
+<p>Failure to retrieve the message history will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a></p>
+
+</div> <!-- /end java,ruby language block -->
+
+<h2 id="related-types">Related types</h2>
+<h3 id="presence-message"><span lang='default'>PresenceMessage</span><span lang='ruby'>Ably::Models::PresenceMessage</span><span lang='java'>io.ably.lib.types.PresenceMessage</span></h3>
+<p>A <code>PresenceMessage</code> represents an individual presence update that is sent to or received from Ably.</p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><div lang="java"><code>action</code></div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage.action</code></a><br><i>Type: enum Action { ABSENT, PRESENT, ENTER, LEAVE, UPDATE }</i></dd>
+	<dt><div lang="javascript,nodejs"><code>action</code></div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>Presence action</code></a><br><i>Type: Integer value for Action { &#8220;ABSENT&#8221; : 0, &#8220;PRESENT&#8221; : 1, &#8220;ENTER&#8221; : 2, &#8220;LEAVE&#8221; : 3, &#8220;UPDATE&#8221; : 4 }</i></dd>
+	<dt><div lang="ruby"><code>action</code></div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: enum ACTION { :absent, :present, :enter, :leave, :update }</i></dd>
 </dl>
 <dl>
-	<dt><span lang="java">Object</span>clientData</dt>
-	<dd>An optional message payload for a status line or other data associated with the presence update. The data may be one of the supported payload datatypes.</dd>
+	<dt><div lang="java"><code>data</code></div></dt>
+	<dd>The presence update payload, if provided<br><i>Type: String, ByteArray, JSONObject, JSONArray</i></dd>
+	<dt><div lang="javascript,nodejs"><code>data</code></div></dt>
+	<dd>The presence update payload, if provided<br><i>Type: String, StringBuffer, JSON Object</i></dd>
+	<dt><div lang="ruby"><code>data</code></div></dt>
+	<dd>The presence update payload, if provided<br><i>Type: String, Binary (ASCII-8BIT String), Hash, Array</i></dd>
 </dl>
-<div lang="java">
-<h2 id="paginated-result">PaginatedResult</h2>
-<p>A <code>PaginatedResult</code> is an interface that represents the result of a query that supports pagination. An instance of <code>PaginatedResult</code> encapsulates a collection of <code>PresenceMessage</code> objects representing the current page of results, and provides the means &#8211; in the form of <code>Param[]</code> to perform queries for subsequent or related pages.</p>
 <dl>
-	<dt>public PresenceMessage[] asArray()</dt>
-	<dd>Returns the current page of results as an Array.</dd>
-	<dt>public List&lt;PresenceMessage&gt;</dt>
-	<dd>Returns the current page of results as a List.</dd>
-	<dt>public Param[] getFirst()</dt>
-	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the first call in this paginated sequence.</dd>
-	<dt>public Param[] getCurrent()</dt>
-	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the current call in this paginated sequence.</dd>
-	<dt>public Param[] getNext()</dt>
-	<dd>Returns the params to pass to a <code>history()</code> call to reproduce the next call in this paginated sequence.</dd>
+	<dt><code>id</code></dt>
+	<dd>Unique ID assigned by Ably to this presence update<br><i>Type: String</i></dd>
 </dl>
-</div>
+<dl>
+	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span></dt>
+	<dd>The client ID of the publisher of this presence update<br><i>Type: String</i></dd>
+</dl>
+<dl>
+	<dt><span lang="default"><code>connectionId</code></span><span lang="ruby"><code>connection_id</code></span></dt>
+	<dd>The connection ID of the publisher of this presence update<br><i>Type: String</i></dd>
+</dl>
+<dl>
+	<dt><code>timestamp</code></dt>
+	<dd>Timestamp when the presence update was received by the Ably the realtime service, as milliseconds since the epoch<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+</dl>
+<dl>
+	<dt><code>encoding</code></dt>
+	<dd>This will typically be empty as all presence updates received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: String</i></dd>
+</dl>
+<h3 id="presence-action"><span lang='default'>Presence action</span><span lang='java'>io.ably.lib.types.PresenceMessage.Action</span><span lang='ruby'>Ably::Models::PresenceMessage::ACTION</span></h3>
+
+
+<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<p><code>Presence</code> <code>action</code> is a String with a value matching any of the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>.</p>
+<pre lang="javascript"><code lang="javascript">var allPresenceActions = [
+  'absent', // (reserved for internal use)
+  'present',
+  'enter',
+  'leave',
+  'update'
+]</code></pre>
+
+</div> <!-- /end javascript,nodejs language block -->
+
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>io.ably.lib.types.PresenceMessage.Action</code> is an enum representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>.</p>
+<pre lang="java"><code lang="java">public enum Action {
+  ABSENT,  // 0 (reserved for internal use)
+  PRESENT, // 1
+  ENTER,   // 2
+  LEAVE,   // 3
+  UPDATE   // 4
+}</code></pre>
+
+</div> <!-- /end java language block -->
+
+
+
+<div lang="ruby"> <!-- start ruby language block -->
+<p><code>Ably::Models::PresenceMessage::ACTION</code> is an enum-like value representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>. <code>ACTION</code> can be represented interchangeably as either symbols or constants.</p>
+<h4>Symbol states</h4>
+<pre lang="ruby"><code lang="ruby">:absent  # =&gt; 0 (reserved for internal use)
+:present # =&gt; 1
+:enter   # =&gt; 2
+:leave   # =&gt; 3
+:update  # =&gt; 4</code></pre>
+<h4>Constant states</h4>
+<pre lang="ruby"><code lang="ruby">PresenceMessage::ACTION.Absent  # =&gt; 0 (internal use)
+PresenceMessage::ACTION.Present # =&gt; 1
+PresenceMessage::ACTION.Enter   # =&gt; 2
+PresenceMessage::ACTION.Leave   # =&gt; 3
+PresenceMessage::ACTION.Update  # =&gt; 4</code></pre>
+<h4>Example usage</h4>
+<pre lang="ruby"><code lang="ruby"># Example with symbols
+presence.on(:attached) { ... }
+
+# Example with constants
+presence.on(Ably::Models::PresenceMessage::ACTION.Enter) { ... }
+
+# Interchangeable
+Ably::Models::PresenceMessage::ACTION.Enter == :enter # =&gt; true</code></pre>
+
+</div> <!-- /end ruby language block -->
+
+<h3 id="paginated-result"><span lang='default'>PaginatedResult</span><span lang='ruby'>Ably::Models::PaginatedResult</span><span lang='java'>io.ably.lib.types.PaginatedResult</span></h3>
+<p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">Ably REST API paginated query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
+<h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
+<dl>
+	<dt><code>items</code></dt>
+	<dd>contains a page of results (for example an Array of <a href="#message"><code>Message</code></a> or <a href="#presence-message"><code>PresenceMessage</code></a> objects for a channel history request)<br><i>Type: Array &lt;Message, Presence, Stats&gt;</i></dd>
+</dl>
+<dl>
+	<dt><div lang="default"><code>isLast</code></div></dt>
+	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
+	<dt><div lang="ruby"><code>last?</code></div></dt>
+	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
+</dl>
+<dl>
+	<dt><div lang="default"><code>hasNext</code></div></dt>
+	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
+	<dt><div lang="ruby"><code>has_next?</code></div></dt>
+	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
+</dl>
+<h4>Methods</h4>
+<h6>first</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>first(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))</span><span lang='ruby'><a href="/realtime/types#paginated-result">PaginatedResult</a> first</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a> first()</span></p>
+</blockquote>
+<p>Returns a new <code>PaginatedResult</code> for the first page of results. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</p>
+<h6>items</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>Object[] items()</span><span lang='ruby'>Object[] items</span><span lang='java'>public Object[] items()</span></p>
+</blockquote>
+<p>Returns the current page of results as an Array. The type of the objects in the Array is determined by the operation that provided the <code>PaginatedResult</code>. For example, a <a href="/realtime/channels-messages#history">Message#history</a> request will return an array of <code>Message</code> objects.</p>
+<h6>next</h6>
+<blockquote class="definition">
+<p class="definition"><span lang='default'>next(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))</span><span lang='ruby'><a href="/realtime/types#paginated-result">PaginatedResult</a> next</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a> next()</span></p>
+</blockquote>
+<p>Returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <span lang="default"><code>null</code></span><span lang="java"><code>Null</code></span><span lang="ruby"><code>nil</code></span> is returned. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</p>
+<h4>Example</h4>
+<pre lang="javascript"><code lang="javascript">channel.history(function(err, paginatedResult) {
+  console.log('Page 0 item 0:' + paginatedResult.items[0].data);
+  paginatedResult.next(function(err, nextPage) {
+    console.log('Page 1 item 1: ' + nextPage.items[1].data);
+    console.log('Last page?: ' + nextPage.isLast;
+  });
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">channel.history(function(err, paginatedResult) {
+  console.log('Page 0 item 0:' + paginatedResult.items[0].data);
+  paginatedResult.next(function(err, nextPage) {
+    console.log('Page 1 item 1: ' + nextPage.items[1].data);
+    console.log('Last page?: ' + nextPage.isLast;
+  });
+});</code></pre>
+<pre lang="java"><code lang="java">PaginatedResult firstPage = channel.history();
+System.out.println("Page 0 item 0:" + firstPage.items[0].data);
+if (firstPage.hasNext) {
+  PaginatedResult nextPage = firstPage.next();
+  System.out.println("Page 1 item 1:" + nextPage.items[1].data);
+  System.out.println("More pages?:" + Strong.valueOf(nextpage.hasNext()));
+});</code></pre>
+<pre lang="ruby"><code lang="ruby"># When using the REST sync library
+first_page = channel.history
+puts "Page 0 item 0: #{first_page.items[0].data}"
+if first_page.has_next?
+  next_page = first_page.next
+  puts "Page 1 item 1: #{next_page.items[1].data}"
+  puts "Last page?: #{next_page.is_last?}"
+end
+
+# When using the Realtime EventMachine library
+channel.history do |first_page|
+  puts "Page 0 item 0: #{first_page.items[0].data}"
+  if first_page.has_next?
+    first_page.next do |next_page|
+      puts "Page 1 item 1: #{next_page.items[1].data}"
+      puts "Last page?: #{next_page.is_last?}"
+    end
+  end
+end</code></pre>
+<h3 id="param"><span lang='java'>io.ably.lib.types.Param</span></h3>
+
+
+<div lang="java"> <!-- start java language block -->
+<p><code>Param</code> is a type encapsulating a key/value pair. This type is used frequently in method parameters allowing key/value pairs to be used more flexible, see <a href="/realtime/history#channel-history"><code>Channel#history</code></a> for an example.</p>
+<p>Please note that <code>key</code> and <code>value</code> attributes are always strings. If an <code>Integer</code> or other value type is expected, then you must coerce that type into a <code>String</code>.</p>
+<h4><span lang='java'>Members</span></h4>
+<dl>
+	<dt><code>key</code></dt>
+	<dd>The key value<br><i>Type: String</i></dd>
+	<dt><code>value</code></dt>
+	<dd>The value associated with the <code>key</code><br><i>Type: String</i></dd>
+</dl>
+
+</div> <!-- /end java language block -->
+
+
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>
@@ -268,8 +467,9 @@ h4. Returns</p>
 <li class='selected'><a href='/rest/presence/'>Presence</a></li>
 <li class=''><a href='/rest/authentication/'>Authentication</a></li>
 <li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
 <li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/types/'>Types</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
@@ -278,9 +478,9 @@ h4. Returns</p>
 <ul>
 <li class=''><a href='/general/authentication/'>Authentication</a></li>
 <li class=''><a href='/general/channel-rules-namespaces/'>Channel Rules and Namespaces</a></li>
-<li class=''><a href='/general/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/general/push-notifications/'>Mobile push notifications</a></li>
+<li class=''><a href='/general/webhooks/'>Receiving WebHooks</a></li>
 <li class=''><a href='/general/statistics/'>Application Statistics</a></li>
-<li class=''><a href='/general/migrating/'>Migrating to Ably</a></li>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>

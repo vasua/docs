@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Ably API Documentation - Migrating to Ably</title>
+    <title>Ably API Documentation - </title>
     <link rel="shortcut icon" href="/favicon.ico">
 
     <link rel="stylesheet" type="text/css" href="/vendor/prettify/prettify.css" media="screen">
@@ -33,22 +33,24 @@
     <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/images/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
-    
-    <header>
-      
-      
-        <h1 id="title">Migrating to Ably</h1>
-      
-    </header>
-    <article>
-      <p>We have built API compatible browser libraries for both Pusher and PubNub to help ease migration to Ably from these services.</p>
-<h2>Migrating from Pusher</h2>
-<p>Sorry, we have not got to this section yet, do <a href="https://www.ably.io/contact">get in touch with us</a> if you would like to migrate from Pusher.</p>
-<h2>Migrating from PubNub</h2>
-<p>Sorry, we have not got to this section yet, do <a href="https://www.ably.io/contact">get in touch with us</a> if you would like to migrate from PubNub.</p>
-    </article>
-    <hr class="back">
-    <a href="#documentation">Back to top</a>
+    <p>Whenever a member enters or leaves a channel, or updates <a href="#member-data">their member data</a>, a presence event is emitted to all presence subscribers on that channel. Subscribing to presence events makes it incredibly easy to build an app that shows, in real time, any changes to clients connected to Ably and present on a channel.</p>
+<p>The following presence events are emitted:</p>
+<dl>
+	<dt><span lang="ruby"><code>:enter</code></span><span lang="java"><code>Action.ENTER</code></span><span lang="default"><code>enter</code></span></dt>
+	<dd>A new member has entered the channel</dd>
+</dl>
+<dl>
+	<dt><span lang="ruby"><code>:leave</code></span><span lang="java"><code>Action.LEAVE</code></span><span lang="default"><code>leave</code></span></dt>
+	<dd>A member who was present has now left the channel. This may be a result of an explicit request to leave or implicitly when detaching from the channel. Alternatively, if a member&#8217;s connection is abruptly disconnected and they do not resume their connection within a minute, Ably treats this as a leave event as the client is no longer present</dd>
+</dl>
+<dl>
+	<dt><span lang="ruby"><code>:update</code></span><span lang="java"><code>Action.UPDATE</code></span><span lang="default"><code>update</code></span></dt>
+	<dd>An already present member has updated their <a href="#member-data">member data</a>. Being notified of member data updates can be very useful, for example, it can be used to update the status of a user when they are typing a message</dd>
+</dl>
+<dl>
+	<dt><span lang="ruby"><code>:present</code></span><span lang="java"><code>Action.PRESENT</code></span><span lang="default"><code>present</code></span></dt>
+	<dd>When subscribing to presence events on a channel that already has members present, this event is emitted for every member already present on the channel before the subscribe listener was registered</dd>
+</dl>
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/images/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
@@ -75,8 +77,9 @@
 <li class=''><a href='/rest/presence/'>Presence</a></li>
 <li class=''><a href='/rest/authentication/'>Authentication</a></li>
 <li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
 <li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/types/'>Types</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
@@ -85,9 +88,9 @@
 <ul>
 <li class=''><a href='/general/authentication/'>Authentication</a></li>
 <li class=''><a href='/general/channel-rules-namespaces/'>Channel Rules and Namespaces</a></li>
-<li class=''><a href='/general/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/general/push-notifications/'>Mobile push notifications</a></li>
+<li class=''><a href='/general/webhooks/'>Receiving WebHooks</a></li>
 <li class=''><a href='/general/statistics/'>Application Statistics</a></li>
-<li class='selected'><a href='/general/migrating/'>Migrating to Ably</a></li>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>

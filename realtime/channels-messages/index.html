@@ -80,13 +80,13 @@
       <p>The Ably Realtime service organises the message traffic within applications into named channels. Channels are the &#8220;unit&#8221; of message distribution; clients attach to channels to subscribe to messages, and every message published to a unique channel is broadcast by Ably to all subscribers. This scalable and resilient messaging pattern is commonly called <a href="https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern">pub/sub</a>.</p>
 <h2 id="getting-started">Getting started</h2>
 <p>The Ably Realtime client library provides a straightforward API for publishing and subscribing to messages on a channel. If the channel does not exist at the time the client is attached, a channel will be created in the Ably system immediately.</p>
-<pre class="code-editor open-jsbin open-jsbin-ogiqiw" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ogiqiw" lang="javascript">var realtime = new Ably.Realtime('{{API_KEY}}');
+<pre class="code-editor open-jsbin open-jsbin-owecul" lang="javascript"><code class="code-editor open-jsbin open-jsbin-owecul" lang="javascript">var realtime = new Ably.Realtime('{{API_KEY}}');
 var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}');
 channel.subscribe(function(message) {
   alert('Received: ' + message.data);
 });
 channel.publish('example', 'message data');</code></pre>
-<pre class="code-editor open-jsbin open-jsbin-ogiqiw" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ogiqiw" lang="nodejs">var Ably = require('ably-js');
+<pre class="code-editor open-jsbin open-jsbin-owecul" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-owecul" lang="nodejs">var Ably = require('ably-js');
 var realtime = new Ably.Realtime('{{API_KEY}}');
 var channel = realtime.channels.get('{{RANDOM_CHANNEL_NAME}}');
 channel.subscribe(function(message) {
@@ -103,31 +103,35 @@ channel.publish 'example', 'message data'</code></pre>
 Channel channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}");
 channel.subscribe(new MessageListener() {
   @Override
-  public void onMessage(Message[] messages) {
+  public void onMessage(Message message) {
     System.out.println(messages.length + " new messages arrived");
-  }});
-end
+  }
+});
 channel.publish("example", "message data");</code></pre>
 <h2 id="channels">Channels</h2>
 <p>In order to publish, subscribe to, or be present on a channel, you must first obtain a channel instance and then attach to that channel. In most instances, as a convenience, it is unnecessary to explicitly attach a channel as it will implicitly attached when performing any operation on the channel such as publishing or subscribing.</p>
 <h3>Obtaining a channel instance</h3>
 <p>A <code>Channel</code> object is a reference to a single channel. A channel instance is obtained from the <a href="/realtime/usage/#channels"><code>channels</code> collection</a> of the <span lang="ruby"><code>Realtime::Client</code></span><span lang="default"><code>Realtime</code></span> instance, and is uniquely identified by its unicode string name. Find out more about <a href="https://support.ably.io/solution/articles/3000046824-what-restrictions-exist-for-the-name-field-of-a-channel">channel naming</a></p>
-<pre class="code-editor open-jsbin open-jsbin-acerec" lang="javascript"><code class="code-editor open-jsbin open-jsbin-acerec" lang="javascript">var channel = realtime.channels.get('channelName');</code></pre>
-<pre class="code-editor open-jsbin open-jsbin-acerec" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-acerec" lang="nodejs">var channel = realtime.channels.get('channelName');</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-agorop" lang="javascript"><code class="code-editor open-jsbin open-jsbin-agorop" lang="javascript">var channel = realtime.channels.get('channelName');</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-agorop" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-agorop" lang="nodejs">var channel = realtime.channels.get('channelName');</code></pre>
 <pre lang="java"><code lang="java">Channel channel = realtime.channels.get("channelName");</code></pre>
 <pre lang="ruby"><code lang="ruby">channel = realtime.channels.get('channelName')</code></pre>
 <h4>Setting channel options and encryption</h4>
 <p>A set of <a href="#channel-options">channel options</a> may also be passed to configure a channel for encryption. Find out more about <a href="/realtime/encryption">symmetrical message encryption</a>.</p>
-<pre lang="javascript"><code lang="javascript">var options = { encrypted: true, cipherParams: { key: 'A__SECRET__KEY__' } };
-var channel = realtime.channels.get('channelName', options);</code></pre>
-<pre lang="nodejs"><code lang="nodejs">var options = { encrypted: true, cipherParams: { key: 'A__SECRET__KEY__' } };
-var channel = realtime.channels.get('channelName', options);</code></pre>
-<pre lang="java"><code lang="java">CipherParams params = Crypto.getDefaultParams("A__SECRET__KEY__");
+<pre lang="javascript"><code lang="javascript">Ably.Realtime.Crypto.generateRandomKey(function(err, key) {
+  var options = { cipher: { key: key } };
+  var channel = realtime.channels.get('channelName', options);
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">Ably.Realtime.Crypto.generateRandomKey(function(err, key) {
+  var options = { cipher: { key: key } };
+  var channel = realtime.channels.get('channelName', options);
+});</code></pre>
+<pre lang="java"><code lang="java">CipherParams params = Crypto.getDefaultParams(key);
 ChannelOptions options = new ChannelOptions();
-options.encrypted = true;
-options.cipherParams = params;
+options.cipher = params;
 Channel channel = realtime.channels.get("channelName", channelOpts);</code></pre>
-<pre lang="ruby"><code lang="ruby">options = { encrypted: true, cipherParams: { key: 'A__SECRET__KEY__' } }
+<pre lang="ruby"><code lang="ruby">key = Ably::Util::Crypto.generate_random_key
+options = { cipher: { key: key } }
 channel = realtime.channels.get('channelName', options)</code></pre>
 <h3 id="channel-lifecycle">Channel lifecycle</h3>
 <p>Channels are not pre-configured or provisioned by Ably in advance; they are created on demand when clients attach, and remain active until such time that there are no remaining attached clients. Within the <a href="https://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">dashboard for your app</a> however, you can pre-configure one or more <a href="#channel-namespaces">channel namespaces</a> (i.e. name prefixes), and associate different attributes and access rights with those namespaces. Find out more about <a href="#channel-namespaces">channel namespaces</a>.</p>
@@ -174,10 +178,8 @@ channel.publish 'action', 'boom!'</code></pre>
 /* Implicit attach when subscribing */
 channel.subscribe(new MessageListener() {
   @Override
-  public void onMessage(Message[] messages) {
-    for(Message message : messages) {
-      System.out.println("Message received: " + message.data);
-    }
+  public void onMessage(Message message) {
+    System.out.println("Message received: " + message.data);
   }
 });
 channel.publish("action", "boom!");</code></pre>
@@ -313,18 +315,18 @@ A client can register for messages on a channel by implementing <a href="#messag
 <p></div><div lang="ruby"><br />
 A client can subscribe to all messages on a channel by passing a block to the <code>subscribe</code> method. The block is passed a <a href="#message"><code>Message</code></a> object for each message are received.</p>
 </div>
-<pre class="code-editor open-jsbin open-jsbin-ogiqiw" lang="javascript"><code class="code-editor open-jsbin open-jsbin-ogiqiw" lang="javascript">channel.subscribe(function(message) {
+<pre class="code-editor open-jsbin open-jsbin-owecul" lang="javascript"><code class="code-editor open-jsbin open-jsbin-owecul" lang="javascript">channel.subscribe(function(message) {
   console.log('message received for event ' + message.name);
   console.log('message data:' + message.data);
 });</code></pre>
-<pre class="code-editor open-jsbin open-jsbin-ogiqiw" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ogiqiw" lang="nodejs">channel.subscribe(function(message) {
+<pre class="code-editor open-jsbin open-jsbin-owecul" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-owecul" lang="nodejs">channel.subscribe(function(message) {
   console.log('message received for event ' + message.name);
   console.log('message data:' + message.data);
 });</code></pre>
 <pre lang="java"><code lang="java">channel.subscribe(new MessageListener() {
   @Override
-  public void onMessage(Message[] messages) {
-    System.out.println(messages.length + " new messages arrived");
+  public void onMessage(Message message) {
+    System.out.println("Message received: " + message.data);
   }
 });</code></pre>
 <pre lang="ruby"><code lang="ruby">channel.subscribe do |message|
@@ -342,8 +344,8 @@ end</code></pre>
 });</code></pre>
 <pre lang="java"><code lang="java">channel.subscribe("myEvent", new MessageListener() {
   @Override
-  public void onMessage(Message[] messages) {
-    System.out.println(messages.length " new messages arrived");
+  public void onMessage(Message message) {
+    System.out.println("Message received: " + message.data);
   }
 });</code></pre>
 <pre lang="ruby"><code lang="ruby">channel.subscribe('myEvent') do |message|
@@ -373,14 +375,14 @@ channel.unsubscribe("myEvent", &amp;my_proc)
 channel.unsubscribe(&amp;my_proc)</code></pre>
 <h3 id="message-publish">Publishing messages</h3>
 <p>Channels expose a <code>publish</code> method whereby a client can publish either a single message or an array of messages to a channel. A listener optionally passed in to the <code>publish</code> method enables the client to know whether or not the operation succeeded.</p>
-<pre class="code-editor open-jsbin open-jsbin-acerec" lang="javascript"><code class="code-editor open-jsbin open-jsbin-acerec" lang="javascript">channel.publish('event', 'This is my payload', function(err) {
+<pre class="code-editor open-jsbin open-jsbin-owecul" lang="javascript"><code class="code-editor open-jsbin open-jsbin-owecul" lang="javascript">channel.publish('event', 'This is my payload', function(err) {
   if(err) {
     console.log('Unable to publish message; err = ' + err.message);
   } else {
     console.log('Message successfully sent');
   }
 });</code></pre>
-<pre class="code-editor open-jsbin open-jsbin-acerec" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-acerec" lang="nodejs">channel.publish('event', 'This is my payload', function(err) {
+<pre class="code-editor open-jsbin open-jsbin-owecul" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-owecul" lang="nodejs">channel.publish('event', 'This is my payload', function(err) {
   if(err) {
     console.log('Unable to publish message; err = ' + err.message);
   } else {
@@ -416,6 +418,7 @@ end</code></pre>
       if(resultPage.hasNext()) {
         resultPage.next(function(err, nextPage) { ... });
       }
+    }
   });
 });</code></pre>
 <pre lang="nodejs"><code lang="nodejs">channel.attach(function() {
@@ -427,6 +430,7 @@ end</code></pre>
       if(resultPage.hasNext()) {
         resultPage.next(function(err, nextPage) { ... });
       }
+    }
   });
 });</code></pre>
 <pre lang="java"><code lang="java">PaginatedResult&lt;Message&gt; resultPage = channel.history(null);
@@ -630,7 +634,7 @@ Related types
 <blockquote class="definition">
 <p class="definition"><span lang='default'>history(Object options, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#message">Message</a>&gt; resultPage))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> history(Hash options) &#8594; yields <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#message">Message</a>&gt;</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#message">Message</a>&gt; history(<a href="#param">Param</a>[] options)</span></p>
 </blockquote>
-<p>Gets a <a href="#paginated-result">paginated</a> set of historical messages for this channel. If the <a href="https://support.ably.io/support/solutions/articles/3000030059-how-long-are-messages-stored-for">channel is configured to persist messages to disk</a>, then message history will <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically go back 24 &#8211; 72 hours</a>. If not, messages are only retained in memory by the Ably service for two minutes.</p>
+<p>Gets a <a href="#paginated-result">paginated</a> set of historical messages for this channel. If the <a href="https://support.ably.io/support/solutions/articles/3000030059-how-long-are-messages-stored-for">channel is configured to persist messages to disk</a>, then message history will <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically be available for 24 &#8211; 72 hours</a>. If not, messages are only retained in memory by the Ably service for two minutes.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt><span lang="default">options</span><span lang="java"><a href="#param">Param</a>[] options</span></dt>
@@ -993,13 +997,13 @@ Ably::Realtime::Channel::STATE.Attached == :attached # =&gt; true</code></pre>
 <p>A <span lang="java"><code>io.ably.lib.realtime.Channel.MessageListener</code></span> is an interface allowing a client to be notified when messages are received on a channel using a <a href="/realtime/channels-messages#message-subscription">channel subscription</a>.</p>
 <pre lang="java"><code lang="java">public interface MessageListener {
   // Called when one or more messages are received
-  public void onMessage(Message[] messages);
+  public void onMessage(Message message);
 }</code></pre>
 
 </div> <!-- /end java language block -->
 
 <h3 id="paginated-result"><span lang='default'>PaginatedResult</span><span lang='ruby'>Ably::Models::PaginatedResult</span><span lang='java'>io.ably.lib.types.PaginatedResult</span></h3>
-<p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">paginated REST API query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
+<p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">Ably REST API paginated query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>items</code></dt>
@@ -1120,8 +1124,9 @@ end</code></pre>
 <li class=''><a href='/rest/presence/'>Presence</a></li>
 <li class=''><a href='/rest/authentication/'>Authentication</a></li>
 <li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
 <li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/types/'>Types</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
@@ -1130,9 +1135,9 @@ end</code></pre>
 <ul>
 <li class=''><a href='/general/authentication/'>Authentication</a></li>
 <li class=''><a href='/general/channel-rules-namespaces/'>Channel Rules and Namespaces</a></li>
-<li class=''><a href='/general/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/general/push-notifications/'>Mobile push notifications</a></li>
+<li class=''><a href='/general/webhooks/'>Receiving WebHooks</a></li>
 <li class=''><a href='/general/statistics/'>Application Statistics</a></li>
-<li class=''><a href='/general/migrating/'>Migrating to Ably</a></li>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>

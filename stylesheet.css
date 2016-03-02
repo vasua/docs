@@ -417,6 +417,10 @@ hr.back {
       content: "Node.js"; }
     #documentation pre[lang][lang=ios]::before {
       content: "iOS"; }
+    #documentation pre[lang][lang=swift]::before {
+      content: "Swift"; }
+    #documentation pre[lang][lang=go]::before {
+      content: "Swift"; }
     #documentation pre[lang][lang=csharp]::before {
       content: "C# .Net"; }
     #documentation pre[lang][lang=cplusplus]::before {

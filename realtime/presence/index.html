@@ -108,8 +108,7 @@ AblyRealtime realtime = new AblyRealtime(options);
 Channel channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}");
 channel.presence.subscribe(new PresenceListener() {
   @Override
-  public void onPresenceMessage(PresenceMessage[] messages) {
-    PresenceMessage member = messages[0]; // use only first for this example
+  public void onPresenceMessage(PresenceMessage member) {
     System.out.println("Member " + member.clientId + " : " + member.action.toString());
   }
 });
@@ -170,8 +169,7 @@ channel.presence.enter('not moving', function(err) {
 <pre lang="java"><code lang="java">/* Subscribe to presence enter and update events */
 channel.presence.subscribe(new PresenceListener() {
   @Override
-  public void onPresenceMessage(PresenceMessage[] messages) {
-    PresenceMessage member = messages[0]; // use only first for this example
+  public void onPresenceMessage(PresenceMessage member) {
     switch (member.action) {
       case ENTER: {
         System.out.println(member.data); // =&gt; not moving
@@ -322,8 +320,7 @@ Channel channel = realtime.channels.get("realtime-chat");
 
 channel.presence.subscribe(new PresenceListener() {
   @Override
-  public void onPresenceMessage(PresenceMessage[] messages) {
-    PresenceMessage member = messages[0]; /* use only first for this example */
+  public void onPresenceMessage(PresenceMessage member) {
     System.out.println(member.clientId + " entered realtime-chat");
   }
 });
@@ -572,7 +569,7 @@ When a channel is attached, the Ably service immediately synchronises the presen
 <blockquote class="definition">
 <p class="definition"><span lang='default'>history(Object option, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; resultPage))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> history(Hash option) &#8594; yields <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt;</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(<a href="#param">Param</a>[] option)</span></p>
 </blockquote>
-<p>Gets a <a href="#paginated-result">paginated</a> set of historical presence message events for this channel. If the <a href="https://support.ably.io/support/solutions/articles/3000030059-how-long-are-messages-stored-for">channel is configured to persist messages to disk</a>, then the presence message event history will <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically go back 24 &#8211; 72 hours</a>. If not, presence message events are only retained in memory by the Ably service for two minutes.</p>
+<p>Gets a <a href="#paginated-result">paginated</a> set of historical presence message events for this channel. If the <a href="https://support.ably.io/support/solutions/articles/3000030059-how-long-are-messages-stored-for">channel is configured to persist messages to disk</a>, then the presence message event history will <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically be available for 24 &#8211; 72 hours</a>. If not, presence message events are only retained in memory by the Ably service for two minutes.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt><span lang="default">option</span><span lang="java"><a href="#param">Param</a>[] option</span></dt>
@@ -914,7 +911,7 @@ Ably::Models::PresenceMessage::ACTION.Enter == :enter # =&gt; true</code></pre>
 </div> <!-- /end java language block -->
 
 <h3 id="paginated-result"><span lang='default'>PaginatedResult</span><span lang='ruby'>Ably::Models::PaginatedResult</span><span lang='java'>io.ably.lib.types.PaginatedResult</span></h3>
-<p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">paginated REST API query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
+<p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">Ably REST API paginated query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>items</code></dt>
@@ -1012,7 +1009,7 @@ end</code></pre>
 <p>A <span lang="java"><code>io.ably.lib.realtime.Presence.PresenceListener</code></span> is an interface allowing a client to be notified when presence message events are received on a presence channel using a <a href="/realtime/presence#presence-states">presence subscription</a>.</p>
 <pre lang="java"><code lang="java">public interface PresenceListener {
   // Called when one or more presence messages are received
-  public void onPresenceMessage(PresenceMessage[] messages);
+  public void onPresenceMessage(PresenceMessage message);
 }</code></pre>
 
 </div> <!-- /end java language block -->
@@ -1047,8 +1044,9 @@ end</code></pre>
 <li class=''><a href='/rest/presence/'>Presence</a></li>
 <li class=''><a href='/rest/authentication/'>Authentication</a></li>
 <li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
 <li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/types/'>Types</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
@@ -1057,9 +1055,9 @@ end</code></pre>
 <ul>
 <li class=''><a href='/general/authentication/'>Authentication</a></li>
 <li class=''><a href='/general/channel-rules-namespaces/'>Channel Rules and Namespaces</a></li>
-<li class=''><a href='/general/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/general/push-notifications/'>Mobile push notifications</a></li>
+<li class=''><a href='/general/webhooks/'>Receiving WebHooks</a></li>
 <li class=''><a href='/general/statistics/'>Application Statistics</a></li>
-<li class=''><a href='/general/migrating/'>Migrating to Ably</a></li>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>

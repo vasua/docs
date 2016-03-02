@@ -260,7 +260,7 @@ Ably::Models::PresenceMessage::ACTION.Enter == :enter # =&gt; true</code></pre>
 	<dd>This will typically be empty as all presence updates received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: String</i></dd>
 </dl>
 <h3 id="paginated-result"><span lang='default'>PaginatedResult</span><span lang='java'>io.ably.lib.types.PaginatedResult</span><span lang='ruby'>Ably::Models::PaginatedResult</span></h3>
-<p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">paginated REST API query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
+<p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">Ably REST API paginated query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>items</code></dt>
@@ -400,7 +400,7 @@ end</code></pre>
 	<dt><code>all</code></dt>
 	<dd>aggregate count of both <code>inbound</code> and <code>outbound</code> message stats<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">MessageTypes</a></i></dd>
 	<dt><span lang="default"><code>apiRequests</code></span><span lang="ruby"><code>api_requests</code></span></dt>
-	<dd>breakdown of API requests received via the REST API<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
+	<dd>breakdown of API requests received via the Ably REST API<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
 	<dt><code>channels</code></dt>
 	<dd>breakdown of channel related stats such as min, mean and peak channels<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/ResourceCount">ResourceCount</a></i></dd>
 	<dt><code>connections</code></dt>
@@ -418,7 +418,7 @@ end</code></pre>
 	<dt><code>persisted</code></dt>
 	<dd>messages persisted and later retrieved via the <a href="/realtime/history">history API</a><br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/MessageTypes">MessageTypes</a></i></dd>
 	<dt><span lang="default"><code>tokenRequests</code></span><span lang="ruby"><code>token_requests</code></span></dt>
-	<dd>breakdown of Token requests received via the REST API.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
+	<dd>breakdown of Token requests received via the Ably REST API.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
 </dl>
 <h2>Other types</h2>
 <h3 id="auth-options"><span lang='default'>AuthOptions Object</span><span lang='ruby'>AuthOptions Hash</span><span lang='java'>io.ably.lib.rest.Auth.AuthOptions</span></h3>
@@ -529,7 +529,7 @@ end</code></pre>
 </dl>
 <dl>
 	<dt><span lang="default"><code>authCallback</code></span><span lang="ruby"><code>:auth_callback</code></span></dt>
-	<dd>A <span lang="default">function</span><span lang="java"><code>TokenCallback</code> instance</span><span lang="ruby">proc / lambda</span> to call when a new token is required. The role of the callback is to either generate a signed <a href="/realtime/types#token-request"><code>TokenRequest</code></a> which may then be submitted automatically by the library to the <a href="/rest-api#request-token"><code>requestToken</code> REST API</a>; or to provide a valid token in as a <a href="/realtime/types#token-details"><code>TokenDetails</code></a> object. See <a href="/rest/authentication">authentication</a> for details of the token request format and associated API calls.<br><i>Type: <span lang="default">Function</span><span lang="java"><code>TokenCallback</code></span><span lang="ruby">Proc / Lamda</span></i></dd>
+	<dd>A <span lang="default">function</span><span lang="java"><code>TokenCallback</code> instance</span><span lang="ruby">proc / lambda</span> to call when a new token is required. The role of the callback is to either generate a signed <a href="/realtime/types#token-request"><code>TokenRequest</code></a> which may then be submitted automatically by the library to the <a href="/rest-api#request-token">Ably REST API <code>requestToken</code></a>; or to provide a valid token in as a <a href="/realtime/types#token-details"><code>TokenDetails</code></a> object. See <a href="/rest/authentication">authentication</a> for details of the token request format and associated API calls.<br><i>Type: <span lang="default">Function</span><span lang="java"><code>TokenCallback</code></span><span lang="ruby">Proc / Lamda</span></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>authUrl</code></span><span lang="ruby"><code>:auth_url</code></span></dt>
@@ -601,8 +601,6 @@ Note that the log level and log handler have global scope in the library and wil
 <dl>
 	<dt><span lang="default"><code>useBinaryProtocol</code></span><span lang="ruby"><code>:use_binary_protocol</code></span></dt>
 	<dd><em>true</em> If set to false, will forcibly disable the binary protocol. The binary protocol is used by default unless it is not supported. Find out more about the <a href="https://support.ably.io/solution/articles/3000047365-do-you-binary-encode-your-messages-for-greater-efficiency">benefits of binary encoding</a><br><i>Type: Boolean</i></dd>
-</dl>
-<dl>
 	<dt><span lang="default"><code>queueMessages</code></span><span lang="ruby"><code>:queue_messages</code></span></dt>
 	<dd><em>true</em> If false, this disables the default behaviour whereby the library queues messages on a connection in the disconnected or connecting states. The default behaviour allows applications to submit messages immediately upon instancing the library without having to wait for the connection to be established. Applications may use this option to disable queuing if they wish to have application-level control over the queueing under those conditions.<br><i>Type: Boolean</i></dd>
 </dl>
@@ -825,7 +823,7 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 <p>A <span lang="java"><code>io.ably.lib.realtime.Channel.MessageListener</code></span> is an interface allowing a client to be notified when messages are received on a channel using a <a href="/realtime/channels-messages#message-subscription">channel subscription</a>.</p>
 <pre lang="java"><code lang="java">public interface MessageListener {
   // Called when one or more messages are received
-  public void onMessage(Message[] messages);
+  public void onMessage(Message message);
 }</code></pre>
 
 </div> <!-- /end java language block -->
@@ -837,7 +835,7 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 <p>A <span lang="java"><code>io.ably.lib.realtime.Channel.MessageListener</code></span> is an interface allowing a client to be notified when messages are received on a channel using a <a href="/realtime/channels-messages#message-subscription">channel subscription</a>.</p>
 <pre lang="java"><code lang="java">public interface MessageListener {
   // Called when one or more messages are received
-  public void onMessage(Message[] messages);
+  public void onMessage(Message message);
 }</code></pre>
 
 </div> <!-- /end java language block -->
@@ -913,7 +911,7 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 </dl>
 <dl>
 	<dt><span lang="default"><code>ttl</code></span><span lang="ruby"><code>:ttl</code></span></dt>
-	<dd><em>1 hour</em> Requested time to live for the token being created in <span lang="ruby">milliseconds</span><span lang="default">. When omitted, the REST API default of 60 minutes is applied by Ably<br><i>Type: <span class="default">long (milliseconds)</span><span class="ruby">Integer (seconds)</span></i></dd>
+	<dd><em>1 hour</em> Requested time to live for the token being created in <span lang="ruby">milliseconds</span><span lang="default">. When omitted, the Ably REST API default of 60 minutes is applied by Ably<br><i>Type: <span class="default">long (milliseconds)</span><span class="ruby">Integer (seconds)</span></i></dd>
 </dl>
     </article>
     <hr class="back">
@@ -944,8 +942,9 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 <li class=''><a href='/rest/presence/'>Presence</a></li>
 <li class=''><a href='/rest/authentication/'>Authentication</a></li>
 <li class=''><a href='/rest/history/'>History</a></li>
-<li class=''><a href='/rest/statistics/'>Statistics</a></li>
 <li class=''><a href='/rest/encryption/'>Encryption</a></li>
+<li class=''><a href='/rest/statistics/'>Statistics</a></li>
+<li class=''><a href='/rest/types/'>Types</a></li>
 </ul>
   <h2><a href="/rest-api/">REST API</a></h2>
 <ul>
@@ -954,9 +953,9 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 <ul>
 <li class=''><a href='/general/authentication/'>Authentication</a></li>
 <li class=''><a href='/general/channel-rules-namespaces/'>Channel Rules and Namespaces</a></li>
-<li class=''><a href='/general/webhooks/'>Receiving Webhooks</a></li>
+<li class=''><a href='/general/push-notifications/'>Mobile push notifications</a></li>
+<li class=''><a href='/general/webhooks/'>Receiving WebHooks</a></li>
 <li class=''><a href='/general/statistics/'>Application Statistics</a></li>
-<li class=''><a href='/general/migrating/'>Migrating to Ably</a></li>
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
