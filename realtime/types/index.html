@@ -146,7 +146,7 @@
 	<dt><div lang="ruby"><code>data</code></div></dt>
 	<dd>The message payload, if provided<br><i>Type: String, Binary (ASCII-8BIT String), Hash, Array</i></dd>
 	<dt><div lang="php"><code>data</code></div></dt>
-	<dd>The message payload, if provided<br><i>Type: String, Binary (Byte Array), Associative Array, Array</i></dd>
+	<dd>The message payload, if provided<br><i>Type: String, Binary String, Associative Array, Array</i></dd>
 	<dt><div lang="objc"><code>data</code></div></dt>
 	<dd>The message payload, if provided<br><i>Type: NSString *, NSData *, NSDictionary *, NSArray *</i></dd>
 	<dt><div lang="swift"><code>data</code></div></dt>
@@ -200,6 +200,25 @@
 }</code></pre>
 
 </div> <!-- /end java language block -->
+
+
+
+<div lang="php"> <!-- start php language block -->
+<p><code>PresenceMessage Action</code> is one of the class constants representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>.</p>
+<pre lang="php"><code lang="php">namespace Ably\Models;
+class PresenceMessages {
+  const ABSENT  = 0; /* (reserved for internal use) */
+  const PRESENT = 1;
+  const ENTER   = 2;
+  const LEAVE   = 3;
+  const UPDATE  = 4;
+}</code></pre>
+<h4>Example usage</h4>
+<pre lang="php"><code lang="php">if ($presenceMessage-&gt;action == Ably\Models\PresenceMesage::ENTER) {
+  /* do something */
+}</code></pre>
+
+</div> <!-- /end php language block -->
 
 
 
@@ -262,6 +281,8 @@ Ably::Models::PresenceMessage::ACTION.Enter == :enter # =&gt; true</code></pre>
 	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>Presence action</code></a><br><i>Type: Integer value for Action { &#8220;ABSENT&#8221; : 0, &#8220;PRESENT&#8221; : 1, &#8220;ENTER&#8221; : 2, &#8220;LEAVE&#8221; : 3, &#8220;UPDATE&#8221; : 4 }</i></dd>
 	<dt><div lang="ruby"><code>action</code></div></dt>
 	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: enum ACTION { :absent, :present, :enter, :leave, :update }</i></dd>
+	<dt><div lang="php"><code>action</code></div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: const PresenceMessage::ABSENT,PRESENT,ENTER,LEAVE,UPDATE</i></dd>
 	<dt><div lang="objc,swift"><code>action</code></div></dt>
 	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage.action</code></a><br><i>Type: ARTPresenceAction</i></dd>
 </dl>
@@ -276,6 +297,8 @@ Ably::Models::PresenceMessage::ACTION.Enter == :enter # =&gt; true</code></pre>
 	<dd>The message payload, if provided<br><i>Type: String, NSData, Dictionary, Array</i></dd>
 	<dt><div lang="objc"><code>data</code></div></dt>
 	<dd>The message payload, if provided<br><i>Type: NSString *, NSData *, NSDictionary *, NSArray *</i></dd>
+	<dt><div lang="php"><code>data</code></div></dt>
+	<dd>The message payload, if provided<br><i>Type: String, Binary String, Associative Array, Array</i></dd>
 </dl>
 <dl>
 	<dt><code>id</code></dt>
@@ -803,10 +826,10 @@ Note that the log level and log handler have global scope in the library and wil
 
 
 
-<div lang="ruby"> <!-- start ruby language block -->
-<p><code>ChannelOptions</code>, an Associate Array, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following named keys and values can be added to the Associative Array:</p>
+<div lang="php"> <!-- start php language block -->
+<p><code>ChannelOptions</code>, an Associative Array, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following named keys and values can be added to the Associated Array:</p>
 
-</div> <!-- /end ruby language block -->
+</div> <!-- /end php language block -->
 
 
 
@@ -818,7 +841,7 @@ Note that the log level and log handler have global scope in the library and wil
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><span lang="default"><code>cipher</code></span><span lang="ruby"><code>:cipher</code></span></dt>
-	<dd>Requests encryption for this channel when not null, and specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#getting-started">an example</a><br><i>Type: either <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a><span lang="javascript,nodejs,ruby,">, or <span lang="javascript,nodejs">an options object</span><span lang="java">a Param[] list</span><span lang="ruby">an options hash</span><span lang="php">an Associative Array</span> containing at a minimum a <code>key</code></span></i></dd>
+	<dd>Requests encryption for this channel when not null, and specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#getting-started">an example</a><br><i>Type: <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a><span lang="javascript,nodejs,,java,ruby,php"> or <span lang="javascript,nodejs">an options object</span><span lang="java">a Param[] list</span><span lang="ruby">an options hash</span><span lang="php">an Associative Array</span> containing at a minimum a <code>key</code></span></i></dd>
 </dl>
 
 

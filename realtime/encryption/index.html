@@ -249,10 +249,10 @@ let channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}", options: options)
 
 
 
-<div lang="ruby"> <!-- start ruby language block -->
-<p><code>ChannelOptions</code>, an Associate Array, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following named keys and values can be added to the Associative Array:</p>
+<div lang="php"> <!-- start php language block -->
+<p><code>ChannelOptions</code>, an Associative Array, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following named keys and values can be added to the Associated Array:</p>
 
-</div> <!-- /end ruby language block -->
+</div> <!-- /end php language block -->
 
 
 
@@ -264,7 +264,7 @@ let channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}", options: options)
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><span lang="default"><code>cipher</code></span><span lang="ruby"><code>:cipher</code></span></dt>
-	<dd>Requests encryption for this channel when not null, and specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#getting-started">an example</a><br><i>Type: either <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a><span lang="javascript,nodejs,ruby,">, or <span lang="javascript,nodejs">an options object</span><span lang="java">a Param[] list</span><span lang="ruby">an options hash</span><span lang="php">an Associative Array</span> containing at a minimum a <code>key</code></span></i></dd>
+	<dd>Requests encryption for this channel when not null, and specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#getting-started">an example</a><br><i>Type: <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a><span lang="javascript,nodejs,,java,ruby,php"> or <span lang="javascript,nodejs">an options object</span><span lang="java">a Param[] list</span><span lang="ruby">an options hash</span><span lang="php">an Associative Array</span> containing at a minimum a <code>key</code></span></i></dd>
 </dl>
 
 

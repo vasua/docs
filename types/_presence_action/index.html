@@ -55,6 +55,24 @@ LEAVE,   // 3
 UPDATE   // 4
 }
 ```
+<p>blang[php].<br />
+  <code>PresenceMessage Action</code> is one of the class constants representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>.</p>
+```[php]
+namespace Ably\Models;
+class PresenceMessages {
+const ABSENT  = 0; /* (reserved for internal use) */
+const PRESENT = 1;
+const ENTER   = 2;
+const LEAVE   = 3;
+const UPDATE  = 4;
+}
+```
+h4. Example usage
+```[php]
+if ($presenceMessage&#8594;action == Ably\Models\PresenceMesage::ENTER) {
+/* do something */
+}
+```
 <p>blang[ruby].<br />
   <code>Ably::Models::PresenceMessage::ACTION</code> is an enum-like value representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>. <code>ACTION</code> can be represented interchangeably as either symbols or constants.</p>
 h4. Symbol states

@@ -104,10 +104,15 @@
   }
 });</code></pre>
 <pre lang="ruby"><code lang="ruby">members_page = channel.presence.get
-puts "#{result_page.items.length} presence members in first page"
-if result_page.has_next?
-  next_page = result_page.next
+puts "#{members_page.items.length} presence members in first page"
+if members_page.has_next?
+  next_page = members_page.next
 end</code></pre>
+<pre lang="php"><code lang="php">$membersPage = $channel=&gt;presence-&gt;get();
+echo(count($membersPage-&gt;items) . '' presence members in first page');
+if ($membersPage-&gt;hasNext()) {
+  $nextPage = $membersPage.next();
+}</code></pre>
 <pre lang="java"><code lang="java">PaginatedResult&lt;PresenceMessage&gt; membersPage = channel.presence.get(null);
 System.out.println(membersPage.items().length + " members in first page");
 if(membersPage.hasNext()) {
@@ -136,51 +141,56 @@ if(membersPage.hasNext()) {
 <p>History provides access to instantaneous &#8220;live&#8221; history as well as the longer term persisted history for presence channels. If <a href="/realtime/history#persisted-history">persisted history</a> is enabled for the channel, then presence events will <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically be stored for 24 &#8211; 72 hours</a>. If persisted history is not enabled, Ably retains the last two minutes of presence event history in memory.</p>
 <p>The following example retrieves the first two pages of historical presence events published.</p>
 <pre lang="javascript"><code lang="javascript">var presence = channel.presence;
-presence.history(function(err, resultPage) {
+presence.history(function(err, eventsPage) {
   if(err) {
     console.log('Unable to get presence history; err = ' + err.message);
   } else {
-    console.log(resultPage.items.length + ' presence events received in first page');
-    if(resultPage.hasNext()) {
-      resultPage.next(function(err, nextPage) { ... });
+    console.log(eventsPage.items.length + ' presence events received in first page');
+    if(eventsPage.hasNext()) {
+      eventsPage.next(function(err, nextPage) { ... });
     }
 });</code></pre>
 <pre lang="nodejs"><code lang="nodejs">var presence = channel.presence;
-presence.history(function(err, resultPage) {
+presence.history(function(err, eventsPage) {
   if(err) {
     console.log('Unable to get presence history; err = ' + err.message);
   } else {
-    console.log(resultPage.items.length + ' presence events received in first page');
-    if(resultPage.hasNext()) {
-      resultPage.next(function(err, nextPage) { ... });
+    console.log(eventsPage.items.length + ' presence events received in first page');
+    if(eventsPage.hasNext()) {
+      eventsPage.next(function(err, nextPage) { ... });
     }
 });</code></pre>
-<pre lang="ruby"><code lang="ruby">presence = channel.presence
-presence.history do |result_page|
-  puts "#{result_page.items.length} presence events received in first page"
-  if result_page.has_next?
-    result_page.next { |next_page| ... }
-  end
+<pre lang="ruby"><code lang="ruby">events_page = channel.presence.history
+puts "#{events_page.items.length} presence events received in first page"
+if events_page.has_next?
+  next_page = events_page.next
+  puts "#{next_page.items.length} presence events received on second page"
 end</code></pre>
-<pre lang="java"><code lang="java">PaginatedResult&lt;PresenceMessage&gt; resultPage = channel.presence.history(null);
-System.out.println(resultPage.items().length + " presence events received in first page");
-if(resultPage.hasNext()) {
-  PaginatedResult&lt;PresenceMessage&gt; nextPage = resultPage.next();
+<pre lang="php"><code lang="php">$eventsPage = $channel-&gt;presence-&gt;history();
+echo(count($eventsPage-&gt;items) . ' presence events received in first page');
+if ($eventsPage.hasNext()) {
+  $nextPage = $eventsPage.next();
+  echo(count($nextPage-&gt;items) . ' presence events received in second page');
+}</code></pre>
+<pre lang="java"><code lang="java">PaginatedResult&lt;PresenceMessage&gt; eventsPage = channel.presence.history(null);
+System.out.println(eventsPage.items().length + " presence events received in first page");
+if(eventsPage.hasNext()) {
+  PaginatedResult&lt;PresenceMessage&gt; nextPage = eventsPage.next();
   System.out.println(nextPage.items().length + " presence events received in 2nd page");
 }</code></pre>
-<pre lang="objc"><code lang="objc">[channel.presence history:^(ARTPaginatedResult&lt;ARTPresenceMessage *&gt; *resultPage, NSError *error) {
-    NSLog(@"%lu presence events received in first page", [resultPage.items count]);
-    if (resultPage.hasNext) {
-        [resultPage next:^(ARTPaginatedResult&lt;ARTPresenceMessage *&gt; *nextPage, NSError *error) {
+<pre lang="objc"><code lang="objc">[channel.presence history:^(ARTPaginatedResult&lt;ARTPresenceMessage *&gt; *eventsPage, NSError *error) {
+    NSLog(@"%lu presence events received in first page", [eventsPage.items count]);
+    if (eventsPage.hasNext) {
+        [eventsPage next:^(ARTPaginatedResult&lt;ARTPresenceMessage *&gt; *nextPage, NSError *error) {
             NSLog(@"%lu presence events received in 2nd page", [nextPage.items count]);
         }];
     }
 }];</code></pre>
-<pre lang="swift"><code lang="swift">channel.presence.history { resultPage, error in
-    let resultPage = resultPage!
-    print("\(resultPage.items.count) presence events received in first page")
-    if resultPage.hasNext {
-        resultPage.next { nextPage, error in
+<pre lang="swift"><code lang="swift">channel.presence.history { eventsPage, error in
+    let eventsPage = eventsPage!
+    print("\(eventsPage.items.count) presence events received in first page")
+    if eventsPage.hasNext {
+        eventsPage.next { nextPage, error in
             print("\(nextPage!.items.count) presence events received in 2nd page")
         }
     }
@@ -212,13 +222,13 @@ Related types
 <h6 id="get">get</h6>
 <p>Get the current presence member set for this channel.  In the REST client library this method directly queries <a href="/rest-api#presence">Ably&#8217;s REST presence API</a></p>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>get(Object options, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; resultPage))</span><span lang='ruby'><a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; get(Hash options)</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; get(<a href="#param">Param</a>[] options)</span><span lang='swift,objc'>get(query: ARTPresenceQuery, cb: (<a href="#presence-message">ARTPresenceMessage</a>, NSError?) &#8594; Void)</span></p>
+<p class="definition"><span lang='default'>get(Object options, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; resultPage))</span><span lang='ruby'><a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; get(Hash options)</span><span lang='php'><a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; get(Array options)</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; get(<a href="#param">Param</a>[] options)</span><span lang='swift,objc'>get(query: ARTPresenceQuery, cb: (<a href="#presence-message">ARTPresenceMessage</a>, NSError?) &#8594; Void)</span></p>
 </blockquote>
 <p>Gets an array of members present on the channel as <a href="#presence-message">PresenceMessage</a> objects.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt><span lang="default">options</span><span lang="objc,swift">query</span><span lang="java"><a href="#param">Param</a>[] options</span><span lang="ruby">options</span></dt>
-	<dd><span lang="default">an optional object containing query parameters</span><span lang="ruby">an optional set of symbol key and value pairs containing the query parameters</span> as specified below.</dd>
+	<dd><span lang="default">an optional object containing query parameters</span><span lang="ruby">an optional set of symbol key and value pairs containing the query parameters</span><span lang="php">an optional Associate Array containing the query parameters</span> as specified below.</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
@@ -244,22 +254,22 @@ Related types
 
 
 
-<div lang="java,ruby"> <!-- start java,ruby language block -->
+<div lang="java,ruby,php"> <!-- start java,ruby,php language block -->
 <h4>Returns</h4>
 <p>On success, the returned <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulates an array of <a href="#presence-message"><code>PresenceMessage</code></a> objects corresponding to the current page of members currently present on the channel. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
 <p>Failure to retrieve the current presence member set will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a></p>
 
-</div> <!-- /end java,ruby language block -->
+</div> <!-- /end java,ruby,php language block -->
 
 <h6 id="history">history</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>history(Object option, callback(<a href="/rest/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; resultPage))</span><span lang='ruby'><a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(Hash option)</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(<a href="#param">Param</a>[] option)</span><span lang='objc,swift'>history(query: ARTDataQuery?, callback: (<a href="#paginated-result">ARTPaginatedResult</a>&lt;<a href="#presence-message">ARTPresenceMessage</a>&gt;?, NSError?) &#8594; Void) throws</span></p>
+<p class="definition"><span lang='default'>history(Object options, callback(<a href="/rest/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; resultPage))</span><span lang='ruby'><a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(Hash options)</span><span lang='php'><a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(Array options)</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(<a href="#param">Param</a>[] options)</span><span lang='objc,swift'>history(query: ARTDataQuery?, callback: (<a href="#paginated-result">ARTPaginatedResult</a>&lt;<a href="#presence-message">ARTPresenceMessage</a>&gt;?, NSError?) &#8594; Void) throws</span></p>
 </blockquote>
 <p>Gets a <a href="#paginated-result">paginated</a> set of historical presence message events for this channel. If the <a href="https://support.ably.io/support/solutions/articles/3000030059-how-long-are-messages-stored-for">channel is configured to persist messages to disk</a>, then the presence message event history will <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically be available for 24 &#8211; 72 hours</a>. If not, presence message events are only retained in memory by the Ably service for two minutes.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><span lang="default">option</span><span lang="java"><a href="#param">Param</a>[] option</span></dt>
-	<dd><span lang="default">an optional object containing query parameters</span><span lang="ruby">an optional set of key value pairs containing query parameters</span>, as specified in the <a href="/rest/history#presence-history">presence history API documentation</a>.</dd>
+	<dt><span lang="default">options</span><span lang="java"><a href="#param">Param</a>[] options</span></dt>
+	<dd><span lang="default">an optional object containing query parameters</span><span lang="ruby">an optional set of key value pairs containing query parameters</span><span lang="php">an optional Associate Array containing the query parameters</span>, as specified in the <a href="/rest/history#presence-history">presence history API documentation</a>.</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
@@ -267,7 +277,7 @@ Related types
 	<dt><div lang="swift,objc">callback</div></dt>
 	<dd>called with a <a href="#paginated-result">ARTPaginatedResult</a>&lt;<a href="#presence-message">ARTPresenceMessage</a>&gt; object or an error</dd>
 </dl>
-<p>Further details of the supported <code>option</code> params, see <a href="/rest/history#presence-history">presence history API documentation</a>.</p>
+<p>Further details of the supported <code>options</code> params, see <a href="/rest/history#presence-history">presence history API documentation</a>.</p>
 
 
 <div lang="javascript,nodejs,,swift,objc"> <!-- start javascript,nodejs,,swift,objc language block -->
@@ -279,12 +289,12 @@ Related types
 
 
 
-<div lang="java,ruby"> <!-- start java,ruby language block -->
+<div lang="java,ruby,php"> <!-- start java,ruby,php language block -->
 <h4>Returns</h4>
 <p>On success, the returned <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulates an array of <a href="#presence-message"><code>PresenceMessage</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
 <p>Failure to retrieve the message history will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a></p>
 
-</div> <!-- /end java,ruby language block -->
+</div> <!-- /end java,ruby,php language block -->
 
 <h2 id="related-types">Related types</h2>
 <h3 id="presence-message"><span lang='default'>PresenceMessage</span><span lang='swift,objc'>ARTPresenceMessage</span><span lang='ruby'>Ably::Models::PresenceMessage</span><span lang='java'>io.ably.lib.types.PresenceMessage</span></h3>
@@ -297,6 +307,8 @@ Related types
 	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>Presence action</code></a><br><i>Type: Integer value for Action { &#8220;ABSENT&#8221; : 0, &#8220;PRESENT&#8221; : 1, &#8220;ENTER&#8221; : 2, &#8220;LEAVE&#8221; : 3, &#8220;UPDATE&#8221; : 4 }</i></dd>
 	<dt><div lang="ruby"><code>action</code></div></dt>
 	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: enum ACTION { :absent, :present, :enter, :leave, :update }</i></dd>
+	<dt><div lang="php"><code>action</code></div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: const PresenceMessage::ABSENT,PRESENT,ENTER,LEAVE,UPDATE</i></dd>
 	<dt><div lang="objc,swift"><code>action</code></div></dt>
 	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage.action</code></a><br><i>Type: ARTPresenceAction</i></dd>
 </dl>
@@ -311,6 +323,8 @@ Related types
 	<dd>The message payload, if provided<br><i>Type: String, NSData, Dictionary, Array</i></dd>
 	<dt><div lang="objc"><code>data</code></div></dt>
 	<dd>The message payload, if provided<br><i>Type: NSString *, NSData *, NSDictionary *, NSArray *</i></dd>
+	<dt><div lang="php"><code>data</code></div></dt>
+	<dd>The message payload, if provided<br><i>Type: String, Binary String, Associative Array, Array</i></dd>
 </dl>
 <dl>
 	<dt><code>id</code></dt>
@@ -360,6 +374,25 @@ Related types
 }</code></pre>
 
 </div> <!-- /end java language block -->
+
+
+
+<div lang="php"> <!-- start php language block -->
+<p><code>PresenceMessage Action</code> is one of the class constants representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>.</p>
+<pre lang="php"><code lang="php">namespace Ably\Models;
+class PresenceMessages {
+  const ABSENT  = 0; /* (reserved for internal use) */
+  const PRESENT = 1;
+  const ENTER   = 2;
+  const LEAVE   = 3;
+  const UPDATE  = 4;
+}</code></pre>
+<h4>Example usage</h4>
+<pre lang="php"><code lang="php">if ($presenceMessage-&gt;action == Ably\Models\PresenceMesage::ENTER) {
+  /* do something */
+}</code></pre>
+
+</div> <!-- /end php language block -->
 
 
 

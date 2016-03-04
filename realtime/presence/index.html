@@ -677,12 +677,12 @@ When a channel is attached, the Ably service immediately synchronises the presen
 
 <h6 id="history">history</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>history(Object option, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; resultPage))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> history(Hash option) &#8594; yields <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt;</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(<a href="#param">Param</a>[] option)</span><span lang='objc,swift'>history(query: ARTRealtimeHistoryQuery?, callback: (<a href="#paginated-result">ARTPaginatedResult</a>&lt;<a href="#presence-message">ARTPresenceMessage</a>&gt;?, NSError?) &#8594; Void) throws</span></p>
+<p class="definition"><span lang='default'>history(Object options, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; resultPage))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> history(Hash options) &#8594; yields <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt;</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(<a href="#param">Param</a>[] options)</span><span lang='objc,swift'>history(query: ARTRealtimeHistoryQuery?, callback: (<a href="#paginated-result">ARTPaginatedResult</a>&lt;<a href="#presence-message">ARTPresenceMessage</a>&gt;?, NSError?) &#8594; Void) throws</span></p>
 </blockquote>
 <p>Gets a <a href="#paginated-result">paginated</a> set of historical presence message events for this channel. If the <a href="https://support.ably.io/support/solutions/articles/3000030059-how-long-are-messages-stored-for">channel is configured to persist messages to disk</a>, then the presence message event history will <a href="https://support.ably.io/solution/articles/3000030059-how-long-are-messages-stored-for">typically be available for 24 &#8211; 72 hours</a>. If not, presence message events are only retained in memory by the Ably service for two minutes.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><span lang="default">option</span><span lang="objc,swift">option</span><span lang="java"><a href="#param">Param</a>[] option</span></dt>
+	<dt><span lang="default">options</span><span lang="objc,swift">options</span><span lang="java"><a href="#param">Param</a>[] options</span></dt>
 	<dd><span lang="default">an optional object containing query parameters</span><span lang="ruby">an optional set of key value pairs containing query parameters</span>, as specified in the <a href="/realtime/history#presence-history">presence history API documentation</a>.</dd>
 </dl>
 <dl>
@@ -693,7 +693,7 @@ When a channel is attached, the Ably service immediately synchronises the presen
 	<dt><div lang="swift,objc">callback</div></dt>
 	<dd>called with a <a href="#paginated-result">ARTPaginatedResult</a>&lt;<a href="#presence-message">ARTPresenceMessage</a>&gt; object or an error</dd>
 </dl>
-<p>Further details of the supported <code>option</code> params, see <a href="/realtime/history#presence-history">presence history API documentation</a>.</p>
+<p>Further details of the supported <code>options</code> params, see <a href="/realtime/history#presence-history">presence history API documentation</a>.</p>
 
 
 <div lang="javascript,nodejs,,swift,objc"> <!-- start javascript,nodejs,,swift,objc language block -->
@@ -941,6 +941,8 @@ When a channel is attached, the Ably service immediately synchronises the presen
 	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>Presence action</code></a><br><i>Type: Integer value for Action { &#8220;ABSENT&#8221; : 0, &#8220;PRESENT&#8221; : 1, &#8220;ENTER&#8221; : 2, &#8220;LEAVE&#8221; : 3, &#8220;UPDATE&#8221; : 4 }</i></dd>
 	<dt><div lang="ruby"><code>action</code></div></dt>
 	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: enum ACTION { :absent, :present, :enter, :leave, :update }</i></dd>
+	<dt><div lang="php"><code>action</code></div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: const PresenceMessage::ABSENT,PRESENT,ENTER,LEAVE,UPDATE</i></dd>
 	<dt><div lang="objc,swift"><code>action</code></div></dt>
 	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage.action</code></a><br><i>Type: ARTPresenceAction</i></dd>
 </dl>
@@ -955,6 +957,8 @@ When a channel is attached, the Ably service immediately synchronises the presen
 	<dd>The message payload, if provided<br><i>Type: String, NSData, Dictionary, Array</i></dd>
 	<dt><div lang="objc"><code>data</code></div></dt>
 	<dd>The message payload, if provided<br><i>Type: NSString *, NSData *, NSDictionary *, NSArray *</i></dd>
+	<dt><div lang="php"><code>data</code></div></dt>
+	<dd>The message payload, if provided<br><i>Type: String, Binary String, Associative Array, Array</i></dd>
 </dl>
 <dl>
 	<dt><code>id</code></dt>
@@ -1004,6 +1008,25 @@ When a channel is attached, the Ably service immediately synchronises the presen
 }</code></pre>
 
 </div> <!-- /end java language block -->
+
+
+
+<div lang="php"> <!-- start php language block -->
+<p><code>PresenceMessage Action</code> is one of the class constants representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>.</p>
+<pre lang="php"><code lang="php">namespace Ably\Models;
+class PresenceMessages {
+  const ABSENT  = 0; /* (reserved for internal use) */
+  const PRESENT = 1;
+  const ENTER   = 2;
+  const LEAVE   = 3;
+  const UPDATE  = 4;
+}</code></pre>
+<h4>Example usage</h4>
+<pre lang="php"><code lang="php">if ($presenceMessage-&gt;action == Ably\Models\PresenceMesage::ENTER) {
+  /* do something */
+}</code></pre>
+
+</div> <!-- /end php language block -->
 
 
 
