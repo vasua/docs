@@ -6,10 +6,10 @@ $.expr[":"].langcontains = function(obj, index, meta, stack) {
 
 $(function() {
   var friendlyLanguageNames = {
-    "javascript": "Javascript","java": "Java","python": "Python","ruby": "Ruby","nodejs": "Node.js","objc": "Obj-C","swift": "Swift","go": "Swift","csharp": "C# .Net","cplusplus": "C++","c": "C","appcelerator": "Appcelerator","phonegap": "PhoneGap"
+    "javascript": "Javascript","java": "Java","python": "Python","php": "PHP","ruby": "Ruby","nodejs": "Node.js","objc": "Obj-C","swift": "Swift","go": "Swift","csharp": "C# .Net","cplusplus": "C++","c": "C","appcelerator": "Appcelerator","phonegap": "PhoneGap"
   };
   var languageExtensions = {
-    "javascript": "js","java": "java","python": "java","ruby": "ruby","nodejs": "js","objc": "m","swift": "swift","go": "go","csharp": "cs","cplusplus": "cpp","c": "c","appcelerator": "js","phonegap": "js","html": "html","json": "json","sh": "sh","yaml": "yaml"
+    "javascript": "js","java": "java","python": "java","php": "php","ruby": "ruby","nodejs": "js","objc": "m","swift": "swift","go": "go","csharp": "cs","cplusplus": "cpp","c": "c","appcelerator": "js","phonegap": "js","html": "html","json": "json","sh": "sh","yaml": "yaml"
   };
 
   function friendlyLanguageFromId(languageId) {

@@ -37,8 +37,12 @@
   <code>TokenParams</code> is a plain Javascript object and is used in the parameters of <a href="/realtime/authentication">token authentication</a> requests, corresponding to the desired attributes of the token. The following attributes can be defined on the object:</p>
 <p>blang[ruby].<br />
   <code>TokenParams</code> is a Hash object and is used in the parameters of <a href="/realtime/authentication">token authentication</a> requests, corresponding to the desired attributes of the token. The following key symbol values can be added to the Hash:</p>
+<p>blang[php].<br />
+  <code>TokenParams</code> is an Associative Array and is used in the parameters of <a href="/realtime/authentication">token authentication</a> requests, corresponding to the desired attributes of the token. The following named keys and values can be added to the Associative Array:</p>
 <p>blang[java].<br />
   <code>TokenParams</code> is used in the parameters of <a href="/realtime/authentication">token authentication</a> requests, corresponding to the desired attributes of the token.</p>
+<p>blang[objc,swift].<br />
+  <code>ARTTokenParams</code> is used in the parameters of <a href="/realtime/authentication">token authentication</a> requests, corresponding to the desired attributes of the token.</p>
 <p>h4.<br />
   default: Properties<br />
   java:    Members<br />
@@ -57,11 +61,11 @@
 </dl>
 <dl>
 	<dt><span lang="default"><code>timestamp</code></span><span lang="ruby"><code>:timestamp</code></span></dt>
-	<dd><span lang="default">The timestamp (in milliseconds since the epoch)</span><span lang="ruby">The timestamp</span> of this request. <code>timestamp</code>, in conjunction with the <code>nonce</code>, is used to prevent token requests from being replayed.<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+	<dd><span lang="default">The timestamp (in milliseconds since the epoch)</span><span lang="ruby,objc,swift">The timestamp</span> of this request. <code>timestamp</code>, in conjunction with the <code>nonce</code>, is used to prevent token requests from being replayed.<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span><span lang="objc,swift">NSDate</span></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>ttl</code></span><span lang="ruby"><code>:ttl</code></span></dt>
-	<dd><em>1 hour</em> Requested time to live for the token being created in <span lang="ruby">milliseconds</span><span lang="default">. When omitted, the Ably REST API default of 60 minutes is applied by Ably<br><i>Type: <span class="default">long (milliseconds)</span><span class="ruby">Integer (seconds)</span></i></dd>
+	<dd><em>1 hour</em> Requested time to live for the token being created <span lang="default">in milliseconds</span><span lang="objc,swift">as a <code>NSTimeInterval</code></span>. When omitted, the Ably REST API default of 60 minutes is applied by Ably<br><i>Type: <span class="default">long (milliseconds)</span><span class="ruby">Integer (seconds)</span><span class="objc,swift">NSTimeInterval</span></i></dd>
 </dl>
   </div>
   <div id="sidebar">

@@ -38,31 +38,27 @@
   <code>ChannelOptions</code>, a plain Javascript object, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following attributes can be defined on the object:</p>
 <p>blang[ruby].<br />
   <code>ChannelOptions</code>, a Hash object, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following key symbol values can be added to the Hash:</p>
-<p>blang[java].<br />
-  <code>io.ably.lib.types.ChannelOptions</code> may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options.</p>
+<p>blang[ruby].<br />
+  <code>ChannelOptions</code>, an Associate Array, may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options. The following named keys and values can be added to the Associative Array:</p>
+<p>blang[java,swift,objc].<br />
+  <span lang="swift,objc"><code>ART</code></span><span lang="java"><code>io.ably.lib.types.</code></span><code>ChannelOptions</code> may optionally be specified when instancing a <a href="/realtime/channels-messages"><code>Channel</code></a>, and this may be used to specify channel-specific options.</p>
 <p>h4.<br />
   default: Properties<br />
   java:    Members<br />
   ruby:    Attributes</p>
 <dl>
-	<dt><span lang="default"><code>cipher</code></span><span lang="ruby"><code>:cipher_params</code></span></dt>
-	<dd>Requests encryption for this channel when not null, and specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#getting-started">an example</a><br><i>Type: either <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a><span lang="ruby,jsall">, or <span lang="jsall">an options object</span><span lang="java">a Param[] list</span><span lang="ruby">an options hash</span> containing at a minimum a <code>key</code> key</span></i></dd>
+	<dt><span lang="default"><code>cipher</code></span><span lang="ruby"><code>:cipher</code></span></dt>
+	<dd>Requests encryption for this channel when not null, and specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#getting-started">an example</a><br><i>Type: either <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a><span lang="ruby,jsall">, or <span lang="jsall">an options object</span><span lang="java">a Param[] list</span><span lang="ruby">an options hash</span><span lang="php">an Associative Array</span> containing at a minimum a <code>key</code></span></i></dd>
 </dl>
-<div lang="java">
-<h4>Static methods</h4>
-<h6 id="with-cipher-key">withCipherKey</h6>
-<blockquote class="definition">
-<p class="definition">public static ChannelOptions.withCipherKey(Byte[] or String key)</p>
-</blockquote>
-<p>A helper method to generate a <code>ChannelOptions</code> for the simple case where you only specify a key.</p>
-<h4>Parameters</h4>
-<dl>
-	<dt>key</dt>
-	<dd>A binary <code>Byte[]</code> array or a base64-encoded <code>String</code>.</dd>
-</dl>
-<h4>Returns</h4>
-<p>On success, the method returns a complete <code>ChannelOptions</code> object. Failure will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a>.</p>
-</div>
+<p>blang[java].<br />
+  h4. Static methods</p>
+h6(#with-cipher-key). withCipherKey
+bq(definition). public static ChannelOptions.withCipherKey(Byte[] or String key)
+A helper method to generate a <code>ChannelOptions</code> for the simple case where you only specify a key.
+h4. Parameters
+- key := A binary <code>Byte[]</code> array or a base64-encoded <code>String</code>.
+h4. Returns
+On success, the method returns a complete <code>ChannelOptions</code> object. Failure will raise an <a href="/realtime/types/#ably-exception"><code>AblyException</code></a>.
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/images/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>

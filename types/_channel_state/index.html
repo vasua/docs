@@ -92,6 +92,29 @@ h4. Example usage
     Ably::Realtime::Channel::STATE.Attached == :attached # =&gt; true<br />
   ```</li>
 </ol>
+<p>blang[objc,swift].<br />
+  <code>ARTRealtimeChannelState</code> is an enum representing all the <a href="/realtime/channel#channel-states"><code>Realtime Channel</code> states</a>.</p>
+```[objc]
+typedef NS_ENUM(NSUInteger, ARTRealtimeChannelState) {
+ARTRealtimeChannelInitialised,
+ARTRealtimeChannelAttaching,
+ARTRealtimeChannelAttached,
+ARTRealtimeChannelDetaching,
+ARTRealtimeChannelDetached,
+ARTRealtimeChannelFailed
+};
+```
+
+```[swift]
+public enum ARTRealtimeChannelState : UInt {
+case Initialised
+case Attaching
+case Attached
+case Detaching
+case Detached
+case Failed
+}
+```
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/images/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>

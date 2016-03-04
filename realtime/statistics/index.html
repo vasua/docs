@@ -84,24 +84,40 @@ Params options = new Param[]{ new Param("unit", "hour") }
 PaginatedResult&lt;Stats&gt; results = realtime.stats(options);
 Stats thisHour = results.items[0];
 System.out.println("Published this hour " + thisHour.inbound.all.all.count);</code></pre>
+<pre lang="objc"><code lang="objc">ARTRealtime *realtime = [[ARTRealtime alloc] initWithKey:@"{{API_KEY}}"];
+ARTStatsQuery *query = [[ARTStatsQuery alloc] init];
+query.unit = ARTStatsGranularityHour;
+[realtime stats:query callback:^(ARTPaginatedResult&lt;ARTStats *&gt; *result, NSError *error) {
+    ARTStats *thisHour = result.items[0];
+    NSLog(@"Published this hour %lu", thisHour.inbound.all.all.count);
+} error:nil];</code></pre>
+<pre lang="swift"><code lang="swift">let realtime = ARTRealtime(key: "{{API_KEY}}")
+let query = ARTStatsQuery()
+query.unit = .Hour
+try! realtime.stats(query) { results, error in
+    let thisHour = results!.items[0]
+    print("Published this hour \(thisHour.inbound.all.all.count)")
+}</code></pre>
 <h1>Realtime API Reference</h1>
 <h6 id="stats">stats</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='javascript,nodejs'>stats(Object options, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt; results))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> stats(Hash options) &#8594; yields <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt;</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats-type">Stats</a>&gt; stats(<a href="#param">Param</a>[] options)</span></p>
+<p class="definition"><span lang='javascript,nodejs'>stats(Object options, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt; results))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> stats(Hash options) &#8594; yields <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats">Stats</a>&gt;</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a>&lt;<a href="/realtime/types#stats-type">Stats</a>&gt; stats(<a href="#param">Param</a>[] options)</span><span lang='swift,objc'>stats(query: ARTStatsQuery?, callback: (<a href="">ARTPaginatedResult</a>#/realtime/types#paginated-result&lt;<a href="/realtime/types#stats">ARTStats</a>&gt;?, NSError?) &#8594; Void) throws</span></p>
 </blockquote>
 <p>This call queries the <a href="/rest-api#stats-type">REST <code>/stats</code> API</a> and retrieves your application&#8217;s usage statistics. A <a href="/realtime/types#paginated-result">PaginatedResult</a> is returned, containing an array of <a href="/realtime/types#stats-type">Stats</a> for the first page of results. <a href="/realtime/types#paginated-result">PaginatedResult</a> objects are iterable providing a means to page through historical statistics. <a href="/general/statistics">See an example set of raw stats returned via the REST API</a>.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt>options</dt>
-	<dd>an optional <span lang="default">object</span><span lang="ruby">Hash</span><span lang="java"><a href="#param"><code>Param</code></a>[] array</span> containing the query parameters</dd>
+	<dt><span lang="default">options</span><span lang="objc,swift">query</span></dt>
+	<dd>an optional <span lang="default">object</span><span lang="ruby">Hash</span><span lang="objc,swift"><code>ARTStatsQuery</code></span><span lang="java"><a href="#param"><code>Param</code></a>[] array</span> containing the query parameters</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
 	<dd>is a function of the form: <code>function(err, result)</code></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>yields a <code>PaginatedResult&lt;Stats&gt;</code> array</dd>
+	<dt><div lang="swift,objc">callback</div></dt>
+	<dd>called with a <a href="#paginated-result">ARTPaginatedResult</a>&lt;<a href="/rest/types#stats">ARTStats</a>&gt; object or an error</dd>
 </dl>
-<h4><code>options</code> parameters</h4>
+<h4><span lang="default"><code>options</code> parameters</span><span lang="objc,swift"><code>ARTStatsQuery</code> properties</span></h4>
 <p>The following options, as defined in the <a href="/rest-api#stats">REST <code>/stats</code> API</a> endpoint, are permitted:</p>
 <dl>
 	<dt><span lang="ruby">:</span>start</dt>
@@ -113,16 +129,16 @@ System.out.println("Published this hour " + thisHour.inbound.all.all.count);</co
 	<dt><span lang="ruby">:</span>limit</dt>
 	<dd><em>100</em> maximum number of messages to retrieve up to 1,000<br><i>Type: Integer</i></dd>
 	<dt><span lang="ruby">:</span>unit</dt>
-	<dd><em>minute</em> <span lang="ruby"><code>:</code></span><code>minute</code>, <span lang="ruby"><code>:</code></span><code>hour</code>, <span lang="ruby"><code>:</code></span><code>day</code> or <span lang="ruby"><code>:</code></span><code>month</code>. Based on the unit selected, the given start or end times are rounded down to the start of the relevant interval depending on the unit granularity of the query<br><i>Type: <span lang="default">String</span><span lang="ruby">Symbol</span></i></dd>
+	<dd><em>minute</em> <span lang="ruby"><code>:</code></span><code>minute</code>, <span lang="ruby"><code>:</code></span><code>hour</code>, <span lang="ruby"><code>:</code></span><code>day</code> or <span lang="ruby"><code>:</code></span><code>month</code>. Based on the unit selected, the given start or end times are rounded down to the start of the relevant interval depending on the unit granularity of the query<br><i>Type: <span lang="default">String</span><span lang="objc,swift"><a href="#stats-granularity">ARTStatsGranularity</a></span><span lang="ruby">Symbol</span></i></dd>
 </dl>
 
 
-<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<div lang="javascript,nodejs,,objc,swift"> <!-- start javascript,nodejs,,objc,swift language block -->
 <h4>Callback result</h4>
 <p>On success, <code>result</code> contains a <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulating an array of <a href="/realtime/types#stats"><code>Stats</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next</code></a> and <a href="#paginated-result"><code>first</code></a> methods.</p>
 <p>On failure to retrieve stats, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with an error response as defined in the <a href="/rest-api#common">Ably REST API</a> documentation.</p>
 
-</div> <!-- /end javascript,nodejs language block -->
+</div> <!-- /end javascript,nodejs,,objc,swift language block -->
 
 
 
@@ -144,7 +160,7 @@ System.out.println("Published this hour " + thisHour.inbound.all.all.count);</co
 </div> <!-- /end ruby language block -->
 
 <h2 id="related-types">Related types</h2>
-<h3 id="stats-type"><span lang='default'>Stats object</span><span lang='java'>io.ably.lib.types.Stats</span><span lang='ruby'>Ably::Models::Stats</span></h3>
+<h3 id="stats-type"><span lang='default'>Stats object</span><span lang='objc,swift'>ARTStats</span><span lang='java'>io.ably.lib.types.Stats</span><span lang='ruby'>Ably::Models::Stats</span></h3>
 <p>A <code>Stats</code> object represents a application statistic for the specified interval and time period. Ably aggregates statistics globally for all accounts and applications, and makes these available both through our <a href="/realtime/statistics">statistics API</a> as well as your <a href="https://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">application dashboard</a>.</p>
 <p>Please note that most attributes of the <code>Stats</code> type below contain references to further stats types. This documentation is not exhaustive for all stats stypes, and as such, links to the stats types below will take you to the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats">Ruby library stats documentation</a> which contains exhaustive stats documentation. Ruby however uses <code>under_score</code> case instead of the default <code>camelCase</code> in most languages, so please bear that in mind.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
@@ -172,6 +188,26 @@ System.out.println("Published this hour " + thisHour.inbound.all.all.count);</co
 	<dt><span lang="default"><code>tokenRequests</code></span><span lang="ruby"><code>token_requests</code></span></dt>
 	<dd>breakdown of Token requests received via the Ably REST API.<br><i>Type: <a href="http://www.rubydoc.info/gems/ably/Ably/Models/Stats/RequestCount">RequestCount</a></i></dd>
 </dl>
+<h3 id="stats-granularity"><span lang='objc,swift'>ARTStatsGranularity</span></h3>
+
+
+<div lang="swift,objc"> <!-- start swift,objc language block -->
+<p><code>ARTStatsGranularity</code> is an enum specifying the granularity of a <a href="#stats-type"><code>ARTStats interval</code></a>.</p>
+<pre lang="objc"><code lang="objc">typedef NS_ENUM(NSUInteger, ARTStatsGranularity) {
+    ARTStatsGranularityMinute,
+    ARTStatsGranularityHour,
+    ARTStatsGranularityDay,
+    ARTStatsGranularityMonth
+};</code></pre>
+<pre lang="swift"><code lang="swift">enum ARTStatsGranularity : UInt {
+    case Minute
+    case Hour
+    case Day
+    case Month
+}</code></pre>
+
+</div> <!-- /end swift,objc language block -->
+
 <h3 id="param"><span lang='java'>io.ably.lib.types.Param</span></h3>
 
 

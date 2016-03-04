@@ -1155,7 +1155,7 @@ class RealtimePresence:
     waitForSync: Bool default true, // RTP11c1
     clientId: String?, // RTP11c2
     connectionId: String?, // RTP11c3
-  ) =&gt; io PaginatedResult&lt;PresenceMessage&gt; // RTP11
+  ) =&gt; io [PresenceMessage] // RTP11
   history(
     start: Time, // RTP12a
     end: Time, // RTP12a

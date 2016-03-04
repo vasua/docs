@@ -55,15 +55,15 @@
 </dl>
 <dl>
 	<dt><span lang="default"><code>defaultTokenParams</code></span><span lang="ruby"><code>:default_token_params</code></span></dt>
-	<dd>When a <a href="/realtime/types#token-params">TokenParams</a> object is provided, it will override the client library defaults when issuing new tokens or token requests<br>__Type: <a href="/realtime/types#token-params">TokenParams</a>_</dd>
+	<dd>When a <a href="/realtime/types#token-params">TokenParams</a> object is provided, it will override the client library defaults when issuing new tokens or token requests<br><i>Type: <a href="/realtime/types#token-params">TokenParams</a></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>disconnectedRetryTimeout</code></span><span lang="ruby"><code>:disconnected_retry_timeout</code></span></dt>
-	<dd><em><span lang="default">15,000ms</span><span lang="ruby">15s</span></em> When the connection enters the <code>DISCONNECTED</code> state, after this delay in <span lang="default">milliseconds</span><span lang="ruby">seconds</span>, if the state is still <code>DISCONNECTED</code>, the client library will attempt to reconnect automatically<br><i>Type: Integer</i></dd>
+	<dd><em><span lang="default">15,000ms</span><span lang="ruby">15s</span></em> When the connection enters the <code>DISCONNECTED</code> state, after this delay <span lang="default">in milliseconds</span><span lang="ruby">in seconds</span><span lang="objc,swift">as a <code>NSTimeInterval</code></span>, if the state is still <code>DISCONNECTED</code>, the client library will attempt to reconnect automatically<br><i>Type: <span lang="default">Integer</span><span lang="objc,swift">NSTimeInterval</span></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>suspendedRetryTimeout</code></span><span lang="ruby"><code>:suspended_retry_timeout</code></span></dt>
-	<dd><em><span lang="default">30,000ms</span><span lang="ruby">30s</span></em> When the connection enters the <code>SUSPENDED</code> state, after this delay in <span lang="default">milliseconds</span><span lang="ruby">seconds</span>, if the state is still <code>SUSPENDED</code>, the client library will attempt to reconnect automatically<br><i>Type: Integer</i></dd>
+	<dd><em><span lang="default">30,000ms</span><span lang="ruby">30s</span></em> When the connection enters the <code>SUSPENDED</code> state, after this delay <span lang="default">in milliseconds</span><span lang="ruby">in seconds</span><span lang="objc,swift">as a <code>NSTimeInterval</code></span>, if the state is still <code>SUSPENDED</code>, the client library will attempt to reconnect automatically<br><i>Type: <span lang="default">Integer</span><span lang="objc,swift">NSTimeInterval</span></i></dd>
 </dl>
   </div>
   <div id="sidebar">

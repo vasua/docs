@@ -37,8 +37,10 @@
   <code>AuthOptions</code> is a plain Javascript object and is used when making <a href="/realtime/authentication">authentication</a> requests. These options will supplement or override the corresponding options given when the library was instanced. The following attributes can be defined on the object:</p>
 <p>blang[ruby].<br />
   <code>AuthOptions</code> is a Hash object and is used when making <a href="/realtime/authentication">authentication</a> requests. These options will supplement or override the corresponding options given when the library was instanced. The following key symbol values can be added to the Hash:</p>
-<p>blang[java].<br />
-  <code>AuthOptions</code> is used when making <a href="/realtime/authentication">authentication</a> requests. These options will supplement or override the corresponding options given when the library was instanced.</p>
+<p>blang[php].<br />
+  <code>AuthOptions</code> is an Associative Array and is used when making <a href="/realtime/authentication">authentication</a> requests. These options will supplement or override the corresponding options given when the library was instanced. The following named keys and values can be added to the Associative Array:</p>
+<p>blang[java,swift,objc].<br />
+  <span lang="swift,objc"><code>ART</code></span><code>AuthOptions</code> is used when making <a href="/realtime/authentication">authentication</a> requests. These options will supplement or override the corresponding options given when the library was instanced.</p>
 <p>h4.<br />
   default: Properties<br />
   java:    Members<br />
@@ -53,11 +55,11 @@
 </dl>
 <dl>
 	<dt><span lang="default"><code>authHeaders</code></span><span lang="ruby"><code>:auth_headers</code></span></dt>
-	<dd>A set of key value pair headers to be added to any request made to the <code>authUrl</code>. Useful when an application requires these to be added to validate the request or implement the response.<br><i>Type: <span lang="default">Object</span><span lang="ruby">Hash</span><span lang="java">Param[]</span></i></dd>
+	<dd>A set of key value pair headers to be added to any request made to the <code>authUrl</code>. Useful when an application requires these to be added to validate the request or implement the response.<br><i>Type: <span lang="default">Object</span><span lang="ruby">Hash</span><span lang="php">Associative Array</span><span lang="java">Param[]</span></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>authParams</code></span><span lang="ruby"><code>:auth_params</code></span></dt>
-	<dd>A set of key value pair params to be added to any request made to the <code>authUrl</code>. When the <code>authMethod</code> is <code>GET</code>, query params are added to the URL, whereas when <code>authMethod</code> is <code>POST</code>, the params are sent as URL encoded form data. Useful when an application require these to be added to validate the request or implement the response.<br><i>Type: <span lang="default">Object</span><span lang="ruby">Hash</span><span lang="java">Param[]</span></i></dd>
+	<dd>A set of key value pair params to be added to any request made to the <code>authUrl</code>. When the <code>authMethod</code> is <code>GET</code>, query params are added to the URL, whereas when <code>authMethod</code> is <code>POST</code>, the params are sent as URL encoded form data. Useful when an application require these to be added to validate the request or implement the response.<br><i>Type: <span lang="default">Object</span><span lang="ruby">Hash</span><span lang="php">Associative Array</span><span lang="java">Param[]</span></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>force</code></span><span lang="ruby"><code>:force</code></span></dt>

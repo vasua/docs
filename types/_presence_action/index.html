@@ -88,6 +88,28 @@ h4. Example usage
     Ably::Models::PresenceMessage::ACTION.Enter == :enter # =&gt; true<br />
   ```</li>
 </ol>
+<p>blang[objc,swift].<br />
+  <code>ARTPresenceAction</code> is an enum representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>.</p>
+```[objc]
+typedef NS_ENUM(NSUInteger, ARTPresenceAction) {
+ARTPresenceAbsent,
+ARTPresencePresent,
+ARTPresenceEnter,
+ARTPresenceLeave,
+ARTPresenceUpdate,
+ARTPresenceLast
+};
+```
+```[swift]
+enum ARTPresenceAction : UInt {
+case Absent
+case Present
+case Enter
+case Leave
+case Update
+case Last
+}
+```
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/images/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>

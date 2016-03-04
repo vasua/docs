@@ -47,11 +47,15 @@
 	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
 	<dt><div lang="ruby"><code>last?</code></div></dt>
 	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
+	<dt><div lang="php"><code>isLast()</code></div></dt>
+	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
 </dl>
 <dl>
 	<dt><div lang="default"><code>hasNext</code></div></dt>
 	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
 	<dt><div lang="ruby"><code>has_next?</code></div></dt>
+	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
+	<dt><div lang="php"><code>hasNext()</code></div></dt>
 	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
 </dl>
 <h4>Methods</h4>
@@ -59,20 +63,26 @@
 <p>bq(definition).<br />
   default:  first(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))<br />
   ruby:     <a href="/realtime/types#paginated-result">PaginatedResult</a> first<br />
-  java:     public <a href="/realtime/types#paginated-result">PaginatedResult</a> first()</p>
-<p>Returns a new <code>PaginatedResult</code> for the first page of results. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</p>
+  php:      <a href="/realtime/types#paginated-result">PaginatedResult</a> first()<br />
+  java:     public <a href="/realtime/types#paginated-result">PaginatedResult</a> first()<br />
+  swift,objc: first(callback: (ARTPaginatedResult?, NSError?) &#8594; Void)</p>
+<p>Returns a new <code>PaginatedResult</code> for the first page of results. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</span></p>
 <h6>items</h6>
 <p>bq(definition).<br />
   default:  Object[] items()<br />
   ruby:     Object[] items<br />
-  java:     public Object[] items()</p>
+  php:      Object[] items()<br />
+  java:     public Object[] items()<br />
+  swift, objc: items: [AnyObject]</p>
 <p>Returns the current page of results as an Array. The type of the objects in the Array is determined by the operation that provided the <code>PaginatedResult</code>. For example, a <a href="/realtime/channels-messages#history">Message#history</a> request will return an array of <code>Message</code> objects.</p>
 <h6>next</h6>
 <p>bq(definition).<br />
   default:  next(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))<br />
   ruby:     <a href="/realtime/types#paginated-result">PaginatedResult</a> next<br />
-  java:     public <a href="/realtime/types#paginated-result">PaginatedResult</a> next()</p>
-<p>Returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <span lang="default"><code>null</code></span><span lang="java"><code>Null</code></span><span lang="ruby"><code>nil</code></span> is returned. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</p>
+  php:      <a href="/realtime/types#paginated-result">PaginatedResult</a> next()<br />
+  java:     public <a href="/realtime/types#paginated-result">PaginatedResult</a> next()<br />
+  swift,objc: next(callback: (ARTPaginatedResult?, NSError?) &#8594; Void)</p>
+<p>Returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <span lang="default"><code>null</code></span><span lang="java"><code>Null</code></span><span lang="ruby,objc,swift"><code>nil</code></span> is returned. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</span></p>
 <h4>Example</h4>
 <p>```[jsall]<br />
 channel.history(function(err, paginatedResult) {<br />
@@ -116,6 +126,35 @@ channel.history do |first_page|<br />
 end<br />
 ```</li>
 </ol>
+<p>```[php]<br />
+$firstPage = $channel.history();<br />
+echo(&quot;Page 0 item 0: &quot; . $firstPage&#8594;items<sup class="footnote" id="fnr0"><a href="#fn0">0</a></sup>&#8594;data);<br />
+if ($firstPage&#8594;hasNext()) {<br />
+  $nextPage = $firstPage&#8594;next();<br />
+  echo(&quot;Page 1 item 1: &quot; . $nextPage&#8594;items<sup class="footnote" id="fnr1"><a href="#fn1">1</a></sup>&#8594;data);<br />
+  echo(&quot;Last page?: &quot; . $nextPage&#8594;isLast());<br />
+}<br />
+```</p>
+<p>```[objc]<br />
+[channel history:^(ARTPaginatedResult&lt;ARTMessage *&gt; *paginatedResult, NSError *error) {<br />
+    NSLog(<code>"Page 0 item 0: %</code>&#8220;, paginatedResult.items<sup class="footnote" id="fnr0"><a href="#fn0">0</a></sup>.data);<br />
+    [paginatedResult next:^(ARTPaginatedResult&lt;ARTMessage *&gt; *nextPage, NSError *error) {<br />
+        NSLog(@&#8221;Page 1 item 1: %<code>", nextPage.items[1].data);
+        NSLog(</code>&#8220;Last page?: %d&#8221;, nextPage.isLast);<br />
+    }];<br />
+}];<br />
+```</p>
+<p>```[swift]<br />
+channel.history { paginatedResult, error in<br />
+    let paginatedResult = paginatedResult!<br />
+    print(&#8220;Page 0 item 0: \((paginatedResult.items<sup class="footnote" id="fnr0"><a href="#fn0">0</a></sup> as! ARTMessage).data)&#8221;)<br />
+    paginatedResult.next { nextPage, error in<br />
+        let nextPage = nextPage!<br />
+        print(&#8220;Page 0 item 0: \((nextPage.items<sup class="footnote" id="fnr1"><a href="#fn1">1</a></sup> as! ARTMessage).data)&#8221;)<br />
+        print(&#8220;Last page? \(nextPage.isLast)&#8221;)<br />
+    }<br />
+}<br />
+```</p>
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/images/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>

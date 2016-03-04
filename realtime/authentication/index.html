@@ -84,6 +84,8 @@
 <pre lang="java"><code lang="java">ClientOptions options = new ClientOptions();
 options.key = "{{API_KEY}}";
 AblyRealtime realtime = new AblyRealtime(options);</code></pre>
+<pre lang="swift"><code lang="swift">let realtime = ARTRealtime(key: "{{API_KEY}}")</code></pre>
+<pre lang="objc"><code lang="objc">ARTRealtime *realtime = [[ARTRealtime alloc] initWithKey:@"{{API_KEY}}"];</code></pre>
 <h3 id="token-authentication">Token Authentication</h3>
 <p><strong>Token Authentication</strong> uses a token obtained via the REST API <a href="#request-token"><code>requestToken</code></a> endpoint to authenticate with Ably. Tokens are authentication credentials that are short-lived, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of <a href="/general/authentication#capabilities-explained" title="capabilities">access rights</a> or an <a href="#identified-clients">explicit <code>clientId</code> identity</a> &#8211; and therefore token-based authentication provides the flexibility to implement access and identity control policies in the application. See the <a href="/general/authentication#token-authentication">Token Authentication documentation</a> for more details.</p>
 <p>The <a href="/realtime/usage#constructor">Realtime</a> library will typically be instanced with a means to obtain a token as opposed to a short-lived token so that when the token expires, the library can assume responsibility to automatically obtain a new token and seamlessly continue operations with Ably. Conversely, if a library is instanced with a previously obtained <a href="#token-details"><code>Token</code></a> by setting the <span lang="ruby"><code>:token</code> or <code>:token_details</code></span><span lang="default"><code>token</code> or <code>tokenDetails</code></span> attributes of <a href="#client-options"><code>ClientOptions</code></a>, when the token expires, the client will be disconnected and enter the <code>FAILED</code> state as the library has no means to obtain a new token. It is therefore recommended that all client libraries that use token authentication have a means to issue new tokens using either the <span lang="ruby"><a href="#client-options"><code>auth_url</code></a> or <a href="#client-options"><code>auth_callback</code></a></span><span lang="default"><a href="#client-options"><code>authUrl</code></a> or <a href="#client-options"><code>authCallback</code></a></span> attribute of <a href="#client-options"><code>ClientOptions</code></a> when instancing the library.</p>
@@ -94,6 +96,12 @@ AblyRealtime realtime = new AblyRealtime(options);</code></pre>
 <pre lang="java"><code lang="java">ClientOptions options = new ClientOptions();
 options.authUrl = "http://my.website/auth";
 AblyRealtime realtime = new AblyRealtime(options);</code></pre>
+<pre lang="objc"><code lang="objc">ARTClientOptions *options = [[ARTClientOptions alloc] init];
+options.authUrl = [NSURL URLWithString:@"http://my.website/auth"];
+ARTRealtime *realtime = [[ARTRealtime alloc] initWithOptions:options];</code></pre>
+<pre lang="swift"><code lang="swift">let options = ARTClientOptions()
+options.authUrl = NSURL(string: "http://my.website/auth")
+let realtime = ARTRealtime(options: options)</code></pre>
 <h3 id="auth-object">Auth object</h3>
 <p>The principal use-case for <code>Auth</code> object is to <a href="#create-token-request">create signed token request objects</a> or <a href="#request-token">obtain tokens from Ably</a>, and then issue them to other &#8220;less trusted&#8221; clients. Typically, your servers should be the only devices to have a <a href="https://support.ably.io/solution/articles/3000030054-what-is-an-app-api-key">private API key</a>, and this private API key is used to securely sign token requests or request tokens from Ably. Clients are then issued with short-lived tokens or token requests, and the libraries can then use these to authenticate with Ably. If you adopt this model, your private API key is never shared with clients directly.</p>
 <p>A subsidiary use-case for the <code>Auth</code> object is to preemptively trigger renewal of a token or to acquire a new token with a revised set of capabilities by explicitly calling <a href="#authorise"><code>authorise</code></a></p>
@@ -128,6 +136,16 @@ tokenParams.clientId = "Bob";
 TokenRequest tokenRequest;
 tokenRequest = realtime.auth.createTokenRequest(tokenParams, null);
 /* ... issue the TokenRequest to a client ... */</code></pre>
+<pre lang="objc"><code lang="objc">ARTRealtime *realtime = [[ARTRealtime alloc] initWithKey:@"xVLyHw.fXSk9A:EYAP95RZblK3d9gw"];
+ARTTokenParams *tokenParams = [[ARTTokenParams alloc] initWithClientId:@"Bob"];
+[realtime.auth createTokenRequest:tokenParams options:nil callback:^(ARTTokenRequest *tokenRequest, NSError *error) {
+    // ... issue the TokenRequest to a client ...
+}];</code></pre>
+<pre lang="swift"><code lang="swift">let realtime = ARTRealtime(key: "xVLyHw.fXSk9A:EYAP95RZblK3d9gw")
+let tokenParams = ARTTokenParams(clientId: "Bob")
+realtime.auth.createTokenRequest(tokenParams, options: nil) { tokenRequest, error in
+    // ... issue the TokenRequest to a client ...
+}</code></pre>
 <h1>Auth API Reference</h1>
 <div class="inline-toc">
 <ul><li>Auth reference
@@ -158,18 +176,18 @@ Related types
 </ul>
 </li></ul>
 </div><p>The Auth object is available as the <span lang="java"><a href="/realtime/usage#auth"><code>auth</code> field</a></span><span lang="default"><a href="/realtime/usage#auth"><code>auth</code> property</a></span><span lang="ruby"><a href="/realtime/usage#auth"><code>auth</code> attribute</a></span> of an <a href="/realtime/usage#constructor">Ably Realtime client instance</a>.</p>
-<h2 id="properties"><span lang='default'>Auth Properties</span><span lang='java'>io.ably.lib.rest.Auth Members</span><span lang='ruby'>Ably::Auth Attributes</span></h2>
-<p>The <code>Auth</code> object exposes the following public <span lang="default">properties</span><span lang="ruby">attributes</span><span lang="java">members</span>:</p>
+<h2 id="properties"><span lang='default'>Auth Properties</span><span lang='java'>io.ably.lib.rest.Auth Members</span><span lang='ruby'>Ably::Auth Attributes</span><span lang='objc,swift'>ARTAuth Properties</span></h2>
+<p>The <span lang="objc,swift"><code>ART</code></span><code>Auth</code> object exposes the following public <span lang="default">properties</span><span lang="ruby">attributes</span><span lang="java">members</span>:</p>
 <h6 id="client-id"><span lang='default'>clientId</span><span lang='ruby'>client_id</span></h6>
 <p>The client ID string, if any, configured for this client connection. See <a href="#identified-clients">identified clients</a> for more information on trusted client identifiers.</p>
-<h2 id="methods"><span lang='default'>Auth Methods</span><span lang='java'>io.ably.lib.rest.Auth Methods</span><span lang='ruby'>Ably::Auth Methods</span></h2>
+<h2 id="methods"><span lang='default'>Auth Methods</span><span lang='java'>io.ably.lib.rest.Auth Methods</span><span lang='ruby'>Ably::Auth Methods</span><span lang='objc,swift'>ARTAuth Methods</span></h2>
 <h6 id="authorise">authorise</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>authorise(<a href="#token-params">TokenParams</a> tokenParams, <a href="#auth-options">AuthOptions</a> authOptions, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#token-details">TokenDetails</a> tokenDetails))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> authorise(<a href="#token-params">TokenParams</a> token_params, <a href="#auth-options">AuthOptions</a> auth_options) &#8594; yields <a href="#token-details">TokenDetails</a></span><span lang='java'>public <a href="#token-details">TokenDetails</a> authorise(<a href="#token-params">TokenParams</a> tokenParams, <a href="#auth-options">AuthOptions</a> authOptions)</span></p>
+<p class="definition"><span lang='default'>authorise(<a href="#token-params">TokenParams</a> tokenParams, <a href="#auth-options">AuthOptions</a> authOptions, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#token-details">TokenDetails</a> tokenDetails))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> authorise(<a href="#token-params">TokenParams</a> token_params, <a href="#auth-options">AuthOptions</a> auth_options) &#8594; yields <a href="#token-details">TokenDetails</a></span><span lang='java'>public <a href="#token-details">TokenDetails</a> authorise(<a href="#token-params">TokenParams</a> tokenParams, <a href="#auth-options">AuthOptions</a> authOptions)</span><span lang='swift,objc'>authorise(tokenParams: <a href="#token-params">ARTTokenParams</a>?, authOptions: <a href="#auth-options">ARTAuthOptions</a>?, callback: (<a href="#token-details">ARTTokenDetails</a>?, NSError?) &#8594; Void)</span></p>
 </blockquote>
-<p>Ensures valid auth credentials are present for the library instance. This may rely on an already-known and valid token, and will obtain a new token if necessary or explicitly requested using <a href="#request-token"><code>requestToken</code></a>.</p>
-<p>In the event that a new token request is made, the specified <span lang="ruby"><code>token_params</code> and <code>auth_options</code></span><span lang="java"><code>tokenParams</code> and <code>authOptions</code></span> are used.</p>
-<p>The <span lang="ruby"><code>token_params</code> and <code>auth_options</code></span><span lang="java"><code>tokenParams</code> and <code>authOptions</code></span> objects will supplement or override the existing client library defaults, and all subsequent explicit or implicit token requests will use these defaults.</p>
+<p>Ensures valid auth credentials are present for the library instance. This may rely on an already-known and valid token, and will obtain a new token if necessary or explicitly requested using <span lang="default"><a href="#request-token"><code>requestToken</code></a></span><span lang="ruby"><a href="#request-token"><code>request_token</code></a></span>.</p>
+<p>In the event that a new token request is made, the specified <span lang="ruby"><code>token_params</code> and <code>auth_options</code></span><span lang="default"><code>tokenParams</code> and <code>authOptions</code></span> are used.</p>
+<p>The <span lang="ruby"><code>token_params</code> and <code>auth_options</code></span><span lang="default"><code>tokenParams</code> and <code>authOptions</code></span> objects will supplement or override the existing client library defaults, and all subsequent explicit or implicit token requests will use these defaults.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt><span lang="ruby">token_params</span><span lang="default">tokenParams</span></dt>
@@ -184,15 +202,17 @@ Related types
 	<dd>is a function of the form: <code>function(err, tokenDetails)</code></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>yields a <a href="#token-details"><code>TokenDetails</code></a> object</dd>
+	<dt><div lang="swift,objc">callback</div></dt>
+	<dd>called with a <a href="#token-details"><code>ARTTokenDetails</code></a> object or an error</dd>
 </dl>
 
 
-<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<div lang="javascript,nodejs,,objc,swift"> <!-- start javascript,nodejs,,objc,swift language block -->
 <h4>Callback result</h4>
 <p>On success, <code>tokenDetails</code> contains a <a href="#token-details"><code>TokenDetails</code></a> object containing the details of the new or existing token along with the token string.</p>
-<p>On failure to obtain a token, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with an error response as defined in the <a href="/rest-api#common">Ably REST API</a> documentation.</p>
+<p>On failure to obtain a token, <code>err</code> contains an <span lang="ruby"><a href="#error-info"><code>ErrorInfo</code></a></span><span lang="objc,swift"><code>NSError</code></span> object with an error response as defined in the <a href="/rest-api#common">Ably REST API</a> documentation.</p>
 
-</div> <!-- /end javascript,nodejs language block -->
+</div> <!-- /end javascript,nodejs,,objc,swift language block -->
 
 
 
@@ -239,11 +259,27 @@ Related types
 <pre lang="ruby"><code lang="ruby">client.auth.authorise(client_id: 'bob') do |token_details|
   puts "Success; token = #{token_details.token}"
 end</code></pre>
+<pre lang="objc"><code lang="objc">ARTTokenParams *tokenParams = [[ARTTokenParams alloc] initWithClientId:@"Bob"];
+[client.auth authorise:tokenParams options:nil callback:^(ARTTokenDetails *tokenDetails, NSError *error) {
+    if (error) {
+        NSLog(@"An error occurred; err = %@", error);
+    } else {
+        NSLog(@"Success; token = %@", tokenDetails.token);
+    }
+}];</code></pre>
+<pre lang="swift"><code lang="swift">let tokenParams = ARTTokenParams(clientId: "Bob")
+client.auth.authorise(tokenParams, options: nil) { tokenDetails, error in
+    guard let tokenDetails = tokenDetails else {
+        print("An error occurred; err = \(error!)")
+        return
+    }
+    print("Success; token = \(tokenDetails.token)")
+}</code></pre>
 <h6 id="create-token-request"><span lang='default'>createTokenRequest</span><span lang='ruby'>create_token_request</span></h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>createTokenRequest(<a href="#token-params">TokenParams</a> tokenParams, <a href="#auth-options">AuthOptions</a> authOptions, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#token-request">TokenRequest</a> tokenRequest))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> create_token_request(<a href="#token-params">TokenParams</a> token_params, <a href="#auth-options">AuthOptions</a> auth_options) &#8594; yields <a href="#token-request">TokenRequest</a></span><span lang='java'>public <a href="#token-request">TokenRequest</a> createTokenRequest(<a href="#token-params">TokenParams</a> tokenParams, <a href="#auth-options">AuthOptions</a> authOptions)</span></p>
+<p class="definition"><span lang='default'>createTokenRequest(<a href="#token-params">TokenParams</a> tokenParams, <a href="#auth-options">AuthOptions</a> authOptions, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#token-request">TokenRequest</a> tokenRequest))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> create_token_request(<a href="#token-params">TokenParams</a> token_params, <a href="#auth-options">AuthOptions</a> auth_options) &#8594; yields <a href="#token-request">TokenRequest</a></span><span lang='java'>public <a href="#token-request">TokenRequest</a> createTokenRequest(<a href="#token-params">TokenParams</a> tokenParams, <a href="#auth-options">AuthOptions</a> authOptions)</span><span lang='objc,swift'>createTokenRequest(tokenParams: <a href="#token-params">ARTTokenParams</a>?, options: <a href="#auth-options">ARTAuthOptions</a>?, callback: (<a href="#token-request">ARTTokenRequest</a>?, NSError?) &#8594; Void)</span></p>
 </blockquote>
-<p>Creates and signs a token request based on the specified <span lang="ruby"><code>token_params</code> and <code>auth_options</code></span><span lang="java"><code>tokenParams</code> and <code>authOptions</code></span>. Note this can only be used when the <a href="https://support.ably.io/solution/articles/3000030054-what-is-an-app-api-key">API <code>key</code></a> value is available locally. Otherwise, signed token requests must be obtained from the key owner. Use this to generate signed token requests in order to implement a token request callback for use by other clients.</p>
+<p>Creates and signs a token request based on the specified <span lang="ruby"><code>token_params</code> and <code>auth_options</code></span><span lang="default"><code>tokenParams</code> and <code>authOptions</code></span>. Note this can only be used when the <a href="https://support.ably.io/solution/articles/3000030054-what-is-an-app-api-key">API <code>key</code></a> value is available locally. Otherwise, signed token requests must be obtained from the key owner. Use this to generate signed token requests in order to implement a token request callback for use by other clients.</p>
 <p>To understand why a token request may be issued to clients in favour of a token, see <a href="/general/authentication/#token-authentication">Token Authentication explained</a>.</p>
 <h4>Parameters</h4>
 <dl>
@@ -252,13 +288,15 @@ end</code></pre>
 </dl>
 <dl>
 	<dt><span lang="ruby">auth_options</span><span lang="default">authOptions</span></dt>
-	<dd><span lang="default">an optional object containing the <a href="#auth-options">authentication options</a></span><span lang="java">an optional <a href="#auth-options"><code>TokenParams</code></a> object containing the authentication options</span><span lang="ruby">an optional set of key value pairs containing the <a href="#auth-options">authentication options</a></span> for the token request<br><i>Type: <a href="#auth-options">AuthOptions</a></i></dd>
+	<dd><span lang="default">an optional object containing the <a href="#auth-options">authentication options</a></span><span lang="java">an optional <a href="#token-params"><code>TokenParams</code></a> object containing the authentication options</span><span lang="ruby">an optional set of key value pairs containing the <a href="#auth-options">authentication options</a></span><span lang="objc,swift">an optional <a href="#token-params"><code>ARTTokenParams</code></a> containing the <a href="#auth-options">authentication options</a><br><i>Type: <a href="#auth-options">AuthOptions</a></i></dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
 	<dd>is a function of the form: <code>function(err, tokenRequest)</code></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
-	<dd>yields a <a href="#token-details"><code>TokenDetails</code></a> object</dd>
+	<dd>yields a <a href="#token-request"><code>TokenRequest</code></a> object</dd>
+	<dt><div lang="swift,objc">callback</div></dt>
+	<dd>called with a <a href="#token-request"><code>ARTTokenRequest</code></a> object or an error</dd>
 </dl>
 
 
@@ -314,12 +352,28 @@ end</code></pre>
 <pre lang="ruby"><code lang="ruby">client.auth.create_token_request(client_id: 'bob') do |token_request|
   puts "Success; token request = #{token_request}"
 end</code></pre>
+<pre lang="objc"><code lang="objc">ARTTokenParams *tokenParams = [[ARTTokenParams alloc] initWithClientId:@"Bob"];
+[client.auth createTokenRequest:tokenParams options:nil callback:^(ARTTokenRequest *tokenRequest, NSError *error) {
+    if (error) {
+        NSLog(@"An error occurred; err = %@", error);
+    } else {
+        NSLog(@"Success; token request = %@", tokenRequest);
+    }
+}];</code></pre>
+<pre lang="swift"><code lang="swift">let tokenParams = ARTTokenParams(clientId: "Bob")
+client.auth.createTokenRequest(tokenParams, options: nil) { tokenRequest, error in
+    guard let tokenRequest = tokenRequest else {
+        print("An error occurred; err = \(error!)")
+        return
+    }
+    print("Success; token request = \(tokenRequest)")
+}</code></pre>
 <h6 id="request-token"><span lang='default'>requestToken</span><span lang='ruby'>request_token</span></h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>requestToken(<a href="#token-params">TokenParams</a> tokenParams, <a href="#auth-options">AuthOptions</a> authOptions, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#token-details">TokenDetails</a> tokenDetails))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> request_token(<a href="#token-params">TokenParams</a> token_params, <a href="#auth-options">AuthOptions</a> auth_options) &#8594; yields <a href="#token-details">TokenDetails</a></span><span lang='java'>public <a href="#token-details">TokenDetails</a> requestToken(<a href="#token-params">TokenParams</a> tokenParams, <a href="#auth-options">AuthOptions</a> authOptions)</span></p>
+<p class="definition"><span lang='default'>requestToken(<a href="#token-params">TokenParams</a> tokenParams, <a href="#auth-options">AuthOptions</a> authOptions, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#token-details">TokenDetails</a> tokenDetails))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> request_token(<a href="#token-params">TokenParams</a> token_params, <a href="#auth-options">AuthOptions</a> auth_options) &#8594; yields <a href="#token-details">TokenDetails</a></span><span lang='java'>public <a href="#token-details">TokenDetails</a> requestToken(<a href="#token-params">TokenParams</a> tokenParams, <a href="#auth-options">AuthOptions</a> authOptions)</span><span lang='objc,swift'>requestToken(tokenParams: <a href="#token-params">ARTTokenParams</a>?, withOptions: <a href="#auth-options">ARTAuthOptions</a>?, callback: (<a href="#token-details">ARTTokenDetails</a>?, NSError?) &#8594; Void)</span></p>
 </blockquote>
-<p>Calls the <a href="/rest-api#request-token"><code>requestToken</code> REST API endpoint</a> to obtain a token according to the specified <span lang="ruby"><code>token_params</code> and <code>auth_options</code></span><span lang="java"><code>tokenParams</code> and <code>authOptions</code></span>.</p>
-<p>Both <span lang="ruby"><code>auth_options</code> and <code>token_params</code></span><span lang="java"><code>authOptions</code> and <code>tokenParams</code></span> are optional. When they are omitted or <code>null</code>, the default token parameters and authentication options for the client library are used, as specified in the <code>ClientOptions</code> when the client library was instanced, or later updated with an explicit <a href="#authorise"><code>authorise</code></a> request.</p>
+<p>Calls the <a href="/rest-api#request-token"><code>requestToken</code> REST API endpoint</a> to obtain a token according to the specified <span lang="ruby"><code>token_params</code> and <code>auth_options</code></span><span lang="default"><code>tokenParams</code> and <code>authOptions</code></span>.</p>
+<p>Both <span lang="ruby"><code>auth_options</code> and <code>token_params</code></span><span lang="default"><code>authOptions</code> and <code>tokenParams</code></span> are optional. When they are omitted or <code>null</code>, the default token parameters and authentication options for the client library are used, as specified in the <code>ClientOptions</code> when the client library was instanced, or later updated with an explicit <a href="#authorise"><code>authorise</code></a> request.</p>
 <p>To understand why a token request may be issued to clients in favour of a token, see <a href="/general/authentication/#token-authentication">Token Authentication explained</a>.</p>
 <h4>Parameters</h4>
 <dl>
@@ -335,15 +389,17 @@ end</code></pre>
 	<dd>is a function of the form: <code>function(err, tokenDetails)</code></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>yields a <a href="#token-details"><code>TokenDetails</code></a> object</dd>
+	<dt><div lang="swift,objc">callback</div></dt>
+	<dd>called with a <a href="#token-details"><code>ARTTokenDetails</code></a> object or an error</dd>
 </dl>
 
 
-<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<div lang="javascript,nodejs,,objc,swift"> <!-- start javascript,nodejs,,objc,swift language block -->
 <h4>Callback result</h4>
 <p>On success, <code>tokenDetails</code> contains a <a href="#token-details"><code>TokenDetails</code></a> object containing the details of the new token along with the token string.</p>
-<p>On failure to obtain a token, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with an error response as defined in the <a href="/rest-api#common">Ably REST API</a> documentation.</p>
+<p>On failure to obtain a token, <code>err</code> contains an <span lang="ruby"><a href="#error-info"><code>ErrorInfo</code></a></span><span lang="objc,swift"><code>NSError</code></span> object with an error response as defined in the <a href="/rest-api#common">Ably REST API</a> documentation.</p>
 
-</div> <!-- /end javascript,nodejs language block -->
+</div> <!-- /end javascript,nodejs,,objc,swift language block -->
 
 
 
@@ -390,8 +446,24 @@ end</code></pre>
 } catch(AblyException e) {
   System.out.println("An error occurred; err = " + e.getMessage());
 }</code></pre>
+<pre lang="objc"><code lang="objc">ARTTokenParams *tokenParams = [[ARTTokenParams alloc] initWithClientId:@"Bob"];
+[client.auth requestToken:tokenParams withOptions:nil callback:^(ARTTokenDetails *tokenDetails, NSError *error) {
+    if (error) {
+        NSLog(@"An error occurred; err = %@", error);
+    } else {
+        NSLog(@"Success; token = %@", tokenDetails.token);
+    }
+}];</code></pre>
+<pre lang="swift"><code lang="swift">let tokenParams = ARTTokenParams(clientId: "Bob")
+client.auth.requestToken(tokenParams, withOptions: : nil) { tokenDetails, error in
+    guard let tokenDetails = tokenDetails else {
+        print("An error occurred; err = \(error!)")
+        return
+    }
+    print("Success; token = \(tokenDetails.token)")
+}</code></pre>
 <h2 id="related-types">Related types</h2>
-<h3 id="auth-options"><span lang='default'>AuthOptions Object</span><span lang='ruby'>AuthOptions Hash</span><span lang='java'>io.ably.lib.rest.Auth.AuthOptions</span></h3>
+<h3 id="auth-options"><span lang='default'>AuthOptions Object</span><span lang='objc,swift'>ARTAuthOptions</span><span lang='ruby'>AuthOptions Hash</span><span lang='java'>io.ably.lib.rest.Auth.AuthOptions</span></h3>
 
 
 <div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
@@ -408,10 +480,17 @@ end</code></pre>
 
 
 
-<div lang="java"> <!-- start java language block -->
-<p><code>AuthOptions</code> is used when making <a href="/realtime/authentication">authentication</a> requests. These options will supplement or override the corresponding options given when the library was instanced.</p>
+<div lang="php"> <!-- start php language block -->
+<p><code>AuthOptions</code> is an Associative Array and is used when making <a href="/realtime/authentication">authentication</a> requests. These options will supplement or override the corresponding options given when the library was instanced. The following named keys and values can be added to the Associative Array:</p>
 
-</div> <!-- /end java language block -->
+</div> <!-- /end php language block -->
+
+
+
+<div lang="java,swift,objc"> <!-- start java,swift,objc language block -->
+<p><span lang="swift,objc"><code>ART</code></span><code>AuthOptions</code> is used when making <a href="/realtime/authentication">authentication</a> requests. These options will supplement or override the corresponding options given when the library was instanced.</p>
+
+</div> <!-- /end java,swift,objc language block -->
 
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
@@ -424,11 +503,11 @@ end</code></pre>
 </dl>
 <dl>
 	<dt><span lang="default"><code>authHeaders</code></span><span lang="ruby"><code>:auth_headers</code></span></dt>
-	<dd>A set of key value pair headers to be added to any request made to the <code>authUrl</code>. Useful when an application requires these to be added to validate the request or implement the response.<br><i>Type: <span lang="default">Object</span><span lang="ruby">Hash</span><span lang="java">Param[]</span></i></dd>
+	<dd>A set of key value pair headers to be added to any request made to the <code>authUrl</code>. Useful when an application requires these to be added to validate the request or implement the response.<br><i>Type: <span lang="default">Object</span><span lang="ruby">Hash</span><span lang="php">Associative Array</span><span lang="java">Param[]</span></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>authParams</code></span><span lang="ruby"><code>:auth_params</code></span></dt>
-	<dd>A set of key value pair params to be added to any request made to the <code>authUrl</code>. When the <code>authMethod</code> is <code>GET</code>, query params are added to the URL, whereas when <code>authMethod</code> is <code>POST</code>, the params are sent as URL encoded form data. Useful when an application require these to be added to validate the request or implement the response.<br><i>Type: <span lang="default">Object</span><span lang="ruby">Hash</span><span lang="java">Param[]</span></i></dd>
+	<dd>A set of key value pair params to be added to any request made to the <code>authUrl</code>. When the <code>authMethod</code> is <code>GET</code>, query params are added to the URL, whereas when <code>authMethod</code> is <code>POST</code>, the params are sent as URL encoded form data. Useful when an application require these to be added to validate the request or implement the response.<br><i>Type: <span lang="default">Object</span><span lang="ruby">Hash</span><span lang="php">Associative Array</span><span lang="java">Param[]</span></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>force</code></span><span lang="ruby"><code>:force</code></span></dt>
@@ -454,16 +533,16 @@ end</code></pre>
 	<dt><span lang="default"><code>useTokenAuth</code></span><span lang="ruby"><code>:use_token_auth</code></span></dt>
 	<dd><em>false</em> When true, forces <a href="/general/authentication#token-authentication">Token authentication</a> to be used by the libary<br><i>Type: Boolean</i></dd>
 </dl>
-<h3 id="token-details"><span lang='default'>TokenDetails</span><span lang='java'>io.ably.lib.types.TokenDetails</span><span lang='ruby'>Ably::Models::TokenDetails</span></h3>
+<h3 id="token-details"><span lang='default'>TokenDetails Object</span><span lang='objc,swift'>ARTTokenDetails</span><span lang='java'>io.ably.lib.types.TokenDetails</span><span lang='ruby'>Ably::Models::TokenDetails</span></h3>
 <p><code>TokenDetails</code> is a type providing details of the token string and its associated metadata.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>token</code></dt>
 	<dd>The token itself. A typical token string may appear like <code>{{TOKEN}}</code><br><i>Type: String</i></dd>
 	<dt><code>expires</code></dt>
-	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby">The time</span> at which this token expires<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby,objc,swift">The time</span> at which this token expires<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span><span lang="objc,swift">NSDate</span></i></dd>
 	<dt><code>issued</code></dt>
-	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby">The time</span> at which this token was issued<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby,objc,swift">The time</span> at which this token was issued<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span><span lang="objc,swift">NSDate</span></i></dd>
 	<dt><code>capability</code></dt>
 	<dd>The capability associated with this token. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/general/authentication/#capabilities-explained">Read more about authentication and capabilities</a><br><i>Type: String</i></dd>
 	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span></dt>
@@ -476,7 +555,7 @@ end</code></pre>
 	<dd>True when the token has expired<br><i>Type: Boolean</i><br />
 </div></dd>
 </dl>
-<h3 id="token-params"><span lang='default'>TokenParams Object</span><span lang='ruby'>TokenParams Hash</span><span lang='java'>io.ably.lib.rest.Auth.TokenParams</span></h3>
+<h3 id="token-params"><span lang='default'>TokenParams Object</span><span lang='objc,swift'>ARTTokenParams</span><span lang='ruby'>TokenParams Hash</span><span lang='java'>io.ably.lib.rest.Auth.TokenParams</span></h3>
 
 
 <div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
@@ -493,10 +572,24 @@ end</code></pre>
 
 
 
+<div lang="php"> <!-- start php language block -->
+<p><code>TokenParams</code> is an Associative Array and is used in the parameters of <a href="/realtime/authentication">token authentication</a> requests, corresponding to the desired attributes of the token. The following named keys and values can be added to the Associative Array:</p>
+
+</div> <!-- /end php language block -->
+
+
+
 <div lang="java"> <!-- start java language block -->
 <p><code>TokenParams</code> is used in the parameters of <a href="/realtime/authentication">token authentication</a> requests, corresponding to the desired attributes of the token.</p>
 
 </div> <!-- /end java language block -->
+
+
+
+<div lang="objc,swift"> <!-- start objc,swift language block -->
+<p><code>ARTTokenParams</code> is used in the parameters of <a href="/realtime/authentication">token authentication</a> requests, corresponding to the desired attributes of the token.</p>
+
+</div> <!-- /end objc,swift language block -->
 
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
@@ -513,14 +606,14 @@ end</code></pre>
 </dl>
 <dl>
 	<dt><span lang="default"><code>timestamp</code></span><span lang="ruby"><code>:timestamp</code></span></dt>
-	<dd><span lang="default">The timestamp (in milliseconds since the epoch)</span><span lang="ruby">The timestamp</span> of this request. <code>timestamp</code>, in conjunction with the <code>nonce</code>, is used to prevent token requests from being replayed.<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+	<dd><span lang="default">The timestamp (in milliseconds since the epoch)</span><span lang="ruby,objc,swift">The timestamp</span> of this request. <code>timestamp</code>, in conjunction with the <code>nonce</code>, is used to prevent token requests from being replayed.<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span><span lang="objc,swift">NSDate</span></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default"><code>ttl</code></span><span lang="ruby"><code>:ttl</code></span></dt>
-	<dd><em>1 hour</em> Requested time to live for the token being created in <span lang="ruby">milliseconds</span><span lang="default">. When omitted, the Ably REST API default of 60 minutes is applied by Ably<br><i>Type: <span class="default">long (milliseconds)</span><span class="ruby">Integer (seconds)</span></i></dd>
+	<dd><em>1 hour</em> Requested time to live for the token being created <span lang="default">in milliseconds</span><span lang="objc,swift">as a <code>NSTimeInterval</code></span>. When omitted, the Ably REST API default of 60 minutes is applied by Ably<br><i>Type: <span class="default">long (milliseconds)</span><span class="ruby">Integer (seconds)</span><span class="objc,swift">NSTimeInterval</span></i></dd>
 </dl>
-<h3 id="token-request"><span lang='default'>TokenRequest Object</span><span lang='ruby'>Ably::Models::TokenRequest</span><span lang='java'>io.ably.lib.rest.Auth.TokenRequest</span></h3>
-<p><code>TokenRequest</code> is a type containing parameters for a token request. Tokens are requested using the <a href="/rest-api/#request-token">REST requestToken endpoint</a>.</p>
+<h3 id="token-request"><span lang='default'>TokenRequest Object</span><span lang='objc,swift'>ARTTokenRequest</span><span lang='ruby'>Ably::Models::TokenRequest</span><span lang='java'>io.ably.lib.rest.Auth.TokenRequest</span></h3>
+<p><code>TokenRequest</code> is a type containing parameters for a token request. Tokens are requested using <span lang="default"><a href="/rest/authentication#request-token">Auth#requestToken</a></span><span lang="ruby"><a href="/rest/authentication#request-token">Auth#request_token</a></span></p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><span lang="default"><code>keyName</code></span><span lang="ruby"><code>key_name</code></span></dt>

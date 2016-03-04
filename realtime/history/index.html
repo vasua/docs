@@ -102,6 +102,30 @@ channel.publish("example", "message data", new CompletionListener() {
     System.out.println("Last message: " + lastMessage.id + " - " + lastMessage.data);
   }
 });</code></pre>
+<pre lang="objc"><code lang="objc">ARTRealtime *realtime = [[ARTRealtime alloc] initWithKey:@"{{API_KEY}}"];
+ARTRealtimeChannel *channel = [realtime.channels get:@"RANDOM_CHANNEL_NAME"];
+[channel publish:@"example" data:@"message data" cb:^(ARTErrorInfo *error) {
+    if (error) {
+        NSLog(@"Unable to publish message; err = %@", error.message);
+        return;
+    }
+    [channel history:^(ARTPaginatedResult&lt;ARTMessage *&gt; *resultPage, NSError *error) {
+        ARTMessage *lastMessage = resultPage.items[0];
+        NSLog(@"Last message: %@ - %@", lastMessage.id,lastMessage.data);
+    }];
+}];</code></pre>
+<pre lang="swift"><code lang="swift">let realtime = ARTRealtime(key: "{{API_KEY}}")
+let channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}")
+channel.publish("example", data: "message data") { error in
+    if let error = error {
+        print("Unable to publish message; err = \(error.message)")
+        return
+    }
+    channel.history { resultPage, error in
+        let lastMessage = resultPage!.items[0] as! ARTMessage
+        print("Last message: \(lastMessage.id) - \(lastMessage.data)")
+    }
+}</code></pre>
 <h2 id="channel-and-presence">Channel &amp; Presence history</h2>
 <p>Both the <a href="/realtime/channels-messages"><code>Channel</code></a> and <a href="/realtime/presence"><code>Presence</code></a> objects provide history. The <a href="/realtime/channels-messages"><code>Channel</code></a> object provides the history of <a href="#message"><code>Message</code></a> objects published on the channel, whereas the <a href="/realtime/presence"><code>Presence</code></a> object provides presence event history of that channel i.e. members entering, updating or leaving the channel as <a href="#presence-message"><code>PresenceMessage</code></a> objects.</p>
 <h3 id="persisted-history">Enabling persistent history</h3>
@@ -147,6 +171,28 @@ channel.on(ChannelState.attached, new ChannelStateListener() {
     System.out.println("Last message before attach: " + lastMessage.data);
   }
 });</code></pre>
+<pre lang="objc"><code lang="objc">ARTRealtime *realtime = [[ARTRealtime alloc] initWithKey:@"{{API_KEY}}"];
+ARTRealtimeChannel *channel = [realtime.channels get:@"RANDOM_CHANNEL_NAME"];
+[channel attach];
+[channel on:ARTChannelEventAttached call:^(ARTErrorInfo *error) {
+    ARTRealtimeHistoryQuery *query = [[ARTRealtimeHistoryQuery alloc] init];
+    query.untilAttach = YES;
+    [channel history:query callback:^(ARTPaginatedResult&lt;ARTMessage *&gt; *resultPage, NSError *error) {
+        ARTMessage *lastMessage = resultPage.items[0];
+        NSLog(@"Last message: %@ - %@", lastMessage.id,lastMessage.data);
+    } error:nil];
+}];</code></pre>
+<pre lang="swift"><code lang="swift">let realtime = ARTRealtime(key: "{{API_KEY}}")
+let channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}")
+channel.attach()
+channel.on(.Attached) { error in
+    let query = ARTRealtimeHistoryQuery()
+    query.untilAttach = true
+    try! channel.history(query) { resultPage, error in
+        let lastMessage = resultPage!.items[0] as! ARTMessage
+        print("Last message before attach: \(lastMessage.id) - \(lastMessage.data)")
+    }
+}</code></pre>
 <h1>API reference</h1>
 <div class="inline-toc">
 <ul><li>History API
@@ -180,12 +226,12 @@ Related types
 <h3>Methods</h3>
 <h6 id="channel-history">history</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>history(Object option, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#message">Message</a>&gt; resultPage))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> history(Hash option) &#8594; yields <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#message">Message</a>&gt;</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#message">Message</a>&gt; history(<a href="#param">Param</a>[] option)</span></p>
+<p class="definition"><span lang='default'>history(Object option, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#message">Message</a>&gt; resultPage))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> history(Hash option) &#8594; yields <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#message">Message</a>&gt;</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#message">Message</a>&gt; history(<a href="#param">Param</a>[] option)</span><span lang='objc,swift'>history(query: ARTRealtimeHistoryQuery?, callback: (<a href="#paginated-result">ARTPaginatedResult</a>&lt;<a href="#message">ARTMessage</a>&gt;?, NSError?) &#8594; Void) throws</span></p>
 </blockquote>
 <p>Gets a <a href="#paginated-result">paginated</a> set of historical messages for this channel.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><span lang="default">option</span><span lang="java"><a href="#param">Param</a>[] option</span></dt>
+	<dt><span lang="default">option</span><span lang="objc,swift">query</span><span lang="java"><a href="#param">Param</a>[] option</span></dt>
 	<dd><span lang="default">an optional object containing the query parameters</span><span lang="ruby">an optional set of key value pairs containing the query parameters</span>, as specified below.</dd>
 </dl>
 <dl>
@@ -193,8 +239,10 @@ Related types
 	<dd>is a function of the form: <code>function(err, resultPage)</code></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>yields a <code>PaginatedResult&lt;Message&gt;</code> array</dd>
+	<dt><div lang="swift,objc">callback</div></dt>
+	<dd>called with a <a href="#paginated-result">ARTPaginatedResult</a>&lt;<a href="#message">ARTMessage</a>&gt; object or an error</dd>
 </dl>
-<h4><code>options</code> parameters</h4>
+<h4><span lang="default"><code>options</code> parameters</span><span lang="objc,swift"><code>ARTRealtimeHistoryQuery</code> properties</span></h4>
 <dl>
 	<dt><span lang="ruby">:</span>start</dt>
 	<dd><em>beginning of time</em> earliest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any message retrieved<br><i>Type: Long<span lang="ruby">, Time</span></i></dd>
@@ -209,12 +257,12 @@ Related types
 </dl>
 
 
-<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<div lang="javascript,nodejs,,objc,swift"> <!-- start javascript,nodejs,,objc,swift language block -->
 <h4>Callback result</h4>
 <p>On success, <code>resultPage</code> contains a <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulating an array of <a href="#message"><code>Message</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next()</code></a> and <a href="#paginated-result"><code>first()</code></a> methods.</p>
 <p>On failure to retrieve message history, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with the failure reason.</p>
 
-</div> <!-- /end javascript,nodejs language block -->
+</div> <!-- /end javascript,nodejs,,objc,swift language block -->
 
 
 
@@ -240,12 +288,12 @@ Related types
 <h3>Methods</h3>
 <h6 id="presence-history">history</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>history(Object option, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; resultPage))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> history(Hash option) &#8594; yields <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt;</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(<a href="#param">Param</a>[] option)</span></p>
+<p class="definition"><span lang='default'>history(Object option, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; resultPage))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> history(Hash option) &#8594; yields <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt;</span><span lang='java'>public <a href="#paginated-result">PaginatedResult</a>&lt;<a href="#presence-message">PresenceMessage</a>&gt; history(<a href="#param">Param</a>[] option)</span><span lang='objc,swift'>history(query: ARTRealtimeHistoryQuery?, callback: (<a href="#paginated-result">ARTPaginatedResult</a>&lt;<a href="#presence-message">ARTPresenceMessage</a>&gt;?, NSError?) &#8594; Void) throws</span></p>
 </blockquote>
 <p>Gets a <a href="#paginated-result">paginated</a> set of historical presence events for this channel.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><span lang="default">option</span><span lang="java"><a href="#param">Param</a>[] option</span></dt>
+	<dt><span lang="default">option</span><span lang="objc,swift">query</span><span lang="java"><a href="#param">Param</a>[] option</span></dt>
 	<dd><span lang="default">an optional object containing the query parameters</span><span lang="ruby">an optional set of key value pairs containing the query parameters</span>, as specified below.</dd>
 </dl>
 <dl>
@@ -253,8 +301,10 @@ Related types
 	<dd>is a function of the form: <code>function(err, resultPage)</code></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>yields a <code>PaginatedResult&lt;PresenceMessage&gt;</code> array</dd>
+	<dt><div lang="swift,objc">callback</div></dt>
+	<dd>called with a <a href="#paginated-result">ARTPaginatedResult</a>&lt;<a href="#presence-message">ARTPresenceMessage</a>&gt; object or an error</dd>
 </dl>
-<h4><code>options</code> parameters</h4>
+<h4><span lang="default"><code>options</code> parameters</span><span lang="objc,swift"><code>ARTRealtimeHistoryQuery</code> properties</span></h4>
 <dl>
 	<dt><span lang="ruby">:</span>start</dt>
 	<dd><em>beginning of time</em> earliest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any presence event retrieved<br><i>Type: Long<span lang="ruby">, Time</span></i></dd>
@@ -269,12 +319,12 @@ Related types
 </dl>
 
 
-<div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
+<div lang="javascript,nodejs,,objc,swift"> <!-- start javascript,nodejs,,objc,swift language block -->
 <h4>Callback result</h4>
 <p>On success, <code>resultPage</code> contains a <a href="#paginated-result"><code>PaginatedResult</code></a> encapsulating an array of <a href="#presence-message"><code>PresenceMessage</code></a> objects corresponding to the current page of results. <a href="#paginated-result"><code>PaginatedResult</code></a> supports pagination using <a href="#paginated-result"><code>next()</code></a> and <a href="#paginated-result"><code>first()</code></a> methods.</p>
 <p>On failure to retrieve presence event history, <code>err</code> contains an <a href="#error-info"><code>ErrorInfo</code></a> object with the failure reason.</p>
 
-</div> <!-- /end javascript,nodejs language block -->
+</div> <!-- /end javascript,nodejs,,objc,swift language block -->
 
 
 
@@ -296,7 +346,7 @@ Related types
 </div> <!-- /end ruby language block -->
 
 <h2 id="related-types">Related types</h2>
-<h3 id="message"><span lang='default'>Message</span><span lang='ruby'>Ably::Models::Message Enum</span><span lang='java'>io.ably.lib.types.Message</span></h3>
+<h3 id="message"><span lang='default'>Message</span><span lang='swift,objc'>ARTMessage</span><span lang='ruby'>Ably::Models::Message Enum</span><span lang='java'>io.ably.lib.types.Message</span></h3>
 <p>A <code>Message</code> represents an individual message that is sent to or received from Ably.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
@@ -310,6 +360,12 @@ Related types
 	<dd>The message payload, if provided<br><i>Type: String, ByteArray, JSONObject, JSONArray</i></dd>
 	<dt><div lang="ruby"><code>data</code></div></dt>
 	<dd>The message payload, if provided<br><i>Type: String, Binary (ASCII-8BIT String), Hash, Array</i></dd>
+	<dt><div lang="php"><code>data</code></div></dt>
+	<dd>The message payload, if provided<br><i>Type: String, Binary (Byte Array), Associative Array, Array</i></dd>
+	<dt><div lang="objc"><code>data</code></div></dt>
+	<dd>The message payload, if provided<br><i>Type: NSString *, NSData *, NSDictionary *, NSArray *</i></dd>
+	<dt><div lang="swift"><code>data</code></div></dt>
+	<dd>The message payload, if provided<br><i>Type: String, NSData, Dictionary, Array</i></dd>
 </dl>
 <dl>
 	<dt><code>id</code></dt>
@@ -325,13 +381,13 @@ Related types
 </dl>
 <dl>
 	<dt><code>timestamp</code></dt>
-	<dd>Timestamp when the presence update was received by the Ably the realtime service, as milliseconds since the epoch<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+	<dd>Timestamp when the presence update was received by the Ably the realtime service, as <span lang="default">milliseconds since the epoch</span><span lang="ruby">a <code>Time</code> object</span><br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span><span lang="objc,swift">NSDate</span></i></dd>
 </dl>
 <dl>
 	<dt><code>encoding</code></dt>
 	<dd>This will typically be empty as all messages received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: String</i></dd>
 </dl>
-<h3 id="presence-message"><span lang='default'>PresenceMessage</span><span lang='ruby'>Ably::Models::PresenceMessage Enum</span><span lang='java'>io.ably.lib.types.PresenceMessage</span></h3>
+<h3 id="presence-message"><span lang='default'>PresenceMessage</span><span lang='swift,objc'>ARTPresenceMessage</span><span lang='ruby'>Ably::Models::PresenceMessage Enum</span><span lang='java'>io.ably.lib.types.PresenceMessage</span></h3>
 <p>A <code>PresenceMessage</code> represents an individual presence update that is sent to or received from Ably.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
@@ -341,6 +397,8 @@ Related types
 	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>Presence action</code></a><br><i>Type: Integer value for Action { &#8220;ABSENT&#8221; : 0, &#8220;PRESENT&#8221; : 1, &#8220;ENTER&#8221; : 2, &#8220;LEAVE&#8221; : 3, &#8220;UPDATE&#8221; : 4 }</i></dd>
 	<dt><div lang="ruby"><code>action</code></div></dt>
 	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: enum ACTION { :absent, :present, :enter, :leave, :update }</i></dd>
+	<dt><div lang="objc,swift"><code>action</code></div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage.action</code></a><br><i>Type: ARTPresenceAction</i></dd>
 </dl>
 <dl>
 	<dt><div lang="java"><code>data</code></div></dt>
@@ -349,6 +407,10 @@ Related types
 	<dd>The presence update payload, if provided<br><i>Type: String, StringBuffer, JSON Object</i></dd>
 	<dt><div lang="ruby"><code>data</code></div></dt>
 	<dd>The presence update payload, if provided<br><i>Type: String, Binary (ASCII-8BIT String), Hash, Array</i></dd>
+	<dt><div lang="swift"><code>data</code></div></dt>
+	<dd>The message payload, if provided<br><i>Type: String, NSData, Dictionary, Array</i></dd>
+	<dt><div lang="objc"><code>data</code></div></dt>
+	<dd>The message payload, if provided<br><i>Type: NSString *, NSData *, NSDictionary *, NSArray *</i></dd>
 </dl>
 <dl>
 	<dt><code>id</code></dt>
@@ -364,13 +426,13 @@ Related types
 </dl>
 <dl>
 	<dt><code>timestamp</code></dt>
-	<dd>Timestamp when the presence update was received by the Ably the realtime service, as milliseconds since the epoch<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+	<dd>Timestamp when the presence update was received by the Ably the realtime service, as milliseconds since the epoch<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span><span lang="objc,swift">NSDate</span></i></dd>
 </dl>
 <dl>
 	<dt><code>encoding</code></dt>
 	<dd>This will typically be empty as all presence updates received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: String</i></dd>
 </dl>
-<h3 id="presence-action"><span lang='default'>Presence action</span><span lang='java'>io.ably.lib.types.PresenceMessage.Action</span><span lang='ruby'>Ably::Models::PresenceMessage::ACTION</span></h3>
+<h3 id="presence-action"><span lang='default'>Presence action</span><span lang='swift,objc'>ARTPresenceAction</span><span lang='java'>io.ably.lib.types.PresenceMessage.Action</span><span lang='ruby'>Ably::Models::PresenceMessage::ACTION</span></h3>
 
 
 <div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
@@ -427,7 +489,30 @@ Ably::Models::PresenceMessage::ACTION.Enter == :enter # =&gt; true</code></pre>
 
 </div> <!-- /end ruby language block -->
 
-<h3 id="paginated-result"><span lang='default'>PaginatedResult</span><span lang='ruby'>Ably::Models::PaginatedResult</span><span lang='java'>io.ably.lib.types.PaginatedResult</span></h3>
+
+
+<div lang="objc,swift"> <!-- start objc,swift language block -->
+<p><code>ARTPresenceAction</code> is an enum representing all the <a href="/realtime/presence#presence-states"><code>Realtime Presence</code> states &amp; events</a>.</p>
+<pre lang="objc"><code lang="objc">typedef NS_ENUM(NSUInteger, ARTPresenceAction) {
+    ARTPresenceAbsent,
+    ARTPresencePresent,
+    ARTPresenceEnter,
+    ARTPresenceLeave,
+    ARTPresenceUpdate,
+    ARTPresenceLast
+};</code></pre>
+<pre lang="swift"><code lang="swift">enum ARTPresenceAction : UInt {
+  case Absent
+  case Present
+  case Enter
+  case Leave
+  case Update
+  case Last
+}</code></pre>
+
+</div> <!-- /end objc,swift language block -->
+
+<h3 id="paginated-result"><span lang='default'>PaginatedResult</span><span lang='swift,objc'>ARTPaginatedResult</span><span lang='ruby'>Ably::Models::PaginatedResult</span><span lang='java'>io.ably.lib.types.PaginatedResult</span></h3>
 <p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">Ably REST API paginated query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
@@ -439,29 +524,33 @@ Ably::Models::PresenceMessage::ACTION.Enter == :enter # =&gt; true</code></pre>
 	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
 	<dt><div lang="ruby"><code>last?</code></div></dt>
 	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
+	<dt><div lang="php"><code>isLast()</code></div></dt>
+	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
 </dl>
 <dl>
 	<dt><div lang="default"><code>hasNext</code></div></dt>
 	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
 	<dt><div lang="ruby"><code>has_next?</code></div></dt>
 	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
+	<dt><div lang="php"><code>hasNext()</code></div></dt>
+	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
 </dl>
 <h4>Methods</h4>
 <h6>first</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>first(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))</span><span lang='ruby'><a href="/realtime/types#paginated-result">PaginatedResult</a> first</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a> first()</span></p>
+<p class="definition"><span lang='default'>first(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))</span><span lang='ruby'><a href="/realtime/types#paginated-result">PaginatedResult</a> first</span><span lang='php'><a href="/realtime/types#paginated-result">PaginatedResult</a> first()</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a> first()</span><span lang='swift,objc'>first(callback: (ARTPaginatedResult?, NSError?) &#8594; Void)</span></p>
 </blockquote>
-<p>Returns a new <code>PaginatedResult</code> for the first page of results. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</p>
+<p>Returns a new <code>PaginatedResult</code> for the first page of results. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</span></p>
 <h6>items</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>Object[] items()</span><span lang='ruby'>Object[] items</span><span lang='java'>public Object[] items()</span></p>
+<p class="definition"><span lang='default'>Object[] items()</span><span lang='ruby'>Object[] items</span><span lang='php'>Object[] items()</span><span lang='java'>public Object[] items()</span><span lang='swift, objc'>items: [AnyObject]</span></p>
 </blockquote>
 <p>Returns the current page of results as an Array. The type of the objects in the Array is determined by the operation that provided the <code>PaginatedResult</code>. For example, a <a href="/realtime/channels-messages#history">Message#history</a> request will return an array of <code>Message</code> objects.</p>
 <h6>next</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>next(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))</span><span lang='ruby'><a href="/realtime/types#paginated-result">PaginatedResult</a> next</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a> next()</span></p>
+<p class="definition"><span lang='default'>next(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="/realtime/types#paginated-result">PaginatedResult</a> resultPage))</span><span lang='ruby'><a href="/realtime/types#paginated-result">PaginatedResult</a> next</span><span lang='php'><a href="/realtime/types#paginated-result">PaginatedResult</a> next()</span><span lang='java'>public <a href="/realtime/types#paginated-result">PaginatedResult</a> next()</span><span lang='swift,objc'>next(callback: (ARTPaginatedResult?, NSError?) &#8594; Void)</span></p>
 </blockquote>
-<p>Returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <span lang="default"><code>null</code></span><span lang="java"><code>Null</code></span><span lang="ruby"><code>nil</code></span> is returned. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</p>
+<p>Returns a new <code>PaginatedResult</code> loaded with the next page of results. If there are no further pages, then <span lang="default"><code>null</code></span><span lang="java"><code>Null</code></span><span lang="ruby,objc,swift"><code>nil</code></span> is returned. <span lang="ruby">When using the Realtime library, the <code>first</code> method returns a <a href="/realtime/types#deferrable">Deferrable</a> and yields a <a href="/realtime/types#paginated-result">PaginatedResult</a>.</span></p>
 <h4>Example</h4>
 <pre lang="javascript"><code lang="javascript">channel.history(function(err, paginatedResult) {
   console.log('Page 0 item 0:' + paginatedResult.items[0].data);
@@ -503,6 +592,29 @@ channel.history do |first_page|
     end
   end
 end</code></pre>
+<pre lang="php"><code lang="php">$firstPage = $channel.history();
+echo("Page 0 item 0: " . $firstPage-&gt;items[0]-&gt;data);
+if ($firstPage-&gt;hasNext()) {
+  $nextPage = $firstPage-&gt;next();
+  echo("Page 1 item 1: " . $nextPage-&gt;items[1]-&gt;data);
+  echo("Last page?: " . $nextPage-&gt;isLast());
+}</code></pre>
+<pre lang="objc"><code lang="objc">[channel history:^(ARTPaginatedResult&lt;ARTMessage *&gt; *paginatedResult, NSError *error) {
+    NSLog(@"Page 0 item 0: %@", paginatedResult.items[0].data);
+    [paginatedResult next:^(ARTPaginatedResult&lt;ARTMessage *&gt; *nextPage, NSError *error) {
+        NSLog(@"Page 1 item 1: %@", nextPage.items[1].data);
+        NSLog(@"Last page?: %d", nextPage.isLast);
+    }];
+}];</code></pre>
+<pre lang="swift"><code lang="swift">channel.history { paginatedResult, error in
+    let paginatedResult = paginatedResult!
+    print("Page 0 item 0: \((paginatedResult.items[0] as! ARTMessage).data)")
+    paginatedResult.next { nextPage, error in
+        let nextPage = nextPage!
+        print("Page 0 item 0: \((nextPage.items[1] as! ARTMessage).data)")
+        print("Last page? \(nextPage.isLast)")
+    }
+}</code></pre>
 <h3 id="param"><span lang='java'>io.ably.lib.types.Param</span></h3>
 
 

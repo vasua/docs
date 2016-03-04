@@ -202,9 +202,9 @@ ably.requestToken({ clientId: 'client@example.com' }, function(err, token) {
 	<dt><code>token</code></dt>
 	<dd>The token itself. A typical token string may appear like <code>{{TOKEN}}</code><br><i>Type: String</i></dd>
 	<dt><code>expires</code></dt>
-	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby">The time</span> at which this token expires<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby,objc,swift">The time</span> at which this token expires<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span><span lang="objc,swift">NSDate</span></i></dd>
 	<dt><code>issued</code></dt>
-	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby">The time</span> at which this token was issued<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
+	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby,objc,swift">The time</span> at which this token was issued<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span><span lang="objc,swift">NSDate</span></i></dd>
 	<dt><code>capability</code></dt>
 	<dd>The capability associated with this token. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/general/authentication/#capabilities-explained">Read more about authentication and capabilities</a><br><i>Type: String</i></dd>
 	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span></dt>

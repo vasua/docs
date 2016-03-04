@@ -72,10 +72,20 @@
 
 
 <div lang="python"> <!-- start python language block -->
-<p>The Ably library is installable from PyPI as follows:</p>
-<pre lang="text"><code lang="text">pip install ably</code></pre>
+<p>The Ably library is installable from <a href="https://pypi.python.org/pypi">PyPI</a> as follows:</p>
+<pre lang="sh"><code lang="sh">pip install ably</code></pre>
 
 </div> <!-- /end python language block -->
+
+
+
+<div lang="php"> <!-- start php language block -->
+<p>The Ably library is available as a <a href="https://packagist.org/packages/ably/ably-php">composer package on packagist</a> and can be installed as follows:</p>
+<pre lang="sh"><code lang="sh">composer require ably/ably-php --update-no-dev</code></pre>
+<p>Then simply require composer&#8217;s autoloader:</p>
+<pre lang="php"><code lang="php">require_once __DIR__ . '/../vendor/autoload.php';</code></pre>
+
+</div> <!-- /end php language block -->
 
 
 
@@ -191,8 +201,8 @@ channel.publish('greeting', 'hello!');</code></pre>
 channel.publish('greeting', 'hello!')</code></pre>
 <pre lang="ruby"><code lang="ruby">channel = ably.channels.get('quickstart')
 channel.publish 'greeting', 'hello!'</code></pre>
-<pre lang="php"><code lang="php">$channel = $ably.channels.get('quickstart');
-$channel.publish('greeting', 'hello!');</code></pre>
+<pre lang="php"><code lang="php">$channel = $ably-&gt;channels-&gt;get('quickstart');
+$channel-&gt;publish('greeting', 'hello!');</code></pre>
 <pre lang="swift"><code lang="swift">let channel = ably.channels.get("quickstart")
 channel.publish("greeting", data: "hello!")</code></pre>
 <pre lang="objc"><code lang="objc">ARTRealtimeChannel *channel = [ably.channels get:@"quickstart"];

@@ -100,6 +100,32 @@ h4. Example usage
     Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true<br />
   ```</li>
 </ol>
+<p>blang[objc,swift].<br />
+  <code>ARTRealtimeConnectionState</code> is an enum representing all the <a href="/realtime/connection#connection-states"><code>Realtime Connection</code> states</a>.</p>
+```[objc]
+typedef NS_ENUM(NSUInteger, ARTRealtimeConnectionState) {
+ARTRealtimeInitialized,
+ARTRealtimeConnecting,
+ARTRealtimeConnected,
+ARTRealtimeDisconnected,
+ARTRealtimeSuspended,
+ARTRealtimeClosing,
+ARTRealtimeClosed,
+ARTRealtimeFailed
+};
+```
+```[swift]
+public enum ARTRealtimeConnectionState : UInt {
+case Initialized
+case Connecting
+case Connected
+case Disconnected
+case Suspended
+case Closing
+case Closed
+case Failed
+}
+```
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/images/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>

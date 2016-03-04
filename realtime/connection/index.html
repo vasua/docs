@@ -96,6 +96,14 @@ ably.connection.on('connected', new ConnectionStateListener() {
     System.out.println("Connected, that was easy");
   }
 });</code></pre>
+<pre lang="objc"><code lang="objc">ARTRealtime *ably = [[ARTRealtime alloc] initWithKey:@"{{API_KEY}}"];
+[ably.connection on:ARTRealtimeConnected call:^(ARTConnectionStateChange *change) {
+    NSLog(@"Connected, that was easy");
+}];</code></pre>
+<pre lang="swift"><code lang="swift">let realtime = ARTRealtime(key: "{{API_KEY}}")
+realtime.connection.on(.Connected) { change in
+    print("Connected, that was easy")
+}</code></pre>
 <h2 id="connection-state-explained">Connection state explained</h2>
 <p>Although connection state is temporary, the Ably protocol provides continuity of message delivery between the client and the service, provided that a dropped connection is reestablished by the client within a limited interval (typically around 2 minutes). Beyond that, the connection becomes stale and the system will not attempt to recover the connection state. The lifecycle of a connection, and the strategy for reconnecting on failure, reflect the transient nature of the connection state.</p>
 <p>The client library is responsible for managing the connection; this includes selecting a transport (in those environments supporting multiple transports), selecting a host to connect to (automatically falling back to an alternate data centre host if the closest data centre is unreachable), and managing continuity of operation when the connection drops.</p>
@@ -242,6 +250,50 @@ realtime.connection.off</code></pre>
 
 </div> <!-- /end ruby language block -->
 
+
+
+<div lang="objc"> <!-- start objc language block -->
+<pre lang="objc"><code lang="objc">ARTEventListener *listener = [realtime.connection on:ARTRealtimeConnected call:^(ARTConnectionStateChange *change) {
+    NSLog(@"Ably is connected");
+}];</code></pre>
+<p>Alternatively a listener may be registered so that it receives all state change events.</p>
+<pre lang="objc"><code lang="objc">ARTEventListener *listener = [realtime.connection on:^(ARTConnectionStateChange *change) {
+    NSLog(@"New connection state is %lu", (unsigned long)change.current);
+}];</code></pre>
+<p>Previously registered listeners can be removed individually or all together.</p>
+<pre lang="objc"><code lang="objc">// remove a listener registered for a single event
+[realtime.connection off:ARTRealtimeConnected listener:listener];
+
+// remove a listener registered for all events
+[realtime.connection off:listener];
+
+// remove all event listeners
+[realtime.connection off];</code></pre>
+
+</div> <!-- /end objc language block -->
+
+
+
+<div lang="swift"> <!-- start swift language block -->
+<pre lang="swift"><code lang="swift">let listener = realtime.connection.on(.Connected) { change in
+    print("Ably is connected")
+}</code></pre>
+<p>Alternatively a listener may be registered so that it receives all state change events.</p>
+<pre lang="swift"><code lang="swift">let listener = realtime.connection.on { change in
+    print("New connection state is \(change!.current)")
+}</code></pre>
+<p>Previously registered listeners can be removed individually or all together.</p>
+<pre lang="swift"><code lang="swift">// remove a listener registered for a single event
+realtime.connection.off(.Connected, listener: listener)
+
+// remove a listener registered for all events
+realtime.connection.off(listener)
+
+// remove all event listeners
+realtime.connection.off()</code></pre>
+
+</div> <!-- /end swift language block -->
+
 <h3 id="connection-state-recovery">Connection state recovery</h3>
 <p>The Ably system preserves connection state to allow connections to continue transparently across brief disconnections. The connection state that is tracked includes the messages sent to the client on the connection, members present on a channel and the set of channels that the client is attached to.</p>
 <p>There are two modes of connection state recovery:</p>
@@ -303,12 +355,12 @@ Related types
 </li>
 </ul>
 </li></ul>
-</div><h2 id="properties"><span lang='default'>Connection Properties</span><span lang='ruby'>Ably::Realtime::Connection Attributes</span><span lang='java'>io.ably.lib.realtime.Connection Members</span></h2>
+</div><h2 id="properties"><span lang='default'>Connection Properties</span><span lang='swift,objct'>ARTConnection Properties</span><span lang='ruby'>Ably::Realtime::Connection Attributes</span><span lang='java'>io.ably.lib.realtime.Connection Members</span></h2>
 <p>The <code>Connection</code> object exposes the following public <span lang="default">properties</span><span lang="ruby">attributes</span><span lang="java">members</span>:</p>
 <h6 id="id">id</h6>
 <p>A unique public identifier <code>String</code> for this connection, used to identify this member in presence events and messages.</p>
 <h6 id="state">state</h6>
-<p>The current <span lang="java"><a href="#connection-state"><code>io.ably.lib.realtime.ConnectionState</code></a> <code>state</code></span><span lang="ruby"><a href="#connection-state"><code>Ably::Realtime::Connection::STATE</code></a> <code>state</code></span><span lang="default"><code>state String</code></span> of this Connection. See the <a href="#connection-states"><code>Connection</code> states</a> for more information.</p>
+<p>The current <span lang="java"><a href="#connection-state"><code>io.ably.lib.realtime.ConnectionState</code></a> <code>state</code></span><span lang="ruby"><a href="#connection-state"><code>Ably::Realtime::Connection::STATE</code></a> <code>state</code></span><span lang="objc,swift"><a href="#connection-state"><code>ARTRealtimeConnectionState</code></a> <code>state</code></span><span lang="default"><code>state String</code></span> of this Connection. See the <a href="#connection-states"><code>Connection</code> states</a> for more information.</p>
 <h6 id="error-reason"><span lang='default'>errorReason</span><span lang='java'>reason</span><span lang='ruby'>error_reason</span></h6>
 <p>When a connection failure occurs this <span lang="default,ruby">attribute</span><span lang="java">member</span><span lang="javascript,nodejs">property</span> contains the <span lang="javascript,nodejs"><a href="/realtime/types#error-info"><code>ErrorInfo</code></a></span><span lang="java,ruby"><a href="/realtime/types#ably-exception"><code>AblyException</code></a></span>.</p>
 <h6 id="key">key</h6>
@@ -317,12 +369,12 @@ Related types
 <p>The recovery key <code>String</code> can be used by another client to recover this connection&#8217;s state in the <code>recover</code> <a href="/realtime/usage#client-options">client options</a> <span lang="default">property</span><span lang="java">member</span><span lang="ruby">attribute</span>. See <a href="#connection-state-recover-options">connection state recover options</a> for more information.</p>
 <h6 id="serial">serial</h6>
 <p>The serial number <code>Integer</code> of the last message to be received on this connection, used automatically by the library when recovering or resuming a connection. When recovering a connection explicitly, the <span lang="default"><code>recoveryKey</code></span><span lang="ruby"><code>recovery_key</code></span> is used in the <code>recover</code> <a href="/realtime/usage#client-options">client options</a> as it contains both the <code>key</code> and the last message <code>serial</code>.</p>
-<h2 id="methods"><span lang='default'>Connection Methods</span><span lang='ruby'>Ably::Realtime::Connection Methods</span><span lang='java'>io.ably.lib.realtime.Connection Methods</span></h2>
+<h2 id="methods"><span lang='default'>Connection Methods</span><span lang='swift,objc'>ARTConnection Methods</span><span lang='ruby'>Ably::Realtime::Connection Methods</span><span lang='java'>io.ably.lib.realtime.Connection Methods</span></h2>
 <h6 id="connect">connect</h6>
 <blockquote class="definition">
 <p class="definition"><span lang='default'>connect()</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> connect &#8594; yields <a href="/realtime/connection"><code>Connection</code></a></span><span lang='java'>public void connect()</span></p>
 </blockquote>
-<p>Explicitly calling <code>connect</code> is unnecessary unless the <a href="#client-option"><code>ClientOption</code></a> <span lang="default"><code>connectAutomatically</code></span><span lang="ruby"><code>connect_automatically</code></span> is disabled. Unless already <code>connected</code> or <code>connecting</code>, this method causes the connection to open, entering the <code>connecting</code> state.</p>
+<p>Explicitly calling <code>connect</code> is unnecessary unless the <a href="#client-option"><code>ClientOption</code></a> <span lang="default"><code>autoConnect</code></span><span lang="ruby"><code>auto_connect</code></span> is disabled. Unless already <code>connected</code> or <code>connecting</code>, this method causes the connection to open, entering the <code>connecting</code> state.</p>
 
 
 <div lang="ruby"> <!-- start ruby language block -->
@@ -351,13 +403,13 @@ Related types
 <h6 id="on">on</h6>
 <p>There are two overloaded versions of this method:</p>
 <blockquote class="definition" id="on-state-listener">
-<p class="definition" id="on-state-listener"><span lang='default'>on(String state, listener(<a href="#connection-state-change">ConnectionStateChange</a> stateChange))</span><span lang='ruby'>on(<a href="#connection-state">ConnectionState</a> *state) &#8594; yields <a href="#connection-state-change">ConnectionStateChange</a></span><span lang='java'>public void on(<a href="#connection-state">ConnectionState</a> state, <a href="#connection-state-listener">ConnectionStateListener</a> listener)</span></p>
+<p class="definition" id="on-state-listener"><span lang='default'>on(String state, listener(<a href="#connection-state-change">ConnectionStateChange</a> stateChange))</span><span lang='ruby'>on(<a href="#connection-state">ConnectionState</a> *state) &#8594; yields <a href="#connection-state-change">ConnectionStateChange</a></span><span lang='java'>public void on(<a href="#connection-state">ConnectionState</a> state, <a href="#connection-state-listener">ConnectionStateListener</a> listener)</span><span lang='objc,swift'>on(event: <a href="#connection-state">ARTRealtimeConnectionState</a>, call: (<a href="#connection-state-change">ARTConnectionStateChange</a>?) &#8594; Void) &#8594; ARTEventListener</span></p>
 </blockquote>
-<p>Register the given listener <span lang="ruby">block</span> for the specified <a href="#connection-state">ConnectionState</a> <span lang="default"><code>state</code></span><span lang="ruby"><code>state(s)</code></span><span lang="java"><code>state</code></span> changes on the <code>Connection</code>. The listener is passed a <a href="#connection-state-change">ConnectionStateChange</a> object that contains the current state, previous state, and an optional reason for the state change.</span></p>
+<p>Register the given listener <span lang="ruby">block</span><span lang="swift,objc">function</span> for the specified <a href="#connection-state">ConnectionState</a> <span lang="default"><code>state</code></span><span lang="ruby"><code>state(s)</code></span><span lang="java"><code>state</code></span> changes on the <code>Connection</code>. The listener is passed a <a href="#connection-state-change">ConnectionStateChange</a> object that contains the current state, previous state, and an optional reason for the state change.</span></p>
 <blockquote class="definition" id="on-listener">
-<p class="definition" id="on-listener"><span lang='default'>on(listener(<a href="#connection-state-change">ConnectionStateChange</a> stateChange))</span><span lang='ruby'>on &#8594; yields <a href="#connection-state-change">ConnectionStateChange</a></span><span lang='java'>public void on(<a href="#connection-state-listener">ConnectionStateListener</a> listener)</span></p>
+<p class="definition" id="on-listener"><span lang='default'>on(listener(<a href="#connection-state-change">ConnectionStateChange</a> stateChange))</span><span lang='ruby'>on &#8594; yields <a href="#connection-state-change">ConnectionStateChange</a></span><span lang='java'>public void on(<a href="#connection-state-listener">ConnectionStateListener</a> listener)</span><span lang='objc,swift'>on(call: (<a href="#connection-state-change">ARTConnectionStateChange</a>?) &#8594; Void) &#8594; ARTEventListener</span></p>
 </blockquote>
-<p>Register the given listener <span lang="ruby">block</span> for all <a href="#connection-state">ConnectionState</a> changes on the <code>Connection</code>. The listener is passed a <a href="#connection-state-change">ConnectionStateChange</a> object that contains the current state, previous state, and an optional reason for the state change.</span></p>
+<p>Register the given listener <span lang="ruby">block</span><span lang="swift,objc">function</span> for all <a href="#connection-state">ConnectionState</a> changes on the <code>Connection</code>. The listener is passed a <a href="#connection-state-change">ConnectionStateChange</a> object that contains the current state, previous state, and an optional reason for the state change.</span></p>
 <h4>Parameters</h4>
 <dl>
 	<dt><div lang="javascript,nodejs">String state</div></dt>
@@ -366,6 +418,8 @@ Related types
 	<dd>the connection state to subscribe to</dd>
 	<dt><div lang="ruby"><a href="#connection-state">ConnectionState</a> state</div></dt>
 	<dd>the connection state as a Symbol such as <code>:connected</code> or <code>ConnectionState</code> object to subscribe to</dd>
+	<dt><div lang="swift,objc"><a href="#connection-state">ARTRealtimeConnectionState</a> state</div></dt>
+	<dd>the connection state to subscribe to</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">listener</div></dt>
@@ -374,17 +428,19 @@ Related types
 	<dd>listener to be notified for matching state changes</dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>listener block that is yielded to for matching state changes</dd>
+	<dt><div lang="swift,objc">call</div></dt>
+	<dd>called with matching state changes</dd>
 </dl>
 <h4>Example</h4>
 <p><a href="https://jsbin.ably.io:443/usuxex/1/edit?javascript,live" target="_blank">Browser <code>ConnectionState</code> change example</a></p>
 <h6 id="once">once</h6>
 <p>There are two overloaded versions of this method:</p>
 <blockquote class="definition" id="once-state-listener">
-<p class="definition" id="once-state-listener"><span lang='default'>once(String state, listener(<a href="#connection-state-change">ConnectionStateChange</a> stateChange))</span><span lang='ruby'>once(<a href="#connection-state">ConnectionState</a> *state) &#8594; yields <a href="#connection-state-change">ConnectionStateChange</a></span><span lang='java'>public void once(<a href="#connection-state">ConnectionState</a> state, <a href="#connection-state-listener">ConnectionStateListener</a> listener)</span></p>
+<p class="definition" id="once-state-listener"><span lang='default'>once(String state, listener(<a href="#connection-state-change">ConnectionStateChange</a> stateChange))</span><span lang='ruby'>once(<a href="#connection-state">ConnectionState</a> *state) &#8594; yields <a href="#connection-state-change">ConnectionStateChange</a></span><span lang='java'>public void once(<a href="#connection-state">ConnectionState</a> state, <a href="#connection-state-listener">ConnectionStateListener</a> listener)</span><span lang='objc,swift'>once(event: <a href="#connection-state">ARTRealtimeConnectionState</a>, call: (<a href="#connection-state-change">ARTConnectionStateChange</a>?) &#8594; Void) &#8594; ARTEventListener</span></p>
 </blockquote>
-<p>Register the given listener <span lang="ruby">block</span> for a single occurence of the specified <a href="#connection-state">ConnectionState</a> <span lang="default"><code>state</code></span><span lang="ruby"><code>state(s)</code></span><span lang="java"><code>state</code></span> change on the <code>Connection</code>. Once the listener has been called, it is removed as a registered listener and will not be called again. The listener is passed a <a href="#connection-state-change">ConnectionStateChange</a> object that contains the current state, previous state, and an optional reason for the state change.</p>
+<p>Register the given listener <span lang="ruby">block</span><span lang="swift,objc">function</span> for a single occurence of the specified <a href="#connection-state">ConnectionState</a> <span lang="default"><code>state</code></span><span lang="ruby"><code>state(s)</code></span><span lang="java"><code>state</code></span> change on the <code>Connection</code>. Once the listener has been called, it is removed as a registered listener and will not be called again. The listener is passed a <a href="#connection-state-change">ConnectionStateChange</a> object that contains the current state, previous state, and an optional reason for the state change.</p>
 <blockquote class="definition" id="once-listener">
-<p class="definition" id="once-listener"><span lang='default'>once(listener(<a href="#connection-state-change">ConnectionStateChange</a> stateChange))</span><span lang='ruby'>once &#8594; yields <a href="#connection-state-change">ConnectionStateChange</a></span><span lang='java'>public void once(<a href="#connection-state-listener">ConnectionStateListener</a> listener)</span></p>
+<p class="definition" id="once-listener"><span lang='default'>once(listener(<a href="#connection-state-change">ConnectionStateChange</a> stateChange))</span><span lang='ruby'>once &#8594; yields <a href="#connection-state-change">ConnectionStateChange</a></span><span lang='java'>public void once(<a href="#connection-state-listener">ConnectionStateListener</a> listener)</span><span lang='objc,swift'>once(call: (<a href="#connection-state-change">ARTConnectionStateChange</a>?) &#8594; Void) &#8594; ARTEventListener</span></p>
 </blockquote>
 <p>Register the given listener <span lang="ruby">block</span> for a single occurence of any <a href="#connection-state">ConnectionState</a> change on the <code>Connection</code>. Once the listener has been called, it is removed as a registered listener and will not be called again. The listener is passed a <a href="#connection-state-change">ConnectionStateChange</a> object that contains the current state, previous state, and an optional reason for the state change.</p>
 <h4>Parameters</h4>
@@ -395,6 +451,8 @@ Related types
 	<dd>the connection state to subscribe to</dd>
 	<dt><div lang="ruby"><a href="#connection-state">ConnectionState</a> state</div></dt>
 	<dd>the connection state as a Symbol such as <code>:connected</code> or <code>ConnectionState</code> object to subscribe to</dd>
+	<dt><div lang="swift,objc"><a href="#connection-state">ARTRealtimeConnectionState</a> state</div></dt>
+	<dd>the connection state to subscribe to</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">listener</div></dt>
@@ -403,15 +461,17 @@ Related types
 	<dd>listener to be notified for a single occurence of a matching state change</dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>listener block that is yielded to for a single occurence of a matching state change</dd>
+	<dt><div lang="swift,objc">call</div></dt>
+	<dd>called with matching state changes</dd>
 </dl>
 <h6 id="off">off</h6>
 <p>There are two overloaded versions of this method:</p>
 <blockquote class="definition" id="off-state-listener">
-<p class="definition" id="off-state-listener"><span lang='default'>off(String state, listener)</span><span lang='ruby'>off(<a href="#connection-state">ConnectionState</a> *state, &amp;block)</span><span lang='java'>public void off(<a href="#connection-state">ConnectionState</a> state, <a href="#connection-state-listener">ConnectionStateListener</a> listener)</span></p>
+<p class="definition" id="off-state-listener"><span lang='default'>off(String state, listener)</span><span lang='ruby'>off(<a href="#connection-state">ConnectionState</a> *state, &amp;block)</span><span lang='java'>public void off(<a href="#connection-state">ConnectionState</a> state, <a href="#connection-state-listener">ConnectionStateListener</a> listener)</span><span lang='objc,swift'>off(event: <a href="#connection-state">ARTRealtimeConnectionState</a>, listener: ARTEventListener)</span></p>
 </blockquote>
 <p>Remove the given listener <span lang="ruby">block</span> for the <a href="#connection-state">ConnectionState</a> <span lang="default"><code>state</code></span><span lang="ruby"><code>state(s)</code></span><span lang="java"><code>state</code></span>.</p>
 <blockquote class="definition" id="off-listener">
-<p class="definition" id="off-listener"><span lang='default'>off(listener)</span><span lang='ruby'>off(&amp;block)</span><span lang='java'>public void off(<a href="#connection-state-listener">ConnectionStateListener</a> listener)</span></p>
+<p class="definition" id="off-listener"><span lang='default'>off(listener)</span><span lang='ruby'>off(&amp;block)</span><span lang='java'>public void off(<a href="#connection-state-listener">ConnectionStateListener</a> listener)</span><span lang='objc,swift'>off(listener: ARTEventListener)</span></p>
 </blockquote>
 <p>Remove the given listener <span lang="ruby">block</span> for all <a href="#connection-state">ConnectionState</a> states.</p>
 <h4>Parameters</h4>
@@ -422,6 +482,8 @@ Related types
 	<dd>the connection state to unsubscribe from</dd>
 	<dt><div lang="ruby"><a href="#connection-state">ConnectionState</a> state</div></dt>
 	<dd>the connection state as a Symbol such as <code>:connected</code> or <code>ConnectionState</code> object to unsubscribe from</dd>
+	<dt><div lang="swift,objc">event</div></dt>
+	<dd>the connection state to unsubscribe from</dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">listener</div></dt>
@@ -430,10 +492,12 @@ Related types
 	<dd>is the listener to be removed</dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>is the listener block to be removed</dd>
+	<dt><div lang="swift,objc">listener</div></dt>
+	<dd>previous return value from a <code>on</code> or <code>once</code> call</dd>
 </dl>
 <h6 id="ping">ping</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>ping(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> ping &#8594; yields <code>Integer milliseconds</code></span><span lang='java'>public void ping(<a href="#completion-listener">CompletionListener</a> listener)</span></p>
+<p class="definition"><span lang='default'>ping(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> ping &#8594; yields <code>Integer milliseconds</code></span><span lang='java'>public void ping(<a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>ping(cb: (ARTErrorInfo?) &#8594; Void)</span></p>
 </blockquote>
 <p>When connected, sends a heartbeat ping to the Ably server and <span lang="default">executes the callback</span><span lang="java">calls the listener</span><span lang="ruby">yields the elapsed time in milliseconds</span> when a heartbeat ping request is echoed from the server. This can be useful for measuring true roundtrip latency to the connected Ably server.</p>
 
@@ -462,7 +526,7 @@ Related types
 
 </div> <!-- /end java language block -->
 
-<h3 id="connection-state"><span lang='default'>ConnectionState</span><span lang='ruby'>Connection::STATE Enum</span><span lang='java'>io.ably.lib.realtime.ConnectionState Enum</span></h3>
+<h3 id="connection-state"><span lang='default'>ConnectionState</span><span lang='swift,objc'>ARTRealtimeConnectionState</span><span lang='ruby'>Connection::STATE Enum</span><span lang='java'>io.ably.lib.realtime.ConnectionState Enum</span></h3>
 
 
 <div lang="javascript,nodejs"> <!-- start javascript,nodejs language block -->
@@ -531,6 +595,33 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 
 </div> <!-- /end ruby language block -->
 
+
+
+<div lang="objc,swift"> <!-- start objc,swift language block -->
+<p><code>ARTRealtimeConnectionState</code> is an enum representing all the <a href="/realtime/connection#connection-states"><code>Realtime Connection</code> states</a>.</p>
+<pre lang="objc"><code lang="objc">typedef NS_ENUM(NSUInteger, ARTRealtimeConnectionState) {
+    ARTRealtimeInitialized,
+    ARTRealtimeConnecting,
+    ARTRealtimeConnected,
+    ARTRealtimeDisconnected,
+    ARTRealtimeSuspended,
+    ARTRealtimeClosing,
+    ARTRealtimeClosed,
+    ARTRealtimeFailed
+};</code></pre>
+<pre lang="swift"><code lang="swift">public enum ARTRealtimeConnectionState : UInt {   
+    case Initialized
+    case Connecting
+    case Connected
+    case Disconnected
+    case Suspended
+    case Closing
+    case Closed
+    case Failed
+}</code></pre>
+
+</div> <!-- /end objc,swift language block -->
+
 <h3 id="connection-state-listener"><span lang='java'>io.ably.lib.realtime.ConnectionStateListener</span></h3>
 
 
@@ -543,8 +634,8 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 
 </div> <!-- /end java language block -->
 
-<h3 id="connection-state-change"><span lang='default'>ConnectionStateChange Object</span><span lang='java'>io.ably.lib.realtime.ConnectionStateListener.ConnectionStateChange</span><span lang='ruby'>ConnectionStateChange</span></h3>
-<p>A <span lang="java"><code>io.ably.lib.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="ruby"><code>Ably::Models::ConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by the <a href="/realtime/connection"><code>Connection</code></a> object. See <a href="/realtime/connection#on"><code>Connection#on</code></a> to register a listener for one or more events.</p>
+<h3 id="connection-state-change"><span lang='default'>ConnectionStateChange Object</span><span lang='default'>ARTConnectionStateChange</span><span lang='java'>io.ably.lib.realtime.ConnectionStateListener.ConnectionStateChange</span><span lang='ruby'>ConnectionStateChange</span></h3>
+<p>A <span lang="java"><code>io.ably.lib.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="ruby"><code>Ably::Models::ConnectionStateChange</code></span><span lang="swift,objc"><code>ARTConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by the <a href="/realtime/connection"><code>Connection</code></a> object. See <a href="/realtime/connection#on"><code>Connection#on</code></a> to register a listener for one or more events.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><code>previous</code></dt>
