@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -82,13 +84,13 @@
 <h3>Plaintext</h3>
 <p>Each possible data value type is canonically converted to a byte array before being encrypted, as follows:</p>
 <dl>
-	<dt><code>STRING</code></dt>
+	<dt>STRING</dt>
 	<dd>the utf8-encoding of the string, without any trailing null byte</dd>
-	<dt><code>BUFFER</code></dt>
+	<dt>BUFFER</dt>
 	<dd>the unmodified buffer contents</dd>
-	<dt><code>JSONOBJECT</code></dt>
+	<dt>JSONOBJECT</dt>
 	<dd>the utf8-encoding of the JSON-stringified value of the object</dd>
-	<dt><code>JSONARRAY</code></dt>
+	<dt>JSONARRAY</dt>
 	<dd>the utf8-encoding of the JSON-stringified value of the array</dd>
 </dl>
 <h3>Conversion to ciphertext</h3>

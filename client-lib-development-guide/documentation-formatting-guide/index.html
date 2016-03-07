@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -348,15 +350,21 @@ blang[ruby].
 <p>If you wish to add support for more languages, please refer to <code>/lib/documentation_languages.rb</code></p>
 <h2 id="definition-lists">Definition lists</h2>
 <p>Definition lists are used frequently to list out parameters to methods, object properties or return values.  They are prefixed and sufficed with a line break, and used as follows:</p>
-<pre lang="text"><code lang="text">- value := description
-- value 2 := _default description_ description</code></pre>
+<pre lang="text"><code lang="text">- value := description&lt;br&gt;__Type: @Type@__
+- value 2 := _default description_ description&lt;br&gt;__Type: @Type@__</code></pre>
 <p>and renders as:</p>
 <dl>
 	<dt>value</dt>
 	<dd>description</dd>
 	<dt>value 2</dt>
-	<dd><em>default description</em> description</dd>
+	<dd><em>default description</em> description<br><i>Type: <code>Type</code></i></dd>
 </dl>
+<p>Please note that:</p>
+<ul>
+	<li>The definition term (left hand part) is never <code>@code@</code> wrapped</li>
+	<li>Defaults are treated specially by placing <code>_default description_</code> at the start of the definition description (right hand part)</li>
+	<li>As a convention, types are placed after the definition description (right hand part) using the format <code>&lt;br&gt;</code><code>__Type: @Type@__</code></li>
+</ul>
 <p>Column headers for your definition lists can be specified on the first line by surrounding the definitions with an asterix.  For example:</p>
 <pre lang="text"><code lang="text">- *id heading* := *value heading*
 - id := description</code></pre>

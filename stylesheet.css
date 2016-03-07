@@ -290,6 +290,8 @@ hr.back {
           content: ""; }
     #documentation dl dd {
       margin: 5px 0 13px 190px;
+      /* Default value */
+      /* Type definition as last italicised item */
       /* code block within a dl using a <pre>@code@</pre> */
       /* title row for a defintion list */ }
       #documentation dl dd em {
@@ -307,6 +309,13 @@ hr.back {
           white-space: pre; }
         #documentation dl dd em code {
           background-color: transparent; }
+      #documentation dl dd i:last-child {
+        display: block;
+        color: #999;
+        font-style: normal;
+        text-alignt: right; }
+        #documentation dl dd i:last-child code {
+          color: #000; }
       #documentation dl dd pre:not([lang]) {
         border: none;
         background-color: transparent;

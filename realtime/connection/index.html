@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    <script type="text/javascript">window.NavLangs=["javascript","nodejs","ruby","java","swift","objc"];</script>
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -412,20 +414,20 @@ Related types
 <p>Register the given listener <span lang="ruby">block</span><span lang="swift,objc">function</span> for all <a href="#connection-state">ConnectionState</a> changes on the <code>Connection</code>. The listener is passed a <a href="#connection-state-change">ConnectionStateChange</a> object that contains the current state, previous state, and an optional reason for the state change.</span></p>
 <h4>Parameters</h4>
 <dl>
-	<dt><div lang="javascript,nodejs">String state</div></dt>
-	<dd>the connection state to subscribe to</dd>
-	<dt><div lang="java"><a href="#connection-state">ConnectionState</a> state</div></dt>
-	<dd>the connection state to subscribe to</dd>
-	<dt><div lang="ruby"><a href="#connection-state">ConnectionState</a> state</div></dt>
-	<dd>the connection state as a Symbol such as <code>:connected</code> or <code>ConnectionState</code> object to subscribe to</dd>
-	<dt><div lang="swift,objc"><a href="#connection-state">ARTRealtimeConnectionState</a> state</div></dt>
-	<dd>the connection state to subscribe to</dd>
+	<dt><div lang="javascript,nodejs">state</div></dt>
+	<dd>the connection state to subscribe to<br><i>Type: <code>String</code></i></dd>
+	<dt><div lang="java">state</div></dt>
+	<dd>the connection state to subscribe to<br><i>Type: <a href="#connection-state"><code>ConnectionState</code></a></i></dd>
+	<dt><div lang="ruby">state</div></dt>
+	<dd>the connection state as a Symbol such as <code>:connected</code> or <code>ConnectionState</code> object to subscribe to<br><i>Type: <a href="#connection-state"><code>ConnectionState</code></a></i></dd>
+	<dt><div lang="swift,objc">state</div></dt>
+	<dd>the connection state to subscribe to<br><i>Type: <a href="#connection-state"><code>ARTRealtimeConnectionState</code></a></i></dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">listener</div></dt>
 	<dd>is a function of the form <code>function(stateChange)</code> to be notified for matching state changes</dd>
-	<dt><div lang="java"><a href="#connection-state-listener">ConnectionStateListener</a> listener</div></dt>
-	<dd>listener to be notified for matching state changes</dd>
+	<dt><div lang="java">listener</div></dt>
+	<dd>listener to be notified for matching state changes<br><i>Type: <a href="#connection-state-listener"><code>ConnectionStateListener</code></a></i></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>listener block that is yielded to for matching state changes</dd>
 	<dt><div lang="swift,objc">call</div></dt>
@@ -445,20 +447,20 @@ Related types
 <p>Register the given listener <span lang="ruby">block</span> for a single occurence of any <a href="#connection-state">ConnectionState</a> change on the <code>Connection</code>. Once the listener has been called, it is removed as a registered listener and will not be called again. The listener is passed a <a href="#connection-state-change">ConnectionStateChange</a> object that contains the current state, previous state, and an optional reason for the state change.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><div lang="javascript,nodejs">String state</div></dt>
-	<dd>the connection state to subscribe to</dd>
-	<dt><div lang="java"><a href="#connection-state">ConnectionState</a> state</div></dt>
-	<dd>the connection state to subscribe to</dd>
-	<dt><div lang="ruby"><a href="#connection-state">ConnectionState</a> state</div></dt>
-	<dd>the connection state as a Symbol such as <code>:connected</code> or <code>ConnectionState</code> object to subscribe to</dd>
-	<dt><div lang="swift,objc"><a href="#connection-state">ARTRealtimeConnectionState</a> state</div></dt>
-	<dd>the connection state to subscribe to</dd>
+	<dt><div lang="javascript,nodejs">state</div></dt>
+	<dd>the connection state to subscribe to<br><i>Type: <code>String</code></i></dd>
+	<dt><div lang="java">state</div></dt>
+	<dd>the connection state to subscribe to<br><i>Type: <a href="#connection-state"><code>ConnectionState</code></a></i></dd>
+	<dt><div lang="ruby">state</div></dt>
+	<dd>the connection state as a Symbol such as <code>:connected</code> or <code>ConnectionState</code> object to subscribe to<br><i>Type: <a href="#connection-state"><code>ConnectionState</code></a></i></dd>
+	<dt><div lang="swift,objc">state</div></dt>
+	<dd>the connection state to subscribe to<br><i>Type: <a href="#connection-state"><code>ARTRealtimeConnectionState</code></a></i></dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">listener</div></dt>
 	<dd>is a function of the form <code>function(stateChange)</code> to be notified for a single occurence of a matching state change</dd>
-	<dt><div lang="java"><a href="#connection-state-listener">ConnectionStateListener</a> listener</div></dt>
-	<dd>listener to be notified for a single occurence of a matching state change</dd>
+	<dt><div lang="java">listener</div></dt>
+	<dd>listener to be notified for a single occurence of a matching state change<br><i>Type: <a href="#connection-state-listener"><code>ConnectionStateListener</code></a></i></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>listener block that is yielded to for a single occurence of a matching state change</dd>
 	<dt><div lang="swift,objc">call</div></dt>
@@ -476,20 +478,20 @@ Related types
 <p>Remove the given listener <span lang="ruby">block</span> for all <a href="#connection-state">ConnectionState</a> states.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><div lang="javascript,nodejs">String state</div></dt>
-	<dd>the connection state to unsubscribe from</dd>
-	<dt><div lang="java"><a href="#connection-state">ConnectionState</a> state</div></dt>
-	<dd>the connection state to unsubscribe from</dd>
-	<dt><div lang="ruby"><a href="#connection-state">ConnectionState</a> state</div></dt>
-	<dd>the connection state as a Symbol such as <code>:connected</code> or <code>ConnectionState</code> object to unsubscribe from</dd>
+	<dt><div lang="javascript,nodejs">state</div></dt>
+	<dd>the connection state to unsubscribe from<br><i>Type: <code>String</code></i></dd>
+	<dt><div lang="java">state</div></dt>
+	<dd>the connection state to unsubscribe from<br><i>Type: <a href="#connection-state"><code>ConnectionState</code></a></i></dd>
+	<dt><div lang="ruby">state</div></dt>
+	<dd>the connection state as a Symbol such as <code>:connected</code> or <code>ConnectionState</code> object to unsubscribe from<br><i>Type: <a href="#connection-state"><code>ConnectionState</code></a></i></dd>
 	<dt><div lang="swift,objc">event</div></dt>
-	<dd>the connection state to unsubscribe from</dd>
+	<dd>the connection state to unsubscribe from<br><i>Type: <a href="#connection-state"><code>ARTRealtimeConnectionState</code></a></i></dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">listener</div></dt>
 	<dd>is the listener function to be removed</dd>
-	<dt><div lang="java"><a href="#connection-state-listener">ConnectionStateListener</a> listener</div></dt>
-	<dd>is the listener to be removed</dd>
+	<dt><div lang="java">listener</div></dt>
+	<dd>is the listener to be removed<br><i>Type: <a href="#connection-state-listener"><code>ConnectionStateListener</code></a></i></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>is the listener block to be removed</dd>
 	<dt><div lang="swift,objc">listener</div></dt>
@@ -497,7 +499,7 @@ Related types
 </dl>
 <h6 id="ping">ping</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>ping(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> ping &#8594; yields <code>Integer milliseconds</code></span><span lang='java'>public void ping(<a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>ping(cb: (ARTErrorInfo?) &#8594; Void)</span></p>
+<p class="definition"><span lang='default'>ping(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> ping &#8594; yields <code>Integer milliseconds</code></span><span lang='java'>public void ping(<a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>ping(callback: (ARTErrorInfo?) &#8594; Void)</span></p>
 </blockquote>
 <p>When connected, sends a heartbeat ping to the Ably server and <span lang="default">executes the callback</span><span lang="java">calls the listener</span><span lang="ruby">yields the elapsed time in milliseconds</span> when a heartbeat ping request is echoed from the server. This can be useful for measuring true roundtrip latency to the connected Ably server.</p>
 
@@ -634,18 +636,18 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 
 </div> <!-- /end java language block -->
 
-<h3 id="connection-state-change"><span lang='default'>ConnectionStateChange Object</span><span lang='default'>ARTConnectionStateChange</span><span lang='java'>io.ably.lib.realtime.ConnectionStateListener.ConnectionStateChange</span><span lang='ruby'>ConnectionStateChange</span></h3>
+<h3 id="connection-state-change"><span lang='default'>ConnectionStateChange Object</span><span lang='objc,swift'>ARTConnectionStateChange</span><span lang='java'>io.ably.lib.realtime.ConnectionStateListener.ConnectionStateChange</span><span lang='ruby'>ConnectionStateChange</span></h3>
 <p>A <span lang="java"><code>io.ably.lib.realtime.ConnectionStateListener.ConnectionStateChange</code></span><span lang="ruby"><code>Ably::Models::ConnectionStateChange</code></span><span lang="swift,objc"><code>ARTConnectionStateChange</code></span><span lang="default"><code>ConnectionStateChange</code></span> is a type encapsulating state change information emitted by the <a href="/realtime/connection"><code>Connection</code></a> object. See <a href="/realtime/connection#on"><code>Connection#on</code></a> to register a listener for one or more events.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
-	<dt><code>previous</code></dt>
-	<dd>the previous state<br><i>Type: <span lang="default">String</span><span lang="ruby"><a href="/realtime/types#connection-state">Connection::STATE</a></span><span lang="java"><a href="/realtime/types#connection-state">ConnectionState</a></span></i></dd>
-	<dt><code>current</code></dt>
-	<dd>the new state<br><i>Type: <span lang="default">String</span><span lang="ruby"><a href="/realtime/types#connection-state">Connection::STATE</a></span><span lang="java"><a href="/realtime/types#connection-state">ConnectionState</a></span></i></dd>
-	<dt><code>reason</code></dt>
+	<dt>previous</dt>
+	<dd>the previous state<br><i>Type: <span lang="default"><a href="/realtime/types#connection-state">State <code>String</code></a></span><span lang="ruby"><a href="/realtime/types#connection-state"><code>Connection::STATE</code></a></span><span lang="java"><a href="/realtime/types#connection-state"><code>ConnectionState</code></a></span></i></dd>
+	<dt>current</dt>
+	<dd>the new state<br><i>Type: <span lang="default"><a href="/realtime/types#connection-state">State <code>String</code></a></span><span lang="ruby"><a href="/realtime/types#connection-state"><code>Connection::STATE</code></a></span><span lang="java"><a href="/realtime/types#connection-state"><code>ConnectionState</code></a></span></i></dd>
+	<dt>reason</dt>
 	<dd>an <a href="#error-info"><code>ErrorInfo</code></a> containing any information relating to the transition<br><i>Type: <a href="/realtime/types#error-info"><code>ErrorInfo</code></a></i></dd>
-	<dt><span lang="default"><code>retryIn</code></span><span lang="ruby"><code>retry_in</code></span></dt>
-	<dd>Duration upon which the library will retry a connection where applicable, as <span lang="default">milliseconds</span><span lang="ruby">seconds</span><br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Integer</span></i></dd>
+	<dt><span lang="default">retryIn</span><span lang="ruby">retry_in</span></dt>
+	<dd>Duration upon which the library will retry a connection where applicable, as <span lang="default">milliseconds</span><span lang="ruby">seconds</span><br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span></i></dd>
 </dl>
     </article>
     <hr class="back">

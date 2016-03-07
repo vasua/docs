@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -39,14 +41,14 @@
   java:    Members<br />
   ruby:    Attributes</p>
 <dl>
-	<dt><code>previous</code></dt>
-	<dd>the previous state<br><i>Type: <span lang="default">String</span><span lang="ruby"><a href="/realtime/types#connection-state">Connection::STATE</a></span><span lang="java"><a href="/realtime/types#connection-state">ConnectionState</a></span></i></dd>
-	<dt><code>current</code></dt>
-	<dd>the new state<br><i>Type: <span lang="default">String</span><span lang="ruby"><a href="/realtime/types#connection-state">Connection::STATE</a></span><span lang="java"><a href="/realtime/types#connection-state">ConnectionState</a></span></i></dd>
-	<dt><code>reason</code></dt>
+	<dt>previous</dt>
+	<dd>the previous state<br><i>Type: <span lang="default"><a href="/realtime/types#connection-state">State <code>String</code></a></span><span lang="ruby"><a href="/realtime/types#connection-state"><code>Connection::STATE</code></a></span><span lang="java"><a href="/realtime/types#connection-state"><code>ConnectionState</code></a></span></i></dd>
+	<dt>current</dt>
+	<dd>the new state<br><i>Type: <span lang="default"><a href="/realtime/types#connection-state">State <code>String</code></a></span><span lang="ruby"><a href="/realtime/types#connection-state"><code>Connection::STATE</code></a></span><span lang="java"><a href="/realtime/types#connection-state"><code>ConnectionState</code></a></span></i></dd>
+	<dt>reason</dt>
 	<dd>an <a href="#error-info"><code>ErrorInfo</code></a> containing any information relating to the transition<br><i>Type: <a href="/realtime/types#error-info"><code>ErrorInfo</code></a></i></dd>
-	<dt><span lang="default"><code>retryIn</code></span><span lang="ruby"><code>retry_in</code></span></dt>
-	<dd>Duration upon which the library will retry a connection where applicable, as <span lang="default">milliseconds</span><span lang="ruby">seconds</span><br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Integer</span></i></dd>
+	<dt><span lang="default">retryIn</span><span lang="ruby">retry_in</span></dt>
+	<dd>Duration upon which the library will retry a connection where applicable, as <span lang="default">milliseconds</span><span lang="ruby">seconds</span><br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span></i></dd>
 </dl>
   </div>
   <div id="sidebar">

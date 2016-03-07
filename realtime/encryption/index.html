@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    <script type="text/javascript">window.NavLangs=["javascript","nodejs","ruby","java","swift","objc"];</script>
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -263,8 +265,8 @@ let channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}", options: options)
 
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
-	<dt><span lang="default"><code>cipher</code></span><span lang="ruby"><code>:cipher</code></span></dt>
-	<dd>Requests encryption for this channel when not null, and specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#getting-started">an example</a><br><i>Type: <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a><span lang="javascript,nodejs,,java,ruby,php"> or <span lang="javascript,nodejs">an options object</span><span lang="java">a Param[] list</span><span lang="ruby">an options hash</span><span lang="php">an Associative Array</span> containing at a minimum a <code>key</code></span></i></dd>
+	<dt><span lang="default">cipher</span><span lang="ruby">:cipher</span></dt>
+	<dd>Requests encryption for this channel when not null, and specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#getting-started">an example</a><br><i>Type: <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a><span lang="javascript,nodejs,,java,ruby,php"> or <span lang="javascript,nodejs">an options object</span><span lang="java">a <code>Param[]</code> list</span><span lang="ruby">an options hash</span><span lang="php">an Associative Array</span> containing at a minimum a <code>key</code></span></i></dd>
 </dl>
 
 
@@ -295,15 +297,15 @@ let channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}", options: options)
 </dl>
 <dl>
 	<dt><span lang="ruby">:</span>algorithm</dt>
-	<dd><em>AES</em> The name of the algorithm in the default system provider, or the lower-cased version of it; eg &#8220;aes&#8221; or &#8220;AES&#8221;<br><i>Type: String</i></dd>
+	<dd><em>AES</em> The name of the algorithm in the default system provider, or the lower-cased version of it; eg &#8220;aes&#8221; or &#8220;AES&#8221;<br><i>Type: <code>String</code></i></dd>
 	<dt><span lang="ruby">:key_length</span><span lang="default">keyLength</span></dt>
-	<dd><em>128</em> The key length in bits of the cipher, either 128 or 256<br><i>Type: Integer</i></dd>
+	<dd><em>128</em> The key length in bits of the cipher, either 128 or 256<br><i>Type: <code>Integer</code></i></dd>
 	<dt><span lang="ruby">:</span>mode</dt>
-	<dd><em>CBC</em> The cipher mode<br><i>Type: String</i></dd>
+	<dd><em>CBC</em> The cipher mode<br><i>Type: <code>String</code></i></dd>
 </dl>
 <dl>
 	<dt><div lang="java">keySpec</div></dt>
-	<dd>A <code>KeySpec</code> for the cipher key<br><i>Type: SecretKeySpec</i></dd>
+	<dd>A <code>KeySpec</code> for the cipher key<br><i>Type: <code>SecretKeySpec</code></i></dd>
 </dl>
     </article>
     <hr class="back">

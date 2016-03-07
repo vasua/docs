@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -56,15 +58,15 @@
 <p>The following options, as defined in the <a href="/rest-api#stats">REST <code>/stats</code> API</a> endpoint, are permitted:</p>
 <dl>
 	<dt><span lang="ruby">:</span>start</dt>
-	<dd><em>beginning of time</em> earliest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: Long<span lang="ruby">, Time</span></i></dd>
+	<dd><em>beginning of time</em> earliest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: <code>Long</code><span lang="ruby">, <code>Time</code></span></i></dd>
 	<dt><span lang="ruby">:</span>end</dt>
-	<dd><em>current time</em> latest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: Long<span lang="ruby">, Time</span></i></dd>
+	<dd><em>current time</em> latest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: <code>Long</code><span lang="ruby">, <code>Time</code></span></i></dd>
 	<dt><span lang="ruby">:</span>direction</dt>
 	<dd><em>backwards</em> <span lang="ruby"><code>:</code></span><code>forwards</code> or <span lang="ruby"><code>:</code></span><code>backwards</code><br><i>Type: <span lang="default">String</span><span lang="ruby">Symbol</span></i></dd>
 	<dt><span lang="ruby">:</span>limit</dt>
-	<dd><em>100</em> maximum number of messages to retrieve up to 1,000<br><i>Type: Integer</i></dd>
+	<dd><em>100</em> maximum number of messages to retrieve up to 1,000<br><i>Type: <code>Integer</code></i></dd>
 	<dt><span lang="ruby">:</span>unit</dt>
-	<dd><em>minute</em> <span lang="ruby"><code>:</code></span><code>minute</code>, <span lang="ruby"><code>:</code></span><code>hour</code>, <span lang="ruby"><code>:</code></span><code>day</code> or <span lang="ruby"><code>:</code></span><code>month</code>. Based on the unit selected, the given start or end times are rounded down to the start of the relevant interval depending on the unit granularity of the query<br><i>Type: <span lang="default">String</span><span lang="objc,swift"><a href="#stats-granularity">ARTStatsGranularity</a></span><span lang="ruby">Symbol</span></i></dd>
+	<dd><em>minute</em> <span lang="ruby"><code>:</code></span><code>minute</code>, <span lang="ruby"><code>:</code></span><code>hour</code>, <span lang="ruby"><code>:</code></span><code>day</code> or <span lang="ruby"><code>:</code></span><code>month</code>. Based on the unit selected, the given start or end times are rounded down to the start of the relevant interval depending on the unit granularity of the query<br><i>Type: <span lang="default"><code>String</code></span><span lang="objc,swift"><a href="#stats-granularity"><code>ARTStatsGranularity</code></a></span><span lang="ruby"><code>Symbol</code></span></i></dd>
 </dl>
 
 

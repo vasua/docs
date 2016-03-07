@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -36,11 +38,11 @@
     <p>A <code>Ably::Models::ChannelStateChange</code> is a type encapsulating state change information emitted by the <a href="/realtime/channels-messages"><code>Channel</code></a> object. See <a href="/realtime/channels-messages#on"><code>Channel#on</code></a> to register a listener for one or more events.</p>
 <h4>Attributes</h4>
 <dl>
-	<dt><code>previous</code></dt>
-	<dd>the previous state<br><i>Type: <a href="/realtime/types#channel-state">Channel::STATE</a>&gt;</i></dd>
-	<dt><code>current</code></dt>
-	<dd>the new state<br><i>Type: <a href="/realtime/types#channel-state">Channel::STATE</a>&gt;</i></dd>
-	<dt><code>reason</code></dt>
+	<dt>previous</dt>
+	<dd>the previous state<br><i>Type: <a href="/realtime/types#channel-state"><code>Channel::STATE</code></a></i></dd>
+	<dt>current</dt>
+	<dd>the new state<br><i>Type: <a href="/realtime/types#channel-state"><code>Channel::STATE</code></a></i></dd>
+	<dt>reason</dt>
 	<dd>an <a href="#error-info"><code>ErrorInfo</code></a> containing any information relating to the transition<br><i>Type: <a href="/realtime/types#error-info"><code>ErrorInfo</code></a></i></dd>
 </dl>
   </div>

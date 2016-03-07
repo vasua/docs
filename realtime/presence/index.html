@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    <script type="text/javascript">window.NavLangs=["javascript","nodejs","ruby","java","swift","objc"];</script>
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -117,7 +119,7 @@ channel.presence.enter(null, new CompletionListener());</code></pre>
 options.clientId = @"bob";
 ARTRealtime *realtime = [[ARTRealtime alloc] initWithOptions:options];
 ARTRealtimeChannel *channel = [realtime.channels get:@"{{RANDOM_CHANNEL_NAME}}"];
-[channel.presence subscribe:ARTPresenceEnter cb:^(ARTPresenceMessage *member) {
+[channel.presence subscribe:ARTPresenceEnter callback:^(ARTPresenceMessage *member) {
     NSLog(@"Member %@ entered", member.clientId);
 }];
 [channel.presence enter:nil];</code></pre>
@@ -136,19 +138,19 @@ channel.presence.enter(nil)</code></pre>
 <p>Whenever a member enters or leaves a channel, or updates <a href="#member-data">their member data</a>, a presence event is emitted to all presence subscribers on that channel. Subscribing to presence events makes it incredibly easy to build an app that shows, in real time, any changes to clients connected to Ably and present on a channel.</p>
 <p>The following presence events are emitted:</p>
 <dl>
-	<dt><span lang="ruby"><code>:enter</code></span><span lang="java"><code>Action.ENTER</code></span><span lang="default"><code>enter</code></span></dt>
+	<dt><span lang="ruby">:enter</span><span lang="java">Action.ENTER</span><span lang="default">enter</span></dt>
 	<dd>A new member has entered the channel</dd>
 </dl>
 <dl>
-	<dt><span lang="ruby"><code>:leave</code></span><span lang="java"><code>Action.LEAVE</code></span><span lang="default"><code>leave</code></span></dt>
+	<dt><span lang="ruby">:leave</span><span lang="java">Action.LEAVE</span><span lang="default">leave</span></dt>
 	<dd>A member who was present has now left the channel. This may be a result of an explicit request to leave or implicitly when detaching from the channel. Alternatively, if a member&#8217;s connection is abruptly disconnected and they do not resume their connection within a minute, Ably treats this as a leave event as the client is no longer present</dd>
 </dl>
 <dl>
-	<dt><span lang="ruby"><code>:update</code></span><span lang="java"><code>Action.UPDATE</code></span><span lang="default"><code>update</code></span></dt>
+	<dt><span lang="ruby">:update</span><span lang="java">Action.UPDATE</span><span lang="default">update</span></dt>
 	<dd>An already present member has updated their <a href="#member-data">member data</a>. Being notified of member data updates can be very useful, for example, it can be used to update the status of a user when they are typing a message</dd>
 </dl>
 <dl>
-	<dt><span lang="ruby"><code>:present</code></span><span lang="java"><code>Action.PRESENT</code></span><span lang="default"><code>present</code></span></dt>
+	<dt><span lang="ruby">:present</span><span lang="java">Action.PRESENT</span><span lang="default">present</span></dt>
 	<dd>When subscribing to presence events on a channel that already has members present, this event is emitted for every member already present on the channel before the subscribe listener was registered</dd>
 </dl>
 <p><a href="https://jsbin.ably.io:443/ovavik/1/edit?javascript,live">View a presence states and events example</a></p>
@@ -221,17 +223,17 @@ channel.presence.enter(data: 'not moving') do
   channel.presence.update(data: 'travelling North')
 end</code></pre>
 <pre lang="objc"><code lang="objc">// Subscribe to presence enter events
-[channel.presence subscribe:ARTPresenceEnter cb:^(ARTPresenceMessage *member) {
+[channel.presence subscribe:ARTPresenceEnter callback:^(ARTPresenceMessage *member) {
     NSLog(@"%@", member.data); // prints "not moving"
 }];
 
 // Subscribe to presence update events
-[channel.presence subscribe:ARTPresenceUpdate cb:^(ARTPresenceMessage *member) {
+[channel.presence subscribe:ARTPresenceUpdate callback:^(ARTPresenceMessage *member) {
     NSLog(@"%@", member.data); // prints "travelling North"
 }];
 
 // Enter this client with data and update once entered
-[channel.presence enter:@"not moving" cb:^(ARTErrorInfo *error) {
+[channel.presence enter:@"not moving" callback:^(ARTErrorInfo *error) {
     [channel.presence update:@"travelling North"];
 }];</code></pre>
 <pre lang="swift"><code lang="swift">// Subscribe to presence enter events
@@ -310,13 +312,16 @@ System.out.println("The first member has client ID: " + members[0].clientId);</c
     end
   end
 end</code></pre>
-<pre lang="java"><code lang="java">PaginatedResult&lt;PresenceMessage&gt; resultPage = channel.presence.history(null);
+<pre lang="java"><code lang="java">Param[] options = new Param[]{ new Param("untilAttach", "true") }
+PaginatedResult&lt;PresenceMessage&gt; resultPage = channel.presence.history(options);
 System.out.println(resultPage.items().length + " presence events received in first page");
 if(resultPage.hasNext()) {
   PaginatedResult&lt;PresenceMessage&gt; nextPage = resultPage.next();
   System.out.println(nextPage.items().length + " presence events received in 2nd page");
 }</code></pre>
-<pre lang="objc"><code lang="objc">[channel.presence history:^(ARTPaginatedResult&lt;ARTPresenceMessage *&gt; *resultPage, NSError *error) {
+<pre lang="objc"><code lang="objc">ARTRealtimeHistoryQuery *query = [[ARTRealtimeHistoryQuery alloc] init];
+query.untilAttach = YES;
+[channel.presence history:query callback:^(ARTPaginatedResult&lt;ARTPresenceMessage *&gt; *resultPage, NSError *error) {
     NSLog(@"%lu presence events received in first page", [resultPage.items count]);
     if (resultPage.hasNext) {
         [resultPage next:^(ARTPaginatedResult&lt;ARTPresenceMessage *&gt; *nextPage, NSError *error) {
@@ -324,7 +329,9 @@ if(resultPage.hasNext()) {
         }];
     }
 }];</code></pre>
-<pre lang="swift"><code lang="swift">channel.presence.history { resultPage, error in
+<pre lang="swift"><code lang="swift">let query = ARTRealtimeHistoryQuery()
+query.untilAttach = true
+channel.presence.history(query) { resultPage, error in
     let resultPage = resultPage!
     print("\(resultPage.items.count) presence events received in first page")
     if resultPage.hasNext {
@@ -404,7 +411,7 @@ ARTTokenParams *tokenParams = [[ARTTokenParams alloc] initWithClientId:@"*"];
     ARTRealtime *realtime = [[ARTRealtime alloc] initWithToken:tokenDetails.token];
     ARTRealtimeChannel *channel = [realtime.channels get:@"realtime-chat"];
 
-    [channel.presence subscribe:ARTPresenceEnter cb:^(ARTPresenceMessage *member) {
+    [channel.presence subscribe:ARTPresenceEnter callback:^(ARTPresenceMessage *member) {
         NSLog(@"%@ entered realtime-chat", member.clientId);
     }];
 
@@ -480,29 +487,29 @@ When a channel is attached, the Ably service immediately synchronises the presen
 <p>In order to enter and be present on a channel, the client must <a href="https://support.ably.io/solution/articles/3000038608-authenticated-and-identified-clients">be identified by having a client ID</a>, <a href="https://support.ably.io/solution/articles/3000048535-using-capabilities-to-manage-client-access-privileges-on-channels">have permission to be present</a>, and be attached to the channel. For simplicity, the library will implicitly attach to a channel when entering. Entering when already entered is treated as an <a href="#update">update</a>.</p>
 <p>There are two overloaded versions of this method. With both versions, a <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to enter.</p>
 <blockquote class="definition" id="enter-none">
-<p class="definition" id="enter-none"><span lang='default'>enter(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter() &#8594; yields</span><span lang='java'>public void enter(<a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>enter(data: nil, cb: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
+<p class="definition" id="enter-none"><span lang='default'>enter(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter() &#8594; yields</span><span lang='java'>public void enter(<a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>enter(data: nil, callback: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
 </blockquote>
 <p>Enter a presence channel without any data.</p>
 <blockquote class="definition" id="enter-data">
-<p class="definition" id="enter-data"><span lang='default'>enter(Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter(Object data) &#8594; yields</span><span lang='java'>public void enter(Object data, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>enter(data: AnyObject?, cb: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
+<p class="definition" id="enter-data"><span lang='default'>enter(Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter(Object data) &#8594; yields</span><span lang='java'>public void enter(Object data, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>enter(data: AnyObject?, callback: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
 </blockquote>
 <p>Enter a presence channel and provide data that is associated with the current present member.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><div lang="javascript,nodejs">Object data</div></dt>
-	<dd>data payload for the current present member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
-	<dt><div lang="java">Object data</div></dt>
-	<dd>data payload for the current present member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
-	<dt><div lang="ruby">Object data</div></dt>
-	<dd>data payload for the current present member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
-	<dt><div lang="objc,swift">Object data</div></dt>
-	<dd>data payload for the message. The supported payload types are <span lang="objc"><code>NS</code></span><code>String</code>, <span lang="objc"><code>NS</code></span><code>Dictionary</code> or <span lang="objc"><code>NS</code></span><code>Array</code> objects that can be serialised to JSON, binary data as <code>NSData</code>, and <code>nil</code>.</dd>
+	<dt><div lang="javascript,nodejs">data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="java">data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="ruby">data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="objc,swift">data</div></dt>
+	<dd>data payload for the message. The supported payload types are <span lang="objc"><code>NS</code></span><code>String</code>, <span lang="objc"><code>NS</code></span><code>Dictionary</code> or <span lang="objc"><code>NS</code></span><code>Array</code> objects that can be serialised to JSON, binary data as <code>NSData</code>, and <code>nil</code>.<br><i>Type: <code>Object</code></i></dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
 	<dd>is a function of the form <code>function(err)</code> which is called upon completion</dd>
-	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
-	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion<br><i>Type: <a href="#completion-listener"><code>CompletionListener</code></a></i></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>yields upon successfully entering the channel</dd>
 	<dt><div lang="objc,swift">callback</div></dt>
@@ -537,29 +544,29 @@ When a channel is attached, the Ably service immediately synchronises the presen
 <p>In order to leave the presence set of a channel, the client must have already <a href="#enter">entered and been present</a>.</p>
 <p>There are two overloaded versions of this method. With both versions, a <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to leave.</p>
 <blockquote class="definition" id="leave-none">
-<p class="definition" id="leave-none"><span lang='default'>leave(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> leave() &#8594; yields</span><span lang='java'>public void leave(<a href="#completion-listener">CompletionListener</a> listener)</span><span lang='swift,objc'>leave(data: nil, cb: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
+<p class="definition" id="leave-none"><span lang='default'>leave(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> leave() &#8594; yields</span><span lang='java'>public void leave(<a href="#completion-listener">CompletionListener</a> listener)</span><span lang='swift,objc'>leave(data: nil, callback: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
 </blockquote>
 <p>Leave a presence channel without emitting any data.</p>
 <blockquote class="definition" id="leave-data">
-<p class="definition" id="leave-data"><span lang='default'>leave(Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> leave(Object data) &#8594; yields</span><span lang='java'>public void leave(Object data, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='swift,objc'>leave(data: AnyObject?, cb: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
+<p class="definition" id="leave-data"><span lang='default'>leave(Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> leave(Object data) &#8594; yields</span><span lang='java'>public void leave(Object data, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='swift,objc'>leave(data: AnyObject?, callback: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
 </blockquote>
 <p>Leave a presence channel and emit data that is associated with the current leaving member.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><div lang="javascript,nodejs">Object data</div></dt>
-	<dd>data payload for the current present member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
-	<dt><div lang="java">Object data</div></dt>
-	<dd>data payload for the current present member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
-	<dt><div lang="ruby">Object data</div></dt>
-	<dd>data payload for the current present member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
-	<dt><div lang="objc,swift">Object data</div></dt>
-	<dd>data payload for the message. The supported payload types are <span lang="objc"><code>NS</code></span><code>String</code>, <span lang="objc"><code>NS</code></span><code>Dictionary</code> or <span lang="objc"><code>NS</code></span><code>Array</code> objects that can be serialised to JSON, binary data as <code>NSData</code>, and <code>nil</code>.</dd>
+	<dt><div lang="javascript,nodejs">data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="java">data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="ruby">data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="objc,swift">data</div></dt>
+	<dd>data payload for the message. The supported payload types are <span lang="objc"><code>NS</code></span><code>String</code>, <span lang="objc"><code>NS</code></span><code>Dictionary</code> or <span lang="objc"><code>NS</code></span><code>Array</code> objects that can be serialised to JSON, binary data as <code>NSData</code>, and <code>nil</code>.<br><i>Type: <code>Object</code></i></dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
 	<dd>is a function of the form <code>function(err)</code> which is called upon completion</dd>
-	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
-	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion<br><i>Type: <a href="#completion-listener"><code>CompletionListener</code></a></i></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>yields upon successfully leaving the channel</dd>
 	<dt><div lang="objc,swift">callback</div></dt>
@@ -569,25 +576,25 @@ When a channel is attached, the Ably service immediately synchronises the presen
 <p>Clients can update their member data on the channel which will trigger a broadcast of this update to all presence subscribers. The <a href="#enter">pre-requisites for <code>update</code></a> are the same as for <a href="#enter"><code>enter</code></a>. If an attempt to <code>update</code> is made before the client has entered the channel, the update is treated as an <code>enter</code>.</p>
 <p>A <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to update the member data.</p>
 <blockquote class="definition" id="update-data">
-<p class="definition" id="update-data"><span lang='default'>update(Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> update(Object data) &#8594; yields</span><span lang='java'>public void update(Object data, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='swift,objc'>update(data: AnyObject?, cb: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
+<p class="definition" id="update-data"><span lang='default'>update(Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> update(Object data) &#8594; yields</span><span lang='java'>public void update(Object data, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='swift,objc'>update(data: AnyObject?, callback: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
 </blockquote>
 <p>Update the current member&#8217;s data and broadcast an update event to all subscribers. <code>data</code> may be <code>null</code>.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><div lang="javascript,nodejs">Object data</div></dt>
-	<dd>data payload for the current present member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
-	<dt><div lang="java">Object data</div></dt>
-	<dd>data payload for the current present member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
-	<dt><div lang="ruby">Object data</div></dt>
-	<dd>data payload for the current present member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
-	<dt><div lang="objc,swift">Object data</div></dt>
-	<dd>data payload for the message. The supported payload types are <span lang="objc"><code>NS</code></span><code>String</code>, <span lang="objc"><code>NS</code></span><code>Dictionary</code> or <span lang="objc"><code>NS</code></span><code>Array</code> objects that can be serialised to JSON, binary data as <code>NSData</code>, and <code>nil</code>.</dd>
+	<dt><div lang="javascript,nodejs">data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="java">data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="ruby">data</div></dt>
+	<dd>data payload for the current present member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="objc,swift">data</div></dt>
+	<dd>data payload for the message. The supported payload types are <span lang="objc"><code>NS</code></span><code>String</code>, <span lang="objc"><code>NS</code></span><code>Dictionary</code> or <span lang="objc"><code>NS</code></span><code>Array</code> objects that can be serialised to JSON, binary data as <code>NSData</code>, and <code>nil</code>.<br><i>Type: <code>Object</code></i></dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
 	<dd>is a function of the form <code>function(err)</code> which is called upon completion</dd>
-	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
-	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion<br><i>Type: <a href="#completion-listener"><code>CompletionListener</code></a></i></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>yields upon successfully updating the member data</dd>
 	<dt><div lang="objc,swift">callback</div></dt>
@@ -622,7 +629,7 @@ When a channel is attached, the Ably service immediately synchronises the presen
 <p>Get the current presence member set for this channel. Typically, this method returns the member set immediately as the member set is retained in memory by the client. However, by default this method will wait until the presence member set is synchronised, so if the synchronisation is not yet complete following a channel being attached, this method will wait until the presence member set is synchronised.</p>
 <p>When a channel is attached, the Ably service immediately synchronises the presence member set with the client. Typically this process completes in milliseconds, however when the presence member set is very large, bandwidth constraints may slow this synchronisation process down.</p>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>get(Object options, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#presence-message">PresenceMessage[]</a> members))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> get(Hash options) &#8594; yields <a href="#presence-message">PresenceMessage[]</a></span><span lang='java'>public <a href="#presence-message">PresenceMessage[]</a> get(<a href="#param">Param</a>[] options)</span><span lang='swift,objc'>get(query: ARTRealtimePresenceQuery, cb: (<a href="#presence-message">ARTPresenceMessage</a>, NSError?) &#8594; Void)</span></p>
+<p class="definition"><span lang='default'>get(Object options, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err, <a href="#presence-message">PresenceMessage[]</a> members))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> get(Hash options) &#8594; yields <a href="#presence-message">PresenceMessage[]</a></span><span lang='java'>public <a href="#presence-message">PresenceMessage[]</a> get(<a href="#param">Param</a>[] options)</span><span lang='swift,objc'>get(query: ARTRealtimePresenceQuery, callback: (<a href="#presence-message">ARTPresenceMessage</a>, NSError?) &#8594; Void)</span></p>
 </blockquote>
 <p>Gets an array of members present on the channel as <a href="#presence-message">PresenceMessage</a> objects.</p>
 <h4>Parameters</h4>
@@ -640,11 +647,11 @@ When a channel is attached, the Ably service immediately synchronises the presen
 </dl>
 <h4><span lang="default"><code>options</code> parameters</span><span lang="objc,swift"><code>ARTRealtimePresenceQuery</code> properties</span></h4>
 <dl>
-	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>:client_id</code></span></dt>
+	<dt><span lang="default">clientId</span><span lang="ruby">:client_id</span></dt>
 	<dd>when provided, will filter array of members returned that match the provided <span lang="default"><a href="/realtime/usage#client-id"><code>clientId</code></a></span><span lang="ruby"><a href="/realtime/usage#client-id"><code>client_id</code></a></span> string</dd>
-	<dt><span lang="default"><code>connectionId</code></span><span lang="ruby"><code>:connection_id</code></span></dt>
+	<dt><span lang="default">connectionId</span><span lang="ruby">:connection_id</span></dt>
 	<dd>when provided, will filter array of members returned that match the provided <span lang="default"><a href="/realtime/connection#id"><code>connectionId</code></a></span><span lang="ruby"><a href="/realtime/connection/#id"><code>connection_id</code></a></span> string</dd>
-	<dt><span lang="default"><code>waitForSync</code></span><span lang="ruby"><code>:wait_for_sync</code></span></dt>
+	<dt><span lang="default">waitForSync</span><span lang="ruby">:wait_for_sync</span></dt>
 	<dd><em>true</em> A boolean value that by default waits for the initial presence synchronisation following channel attachment to complete before returning the members present. When false, the current list of members is returned without waiting for a complete synchronisation</dd>
 </dl>
 
@@ -725,11 +732,11 @@ When a channel is attached, the Ably service immediately synchronises the presen
 <h6 id="subscribe">subscribe</h6>
 <p>There are three overloaded versions of this method:</p>
 <blockquote class="definition" id="subscribe-listener">
-<p class="definition" id="subscribe-listener"><span lang='default'>subscribe(listener(<a href="#presence-message">PresenceMessage</a>))</span><span lang='java'>public void subscribe(<a href="#presence-listener">PresenceListener</a> listener)</span><span lang='ruby'>subscribe → yields <a href="#presence-message">PresenceMessage</a></span><span lang='objc,swift'>subscribe(cb: (<a href="#presence-message">ARTPresenceMessage</a>) &#8594; Void) &#8594; ARTEventListener</span></p>
+<p class="definition" id="subscribe-listener"><span lang='default'>subscribe(listener(<a href="#presence-message">PresenceMessage</a>))</span><span lang='java'>public void subscribe(<a href="#presence-listener">PresenceListener</a> listener)</span><span lang='ruby'>subscribe → yields <a href="#presence-message">PresenceMessage</a></span><span lang='objc,swift'>subscribe(callback: (<a href="#presence-message">ARTPresenceMessage</a>) &#8594; Void) &#8594; ARTEventListener</span></p>
 </blockquote>
 <p>Subscribe to presence message events on this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the <a href="#presence-listener">PresenceListener</a> interface</span><span lang="ruby">a block</span>, which is called each time one or more presence events occurs such as a member entering or leaving a channel.</p>
 <blockquote class="definition" id="subscribe-event">
-<p class="definition" id="subscribe-event"><span lang='default'>subscribe(String <a href="#presence-action">action</a>, listener(<a href="#presence-message">PresenceMessage</a>))</span><span lang='java'>public void subscribe(<a href="#presence-action">PresenceMessage.Action</a> action, <a href="#presence-listener">PresenceListener</a> listener)</span><span lang='ruby'>subscribe(<a href="#presence-action">PresenceMessage::ACTION</a> action) → yields <a href="#presence-message">PresenceMessage</a></span><span lang='objc,swift'>subscribe(action: ARTPresenceAction, cb: (<a href="#presence-message">ARTPresenceMessage</a>) &#8594; Void) &#8594; ARTEventListener</span></p>
+<p class="definition" id="subscribe-event"><span lang='default'>subscribe(String <a href="#presence-action">action</a>, listener(<a href="#presence-message">PresenceMessage</a>))</span><span lang='java'>public void subscribe(<a href="#presence-action">PresenceMessage.Action</a> action, <a href="#presence-listener">PresenceListener</a> listener)</span><span lang='ruby'>subscribe(<a href="#presence-action">PresenceMessage::ACTION</a> action) → yields <a href="#presence-message">PresenceMessage</a></span><span lang='objc,swift'>subscribe(action: ARTPresenceAction, callback: (<a href="#presence-message">ARTPresenceMessage</a>) &#8594; Void) &#8594; ARTEventListener</span></p>
 </blockquote>
 <p>Subscribe to presence message events with a given <a href="#presence-action"><code>action</code></a> on this channel. The caller supplies <span lang="default">a listener function</span><span lang="java">an implementation of the <a href="#presence-listener">PresenceListener</a> interface</span><span lang="ruby">a block</span>, which is called each time one or more presence events occurs such as a member entering or leaving a channel.</p>
 <div lang="objc,swift"></div><div lang="default">
@@ -740,20 +747,20 @@ When a channel is attached, the Ably service immediately synchronises the presen
 </div>
 <h4>Parameters</h4>
 <dl>
-	<dt>String action</dt>
-	<dd>The presence <a href="#presence-action"><code>action</code> event</a> to subscribe to</dd>
+	<dt>action</dt>
+	<dd>The presence <a href="#presence-action"><code>action</code> event</a> to subscribe to<br><i>Type: <span lang="javascript,nodejs"><code>String</code></span><span lang="java"><a href="#presence-action"><code>PresenceMessage.Action</code></a></span><span lang="ruby"><a href="#presence-action"><code>PresenceMessage::ACTION</code></a> action</span><span lang="objc,swift"><code>ARTPresenceAction</code></span></i></dd>
 </dl>
 <div lang="objc,swift"></div><div lang="default">
 <dl>
-	<dt><span lang="default">String[] </span><span lang="ruby">*</span>actions</dt>
-	<dd>An <span lang="ruby">argument</span> array of <a href="#presence-action"><code>action</code> events</a> to subscribe to<br />
+	<dt>actions</dt>
+	<dd>An <span lang="ruby">argument</span> array of <a href="#presence-action"><code>action</code> events</a> to subscribe to<br><i>Type: <span lang="default"><code>String[]</code></span><span lang="ruby">@*argument</span></i><br />
 </div></dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">listener</div></dt>
 	<dd>is a function of the form <code>function(message)</code> to be called for each amtching presence message event</dd>
-	<dt><div lang="java"><a href="#presence-listener">PresenceListener</a> listener</div></dt>
-	<dd>Message listener to be notified for matching presence message event</dd>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Message listener to be notified for matching presence message event<br><i>Type: <a href="#presence-listener">@PresenceListener</a></i></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>yields matching presence message event when received on the channel</dd>
 	<dt><div lang="swift,objc">callback</div></dt>
@@ -775,14 +782,14 @@ When a channel is attached, the Ably service immediately synchronises the presen
 <p>Unsubscribes all listeners to presence message events on this channel. This removes all earlier subscriptions.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt>String action</dt>
-	<dd>The presence <a href="#presence-action"><code>action</code> event</a> to unsubscribe from</dd>
+	<dt>action</dt>
+	<dd>The presence <a href="#presence-action"><code>action</code> event</a> to subscribe to<br><i>Type: <span lang="javascript,nodejs"><code>String</code></span><span lang="java"><a href="#presence-action"><code>PresenceMessage.Action</code></a></span><span lang="ruby"><a href="#presence-action"><code>PresenceMessage::ACTION</code></a> action</span><span lang="objc,swift"><code>ARTPresenceAction</code></span></i></dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">listenerCallback</div></dt>
 	<dd>is the callback listener function that was previously subscribed</dd>
-	<dt><div lang="java"><a href="#presence-listener">PresenceListener</a> listener</div></dt>
-	<dd>previously registered listener</dd>
+	<dt><div lang="java">listener</div></dt>
+	<dd>previously registered listener<br><i>Type: <a href="#presence-listener">@PresenceListener</a></i></dd>
 	<dt><div lang="ruby">&amp;listener_block</div></dt>
 	<dd>previously registered listener block</dd>
 	<dt><div lang="swift,objc">listener</div></dt>
@@ -792,29 +799,29 @@ When a channel is attached, the Ably service immediately synchronises the presen
 <p>Enter this presence channel for the given <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span>. This method is provided to support typically server instances that act on behalf of multiple client IDs. See <a href="#presence-multiple-client-id">Managing multiple client IDs</a> for more info. In order to be able to publish presence changes for arbitrary client IDs, the client library must have been instanced either with an <a href="https://support.ably.io/solution/articles/3000030054-what-is-an-app-api-key">API key</a>, or with a <a href="https://support.ably.io/solution/articles/3000048586-can-a-client-emulate-any-client-id-i-e-use-a-wildcard-client-id">token bound to a wildcard client ID</a>. The connec</p>
 <p>There are two overloaded versions of this method. With both versions, a <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to enter.</p>
 <blockquote class="definition" id="enter-client-none">
-<p class="definition" id="enter-client-none"><span lang='default'>enterClient(String clientId, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter_client(String client_id) &#8594; yields</span><span lang='java'>public void enterClient(String clientId, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>enterClient(clientId: String, data: nil, cb: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
+<p class="definition" id="enter-client-none"><span lang='default'>enterClient(String clientId, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter_client(String client_id) &#8594; yields</span><span lang='java'>public void enterClient(String clientId, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>enterClient(clientId: String, data: nil, callback: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
 </blockquote>
 <p>Enter a presence channel on behalf of the provided <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> without any data.</p>
 <blockquote class="definition" id="enter-client-data">
-<p class="definition" id="enter-client-data"><span lang='default'>enterClient(String clientId, Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter_client(String client_id, Object data) &#8594; yields</span><span lang='java'>public void enterClient(String clientId, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>enterClient(clientId: String, data: AnyObject?, cb: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
+<p class="definition" id="enter-client-data"><span lang='default'>enterClient(String clientId, Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter_client(String client_id, Object data) &#8594; yields</span><span lang='java'>public void enterClient(String clientId, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>enterClient(clientId: String, data: AnyObject?, callback: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
 </blockquote>
 <p>Enter a presence channel and provide data that is associated with the current present member.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><div lang="javascript,nodejs">Object data</div></dt>
-	<dd>data payload for the member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
-	<dt><div lang="java">Object data</div></dt>
-	<dd>data payload for the member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
-	<dt><div lang="ruby">Object data</div></dt>
-	<dd>data payload for the member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
-	<dt><div lang="objc,swift">Object data</div></dt>
-	<dd>data payload for the message. The supported payload types are <span lang="objc"><code>NS</code></span><code>String</code>, <span lang="objc"><code>NS</code></span><code>Dictionary</code> or <span lang="objc"><code>NS</code></span><code>Array</code> objects that can be serialised to JSON, binary data as <code>NSData</code>, and <code>nil</code>.</dd>
+	<dt><div lang="javascript,nodejs">data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="java">data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="ruby">data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="objc,swift">data</div></dt>
+	<dd>data payload for the message. The supported payload types are <span lang="objc"><code>NS</code></span><code>String</code>, <span lang="objc"><code>NS</code></span><code>Dictionary</code> or <span lang="objc"><code>NS</code></span><code>Array</code> objects that can be serialised to JSON, binary data as <code>NSData</code>, and <code>nil</code>.<br><i>Type: <code>Object</code></i></dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
 	<dd>is a function of the form <code>function(err)</code> which is called upon completion</dd>
-	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
-	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion<br><i>Type: <a href="#completion-listener"><code>CompletionListener</code></a></i></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
 	<dd>yields upon successfully entering the channel</dd>
 	<dt><div lang="objc,swift">callback</div></dt>
@@ -849,61 +856,61 @@ When a channel is attached, the Ably service immediately synchronises the presen
 <p>Leave this presence channel for the given <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span>. This method is provided to support typically server instances that act on behalf of multiple client IDs. See <a href="#presence-multiple-client-id">Managing multiple client IDs</a> for more info. In order to leave the presence set of a channel, the client must have already <a href="#enter-client">entered and been present</a>.</p>
 <p>There are two overloaded versions of this method. With both versions, a <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to leave.</p>
 <blockquote class="definition" id="leave-client-none">
-<p class="definition" id="leave-client-none"><span lang='default'>leaveClient(String clientId, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> leave_client(String client_id) &#8594; yields</span><span lang='java'>public void leaveClient(String clientId, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='swift,objc'>leaveClient(clientId: String, data: nil, cb: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
+<p class="definition" id="leave-client-none"><span lang='default'>leaveClient(String clientId, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> leave_client(String client_id) &#8594; yields</span><span lang='java'>public void leaveClient(String clientId, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='swift,objc'>leaveClient(clientId: String, data: nil, callback: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
 </blockquote>
 <p>Leave a presence channel on behalf of the provided <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> without emitting any data.</p>
 <blockquote class="definition" id="leave-client-data">
-<p class="definition" id="leave-client-data"><span lang='default'>leaveClient(String clientId, Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> leave_client(String client_id, Object data) &#8594; yields</span><span lang='java'>public void leaveClient(String clientId, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='swift,objc'>leave(clientId: String, data: AnyObject?, cb: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
+<p class="definition" id="leave-client-data"><span lang='default'>leaveClient(String clientId, Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> leave_client(String client_id, Object data) &#8594; yields</span><span lang='java'>public void leaveClient(String clientId, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='swift,objc'>leave(clientId: String, data: AnyObject?, callback: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
 </blockquote>
 <p>Leave a presence channel on behalf of the provided <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> and emit data that is associated with the current leaving member.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><div lang="javascript,nodejs">Object data</div></dt>
-	<dd>data payload for the present member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
-	<dt><div lang="java">Object data</div></dt>
-	<dd>data payload for the present member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
-	<dt><div lang="ruby">Object data</div></dt>
-	<dd>data payload for the present member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
-	<dt><div lang="objc,swift">Object data</div></dt>
-	<dd>data payload for the message. The supported payload types are <span lang="objc"><code>NS</code></span><code>String</code>, <span lang="objc"><code>NS</code></span><code>Dictionary</code> or <span lang="objc"><code>NS</code></span><code>Array</code> objects that can be serialised to JSON, binary data as <code>NSData</code>, and <code>nil</code>.</dd>
+	<dt><div lang="javascript,nodejs">data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="java">data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="ruby">data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="objc,swift">data</div></dt>
+	<dd>data payload for the message. The supported payload types are <span lang="objc"><code>NS</code></span><code>String</code>, <span lang="objc"><code>NS</code></span><code>Dictionary</code> or <span lang="objc"><code>NS</code></span><code>Array</code> objects that can be serialised to JSON, binary data as <code>NSData</code>, and <code>nil</code>.<br><i>Type: <code>Object</code></i></dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
 	<dd>is a function of the form <code>function(err)</code> which is called upon completion</dd>
-	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
-	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion<br><i>Type: <a href="#completion-listener"><code>CompletionListener</code></a></i></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
-	<dd>yields upon successfully leaving the channel</dd>
+	<dd>yields upon successfully entering the channel</dd>
 	<dt><div lang="objc,swift">callback</div></dt>
-	<dd>called upon leaving the channel, or with an error</dd>
+	<dd>called upon successfully entering the channel, or with an error</dd>
 </dl>
 <h6 id="update-client"><span lang='default'>updateClient</span><span lang='ruby'>update_client</span></h6>
 <p>Clients can update the member data on behalf of the given <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> which will trigger a broadcast of this update to all presence subscribers. This method is provided to support typically server instances that act on behalf of multiple client IDs. See <a href="#presence-multiple-client-id">Managing multiple client IDs</a> for more info. If an attempt to update is made before the member has entered the channel, the update is treated as an enter.</p>
 <p>A <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to update the member data.</p>
 <blockquote class="definition" id="update-client-data">
-<p class="definition" id="update-client-data"><span lang='default'>updateClient(String clientId, Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> update_client(String client_id, Object data) &#8594; yields</span><span lang='java'>public void updateClient(String clientId, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='swift,objc'>update(clientId: String, data: AnyObject?, cb: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
+<p class="definition" id="update-client-data"><span lang='default'>updateClient(String clientId, Object data, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> update_client(String client_id, Object data) &#8594; yields</span><span lang='java'>public void updateClient(String clientId, Object data, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='swift,objc'>update(clientId: String, data: AnyObject?, callback: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
 </blockquote>
 <p>Update the member data on behalf of the provided <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span> and broadcast an update event to all subscribers. <code>data</code> may be <code>null</code>.</p>
 <h4>Parameters</h4>
 <dl>
-	<dt><div lang="javascript,nodejs">Object data</div></dt>
-	<dd>data payload for the member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.</dd>
-	<dt><div lang="java">Object data</div></dt>
-	<dd>data payload for the member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.</dd>
-	<dt><div lang="ruby">Object data</div></dt>
-	<dd>data payload for the member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.</dd>
-	<dt><div lang="objc,swift">Object data</div></dt>
-	<dd>data payload for the message. The supported payload types are <span lang="objc"><code>NS</code></span><code>String</code>, <span lang="objc"><code>NS</code></span><code>Dictionary</code> or <span lang="objc"><code>NS</code></span><code>Array</code> objects that can be serialised to JSON, binary data as <code>NSData</code>, and <code>nil</code>.</dd>
+	<dt><div lang="javascript,nodejs">data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, JSON objects and arrays, buffers containing arbitrary binary data, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="java">data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, JsonObject, binary data as byte arrays, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="ruby">data</div></dt>
+	<dd>data payload for the member. The supported payload types are Strings, Hash or Array objects that can be serialised to JSON using <code>to_json</code>, binary data as <code>ASCII-8BIT</code> byte arrays, and null.<br><i>Type: <code>Object</code></i></dd>
+	<dt><div lang="objc,swift">data</div></dt>
+	<dd>data payload for the message. The supported payload types are <span lang="objc"><code>NS</code></span><code>String</code>, <span lang="objc"><code>NS</code></span><code>Dictionary</code> or <span lang="objc"><code>NS</code></span><code>Array</code> objects that can be serialised to JSON, binary data as <code>NSData</code>, and <code>nil</code>.<br><i>Type: <code>Object</code></i></dd>
 </dl>
 <dl>
 	<dt><div lang="javascript,nodejs">callback</div></dt>
 	<dd>is a function of the form <code>function(err)</code> which is called upon completion</dd>
-	<dt><div lang="java"><a href="#completion-listener">CompletionListener</a> listener</div></dt>
-	<dd>Listener to be notified on completion</dd>
+	<dt><div lang="java">listener</div></dt>
+	<dd>Listener to be notified on completion<br><i>Type: <a href="#completion-listener"><code>CompletionListener</code></a></i></dd>
 	<dt><div lang="ruby">&amp;block</div></dt>
-	<dd>yields upon successfully updating the member data</dd>
+	<dd>yields upon successfully entering the channel</dd>
 	<dt><div lang="objc,swift">callback</div></dt>
-	<dd>called upon updating the channel, or with an error</dd>
+	<dd>called upon successfully entering the channel, or with an error</dd>
 </dl>
 
 
@@ -935,50 +942,50 @@ When a channel is attached, the Ably service immediately synchronises the presen
 <p>A <code>PresenceMessage</code> represents an individual presence update that is sent to or received from Ably.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
-	<dt><div lang="java"><code>action</code></div></dt>
-	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage.action</code></a><br><i>Type: enum Action { ABSENT, PRESENT, ENTER, LEAVE, UPDATE }</i></dd>
-	<dt><div lang="javascript,nodejs"><code>action</code></div></dt>
-	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>Presence action</code></a><br><i>Type: Integer value for Action { &#8220;ABSENT&#8221; : 0, &#8220;PRESENT&#8221; : 1, &#8220;ENTER&#8221; : 2, &#8220;LEAVE&#8221; : 3, &#8220;UPDATE&#8221; : 4 }</i></dd>
-	<dt><div lang="ruby"><code>action</code></div></dt>
-	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: enum ACTION { :absent, :present, :enter, :leave, :update }</i></dd>
-	<dt><div lang="php"><code>action</code></div></dt>
-	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: const PresenceMessage::ABSENT,PRESENT,ENTER,LEAVE,UPDATE</i></dd>
-	<dt><div lang="objc,swift"><code>action</code></div></dt>
-	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage.action</code></a><br><i>Type: ARTPresenceAction</i></dd>
+	<dt><div lang="java">action</div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage.action</code></a><br><i>Type: <code>enum { ABSENT, PRESENT, ENTER, LEAVE, UPDATE }</code></i></dd>
+	<dt><div lang="javascript,nodejs">action</div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>Presence action</code></a><br><i>Type: <code>int enum { ABSENT, PRESENT, ENTER, LEAVE, UPDATE }</code></i></dd>
+	<dt><div lang="ruby">action</div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: <code>enum { :absent, :present, :enter, :leave, :update }</code></i></dd>
+	<dt><div lang="php">action</div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage::ACTION</code></a><br><i>Type: <code>const PresenceMessage::ABSENT,PRESENT,ENTER,LEAVE,UPDATE</code></i></dd>
+	<dt><div lang="objc,swift">action</div></dt>
+	<dd>the event signified by a PresenceMessage. See <a href="/realtime/types#presence-action"><code>PresenceMessage.action</code></a><br><i>Type: <code>ARTPresenceAction</code></i></dd>
 </dl>
 <dl>
-	<dt><div lang="java"><code>data</code></div></dt>
-	<dd>The presence update payload, if provided<br><i>Type: String, ByteArray, JSONObject, JSONArray</i></dd>
-	<dt><div lang="javascript,nodejs"><code>data</code></div></dt>
-	<dd>The presence update payload, if provided<br><i>Type: String, StringBuffer, JSON Object</i></dd>
-	<dt><div lang="ruby"><code>data</code></div></dt>
-	<dd>The presence update payload, if provided<br><i>Type: String, Binary (ASCII-8BIT String), Hash, Array</i></dd>
-	<dt><div lang="swift"><code>data</code></div></dt>
-	<dd>The message payload, if provided<br><i>Type: String, NSData, Dictionary, Array</i></dd>
-	<dt><div lang="objc"><code>data</code></div></dt>
-	<dd>The message payload, if provided<br><i>Type: NSString *, NSData *, NSDictionary *, NSArray *</i></dd>
-	<dt><div lang="php"><code>data</code></div></dt>
-	<dd>The message payload, if provided<br><i>Type: String, Binary String, Associative Array, Array</i></dd>
+	<dt><div lang="java">data</div></dt>
+	<dd>The presence update payload, if provided<br><i>Type: <code>String</code>, <code>ByteArray</code>, <code>JSONObject</code>, <code>JSONArray</code></i></dd>
+	<dt><div lang="javascript,nodejs">data</div></dt>
+	<dd>The presence update payload, if provided<br><i>Type: <code>String</code>, <code>StringBuffer</code>, <code>JSON Object</code></i></dd>
+	<dt><div lang="ruby">data</div></dt>
+	<dd>The presence update payload, if provided<br><i>Type: <code>String</code>, <code>Binary</code> (ASCII-8BIT String), <code>Hash</code>, <code>Array</code></i></dd>
+	<dt><div lang="swift">data</div></dt>
+	<dd>The message payload, if provided<br><i>Type: <code>String</code>, <code>NSData</code>, <code>Dictionary</code>, <code>Array</code></i></dd>
+	<dt><div lang="objc">data</div></dt>
+	<dd>The message payload, if provided<br><i>Type: <code>NSString *</code>, <code>NSData *</code>, <code>NSDictionary *</code>, <code>NSArray *</code></i></dd>
+	<dt><div lang="php">data</div></dt>
+	<dd>The message payload, if provided<br><i>Type: <code>String</code>, <code>Binary String</code>, <code>Associative Array</code>, <code>Array</code></i></dd>
 </dl>
 <dl>
-	<dt><code>id</code></dt>
-	<dd>Unique ID assigned by Ably to this presence update<br><i>Type: String</i></dd>
+	<dt>id</dt>
+	<dd>Unique ID assigned by Ably to this presence update<br><i>Type: <code>String</code></i></dd>
 </dl>
 <dl>
-	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span></dt>
-	<dd>The client ID of the publisher of this presence update<br><i>Type: String</i></dd>
+	<dt><span lang="default">clientId</span><span lang="ruby">client_id</span></dt>
+	<dd>The client ID of the publisher of this presence update<br><i>Type: <code>String</code></i></dd>
 </dl>
 <dl>
-	<dt><span lang="default"><code>connectionId</code></span><span lang="ruby"><code>connection_id</code></span></dt>
-	<dd>The connection ID of the publisher of this presence update<br><i>Type: String</i></dd>
+	<dt><span lang="default">connectionId</span><span lang="ruby">connection_id</span></dt>
+	<dd>The connection ID of the publisher of this presence update<br><i>Type: <code>String</code></i></dd>
 </dl>
 <dl>
-	<dt><code>timestamp</code></dt>
-	<dd>Timestamp when the presence update was received by the Ably the realtime service, as milliseconds since the epoch<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span><span lang="objc,swift">NSDate</span></i></dd>
+	<dt>timestamp</dt>
+	<dd>Timestamp when the presence update was received by the Ably the realtime service, as milliseconds since the epoch<br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span><span lang="ruby"><code>Time</code></span><span lang="objc,swift"><code>NSDate</code></span></i></dd>
 </dl>
 <dl>
-	<dt><code>encoding</code></dt>
-	<dd>This will typically be empty as all presence updates received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: String</i></dd>
+	<dt>encoding</dt>
+	<dd>This will typically be empty as all presence updates received from Ably are automatically decoded client-side using this value. However, if the message encoding cannot be processed, this attribute will contain the remaining transformations not applied to the <code>data</code> payload<br><i>Type: <code>String</code></i></dd>
 </dl>
 <h3 id="presence-action"><span lang='default'>Presence action</span><span lang='swift,objc'>ARTPresenceAction</span><span lang='java'>io.ably.lib.types.PresenceMessage.Action</span><span lang='ruby'>Ably::Models::PresenceMessage::ACTION</span></h3>
 
@@ -1098,24 +1105,24 @@ Ably::Models::PresenceMessage::ACTION.Enter == :enter # =&gt; true</code></pre>
 <p>A <code>PaginatedResult</code> is a type that represents a page of results for all message and presence history, stats and REST presence requests. The response from a <a href="/rest-api/#pagination">Ably REST API paginated query</a> is accompanied by metadata that indicates the relative queries available to the <code>PaginatedResult</code> object.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
-	<dt><code>items</code></dt>
-	<dd>contains a page of results (for example an Array of <a href="#message"><code>Message</code></a> or <a href="#presence-message"><code>PresenceMessage</code></a> objects for a channel history request)<br><i>Type: Array &lt;Message, Presence, Stats&gt;</i></dd>
+	<dt>items</dt>
+	<dd>contains a page of results (for example an Array of <a href="#message"><code>Message</code></a> or <a href="#presence-message"><code>PresenceMessage</code></a> objects for a channel history request)<br><i>Type: <code>Array &lt;Message, Presence, Stats&gt;</code></i></dd>
 </dl>
 <dl>
-	<dt><div lang="default"><code>isLast</code></div></dt>
-	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
-	<dt><div lang="ruby"><code>last?</code></div></dt>
-	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
-	<dt><div lang="php"><code>isLast()</code></div></dt>
-	<dd><code>true</code> if this page is the last page<br><i>Type: Boolean</i></dd>
+	<dt><div lang="default">isLast</div></dt>
+	<dd><code>true</code> if this page is the last page<br><i>Type: <code>Boolean</code></i></dd>
+	<dt><div lang="ruby">last?</div></dt>
+	<dd><code>true</code> if this page is the last page<br><i>Type: <code>Boolean</code></i></dd>
+	<dt><div lang="php">isLast()</div></dt>
+	<dd><code>true</code> if this page is the last page<br><i>Type: <code>Boolean</code></i></dd>
 </dl>
 <dl>
-	<dt><div lang="default"><code>hasNext</code></div></dt>
-	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
-	<dt><div lang="ruby"><code>has_next?</code></div></dt>
-	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
-	<dt><div lang="php"><code>hasNext()</code></div></dt>
-	<dd><code>true</code> if there are further pages<br><i>Type: Boolean</i></dd>
+	<dt><div lang="default">hasNext</div></dt>
+	<dd><code>true</code> if there are further pages<br><i>Type: <code>Boolean</code></i></dd>
+	<dt><div lang="ruby">has_next?</div></dt>
+	<dd><code>true</code> if there are further pages<br><i>Type: <code>Boolean</code></i></dd>
+	<dt><div lang="php">hasNext()</div></dt>
+	<dd><code>true</code> if there are further pages<br><i>Type: <code>Boolean</code></i></dd>
 </dl>
 <h4>Methods</h4>
 <h6>first</h6>
@@ -1205,10 +1212,10 @@ if ($firstPage-&gt;hasNext()) {
 <p>Please note that <code>key</code> and <code>value</code> attributes are always strings. If an <code>Integer</code> or other value type is expected, then you must coerce that type into a <code>String</code>.</p>
 <h4><span lang='java'>Members</span></h4>
 <dl>
-	<dt><code>key</code></dt>
-	<dd>The key value<br><i>Type: String</i></dd>
-	<dt><code>value</code></dt>
-	<dd>The value associated with the <code>key</code><br><i>Type: String</i></dd>
+	<dt>key</dt>
+	<dd>The key value<br><i>Type: <code>String</code></i></dd>
+	<dt>value</dt>
+	<dd>The value associated with the <code>key</code><br><i>Type: <code>String</code></i></dd>
 </dl>
 
 </div> <!-- /end java language block -->

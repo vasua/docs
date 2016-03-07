@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -78,8 +80,8 @@ channel.publish('unencrypted', 'encrypted secret payload');</code></pre>
 channel_opts = { cipher: { key: key } }
 channel = rest.channels.get('{{RANDOM_CHANNEL_NAME}}', channel_opts)
 channel.publish 'unencrypted', 'encrypted secret payload'</code></pre>
-<pre lang="php"><code lang="php">$key = Ably\Util\Crypto-&gt;generateRandomKey();
-$channelOpts = array('cipher' =&gt; array('key' =&gt; key));
+<pre lang="php"><code lang="php">$key = Ably\Utils\Crypto-&gt;generateRandomKey();
+$channelOpts = array('cipher' =&gt; array('key' =&gt; $key));
 $channel = rest-&gt;channels-&gt;get('{{RANDOM_CHANNEL_NAME}}', $channelOpts);
 $channel-&gt;publish('unencrypted', 'encrypted secret payload');</code></pre>
 <pre lang="java"><code lang="java">ChannelOptions options = ChannelOptions.withCipherKey(&lt;key&gt;);
@@ -120,7 +122,7 @@ Related types
 </li>
 </ul>
 </li></ul>
-</div><p>The <span lang="default"><code>Ably.Rest.</code></span><span lang="ruby"><code>Ably::Util::</code></span><span lang="php"><code>Ably\Util\</code></span><span lang="java"><code>io.ably.lib.util.</code></span><span lang="swift,objc"><code>ART</code></span><code>Crypto</code> object exposes the following public methods:</p>
+</div><p>The <span lang="default"><code>Ably.Rest.</code></span><span lang="ruby"><code>Ably::Util::</code></span><span lang="php"><code>Ably\Utils\</code></span><span lang="java"><code>io.ably.lib.util.</code></span><span lang="swift,objc"><code>ART</code></span><code>Crypto</code> object exposes the following public methods:</p>
 <h2 id="methods">Methods</h2>
 <h6 id="get-default-params"><span lang='default'>getDefaultParams</span><span lang='ruby'>get_default_params</span></h6>
 <blockquote class="definition">
@@ -145,7 +147,7 @@ var channel = rest.channels.get('{{RANDOM_CHANNEL_NAME}}', channelOpts);</code><
 <pre lang="ruby"><code lang="ruby">cipher_params = Ably::Util::Crypto.get_default_params({key: &lt;key&gt;})
 channel_opts = { cipher: cipher_params }
 channel = rest.channels.get('{{RANDOM_CHANNEL_NAME}}', channel_opts)</code></pre>
-<pre lang="php"><code lang="php">$cipherParams = Ably\Util\Crypto-&gt;getDefaultParams(array('key' =&gt; &lt;key&gt;));
+<pre lang="php"><code lang="php">$cipherParams = Ably\Utils\Crypto-&gt;getDefaultParams(array('key' =&gt; &lt;key&gt;));
 $channelOpts = array('cipher' =&gt; $cipherParams);
 $channel = $rest-&gt;channels-&gt;get('{{RANDOM_CHANNEL_NAME}}', $channelOpts);</code></pre>
 <pre lang="java"><code lang="java">CipherParams params = Crypto.getDefaultParams(new Param[]{ new Param("key", &lt;key&gt;) });
@@ -205,8 +207,8 @@ let channel = rest.channels.get("{{RANDOM_CHANNEL_NAME}}", options: options)</co
 });</code></pre>
 <pre lang="ruby"><code lang="ruby">key = Ably::Util::Crypto.generate_random_key(128)
 channel = rest.channels.get('{{RANDOM_CHANNEL_NAME}}', { cipher: {key: key}})</code></pre>
-<pre lang="php"><code lang="php">$key = Ably\Util\Crypto-&gt;generateRandomKey(128);
-$channel = $rest-&gt;channels-&gt;get('{{RANDOM_CHANNEL_NAME}}', array('cipher' =&gt; array('key' =&gt; key)));</code></pre>
+<pre lang="php"><code lang="php">$key = Ably\Utils\Crypto-&gt;generateRandomKey(128);
+$channel = $rest-&gt;channels-&gt;get('{{RANDOM_CHANNEL_NAME}}', array('cipher' =&gt; array('key' =&gt; $key)));</code></pre>
 <pre lang="java"><code lang="java">byte[] key = Crypto.generateRandomKey(128);
 ChannelOptions options = ChannelOptions.withCipher(key);
 Channel channel = rest.channels.get("{{RANDOM_CHANNEL_NAME}}", options);</code></pre>
@@ -249,8 +251,8 @@ let channel = rest.channels.get("{{RANDOM_CHANNEL_NAME}}", options: options)</co
 
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
-	<dt><span lang="default"><code>cipher</code></span><span lang="ruby"><code>:cipher</code></span></dt>
-	<dd>Requests encryption for this channel when not null, and specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#getting-started">an example</a><br><i>Type: <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a><span lang="javascript,nodejs,,java,ruby,php"> or <span lang="javascript,nodejs">an options object</span><span lang="java">a Param[] list</span><span lang="ruby">an options hash</span><span lang="php">an Associative Array</span> containing at a minimum a <code>key</code></span></i></dd>
+	<dt><span lang="default">cipher</span><span lang="ruby">:cipher</span></dt>
+	<dd>Requests encryption for this channel when not null, and specifies encryption-related parameters (such as algorithm, chaining mode, key length and key). See <a href="/realtime/encryption#getting-started">an example</a><br><i>Type: <a href="/realtime/encryption#cipher-params"><code>CipherParams</code></a><span lang="javascript,nodejs,,java,ruby,php"> or <span lang="javascript,nodejs">an options object</span><span lang="java">a <code>Param[]</code> list</span><span lang="ruby">an options hash</span><span lang="php">an Associative Array</span> containing at a minimum a <code>key</code></span></i></dd>
 </dl>
 
 
@@ -281,15 +283,15 @@ let channel = rest.channels.get("{{RANDOM_CHANNEL_NAME}}", options: options)</co
 </dl>
 <dl>
 	<dt><span lang="ruby">:</span>algorithm</dt>
-	<dd><em>AES</em> The name of the algorithm in the default system provider, or the lower-cased version of it; eg &#8220;aes&#8221; or &#8220;AES&#8221;<br><i>Type: String</i></dd>
+	<dd><em>AES</em> The name of the algorithm in the default system provider, or the lower-cased version of it; eg &#8220;aes&#8221; or &#8220;AES&#8221;<br><i>Type: <code>String</code></i></dd>
 	<dt><span lang="ruby">:key_length</span><span lang="default">keyLength</span></dt>
-	<dd><em>128</em> The key length in bits of the cipher, either 128 or 256<br><i>Type: Integer</i></dd>
+	<dd><em>128</em> The key length in bits of the cipher, either 128 or 256<br><i>Type: <code>Integer</code></i></dd>
 	<dt><span lang="ruby">:</span>mode</dt>
-	<dd><em>CBC</em> The cipher mode<br><i>Type: String</i></dd>
+	<dd><em>CBC</em> The cipher mode<br><i>Type: <code>String</code></i></dd>
 </dl>
 <dl>
 	<dt><div lang="java">keySpec</div></dt>
-	<dd>A <code>KeySpec</code> for the cipher key<br><i>Type: SecretKeySpec</i></dd>
+	<dd>A <code>KeySpec</code> for the cipher key<br><i>Type: <code>SecretKeySpec</code></i></dd>
 </dl>
     </article>
     <hr class="back">

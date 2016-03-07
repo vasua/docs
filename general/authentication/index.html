@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -199,22 +201,22 @@ ably.requestToken({ clientId: 'client@example.com' }, function(err, token) {
 <p><code>TokenDetails</code> is a type providing details of the token string and its associated metadata.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
-	<dt><code>token</code></dt>
-	<dd>The token itself. A typical token string may appear like <code>{{TOKEN}}</code><br><i>Type: String</i></dd>
-	<dt><code>expires</code></dt>
-	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby,objc,swift">The time</span> at which this token expires<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span><span lang="objc,swift">NSDate</span></i></dd>
-	<dt><code>issued</code></dt>
-	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby,objc,swift">The time</span> at which this token was issued<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span><span lang="objc,swift">NSDate</span></i></dd>
-	<dt><code>capability</code></dt>
-	<dd>The capability associated with this token. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/general/authentication/#capabilities-explained">Read more about authentication and capabilities</a><br><i>Type: String</i></dd>
-	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span></dt>
-	<dd>The client ID, if any, bound to this token. If a client ID is included, then the token authenticates its bearer as that client ID, and the token may only be used to perform operations on behalf of that client ID. The client is then considered to be an <a href="/realtime/authentication#identified-clients">identified client</a><br><i>Type: String</i></dd>
+	<dt>token</dt>
+	<dd>The token itself. A typical token string may appear like <code>{{TOKEN}}</code><br><i>Type: <code>String</code></i></dd>
+	<dt>expires</dt>
+	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby,objc,swift">The time</span> at which this token expires<br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span><span lang="ruby"><code>Time</code></span><span lang="objc,swift"><code>NSDate</code></span></i></dd>
+	<dt>issued</dt>
+	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby,objc,swift">The time</span> at which this token was issued<br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span><span lang="ruby"><code>Time</code></span><span lang="objc,swift"><code>NSDate</code></span></i></dd>
+	<dt>capability</dt>
+	<dd>The capability associated with this token. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/general/authentication/#capabilities-explained">Read more about authentication and capabilities</a><br><i>Type: <code>String</code></i></dd>
+	<dt><span lang="default">clientId</span><span lang="ruby">client_id</span></dt>
+	<dd>The client ID, if any, bound to this token. If a client ID is included, then the token authenticates its bearer as that client ID, and the token may only be used to perform operations on behalf of that client ID. The client is then considered to be an <a href="/realtime/authentication#identified-clients">identified client</a><br><i>Type: <code>String</code></i></dd>
 </dl>
 <div lang="Ruby">
 <h3>Methods</h3>
 <dl>
-	<dt><code>expired?</code></dt>
-	<dd>True when the token has expired<br><i>Type: Boolean</i><br />
+	<dt>expired?</dt>
+	<dd>True when the token has expired<br><i>Type: <code>Boolean</code></i><br />
 </div></dd>
 </dl>
 <h2 id="token-request-spec">Token request spec</h2>
@@ -252,19 +254,17 @@ ably.requestToken({ clientId: 'client@example.com' }, function(err, token) {
 <h3>Parameter canonicalisation</h3>
 <p>The parameters of the token request are normalised/canonicalised as follows:</p>
 <dl>
-	<dt><code>keyName</code></dt>
+	<dt>keyName</dt>
 	<dd>no action required</dd>
-	<dt><code>ttl</code></dt>
+	<dt>ttl</dt>
 	<dd>the decimal integer representation, without leading zeros, of the requested life of the token in seconds, if none is specified a default of 1 hour is used</dd>
-	<dt><code>capability</code></dt>
+	<dt>capability</dt>
 	<dd>this is a canonicalised representation of the channel paths and associated <a href="#capability-operations">operations</a> in the capability. It is a JSON stringified value of a Javascript object of the form:<br />
-<pre class="code-editor" lang="json"><code class="code-editor">
-{
+<pre lang="json"><code lang="json">{
   "channel1": ["operation1a", "operation1b", "operation1c", ...],
   "channel2": ["operation2a", "operation2b", "operation2c", ...],
   ...
-}
-</code></pre><br />
+}</code></pre><br />
 with the following constraints:<br />
 <ul><br />
 <li>all whitespace is removed;</li><br />
@@ -275,11 +275,11 @@ with the following constraints:<br />
 <li>for channel paths, the wildcard character <code>*</code> has special meaning. When the channel path is exactly <code>"*"</code>, then all channels are matched. If however, a channel path ends with <code>*</code>, then the path before the <code>*</code> is used to match all channels in that namespace. For example, the channel path <code>"user:*"</code> matches all channels in the <code>user</code> namespace such as <code>"user:john"</code> and <code>"user:matt"</code>. <a href="/general/channels-rules-namespaces">Find out more about channel namespaces</a>;</li><br />
 <li>for operations, the wildcard character <code>*</code> has special meaning. When the operation is exactly <code>"*"</code>, then <a href="#capability-operations">all operations</a> are supported. Otherwise, a <a href="#capability-operations">permitted operation</a> string must be provided<br />
 </ul></dd>
-	<dt><code>clientId</code></dt>
+	<dt>clientId</dt>
 	<dd>the canonical form is the unquoted and unescaped string. In the case that no clientId is included in the request, the empty string is used.</dd>
-	<dt><code>timestamp</code></dt>
+	<dt>timestamp</dt>
 	<dd>the decimal integer representation, without leading zeros, of the time of the of the request in seconds since the epoch.</dd>
-	<dt><code>nonce</code></dt>
+	<dt>nonce</dt>
 	<dd>an unquoted, unescaped random string of at least 16 characters.</dd>
 </dl>
 <h3 id="capability-operations">Capability operations</h3>

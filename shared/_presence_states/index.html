@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -36,19 +38,19 @@
     <p>Whenever a member enters or leaves a channel, or updates <a href="#member-data">their member data</a>, a presence event is emitted to all presence subscribers on that channel. Subscribing to presence events makes it incredibly easy to build an app that shows, in real time, any changes to clients connected to Ably and present on a channel.</p>
 <p>The following presence events are emitted:</p>
 <dl>
-	<dt><span lang="ruby"><code>:enter</code></span><span lang="java"><code>Action.ENTER</code></span><span lang="default"><code>enter</code></span></dt>
+	<dt><span lang="ruby">:enter</span><span lang="java">Action.ENTER</span><span lang="default">enter</span></dt>
 	<dd>A new member has entered the channel</dd>
 </dl>
 <dl>
-	<dt><span lang="ruby"><code>:leave</code></span><span lang="java"><code>Action.LEAVE</code></span><span lang="default"><code>leave</code></span></dt>
+	<dt><span lang="ruby">:leave</span><span lang="java">Action.LEAVE</span><span lang="default">leave</span></dt>
 	<dd>A member who was present has now left the channel. This may be a result of an explicit request to leave or implicitly when detaching from the channel. Alternatively, if a member&#8217;s connection is abruptly disconnected and they do not resume their connection within a minute, Ably treats this as a leave event as the client is no longer present</dd>
 </dl>
 <dl>
-	<dt><span lang="ruby"><code>:update</code></span><span lang="java"><code>Action.UPDATE</code></span><span lang="default"><code>update</code></span></dt>
+	<dt><span lang="ruby">:update</span><span lang="java">Action.UPDATE</span><span lang="default">update</span></dt>
 	<dd>An already present member has updated their <a href="#member-data">member data</a>. Being notified of member data updates can be very useful, for example, it can be used to update the status of a user when they are typing a message</dd>
 </dl>
 <dl>
-	<dt><span lang="ruby"><code>:present</code></span><span lang="java"><code>Action.PRESENT</code></span><span lang="default"><code>present</code></span></dt>
+	<dt><span lang="ruby">:present</span><span lang="java">Action.PRESENT</span><span lang="default">present</span></dt>
 	<dd>When subscribing to presence events on a channel that already has members present, this event is emitted for every member already present on the channel before the subscribe listener was registered</dd>
 </dl>
   </div>

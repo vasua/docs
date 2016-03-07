@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -39,20 +41,20 @@
   java:    Members<br />
   ruby:    Attributes</p>
 <dl>
-	<dt><span lang="default"><code>keyName</code></span><span lang="ruby"><code>key_name</code></span></dt>
-	<dd>The key name of the key against which this request is made. The key name is public, whereas the key secret is private<br><i>Type: String</i></dd>
-	<dt><code>ttl</code></dt>
-	<dd>Requested time to live for the token in <span lang="default">milliseconds</span><span lang="ruby">seconds</span>. If the token request is successful, the TTL of the returned token will be less than or equal to this value depending on application settings and the attributes of the issuing key.<br><i>Type: Integer</i></dd>
-	<dt><code>timestamp</code></dt>
-	<dd>The timestamp of this request in milliseconds<br><i>Type: <span lang="default">Integer</span><span lang="java">Long Integer</span><span lang="ruby">Time</span></i></dd>
-	<dt><code>capability</code></dt>
-	<dd>Capability of the token. If the token request is successful, the capability of the returned token will be the intersection of this capability with the capability of the issuing key. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/realtime/authentication">Read more about authentication and capabilities</a><br><i>Type: String</i></dd>
-	<dt><span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span></dt>
-	<dd>The client ID to associate with this token. When provided, the token may only be used to perform operations on behalf of that client ID<br><i>Type: String</i></dd>
-	<dt><code>nonce</code></dt>
-	<dd>An opaque nonce string of at least 16 characters<br><i>Type: String</i></dd>
-	<dt><code>mac</code></dt>
-	<dd>The Message Authentication Code for this request<br><i>Type: String</i></dd>
+	<dt><span lang="default">keyName</span><span lang="ruby">key_name</span></dt>
+	<dd>The key name of the key against which this request is made. The key name is public, whereas the key secret is private<br><i>Type: <code>String</code></i></dd>
+	<dt>ttl</dt>
+	<dd>Requested time to live for the token in <span lang="default">milliseconds</span><span lang="ruby">seconds</span>. If the token request is successful, the TTL of the returned token will be less than or equal to this value depending on application settings and the attributes of the issuing key.<br><i>Type: <code>Integer</code></i></dd>
+	<dt>timestamp</dt>
+	<dd>The timestamp of this request in milliseconds<br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span><span lang="ruby"><code>Time</code></span></i></dd>
+	<dt>capability</dt>
+	<dd>Capability of the token. If the token request is successful, the capability of the returned token will be the intersection of this capability with the capability of the issuing key. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/realtime/authentication">Read more about authentication and capabilities</a><br><i>Type: <code>String</code></i></dd>
+	<dt><span lang="default">clientId</span><span lang="ruby">client_id</span></dt>
+	<dd>The client ID to associate with this token. When provided, the token may only be used to perform operations on behalf of that client ID<br><i>Type: <code>String</code></i></dd>
+	<dt>nonce</dt>
+	<dd>An opaque nonce string of at least 16 characters<br><i>Type: <code>String</code></i></dd>
+	<dt>mac</dt>
+	<dd>The Message Authentication Code for this request<br><i>Type: <code>String</code></i></dd>
 </dl>
   </div>
   <div id="sidebar">

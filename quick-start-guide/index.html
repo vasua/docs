@@ -19,6 +19,8 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
+    
+
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
   </head>
@@ -146,7 +148,6 @@ ably.connection.on(ConnectionState.connected, new ConnectionStateListener() {
 <pre lang="ruby"><code lang="ruby">ably = Ably::Realtime.new(api_key)
 ably.connection.on(:connected) do
   puts "That was simple, you're now connected to Ably in realtime"
-}
 end</code></pre>
 <pre lang="swift"><code lang="swift">let ably = ARTRealtime(key: "{{API_KEY}}")
 ably.connection.on(.Connected) {
@@ -186,12 +187,14 @@ channel.subscribe("greeting") { message in
     print("Received a greeting message in realtime: \(message.data)")
 }</code></pre>
 <pre lang="objc"><code lang="objc">ARTRealtimeChannel *channel = [ably.channels get:@"quickstart"];
-[channel subscribe:@"greeting" cb:^(ARTMessage *message) {
+[channel subscribe:@"greeting" callback:^(ARTMessage *message) {
     NSLog(@"Received a greeting message in realtime: %@", message.data);
 }];</code></pre>
 <h3>The basics: Sending a message</h3>
 <p>Publishing a message to a channel is extremely straightforward.  As this is commonly performed by both connected devices and servers, here are examples in multiple languages</p>
 <pre class="code-editor open-jsbin open-jsbin-onocan" lang="javascript"><code class="code-editor open-jsbin open-jsbin-onocan" lang="javascript">var channel = ably.channels.get('quickstart');
+channel.publish('greeting', 'hello!');</code></pre>
+<pre class="code-editor open-jsbin open-jsbin-onocan" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-onocan" lang="nodejs">var channel = ably.channels.get('quickstart');
 channel.publish('greeting', 'hello!');</code></pre>
 <pre lang="csharp"><code lang="csharp">Channel channel = ably.channels.get('quickstart');
 channel.publish('greeting', 'hello!');</code></pre>
