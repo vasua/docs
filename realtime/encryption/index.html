@@ -8,6 +8,10 @@
     <link rel="stylesheet" type="text/css" href="/vendor/prettify/prettify.css" media="screen">
     <link rel="stylesheet" type="text/css" href="/stylesheet.css" media="screen">
 
+    
+      <link rel="canonical" href="https://www.ably.io/documentation/realtime/encryption" />
+    
+
     <script src="/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
     <script src="/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
     <script src="/vendor/javascripts/base64.js" type="text/javascript"></script>
@@ -148,7 +152,7 @@ Related types
 <p class="definition"><span lang='javascript,nodejs'><a href="#cipher-params">CipherParams</a> Crypto.getDefaultParams(Object params)</span><span lang='ruby'><a href="#cipher-params">CipherParams</a> Crypto.get_default_params(Hash params)</span><span lang='java'>public <a href="#cipher-params">CipherParams</a> Crypto.getDefaultParams(Param[] params)</span><span lang='swift,objc'>getDefaultParams(values: [NSObject : AnyObject]) &#8594; <a href="#cipher-params">ARTCipherParams</a></span></p>
 </blockquote>
 <p>This call obtains a <a href="#cipher-params"><code>CipherParams</code></a> object using the values passed in (which must be a subset of <code>CipherParams</code> fields that at a minimum includes a <code>key</code>), filling in any unspecified fields with default values, and checks that the result is a valid and self-consistent.</p>
-<p>You will rarely need to call this yourself, since the client library will handle it for you if you specify <code>cipher</code> params when initialising a channel (as in the example <a href="#getting-started">at the top</a>)<span lang="javascript,nodejs"> or when setting channel options with <code>channel#setOptions</code></span>.</p>
+<p>You will rarely need to call this yourself, since the client library will handle it for you if you specify <code>cipher</code> params when initializing a channel (as in the example <a href="#getting-started">at the top</a>)<span lang="javascript,nodejs"> or when setting channel options with <code>channel#setOptions</code></span>.</p>
 <h4>Parameters</h4>
 <dl>
 	<dt>params</dt>
@@ -289,7 +293,7 @@ let channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}", options: options)
 
 <h3 id="cipher-params"><span lang='default'>CipherParams</span><span lang='objc,swift'>ARTCipherParams</span><span lang='ruby'>CipherParams Hash</span><span lang='java'>io.ably.lib.util.Crypto.CipherParams</span></h3>
 <p>A <code>CipherParams</code> contains configuration options for a channel cipher, including algorithm, mode, key length and key. Ably client libraries currently support AES with CBC, PKCS#7 with a default key length of 256 bits. All implementations also support AES128.</p>
-<p>Individual client libraries may support either instancing a <code>CipherParams</code> directly, using <span lang="default"><a href="/realtime/encryption#get-default-params"><code>Crypto.getDefaultParams()</code></a></span><span lang="ruby"><a href="/realtime/encryption#get-default-params"><code>Crypto.get_default_params()</code></a></span>, or generating one automatically when initialising a channel, as in <a href="/realtime/encryption#getting-started">this example</a>.</p>
+<p>Individual client libraries may support either instancing a <code>CipherParams</code> directly, using <span lang="default"><a href="/realtime/encryption#get-default-params"><code>Crypto.getDefaultParams()</code></a></span><span lang="ruby"><a href="/realtime/encryption#get-default-params"><code>Crypto.get_default_params()</code></a></span>, or generating one automatically when initializing a channel, as in <a href="/realtime/encryption#getting-started">this example</a>.</p>
 <h4><span lang='default'>Properties</span><span lang='java'>Members</span><span lang='ruby'>Attributes</span></h4>
 <dl>
 	<dt><div lang="javascript,nodejs,,ruby,objc,swift"><span lang="ruby">:</span>key</div></dt>
@@ -298,8 +302,8 @@ let channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}", options: options)
 <dl>
 	<dt><span lang="ruby">:</span>algorithm</dt>
 	<dd><em>AES</em> The name of the algorithm in the default system provider, or the lower-cased version of it; eg &#8220;aes&#8221; or &#8220;AES&#8221;<br><i>Type: <code>String</code></i></dd>
-	<dt><span lang="ruby">:key_length</span><span lang="default">keyLength</span></dt>
-	<dd><em>128</em> The key length in bits of the cipher, either 128 or 256<br><i>Type: <code>Integer</code></i></dd>
+	<dt><span lang="python">key_length</span><span lang="ruby">:key_length</span><span lang="default">keyLength</span></dt>
+	<dd><em>256</em> The key length in bits of the cipher, either 128 or 256<br><i>Type: <code>Integer</code></i></dd>
 	<dt><span lang="ruby">:</span>mode</dt>
 	<dd><em>CBC</em> The cipher mode<br><i>Type: <code>String</code></i></dd>
 </dl>

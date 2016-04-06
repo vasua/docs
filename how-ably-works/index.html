@@ -8,6 +8,10 @@
     <link rel="stylesheet" type="text/css" href="/vendor/prettify/prettify.css" media="screen">
     <link rel="stylesheet" type="text/css" href="/stylesheet.css" media="screen">
 
+    
+      <link rel="canonical" href="https://www.ably.io/documentation/how-ably-works" />
+    
+
     <script src="/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
     <script src="/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
     <script src="/vendor/javascripts/base64.js" type="text/javascript"></script>
@@ -130,9 +134,9 @@
 	<dd>we operate a completely isolated backup domain that is used by our client libraries if the primary <code>ably.io</code> endpoint is failing</dd>
 	<dt><a href="https://support.ably.io/solution/articles/3000044636-routing-around-network-and-dns-issues#fallback">Host fallback</a></dt>
 	<dd>clients that are unable to connect to their closest data centre using the primary <code>ably.io</code> domain will automatically fallback to an alternative data centre using the secondary domain</dd>
-	<dt><a href="https://support.ably.io/solution/articles/3000045691-are-you-able-to-scale-indefinitely-to-meet-demand">Auto scaling</a>-</dt>
+	<dt><a href="https://support.ably.io/solution/articles/3000045691-are-you-able-to-scale-indefinitely-to-meet-demand">Auto scaling</a></dt>
 	<dd>as load on the system increases, more servers are automatically provisioned in every part of the system that requires additional capacity</dd>
-	<dt><a href="https://support.ably.io/solution/articles/3000045691-are-you-able-to-scale-indefinitely-to-meet-demand">Load balancers</a>-</dt>
+	<dt><a href="https://support.ably.io/solution/articles/3000045691-are-you-able-to-scale-indefinitely-to-meet-demand">Load balancers</a></dt>
 	<dd>our load balancers are elastic and scale to meet demand, but are also responsible for intelligently routing traffic to existing and new frontends that are coming online</dd>
 	<dt><a href="https://en.wikipedia.org/wiki/Stateless_protocol">Stateless</a></dt>
 	<dd>our frontends do not store any state thus ensuring that frontends can come online quickly and service new requests, but also go offline easily without data loss</dd>

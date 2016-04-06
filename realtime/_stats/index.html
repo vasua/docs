@@ -8,6 +8,8 @@
     <link rel="stylesheet" type="text/css" href="/vendor/prettify/prettify.css" media="screen">
     <link rel="stylesheet" type="text/css" href="/stylesheet.css" media="screen">
 
+    
+
     <script src="/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
     <script src="/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
     <script src="/vendor/javascripts/base64.js" type="text/javascript"></script>
@@ -60,9 +62,9 @@
 <p>The following options, as defined in the <a href="/rest-api#stats">REST <code>/stats</code> API</a> endpoint, are permitted:</p>
 <dl>
 	<dt><span lang="ruby">:</span>start</dt>
-	<dd><em>beginning of time</em> earliest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: <code>Long</code><span lang="ruby">, <code>Time</code></span></i></dd>
+	<dd><em>beginning of time</em> earliest <span lang="ruby"><code>Time</code> or </span>time in milliseconds since the epoch for any stats retrieved<br><i>Type: <code>Long</code><span lang="ruby">, <code>Time</code></span></i></dd>
 	<dt><span lang="ruby">:</span>end</dt>
-	<dd><em>current time</em> latest <span lang="ruby"><code>Time</code> or </span>millisecond since epoch time for any stats retrieved<br><i>Type: <code>Long</code><span lang="ruby">, <code>Time</code></span></i></dd>
+	<dd><em>current time</em> latest <span lang="ruby"><code>Time</code> or </span>time in milliseconds since the epoch for any stats retrieved<br><i>Type: <code>Long</code><span lang="ruby">, <code>Time</code></span></i></dd>
 	<dt><span lang="ruby">:</span>direction</dt>
 	<dd><em>backwards</em> <span lang="ruby"><code>:</code></span><code>forwards</code> or <span lang="ruby"><code>:</code></span><code>backwards</code><br><i>Type: <span lang="default"><code>String</code></span><span lang="ruby"><code>Symbol</code></span></i></dd>
 	<dt><span lang="ruby">:</span>limit</dt>

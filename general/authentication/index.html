@@ -8,6 +8,10 @@
     <link rel="stylesheet" type="text/css" href="/vendor/prettify/prettify.css" media="screen">
     <link rel="stylesheet" type="text/css" href="/stylesheet.css" media="screen">
 
+    
+      <link rel="canonical" href="https://www.ably.io/documentation/general/authentication" />
+    
+
     <script src="/vendor/javascripts/jquery-1-8-3-min.js" type="text/javascript"></script>
     <script src="/vendor/javascripts/jquery-cookie-1-3-1.js" type="text/javascript"></script>
     <script src="/vendor/javascripts/base64.js" type="text/javascript"></script>
@@ -19,7 +23,7 @@
     <script src="/javascripts/application.js" type="text/javascript"></script>
     <script src="/javascripts/lang-manager.js" type="text/javascript"></script>
 
-    
+    <script type="text/javascript">window.NavLangs=["none"];</script>
 
     <!-- you don't need to keep this, but it's cool for stats! -->
     <meta name="generator" content="nanoc 3.7.5">
@@ -73,7 +77,7 @@
 	<li>all of the configured capabilities of the key are implicitly possible in any request, and clients that legitimately obtain this key may then abuse the rights for that key</li>
 	<li>clients are permitted to use any client ID in all operations with Ably. As such, a client ID in messages and presence cannot be trusted as any client using Basic Authentication can masquerade with any client ID</li>
 </ul>
-<p>These issues are addressed with <a href="#token-authentication">token-based authentication</a>. Tokens are authentication credentials that are short-lived, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of <a href="#capabilities-explained" title="capabilities">access rights</a> or an <a href="/realtime/authentication#identified-clients">explicit <code>clientId</code> identity</a> &#8211; and therefore token-based authentication provides the flexibility to implement access and identity control policies in the application. Tokens may be obtained using the <a href="/rest/authentication">client library authentication API</a> or directly from the Ably <a href="/rest-api/#requestToken">REST API tokenRequest endpoint</a>.</p>
+<p>These issues are addressed with <a href="#token-authentication">token-based authentication</a>. Tokens are authentication credentials that are short-lived, and therefore they may more readily be distributed to clients where there is a risk of compromise. Tokens may also be issued with a particular scope &#8211; such as a limited set of <a href="#capabilities-explained">access rights or capabilities</a> or being limited to use by a specific <a href="/realtime/authentication#identified-clients"><code>clientId</code> identity</a> &#8211; and therefore token-based authentication provides the flexibility to implement access and identity control policies in the application. Tokens may be obtained using the <a href="/rest/authentication">client library authentication API</a> or directly from the Ably <a href="/rest-api/#requestToken">REST API tokenRequest endpoint</a>.</p>
 <p>See <a href="#capabilities-explained">capabilities and token security explained</a> below for examples that use token authenticaiton to control which channels a client can attach to and which operations they can perform.</p>
 <h2 id="selecting-auth">Selecting an authentication mechanism</h2>
 <p>The following guidance aims to help you choose which system to use in any given situation. When deciding, it is recommended to bear in mind the <a href="http://en.wikipedia.org/wiki/Principle_of_least_privilege">principle of least privilege</a>: a client should ideally only possess the credentials and rights that it needs to accomplish what it wants; this way, if the credentials are compromised, the rights that can be abused by an attacker are minimised.</p>
@@ -115,7 +119,7 @@
   <img src="/images/diagrams/signed-token-request-auth-process.png" style="width: 100%" alt="Signed token request auth process diagram"><br />
 </a></p>
 <p>An example of creating a <a href="/realtime/types#token-request">token request</a> can be seen below:</p>
-<pre class="code-editor open-jsbin open-jsbin-uduxab" lang="javascript"><code class="code-editor open-jsbin open-jsbin-uduxab" lang="javascript">var ably = new Ably.Rest({ key: '{{API_KEY}}' });
+<pre class="code-editor open-jsbin open-jsbin-uqidub" lang="javascript"><code class="code-editor open-jsbin open-jsbin-uqidub" lang="javascript">var ably = new Ably.Rest({ key: '{{API_KEY}}' });
 ably.createTokenRequest({ clientId: 'client@example.com' }, null, function(err, tokenRequest) {
   /* tokenRequest =&gt; {
        "capability": "{\"*\":[\"*\"]}",
@@ -154,6 +158,8 @@ ably.requestToken({ clientId: 'client@example.com' }, function(err, token) {
 	<li>If a set of capabilities are requested, and the requested capabilities are incompatible with the issuing key i.e. none of the capabilities requested can be assigned to the token, then this will result in an error, <a href="#capabilities-explained-error">see example</a></li>
 </ul>
 <p>See <a href="#capability-operations">capability operations</a> below for the complete set of supported operations on a channel.</p>
+<h4 id="capabilities-example">Capabilities example in code</h4>
+<p>If you just want to see how capabilities work with some code, take a look at our <a href="https://jsbin.ably.io:443/ivomas/1/edit?javascript,live">capabilities example</a>.</p>
 <h4 id="capabilities-explained-all">Token request without capabilities example</h4>
 <p>Given an API key exists with the following capabilities:</p>
 <pre lang="json"><code lang="json">{
@@ -195,6 +201,7 @@ ably.requestToken({ clientId: 'client@example.com' }, function(err, token) {
   "status": ["*"]
 }}, tokenCallback)</code></pre>
 <p>Then Ably will be unable to issue a token because the requested capabilities do not intersect with the API key&#8217;s capabilities i.e. they are entirely incompatible. In the example above, <code>requestToken</code> will call the callback with an error.</p>
+<p>See a working <a href="https://jsbin.ably.io:443/ivomas/1/edit?javascript,live">capabilities example</a>.</p>
 <h3 id="tokens">Tokens</h3>
 <p>In the documentation, references to tokens typically refer to both <code>TokenDetails</code> object that contain the token string or the token string itself. <code>TokenDetails</code> objects are obtained when <a href="/realtime/authentication#request-token">requesting tokens</a> from the Ably service and contain not only the token string in the <code>token</code> attribute, but also contain attributes describing the properties of the token.</p>
 <h4>TokenDetails type</h4>
@@ -209,16 +216,31 @@ ably.requestToken({ clientId: 'client@example.com' }, function(err, token) {
 	<dd><span lang="default">The time (in milliseconds since the epoch)</span><span lang="ruby,objc,swift">The time</span> at which this token was issued<br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span><span lang="ruby"><code>Time</code></span><span lang="objc,swift"><code>NSDate</code></span></i></dd>
 	<dt>capability</dt>
 	<dd>The capability associated with this token. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/general/authentication/#capabilities-explained">Read more about authentication and capabilities</a><br><i>Type: <code>String</code></i></dd>
-	<dt><span lang="default">clientId</span><span lang="ruby">client_id</span></dt>
+	<dt><span lang="default">clientId</span><span lang="ruby,python">client_id</span></dt>
 	<dd>The client ID, if any, bound to this token. If a client ID is included, then the token authenticates its bearer as that client ID, and the token may only be used to perform operations on behalf of that client ID. The client is then considered to be an <a href="/realtime/authentication#identified-clients">identified client</a><br><i>Type: <code>String</code></i></dd>
 </dl>
-<div lang="Ruby">
+
+
+<div lang="ruby"> <!-- start ruby language block -->
 <h3>Methods</h3>
 <dl>
 	<dt>expired?</dt>
-	<dd>True when the token has expired<br><i>Type: <code>Boolean</code></i><br />
-</div></dd>
+	<dd>True when the token has expired<br><i>Type: <code>Boolean</code></i></dd>
 </dl>
+
+</div> <!-- /end ruby language block -->
+
+
+
+<div lang="python"> <!-- start python language block -->
+<h3>Methods</h3>
+<dl>
+	<dt>is_expired()</dt>
+	<dd>True when the token has expired<br><i>Type: <code>Boolean</code></i></dd>
+</dl>
+
+</div> <!-- /end python language block -->
+
 <h2 id="token-request-spec">Token request spec</h2>
 <p>The <a href="https://www.ably.io/download/">Ably REST and Realtime client libraries</a> aim to make things as simple as possible so it is not necessary to understand all of the details of token requests to interact with the service and issue tokens for clients. If you wish to issue tokens or token requests, we recommend you start with the <a href="/rest/authentication">client library authentication documentation</a>.</p>
 <p>However, if you are using the <a href="/rest-api/#request-token">REST token endpoint directly</a>, or if you are creating token requests without the use of our client libraries, then the following specification will give you an in-depth understanding of how token requests work.</p>
@@ -296,7 +318,7 @@ with the following constraints:<br />
 	<dt>stats</dt>
 	<dd>can retrieve current and historical usage statistics for an app</dd>
 </dl>
-<p>See <a href="#capabilities-explained">understanding capabilities and token security</a> above to get a more thorough overview of how capabilities can be used to secure your application along with working examples.</p>
+<p>See a working <a href="https://jsbin.ably.io:443/ivomas/1/edit?javascript,live">capabilities example</a>, read <a href="#capabilities-explained">understanding capabilities and token security</a> above to get a more thorough overview of how capabilities can be used to secure your application along with working examples.</p>
 <h3>HMAC calculation</h3>
 <p>First the canonicalised request text, constructed as follows:</p>
 <ul>
