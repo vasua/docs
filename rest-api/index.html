@@ -240,7 +240,7 @@ X-Ably-ErrorMessage: &lt;string, equivalent to error.message&gt;</code></pre>
 }]</code></pre>
 <h3>Envelope response format</h3>
 <p>A client that is unable to access response headers or status code can request an <code>envelope</code> response that contains the usual response, plus <code>Link</code> header information and the response status code wrapped in an object as a single response body. This is useful for JSONP and may be useful in other environments. Envelope responses are only supported for JSON, JSONP and HTML formats.</p>
-<p>A client requests an envelope response by including an <code>envelope=true</code> param in the request.</p>
+<p>A client requests an envelope response by including an <code>envelope=json</code> param in the request.</p>
 <p>An envelope response body then has the format:</p>
 <pre lang="json"><code lang="json">{
     "statusCode": &lt;status code&gt;,
