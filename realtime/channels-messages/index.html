@@ -124,7 +124,8 @@ ARTRealtimeChannel *channel = [realtime.channels get:@"{{RANDOM_CHANNEL_NAME}}"]
 let channel = realtime.channels.get("{{RANDOM_CHANNEL_NAME}}")
 channel.subscribe { message in
     print("Received: \(message.data)")
-}</code></pre>
+}
+channel.publish("example", data: "message data")</code></pre>
 <h2 id="channels">Channels</h2>
 <p>In order to publish, subscribe to, or be present on a channel, you must first obtain a channel instance and then attach to that channel. In most instances, as a convenience, it is unnecessary to explicitly attach a channel as it will implicitly attached when performing any operation on the channel such as publishing or subscribing.</p>
 <h3>Obtaining a channel instance</h3>
