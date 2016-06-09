@@ -86,7 +86,7 @@
 ably.connection.on('connected', function() {
   alert('Connected, that was easy');
 })</code></pre>
-<pre class="code-editor open-jsbin open-jsbin-aredoz" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-aredoz" lang="nodejs">var Ably = require('ably-js');
+<pre class="code-editor open-jsbin open-jsbin-aredoz" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-aredoz" lang="nodejs">var Ably = require('ably');
 var ably = new Ably.Realtime('{{API_KEY}}');
 ably.connection.on('connected', function() {
   alert('Connected, that was easy');
@@ -132,7 +132,7 @@ realtime.connection.on(.Connected) { change in
 </dl>
 <dl>
 	<dt>disconnected</dt>
-	<dd>A temporary failure condition. No current connection exists because there is no network connectivity or no host is available.<br><br>The disconnected state is entered if an established connection is dropped, or if a connection attempt was unsuccessful. In the disconnected state the library will periodically attempt to open a new connection (approximately every 15 seconds), anticipating that the connection will be re-established soon and thus connection and channel continuity will be possible. <br><br>In this state, developers can continue to publish messages as they are automatically placed in a local queue, and sent as soon as a connection is established. <br>Messages published by other clients to the Ably service, whilst this client is disconnected, are queued and delivered to this client upon reconnection, so long as the connection is resumed within 2 minutes. <br><br>If connection state recovery is not possible following a new connection being established, all channels are detached, thus ensuring the developer is made aware that continuity on the channel was not possible. The developer is then responsible for reattaching channels and recovering state, if required, using the <a href="/realtime/history">history API</a>.</dd>
+	<dd>A temporary failure condition. No current connection exists because there is no network connectivity or no host is available.<br><br>The disconnected state is entered if an established connection is dropped, or if a connection attempt was unsuccessful. In the disconnected state the library will periodically attempt to open a new connection (approximately every 15 seconds), anticipating that the connection will be re-established soon and thus connection and channel continuity will be possible. <br><br>In this state, developers can continue to publish messages as they are automatically placed in a local queue, and sent as soon as a connection is established. <br>Messages published by other clients to the Ably service, whilst this client is disconnected, are queued and delivered to this client upon reconnection, so long as the connection is resumed within 2 minutes. <br><br>If connection state recovery is not possible following a new connection being established, all channels are detached, thus ensuring the developer is made aware that continuity on the channel was not possible. The developer is then responsible for re-attaching channels and recovering state, if required, using the <a href="/realtime/history">history API</a>.</dd>
 </dl>
 <dl>
 	<dt>suspended</dt>
@@ -307,19 +307,41 @@ realtime.connection.off()</code></pre>
 	<li><code>resume</code>: this is transparent recovery of a live client instance across disconnections. Upon disconnection, the library will automatically re-attempt connection and, once the connection is re-established, any missed messages will be sent to the client. The developer does not need to do anything to trigger this behaviour; all client channel event listeners remain attached and are called when the backlog of messages is received.</li>
 </ul>
 <ul>
-	<li><code>recover</code>: this addresses the case in which a new client library instance wishes to connect and recover the state of an earlier connection. This occurs typically in a browser environment when the page has been refreshed and therefore the client instance is disposed and no client state is retained. In this case any message listeners associated with channels will no longer exist so it is not possible for the library simply to send the message backlog on reconnection; instead the client must re-subscribe to each channel it is interested in, and its message listener(s) will be called with any message backlog for that channel. A client requests recovery of connection state by including a recovery string in the <a href="/realtime/usage#client-options">client options</a> when instancing the Realtime library.  See <a href="#connection-state-recover-options">connection state recover options</a> for more info.</li>
+	<li><code>recover</code>: this addresses the case in which a new client library instance wishes to connect and recover the state of an earlier connection. This occurs typically in a browser environment when the page has been refreshed and therefore the client instance is disposed and no client state is retained. In this case any message listeners associated with channels will no longer exist so it is not possible for the library simply to send the message backlog on reconnection; instead the client must re-subscribe to each channel it is interested in within 15 seconds, and its message listener(s) will be called with any message backlog for that channel. If the previously attached channels are not re-attached within 15 seconds of a connection being recovered, the channels will automatically be detached by Ably. A client requests recovery of connection state by including a recovery string in the <a href="/realtime/usage#client-options">client options</a> when instancing the Realtime library. See <a href="#connection-state-recover-options">connection state recover options</a> for more info.</li>
 </ul>
 <p>In either case, when a connection is resumed or recovered, the message backlog held on the server will be pushed to the client. However, any new messages published will be sent as they become available or messages could be indefinitely deferred on very heavily loaded connections. Therefore the system does not guarantee that messages received after reconnection are delivered in the same order that would have occurred if the connection had not been dropped. In the <code>recover</code> case, in particular, the order of the message delivery depends on the timing of the re-attachment of each channel.</p>
 <h4 id="connection-state-recover-options">Connection state recover options</h4>
-<p>In <code>recover</code> mode it is necessary to request recovery mode in the <a href="/realtime/usage#client-options">client options</a> when instancing the library. Recovery requires that the library knows the most previous connection&#8217;s <span lang="default"><a href="#recovery-key"><code>recoveryKey</code></a></span><span lang="ruby"><a href="#recovery-key"><code>recovery_key</code></a></span> value, which includes both the private unique <a href="#key"><code>Connection#key</code></a> and the last message serial received on that connection. As the recovery key is never shared with any other clients, it allows Ably to safely resend message backlogs to the original client.</p>
+<p>In <code>recover</code> mode it is necessary to request recovery mode in the <a href="/realtime/usage#client-options">client options</a> when instancing the library. Recovery requires that the library knows the previous connection&#8217;s <span lang="default"><a href="#recovery-key"><code>recoveryKey</code></a></span><span lang="ruby"><a href="#recovery-key"><code>recovery_key</code></a></span> value (which includes both the private unique <a href="#key"><code>Connection#key</code></a> and the last message serial received on that connection). As the recovery key is never shared with any other clients, it allows Ably to safely resend message backlogs to the original client.</p>
 
 
 <div lang="javascript"> <!-- start javascript language block -->
-<p>In the browser environment a <code>window close</code> event causes those parameters to be saved in a cookie; a client can then request recovery simply by including <code>recover: true</code> in the initialization options.</p>
-<p>Alternatively, if it is necessary to be explicit about the connection <code>recoveryKey</code> &#8211; for example if there are multiple tabs and the cookies would conflict, or if third-party cookies are disabled &#8211; the connection can be recovered by providing the last value of the connection&#8217;s <code>recoveryKey</code> value in the <a href="/realtime/usage#client-options">client options</a> <code>recover</code> attribute when instancing the library.</p>
+<p>In the browser environment, if a callback is provided in the <code>recover</code> option, when <code>window beforeunload</code> event fires, the connection details, including the <a href="#recovery-key"><code>recoveryKey</code></a>, are stored in the <a href="https://www.w3.org/TR/webstorage/">browser&#8217;s sessionStorage</a>. The provided <code>recover</code> callback is then invoked whenever the connection state can be recovered and just before a connection is established, passing in the <a href="#last-connection-details"><code>LastConnectionDetails</code></a>. The callback is then responsible for confirming whether the connection state should be recovered or not. For example, it is common to recover connection state when the page is reloaded but not for different pages the user has navigated to. The callback allows the developer to decide if the connection should be recovered or not at the time the new connection is established by inspecting the <a href="#last-connection-details"><code>LastConnectionDetails</code></a> and evaluating that against any other application state. Below is a straightforward example:</p>
+<pre lang="javascript"><code lang="javascript">var ably = new Ably.Realtime({
+  authUrl: '/obtainToken',
+  recover: function(lastConnectionDetails, cb) {
+    if (lastConnectionDetails.location.href === document.location.href) {
+      cb(true); /* recover connection as user has reloaded page */
+    } else {
+      cb(false); /* do not recover connection as URL has changed */
+    }
+  }
+});</code></pre>
+<pre lang="nodejs"><code lang="nodejs">var ably = new Ably.Realtime({
+  authUrl: '/obtainToken',
+  recover: function(lastConnectionDetails, cb) {
+    if (lastConnectionDetails.location.href === document.location.href) {
+      cb(true); /* recover connection as user has reloaded page */
+    } else {
+      cb(false); /* do not recover connection as URL has changed */
+    }
+  }
+});</code></pre>
+<p>Please note that as <a href="https://www.w3.org/TR/webstorage/"><code>sessionStorage</code></a> is used to persist the <code>LastConnectionDetails</code> between page reloads, it is only available for pages in the same origin and top-level browsing context.</p>
+<p>Alternatively, if it is necessary to be explicit about the connection <code>recoveryKey</code> , the connection can be recovered by providing the last value of the connection&#8217;s <code>recoveryKey</code> value in the <a href="/realtime/usage#client-options">client options</a> <code>recover</code> attribute when instancing the library.</p>
 
 </div> <!-- /end javascript language block -->
 
+<h4>Connection recovery constraints</h4>
 <p>Connection recovery requires that the new client library instance uses credentials that are compatible with those used for the inherited connection; this requires that the same authentication mode is used, with the same key. If token auth was used, the same token is not required, but the token used must have the same <code>capability</code> and <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span>. This ensures that the client recovering the connection cannot receive a backlog of messages that its new credentials are not entitled to access. Incompatible credentials will result in an unrecoverable connection error.</p>
 <h1>Connection API reference</h1>
 <div class="inline-toc">
@@ -357,6 +379,7 @@ Related types
 <li><a href='#connection-state'>ConnectionState</a></li>
 <li><a href='#connection-state-listener'>ConnectionStateListener</a></li>
 <li><a href='#connection-state-change'>ConnectionStateChange</a></li>
+<li><a href='#last-connection-details'>LastConnectionDetails</a></li>
 </ul>
 </li>
 </ul>
@@ -380,7 +403,7 @@ Related types
 <blockquote class="definition">
 <p class="definition"><span lang='default'>connect()</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> connect &#8594; yields <a href="/realtime/connection"><code>Connection</code></a></span><span lang='java'>public void connect()</span></p>
 </blockquote>
-<p>Explicitly calling <code>connect</code> is unnecessary unless the <a href="#client-option"><code>ClientOption</code></a> <span lang="default"><code>autoConnect</code></span><span lang="ruby"><code>auto_connect</code></span> is disabled. Unless already <code>connected</code> or <code>connecting</code>, this method causes the connection to open, entering the <code>connecting</code> state.</p>
+<p>Explicitly calling <code>connect</code> is unnecessary unless the <a href="#client-options"><code>ClientOptions</code></a> <span lang="default"><code>autoConnect</code></span><span lang="ruby"><code>auto_connect</code></span> is disabled. Unless already <code>connected</code> or <code>connecting</code>, this method causes the connection to open, entering the <code>connecting</code> state.</p>
 
 
 <div lang="ruby"> <!-- start ruby language block -->
@@ -653,6 +676,33 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 	<dt><span lang="default">retryIn</span><span lang="ruby">retry_in</span></dt>
 	<dd>Duration upon which the library will retry a connection where applicable, as <span lang="default">milliseconds</span><span lang="ruby">seconds</span><br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span></i></dd>
 </dl>
+<h3 id="last-connection-details"><span lang='javascript'>LastConnectionDetails</span></h3>
+
+
+<div lang="javascript"> <!-- start javascript language block -->
+<p>A <code>LastConnectionDetails</code> object provides details on the last connection in a browser environment persisted when the <code>window beforeunload</code> fired. This object is provided to the callback specified in the <code>recover</code> attribute of <a href="/realtime/types#client-options"><code>ClientOptions</code></a>. The callback in turn instructs the client library whether the connection should be recovered or not. See <a href="/realtime/connection/#connection-state-recovery">connection state recovery</a> for more information.</p>
+<p>Please note that as <a href="https://www.w3.org/TR/webstorage/"><code>sessionStorage</code></a> is used to persist the <code>LastConnectionDetails</code> between page reloads, it is only available for pages in the same origin and top-level browsing context.</p>
+<h4><span lang='default'>Properties</span></h4>
+<dl>
+	<dt>recoveryKey</dt>
+	<dd>An opaque string obtained from the <a href="/realtime/connection/#recovery-key">recoveryKey</a> attribute of the <a href="/realtime/connection">Connection object</a> before the page was unloaded. This property is used by the library to recover the connection<br><i>Type: <code>String</code></i></dd>
+</dl>
+<dl>
+	<dt>disconnectedAt</dt>
+	<dd>the time at which the previous library was abruptly disconnected before the page was unloaded. This is represented as milliseconds since epoch<br><i>Type: <code>Integer</code></i></dd>
+</dl>
+<dl>
+	<dt>location</dt>
+	<dd>a clone of <a href="https://www.w3.org/TR/html5/browsers.html#the-location-interface"><code>location</code></a> object of the previous page&#8217;s <code>document</code> object before the page was unloaded. A common use case for this attribute is to ensure that the previous page URL is the same as the current URL before allowing the connection to be recovered. For example, you may want the connection to be recovered only for page reloads, but not when a user navigates to a different page<br><i>Type: <code>String</code></i></dd>
+</dl>
+<dl>
+	<dt>clientId</dt>
+	<dd>the <a href="/realtime/authentication/#client-id"><code>clientId</code></a> of the <a href="/realtime/authentication">client&#8217;s Auth object</a> before the page was unloaded. A common use case for this attribute is to ensure that the current logged in user&#8217;s <code>clientId</code> matches the previous connection&#8217;s <code>clientId</code> before allowing the connection to be recovered. Ably prohibits changing a <code>clientId</code> for an existing connection, so any mismatch in <code>clientId</code> during a recover will result in the connection moving to the failed state<br><i>Type: <code>String</code></i></dd>
+</dl>
+
+</div> <!-- /end javascript language block -->
+
+
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>

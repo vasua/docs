@@ -70,6 +70,7 @@
 <option id="anchor-connection-state-listener">Connection State Listener</option>
 <option id="anchor-connection-state-change">Connection State Change</option>
 <option id="anchor-deferrable">Deferrable</option>
+<option id="anchor-last-connection-details">LastConnnectionDetails</option>
 <option id="anchor-message-listener">Message Listener</option>
 <option id="anchor-presence-listener">Presence Listener</option>
 <option id="anchor-token-params">Token Params</option>
@@ -661,7 +662,7 @@ if ($firstPage-&gt;hasNext()) {
 </dl>
 <dl>
 	<dt><span lang="default">useTokenAuth</span><span lang="ruby">:use_token_auth</span><span lang="python">use_token_auth</span></dt>
-	<dd><em>false</em> When true, forces <a href="/general/authentication#token-authentication">Token authentication</a> to be used by the libary<br><i>Type: <code>Boolean</code></i></dd>
+	<dd><em>false</em> When true, forces <a href="/general/authentication#token-authentication">Token authentication</a> to be used by the libary. Please note that if a <span lang="ruby,python"><code>client_id</code></span><span lang="default"><code>clientId</code></span> is not specified in the <a href="/realtime/types#client-options"><code>ClientOptions</code></a> or <a href="/realtime/types#token-params"><code>TokenParams</code></a>, then the token issued will be <a href="https://support.ably.io/solution/articles/3000038608-authenticated-and-identified-clients">anonymous</a><br><i>Type: <code>Boolean</code></i></dd>
 </dl>
 <h3 id="channel-event"><span lang='swift,objc'>ARTChannelEvent</span></h3>
 
@@ -761,7 +762,7 @@ if ($firstPage-&gt;hasNext()) {
 </dl>
 <dl>
 	<dt><span lang="default">useTokenAuth</span><span lang="python">use_token_auth</span><span lang="ruby">:use_token_auth</span></dt>
-	<dd>When true, forces <a href="/general/authentication#token-authentication">Token authentication</a> to be used by the libary.<br><i>Type: <code>Boolean</code></i></dd>
+	<dd><em>false</em> When true, forces <a href="/general/authentication#token-authentication">Token authentication</a> to be used by the libary. Please note that if a <span lang="ruby,python"><code>client_id</code></span><span lang="default"><code>clientId</code></span> is not specified in the <a href="/realtime/types#client-options"><code>ClientOptions</code></a> or <a href="/realtime/types#token-params"><code>TokenParams</code></a>, then the token issued will be <a href="https://support.ably.io/solution/articles/3000038608-authenticated-and-identified-clients">anonymous</a>.<br><i>Type: <code>Boolean</code></i></dd>
 </dl>
 
 
@@ -842,19 +843,27 @@ Note that the log level and log handler have global scope in the library and wil
 	<dt><span lang="default">useBinaryProtocol</span><span lang="python">use_binary_protocol</span><span lang="ruby">:use_binary_protocol</span></dt>
 	<dd><em>true</em> If set to false, will forcibly disable the binary protocol. <span lang="default">The binary protocol is used by default unless it is</span><span lang="swift,objc,php">Note: The binary protocol is currently</span> not supported <span lang="swift">in Swift</span><span lang="obj-c">in Objective-C</span><span lang="php">in PHP</span>. Find out more about the <a href="https://support.ably.io/solution/articles/3000047365-do-you-binary-encode-your-messages-for-greater-efficiency">benefits of binary encoding</a><br><i>Type: <code>Boolean</code></i></dd>
 	<dt><span lang="default">queueMessages</span><span lang="ruby">:queue_messages</span></dt>
-	<dd><em>true</em> If false, this disables the default behaviour whereby the library queues messages on a connection in the disconnected or connecting states. The default behaviour allows applications to submit messages immediately upon instancing the library without having to wait for the connection to be established. Applications may use this option to disable queuing if they wish to have application-level control over the queueing under those conditions.<br><i>Type: <code>Boolean</code></i></dd>
+	<dd><em>true</em> If false, this disables the default behaviour whereby the library queues messages on a connection in the disconnected or connecting states. The default behaviour allows applications to submit messages immediately upon instancing the library without having to wait for the connection to be established. Applications may use this option to disable queuing if they wish to have application-level control over the queueing under those conditions<br><i>Type: <code>Boolean</code></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default">echoMessages</span><span lang="ruby">:echo_messages</span></dt>
-	<dd><em>true</em> If false, prevents messages originating from this connection being echoed back on the same connection.<br><i>Type: <code>Boolean</code></i></dd>
+	<dd><em>true</em> If false, prevents messages originating from this connection being echoed back on the same connection<br><i>Type: <code>Boolean</code></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default">autoConnect</span><span lang="ruby">:auto_connect</span></dt>
-	<dd><em>true</em> By default as soon as the client library is instanced it will connect to Ably. You can optionally set this to false and explicitly connect to Ably when require using the <a href="/realtime/usage/#connect"><code>connect</code></a> method.<br><i>Type: <code>Boolean</code></i></dd>
+	<dd><em>true</em> By default as soon as the client library is instanced it will connect to Ably. You can optionally set this to false and explicitly connect to Ably when require using the <a href="/realtime/usage/#connect"><code>connect</code></a> method<br><i>Type: <code>Boolean</code></i></dd>
 </dl>
 <dl>
-	<dt><span lang="default">recover</span><span lang="ruby">:recover</span></dt>
-	<dd>This option allows a connection to inherit the state of a previous connection that may have existed under a different instance of the Realtime library. This might typically be used by clients of the browser library to ensure connection state can be preserved when the user refreshes the page. See <a href="/realtime/connection/#connection-state-recovery">connection state recovery</a> for further information on this option.<br><i>Type: <code>String</code></i></dd>
+	<dt><div lang="javascript">recover</div></dt>
+	<dd>This option allows a connection to inherit the state of a previous connection that may have existed under a different instance of the Realtime library. This might typically be used by clients of the browser library to ensure connection state can be preserved when the user refreshes the page. A recovery key string can be explicitly provided, or alternatively if a callback function is provided, the client library will automatically persist the recovery key between page reloads and call the callback when the connection is recoverable. The callback is then responsible for confirming whether the connection should be recovered or not. See <a href="/realtime/connection/#connection-state-recovery">connection state recovery</a> for further information<br><i>Type: <code>String</code>, <code>Callable</code></i></dd>
+</dl>
+<dl>
+	<dt><div lang="javascript">closeOnUnload</div></dt>
+	<dd>When true, the client library will automatically send a close request to Ably whenever the <code>window beforeunload</code> event fires. By enabling this option, the close request sent to Ably ensures the connection state will not be retained and all channels associated with the channel will be detached. This is commonly used by developers who want presence leave events to fire immediately i.e. if a user navigates to another page or closes their browser, then enabling this option will result in the presence member leaving immediately. Without this option or an explicit call to the <a href="/realtime/connection#close"><code>close</code></a> method of the <a href="/realtime/connection"><code>Connection object</code></a>, Ably expects that the abruptly disconnected connection could later be recovered and therefore does not immediately remove the user from presence. Instead, to avoid &#8220;twitchy&#8221; presence behaviour an abruptly disconnected client is removed from channels in which they are present after 15 seconds, and the connection state is retained for two minutes<br><i>Type: <code>Boolean</code></i></dd>
+</dl>
+<dl>
+	<dt><div lang="java,ruby,nodejs,objc,swift"><span lang="default">recover</span><span lang="ruby">:recover</span></div></dt>
+	<dd>This option allows a connection to inherit the state of a previous connection that may have existed under a different instance of the library by providing that connection&#8217;s <span lang="default"><a href="/realtime/connection#recovery-key"><code>recoveryKey</code></a></span><span lang="ruby"><a href="/realtime/connection#recovery-key"><code>recovery_key</code></a></span>. This might typically be used by clients of an app to ensure connection state can be preserved following a reload. See <a href="/realtime/connection/#connection-state-recovery">connection state recovery</a> for further information and example code<br><i>Type: <code>String</code></i></dd>
 </dl>
 <dl>
 	<dt><span lang="default">queryTime</span><span lang="ruby">:query_time</span></dt>
@@ -1189,6 +1198,32 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 }</code></pre>
 
 </div> <!-- /end java language block -->
+
+<h3 id="last-connection-details"><span lang='javascript'>LastConnectionDetails</span></h3>
+
+
+<div lang="javascript"> <!-- start javascript language block -->
+<p>A <code>LastConnectionDetails</code> object provides details on the last connection in a browser environment persisted when the <code>window beforeunload</code> fired. This object is provided to the callback specified in the <code>recover</code> attribute of <a href="/realtime/types#client-options"><code>ClientOptions</code></a>. The callback in turn instructs the client library whether the connection should be recovered or not. See <a href="/realtime/connection/#connection-state-recovery">connection state recovery</a> for more information.</p>
+<p>Please note that as <a href="https://www.w3.org/TR/webstorage/"><code>sessionStorage</code></a> is used to persist the <code>LastConnectionDetails</code> between page reloads, it is only available for pages in the same origin and top-level browsing context.</p>
+<h4><span lang='default'>Properties</span></h4>
+<dl>
+	<dt>recoveryKey</dt>
+	<dd>An opaque string obtained from the <a href="/realtime/connection/#recovery-key">recoveryKey</a> attribute of the <a href="/realtime/connection">Connection object</a> before the page was unloaded. This property is used by the library to recover the connection<br><i>Type: <code>String</code></i></dd>
+</dl>
+<dl>
+	<dt>disconnectedAt</dt>
+	<dd>the time at which the previous library was abruptly disconnected before the page was unloaded. This is represented as milliseconds since epoch<br><i>Type: <code>Integer</code></i></dd>
+</dl>
+<dl>
+	<dt>location</dt>
+	<dd>a clone of <a href="https://www.w3.org/TR/html5/browsers.html#the-location-interface"><code>location</code></a> object of the previous page&#8217;s <code>document</code> object before the page was unloaded. A common use case for this attribute is to ensure that the previous page URL is the same as the current URL before allowing the connection to be recovered. For example, you may want the connection to be recovered only for page reloads, but not when a user navigates to a different page<br><i>Type: <code>String</code></i></dd>
+</dl>
+<dl>
+	<dt>clientId</dt>
+	<dd>the <a href="/realtime/authentication/#client-id"><code>clientId</code></a> of the <a href="/realtime/authentication">client&#8217;s Auth object</a> before the page was unloaded. A common use case for this attribute is to ensure that the current logged in user&#8217;s <code>clientId</code> matches the previous connection&#8217;s <code>clientId</code> before allowing the connection to be recovered. Ably prohibits changing a <code>clientId</code> for an existing connection, so any mismatch in <code>clientId</code> during a recover will result in the connection moving to the failed state<br><i>Type: <code>String</code></i></dd>
+</dl>
+
+</div> <!-- /end javascript language block -->
 
 <h3 id="presence-listener"><span lang='java'>io.ably.lib.realtime.Presence.PresenceListener</span></h3>
 

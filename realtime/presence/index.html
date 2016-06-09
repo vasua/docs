@@ -92,7 +92,7 @@ channel.presence.subscribe('enter', function(member) {
   alert('Member ' + member.clientId + ' entered');
 });
 channel.presence.enter();</code></pre>
-<pre class="code-editor open-jsbin open-jsbin-ajaxip" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ajaxip" lang="nodejs">var Ably = require('ably-js');
+<pre class="code-editor open-jsbin open-jsbin-ajaxip" lang="nodejs"><code class="code-editor open-jsbin open-jsbin-ajaxip" lang="nodejs">var Ably = require('ably');
 var realtime = new Ably.Realtime({
   key: '{{API_KEY}}',
   clientId: 'bob' }
@@ -800,7 +800,7 @@ When a channel is attached, the Ably service immediately synchronises the presen
 	<dd>previous return value from a <code>subscribe</code> call</dd>
 </dl>
 <h6 id="enter-client"><span lang='default'>enterClient</span><span lang='ruby'>enter_client</span></h6>
-<p>Enter this presence channel for the given <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span>. This method is provided to support typically server instances that act on behalf of multiple client IDs. See <a href="#presence-multiple-client-id">Managing multiple client IDs</a> for more info. In order to be able to publish presence changes for arbitrary client IDs, the client library must have been instanced either with an <a href="https://support.ably.io/solution/articles/3000030054-what-is-an-app-api-key">API key</a>, or with a <a href="https://support.ably.io/solution/articles/3000048586-can-a-client-emulate-any-client-id-i-e-use-a-wildcard-client-id">token bound to a wildcard client ID</a>. The connec</p>
+<p>Enter this presence channel for the given <span lang="default"><code>clientId</code></span><span lang="ruby"><code>client_id</code></span>. This method is provided to support typically server instances that act on behalf of multiple client IDs. See <a href="#presence-multiple-client-id">Managing multiple client IDs</a> for more info. In order to be able to publish presence changes for arbitrary client IDs, the client library must have been instanced either with an <a href="https://support.ably.io/solution/articles/3000030054-what-is-an-app-api-key">API key</a>, or with a <a href="https://support.ably.io/solution/articles/3000048586-can-a-client-emulate-any-client-id-i-e-use-a-wildcard-client-id">token bound to a wildcard client ID</a>.</p>
 <p>There are two overloaded versions of this method. With both versions, a <span lang="default">callback</span><span lang="ruby">block</span><span lang="java">completion listener</span> can optionally be passed in to be notified of success or failure to enter.</p>
 <blockquote class="definition" id="enter-client-none">
 <p class="definition" id="enter-client-none"><span lang='default'>enterClient(String clientId, callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> enter_client(String client_id) &#8594; yields</span><span lang='java'>public void enterClient(String clientId, <a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>enterClient(clientId: String, data: nil, callback: ((ARTErrorInfo?) &#8594; Void)?)</span></p>
