@@ -367,6 +367,27 @@ channel.on(new ChannelStateListener() {
         print("Attach failed: \(error)")
     }
 }</code></pre>
+<h4>Connection state change side effects on channels</h4>
+<p>Once a channel becomes attached, it will remain attached until any of the following occurs:</p>
+<ul>
+	<li>An explicit request to detach the channel is made;</li>
+	<li>The channel moves into the <code>failed</code> state following an unrecoverable error sent from Ably. If for example permissions were revoked for that client on that channel, the channel would move to the <code>failed</code> state;</li>
+	<li>The connection enters the <code>suspended</code>, <code>failed</code> or <code>closed</code> state;</li>
+	<li>The connection is not resumed fully as part of the <a href="#connection-state-recovery">connection state recovery process</a></li>
+</ul>
+<p>Ably provides automatic message continuity for channels, even when connections are disconnected and later resumed. See <a href="#connection-state-recovery">connection state recovery</a> below for more details on how connections and channel state recovery allows you, as a developer, to publish and receive messages without having to worry about changing network conditions. However, there are times when connection recovery is not possible such as being disconnected from Ably for more than two minutes.  When this occurs, the channels that are attached can no longer provide guaranteed message continuity. We wanted developers to be aware of this discontinuity, and as such, our client libraries will automatically detach all attached channels that have lost continuity. It is then up to the developer to decide what action to take such as using the <a href="/realtime/history">history API</a> to retrieve old messages, or simply to reattach the channel and continue if messsage loss is not important.</p>
+<p>For customers who want to ensure that all channels are attached when a connection is available, regardless of whether messages may have been missed, we recommend the following approach:</p>
+<ul>
+	<li>Add a listener on the connection object for all <code>connected</code> events</li>
+	<li>Reattach all channels you have created. If a channel is already attached, and you call the <a href="/realtime/channels-messages/#attach"><code>channel#attach</code></a> method, the channel will simply remain attached. It is therefore safe to simply attach all channels every time the connection becomes <code>connected</code></li>
+</ul>
+<p>The following Javascript example demonstrates a trivial way to ensure all channels are attached when connected:</p>
+<pre lang="javascript"><code lang="javascript">/* Javascript channel automatic re-attach example */
+realtime.connection.on('connected', function() {
+  for (var channelName in ably.channels.all) {
+    ably.channels.get(channelName).attach();
+  }
+});</code></pre>
 <h3 id="channel-namespaces">Channel namespaces</h3>
 <p>One or more channel namespaces, or channel name prefixes, may be <a href="https://support.ably.io/solution/articles/3000030053-how-do-i-access-my-app-dashboard">configured for an app in your dashboard</a>. When a channel is created whose name is prefixed with one of the namespaces, the channel assumes certain configured attributes associated with that namespace. For example, a channel namespace named &#8220;<code>private</code>&#8221; would match channels named &#8220;<code>private</code>&#8221;, &#8220;<code>private:chat</code>&#8221;, &#8220;<code>private:chat:mike</code>&#8221;.</p>
 <p>Namespace-prefixed channel names are delimited by a single colon <code>:</code>; the first component of the channel name (from the start up to and including the last character before the colon) is the namespace. A channel name may validly contain a colon even if the namespace component does not correspond to a namespace; also, a channel may contain multiple colons and only the component up to the first colon will be matched with a namespace. The only restriction on channel names is that a channel name may not start with a colon <code>:</code>, an open square bracket <code>[</code> and it may not be empty.</p>
@@ -1424,8 +1445,8 @@ if ($firstPage-&gt;hasNext()) {
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
 <li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-fallback/'>Connection host fallback</a></li>
 <li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>

@@ -141,7 +141,7 @@ token_request = rest.auth.create_token_request(client_id: 'Bob')
 token_request = rest.auth.create_token_request(client_id='Bob')
 # ... issue the TokenRequest to a client ...</code></pre>
 <pre lang="php"><code lang="php">$rest = new Ably\AblyRest(array('key' =&gt; '{{API_KEY}}'));
-$tokenRequest = $rest-&gt;auth-&gt;createTokenRequest(array('client_id' =&gt; 'Bob'));
+$tokenRequest = $rest-&gt;auth-&gt;createTokenRequest(array('clientId' =&gt; 'Bob'));
 # ... issue the TokenRequest to a client ...</code></pre>
 <pre lang="java"><code lang="java">ClientOptions options = new ClientOptions();
 options.key = "{{API_KEY}}";
@@ -263,7 +263,7 @@ Related types
 puts "Success; token = #{token_details.token}"</code></pre>
 <pre lang="python"><code lang="python">token_details = client.auth.authorise(token_params={'client_id': 'bob'})
 print("Success; token = " + str(token_details.token))</code></pre>
-<pre lang="php"><code lang="php">$tokenDetails = $client-&gt;auth-&gt;authorise(array('client_id' =&gt; 'bob'));
+<pre lang="php"><code lang="php">$tokenDetails = $client-&gt;auth-&gt;authorise(array('clientId' =&gt; 'bob'));
 echo("Success; token = " . $tokenDetails-&gt;token);</code></pre>
 <pre lang="objc"><code lang="objc">ARTTokenParams *tokenParams = [[ARTTokenParams alloc] initWithClientId:@"Bob"];
 [client.auth authorise:tokenParams options:nil callback:^(ARTTokenDetails *tokenDetails, NSError *error) {
@@ -347,7 +347,7 @@ client.auth.authorise(tokenParams, options: nil) { tokenDetails, error in
 puts "Success; token request = #{token_request}"</code></pre>
 <pre lang="python"><code lang="python">token_request = client.auth.create_token_request(token_params={'client_id': 'bob'})
 print("Success; token request = ' + str(token_request)</code></pre>
-<pre lang="php"><code lang="php">$tokenRequest = $client-&gt;auth-&gt;createTokenRequest(array('client_id' =&gt; 'bob'))
+<pre lang="php"><code lang="php">$tokenRequest = $client-&gt;auth-&gt;createTokenRequest(array('clientId' =&gt; 'bob'))
 echo("Success; token request = " . $tokenRequest);</code></pre>
 <pre lang="objc"><code lang="objc">ARTTokenParams *tokenParams = [[ARTTokenParams alloc] initWithClientId:@"Bob"];
 [client.auth createTokenRequest:tokenParams options:nil callback:^(ARTTokenRequest *tokenRequest, NSError *error) {
@@ -424,7 +424,7 @@ client.auth.createTokenRequest(tokenParams, options: nil) { tokenRequest, error 
 puts "Success; token = #{token_details.token}"</code></pre>
 <pre lang="python"><code lang="python">token_details = client.auth.request_token(token_params={'client_id': 'bob'})
 print("Success; token = " + str(token_details.token))</code></pre>
-<pre lang="php"><code lang="php">$tokenDetails = $client-&gt;auth-&gt;requestToken(array('client_id' =&gt; 'bob'))
+<pre lang="php"><code lang="php">$tokenDetails = $client-&gt;auth-&gt;requestToken(array('clientId' =&gt; 'bob'))
 echo("Success; token = " . $tokenDetails-&gt;token);</code></pre>
 <pre lang="java"><code lang="java">try {
   TokenParams tokenParams = new TokenParams();
@@ -631,7 +631,7 @@ client.auth.requestToken(tokenParams, withOptions: nil) { tokenDetails, error in
 </dl>
 <dl>
 	<dt><span lang="default">ttl</span><span lang="ruby">:ttl</span></dt>
-	<dd><em>1 hour</em> Requested time to live for the token being created <span lang="default">in milliseconds</span><span lang="objc,swift">as a <code>NSTimeInterval</code></span>. When omitted, the Ably REST API default of 60 minutes is applied by Ably<br><i>Type: <span lang="default"><code>Integer</code> (milliseconds)</span><span lang="ruby"><code>Integer</code> (seconds)</span><span lang="objc,swift"><code>NSTimeInterval</code></span><span lang="java"><code>Long Integer</code></span></i></dd>
+	<dd><em>1 hour</em> Requested time to live for the token being created <span lang="default">in milliseconds</span><span lang="ruby">in seconds</span><span lang="objc,swift">as a <code>NSTimeInterval</code></span>. When omitted, the Ably REST API default of 60 minutes is applied by Ably<br><i>Type: <span lang="default"><code>Integer</code> (milliseconds)</span><span lang="ruby"><code>Integer</code> (seconds)</span><span lang="objc,swift"><code>NSTimeInterval</code></span><span lang="java"><code>Long Integer</code></span></i></dd>
 </dl>
 <h3 id="token-request"><span lang='default'>TokenRequest Object</span><span lang='objc,swift'>ARTTokenRequest</span><span lang='ruby'>Ably::Models::TokenRequest</span><span lang='java'>io.ably.lib.rest.Auth.TokenRequest</span></h3>
 <p><code>TokenRequest</code> is a type containing parameters for a token request. Tokens are requested using <span lang="default"><a href="/rest/authentication#request-token">Auth#requestToken</a></span><span lang="ruby"><a href="/rest/authentication#request-token">Auth#request_token</a></span></p>
@@ -642,7 +642,7 @@ client.auth.requestToken(tokenParams, withOptions: nil) { tokenDetails, error in
 	<dt>ttl</dt>
 	<dd>Requested time to live for the token in <span lang="default">milliseconds</span><span lang="ruby">seconds</span>. If the token request is successful, the TTL of the returned token will be less than or equal to this value depending on application settings and the attributes of the issuing key.<br><i>Type: <code>Integer</code></i></dd>
 	<dt>timestamp</dt>
-	<dd>The timestamp of this request in milliseconds<br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span><span lang="ruby"><code>Time</code></span></i></dd>
+	<dd>The timestamp of this request<span lang="default"> in milliseconds</span><span lang="ruby"></span><br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span><span lang="ruby"><code>Time</code></span></i></dd>
 	<dt>capability</dt>
 	<dd>Capability of the token. If the token request is successful, the capability of the returned token will be the intersection of this capability with the capability of the issuing key. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/realtime/authentication">Read more about authentication and capabilities</a><br><i>Type: <code>String</code></i></dd>
 	<dt><span lang="default">clientId</span><span lang="ruby,python">client_id</span></dt>
@@ -705,8 +705,8 @@ client.auth.requestToken(tokenParams, withOptions: nil) { tokenDetails, error in
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
 <li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-fallback/'>Connection host fallback</a></li>
 <li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>

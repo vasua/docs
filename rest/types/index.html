@@ -338,7 +338,7 @@ Ably::Models::PresenceMessage::ACTION.Enter == :enter # =&gt; true</code></pre>
 </dl>
 <dl>
 	<dt>timestamp</dt>
-	<dd>Timestamp when the presence update was received by the Ably the realtime service, as milliseconds since the epoch<br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span><span lang="ruby"><code>Time</code></span><span lang="objc,swift"><code>NSDate</code></span></i></dd>
+	<dd>Timestamp when the presence update was received by the Ably the realtime service<span lang="default">, as milliseconds since the epoch</span><span lang="ruby,objc,swift"></span>.<br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span><span lang="ruby"><code>Time</code></span><span lang="objc,swift"><code>NSDate</code></span></i></dd>
 </dl>
 <dl>
 	<dt>encoding</dt>
@@ -519,7 +519,7 @@ if ($firstPage-&gt;hasNext()) {
 	<dt>ttl</dt>
 	<dd>Requested time to live for the token in <span lang="default">milliseconds</span><span lang="ruby">seconds</span>. If the token request is successful, the TTL of the returned token will be less than or equal to this value depending on application settings and the attributes of the issuing key.<br><i>Type: <code>Integer</code></i></dd>
 	<dt>timestamp</dt>
-	<dd>The timestamp of this request in milliseconds<br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span><span lang="ruby"><code>Time</code></span></i></dd>
+	<dd>The timestamp of this request<span lang="default"> in milliseconds</span><span lang="ruby"></span><br><i>Type: <span lang="default"><code>Integer</code></span><span lang="java"><code>Long Integer</code></span><span lang="ruby"><code>Time</code></span></i></dd>
 	<dt>capability</dt>
 	<dd>Capability of the token. If the token request is successful, the capability of the returned token will be the intersection of this capability with the capability of the issuing key. The capability is a a JSON stringified canonicalised representation of the resource paths and associated operations. <a href="/realtime/authentication">Read more about authentication and capabilities</a><br><i>Type: <code>String</code></i></dd>
 	<dt><span lang="default">clientId</span><span lang="ruby,python">client_id</span></dt>
@@ -740,7 +740,7 @@ if ($firstPage-&gt;hasNext()) {
 	<dt>log</dt>
 	<dd>Parameters to control the log output of the library. The supplied value must be an object that may contain one or both of the following entries:<br />
 <ul><br />
-  <li><code>level</code>: a number controlling the verbosity of the output from 1 (minimum, errors only) to 5 (most verbose);</li><br />
+  <li><code>level</code>: a number controlling the verbosity of the output. Valid values are: 0 (no logs), 1 (errors only), 2 (errors plus connection and channel state changes), 3 (high-level debug output), and 4 (full debug output). </li><br />
   <li><code>handler</code>: a function to handle each line of log output. If <code>handler</code> is not specified, <code>console.log</code> is used.</li><br />
 </ul><br />
 Note that the log level and log handler have global scope in the library and will thus not act independently between library instances when multiple library instances exist concurrently.<br><i>Type: <code>Object</code></i></dd>
@@ -954,7 +954,7 @@ Note that the log level and log handler have global scope in the library and wil
 </dl>
 <dl>
 	<dt><span lang="default">ttl</span><span lang="ruby">:ttl</span></dt>
-	<dd><em>1 hour</em> Requested time to live for the token being created <span lang="default">in milliseconds</span><span lang="objc,swift">as a <code>NSTimeInterval</code></span>. When omitted, the Ably REST API default of 60 minutes is applied by Ably<br><i>Type: <span lang="default"><code>Integer</code> (milliseconds)</span><span lang="ruby"><code>Integer</code> (seconds)</span><span lang="objc,swift"><code>NSTimeInterval</code></span><span lang="java"><code>Long Integer</code></span></i></dd>
+	<dd><em>1 hour</em> Requested time to live for the token being created <span lang="default">in milliseconds</span><span lang="ruby">in seconds</span><span lang="objc,swift">as a <code>NSTimeInterval</code></span>. When omitted, the Ably REST API default of 60 minutes is applied by Ably<br><i>Type: <span lang="default"><code>Integer</code> (milliseconds)</span><span lang="ruby"><code>Integer</code> (seconds)</span><span lang="objc,swift"><code>NSTimeInterval</code></span><span lang="java"><code>Long Integer</code></span></i></dd>
 </dl>
     </article>
     <hr class="back">
@@ -1009,8 +1009,8 @@ Note that the log level and log handler have global scope in the library and wil
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
 <li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-fallback/'>Connection host fallback</a></li>
 <li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>

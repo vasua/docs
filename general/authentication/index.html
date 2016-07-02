@@ -258,7 +258,7 @@ ably.requestToken({ clientId: 'client@example.com' }, function(err, token) {
 <p>A token request is made against the <a href="/rest-api#request-token"><code>requestToken</code></a> endpoint, with a JSON token request in the request body. The token request comprises:</p>
 <ul>
 	<li>the <code>keyName</code> comprising of the app ID and key ID such as <code>{{API_KEY_NAME}}</code></li>
-	<li>a capability (i.e. a set of channel names/namespaces and, for each, a set of <a href="capability-operations">operations</a>) which should be a subset of the set of capability associated with the key specified in key ID</li>
+	<li>a capability (i.e. a set of channel names/namespaces and, for each, a set of <a href="#capability-operations">operations</a>) which should be a subset of the set of capability associated with the key specified in key ID</li>
 	<li>optionally, a <code>clientId</code> thus identifying clients using this token and preventing them from identifying themselves with any other <code>clientId</code></li>
 	<li>optionally, an expiry time or TTL, will default to 1 hour if not specified</li>
 	<li>a timestamp to ensure token request is still valid</li>
@@ -442,8 +442,8 @@ Note that a newline character is added for each field, including any empty clien
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
 <li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-fallback/'>Connection host fallback</a></li>
 <li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>

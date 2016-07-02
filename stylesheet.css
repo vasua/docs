@@ -258,6 +258,11 @@ hr.back {
     padding: 5px 10px; }
     #documentation blockquote p:last-child {
       margin: 0; }
+  #documentation table {
+    border-collapse: collapse; }
+    #documentation table th, #documentation table td {
+      border: 1px solid #eee;
+      padding: 5px; }
   #documentation dl {
     /* make space for anything after a definiion list */
     margin-bottom: 3em; }

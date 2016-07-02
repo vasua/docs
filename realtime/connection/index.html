@@ -300,6 +300,27 @@ realtime.connection.off()</code></pre>
 
 </div> <!-- /end swift language block -->
 
+<h4>State change side effects on channels</h4>
+<p>Once a channel becomes attached, it will remain attached until any of the following occurs:</p>
+<ul>
+	<li>An explicit request to detach the channel is made;</li>
+	<li>The channel moves into the <code>failed</code> state following an unrecoverable error sent from Ably. If for example permissions were revoked for that client on that channel, the channel would move to the <code>failed</code> state;</li>
+	<li>The connection enters the <code>suspended</code>, <code>failed</code> or <code>closed</code> state;</li>
+	<li>The connection is not resumed fully as part of the <a href="#connection-state-recovery">connection state recovery process</a></li>
+</ul>
+<p>Ably provides automatic message continuity for channels, even when connections are disconnected and later resumed. See <a href="#connection-state-recovery">connection state recovery</a> below for more details on how connections and channel state recovery allows you, as a developer, to publish and receive messages without having to worry about changing network conditions. However, there are times when connection recovery is not possible such as being disconnected from Ably for more than two minutes.  When this occurs, the channels that are attached can no longer provide guaranteed message continuity. We wanted developers to be aware of this discontinuity, and as such, our client libraries will automatically detach all attached channels that have lost continuity. It is then up to the developer to decide what action to take such as using the <a href="/realtime/history">history API</a> to retrieve old messages, or simply to reattach the channel and continue if messsage loss is not important.</p>
+<p>For customers who want to ensure that all channels are attached when a connection is available, regardless of whether messages may have been missed, we recommend the following approach:</p>
+<ul>
+	<li>Add a listener on the connection object for all <code>connected</code> events</li>
+	<li>Reattach all channels you have created. If a channel is already attached, and you call the <a href="/realtime/channels-messages/#attach"><code>channel#attach</code></a> method, the channel will simply remain attached. It is therefore safe to simply attach all channels every time the connection becomes <code>connected</code></li>
+</ul>
+<p>The following Javascript example demonstrates a trivial way to ensure all channels are attached when connected:</p>
+<pre lang="javascript"><code lang="javascript">/* Javascript channel automatic re-attach example */
+realtime.connection.on('connected', function() {
+  for (var channelName in ably.channels.all) {
+    ably.channels.get(channelName).attach();
+  }
+});</code></pre>
 <h3 id="connection-state-recovery">Connection state recovery</h3>
 <p>The Ably system preserves connection state to allow connections to continue transparently across brief disconnections. The connection state that is tracked includes the messages sent to the client on the connection, members present on a channel and the set of channels that the client is attached to.</p>
 <p>There are two modes of connection state recovery:</p>
@@ -526,15 +547,15 @@ Related types
 </dl>
 <h6 id="ping">ping</h6>
 <blockquote class="definition">
-<p class="definition"><span lang='default'>ping(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> ping &#8594; yields <code>Integer milliseconds</code></span><span lang='java'>public void ping(<a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>ping(callback: (ARTErrorInfo?) &#8594; Void)</span></p>
+<p class="definition"><span lang='default'>ping(callback(<a href="/realtime/types#error-info">ErrorInfo</a> err))</span><span lang='ruby'><a href="/realtime/types#deferrable">Deferrable</a> ping &#8594; yields <code>Float seconds</code></span><span lang='java'>public void ping(<a href="#completion-listener">CompletionListener</a> listener)</span><span lang='objc,swift'>ping(callback: (ARTErrorInfo?) &#8594; Void)</span></p>
 </blockquote>
-<p>When connected, sends a heartbeat ping to the Ably server and <span lang="default">executes the callback</span><span lang="java">calls the listener</span><span lang="ruby">yields the elapsed time in milliseconds</span> when a heartbeat ping request is echoed from the server. This can be useful for measuring true roundtrip latency to the connected Ably server.</p>
+<p>When connected, sends a heartbeat ping to the Ably server and <span lang="default">executes the callback</span><span lang="java">calls the listener</span><span lang="ruby">yields the elapsed time in seconds</span> when a heartbeat ping request is echoed from the server. This can be useful for measuring true roundtrip latency to the connected Ably server.</p>
 
 
 <div lang="ruby"> <!-- start ruby language block -->
 <h4>Returns</h4>
 <p>A <a href="/realtime/types#deferrable"><code>Deferrable</code></a> object is returned from this method.</p>
-<p>On successfully echoing a heartbeat from Ably, the registered success blocks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields an Integer representing the time in milliseconds for the heartbeat ping request to be echoed.</p>
+<p>On successfully echoing a heartbeat from Ably, the registered success blocks for the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> and any block provided to this method yields a <code>Float</code> representing the time in seconds for the heartbeat ping request to be echoed.</p>
 <p>Failure to receive a heartbeat ping will trigger the errback callbacks of the <a href="/realtime/types#deferrable"><code>Deferrable</code></a> with an <a href="#error-info"><code>ErrorInfo</code></a> object containing an error response as defined in the <a href="/rest-api#common">Ably REST API</a> documentation.</p>
 
 </div> <!-- /end ruby language block -->
@@ -756,8 +777,8 @@ Ably::Realtime::Connection::STATE.Connected == :connected # =&gt; true</code></p
 <li class=''><a href='/client-lib-development-guide/test-api/'>Sandbox Test API</a></li>
 <li class=''><a href='/client-lib-development-guide/encryption/'>Encryption</a></li>
 <li class=''><a href='/client-lib-development-guide/websocket/'>WebSocket Transport</a></li>
-<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/comet/'>Comet Transport</a></li>
+<li class=''><a href='/client-lib-development-guide/connection-recovery/'>Connection Recovery</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-manager/'>Connection Manager</a></li>
 <li class=''><a href='/client-lib-development-guide/connection-fallback/'>Connection host fallback</a></li>
 <li class=''><a href='/client-lib-development-guide/documentation-formatting-guide/'>Documentation Formatting Guide</a></li>

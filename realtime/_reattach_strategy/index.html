@@ -37,23 +37,37 @@
     <div class="fork-banner"><a href="https://github.com/ably/docs"><img src="/images/forkme.png" alt="Fork me on GitHub"></a></div>
 
   <div id="documentation">
-    <p>An <code>ErrorInfo</code> is a type encapsulating error information containing an Ably-specific error code and generic status code.</p>
-<p>h4.<br />
-  default: Properties<br />
-  java:    Members<br />
-  ruby:    Attributes</p>
-<dl>
-	<dt>code</dt>
-	<dd>Ably error code (see <a href="https://github.com/ably/ably-common/blob/master/protocol/errors.json">ably-common/protocol/errors.json</a>)<br><i>Type: <code>Integer</code></i></dd>
-</dl>
-<dl>
-	<dt><span lang="default">statusCode</span><span lang="ruby">status_code</span></dt>
-	<dd>HTTP Status Code corresponding to this error, where applicable<br><i>Type: <code>Integer</code></i></dd>
-</dl>
-<dl>
-	<dt>message</dt>
-	<dd>Additional message information, where available<br><i>Type: <code>String</code></i></dd>
-</dl>
+    
+    <header>
+      
+      
+        <h1 id="title">Untitled</h1>
+      
+    </header>
+    <article>
+      <p>Once a channel becomes attached, it will remain attached until any of the following occurs:</p>
+<ul>
+	<li>An explicit request to detach the channel is made;</li>
+	<li>The channel moves into the <code>failed</code> state following an unrecoverable error sent from Ably. If for example permissions were revoked for that client on that channel, the channel would move to the <code>failed</code> state;</li>
+	<li>The connection enters the <code>suspended</code>, <code>failed</code> or <code>closed</code> state;</li>
+	<li>The connection is not resumed fully as part of the <a href="#connection-state-recovery">connection state recovery process</a></li>
+</ul>
+<p>Ably provides automatic message continuity for channels, even when connections are disconnected and later resumed. See <a href="#connection-state-recovery">connection state recovery</a> below for more details on how connections and channel state recovery allows you, as a developer, to publish and receive messages without having to worry about changing network conditions. However, there are times when connection recovery is not possible such as being disconnected from Ably for more than two minutes.  When this occurs, the channels that are attached can no longer provide guaranteed message continuity. We wanted developers to be aware of this discontinuity, and as such, our client libraries will automatically detach all attached channels that have lost continuity. It is then up to the developer to decide what action to take such as using the <a href="/realtime/history">history API</a> to retrieve old messages, or simply to reattach the channel and continue if messsage loss is not important.</p>
+<p>For customers who want to ensure that all channels are attached when a connection is available, regardless of whether messages may have been missed, we recommend the following approach:</p>
+<ul>
+	<li>Add a listener on the connection object for all <code>connected</code> events</li>
+	<li>Reattach all channels you have created. If a channel is already attached, and you call the <a href="/realtime/channels-messages/#attach"><code>channel#attach</code></a> method, the channel will simply remain attached. It is therefore safe to simply attach all channels every time the connection becomes <code>connected</code></li>
+</ul>
+<p>The following Javascript example demonstrates a trivial way to ensure all channels are attached when connected:</p>
+<pre lang="javascript"><code lang="javascript">/* Javascript channel automatic re-attach example */
+realtime.connection.on('connected', function() {
+  for (var channelName in ably.channels.all) {
+    ably.channels.get(channelName).attach();
+  }
+});</code></pre>
+    </article>
+    <hr class="back">
+    <a href="#documentation">Back to top</a>
   </div>
   <div id="sidebar">
   <a href="/" title="API Documentation Home"><img src="/images/ably-logo.png" class="ably-logo" title="API Documentation Home"></a>
