@@ -52,17 +52,33 @@
 	<li>The connection enters the <code>suspended</code>, <code>failed</code> or <code>closed</code> state;</li>
 	<li>The connection is not resumed fully as part of the <a href="#connection-state-recovery">connection state recovery process</a></li>
 </ul>
-<p>Ably provides automatic message continuity for channels, even when connections are disconnected and later resumed. See <a href="#connection-state-recovery">connection state recovery</a> below for more details on how connections and channel state recovery allows you, as a developer, to publish and receive messages without having to worry about changing network conditions. However, there are times when connection recovery is not possible such as being disconnected from Ably for more than two minutes.  When this occurs, the channels that are attached can no longer provide guaranteed message continuity. We wanted developers to be aware of this discontinuity, and as such, our client libraries will automatically detach all attached channels that have lost continuity. It is then up to the developer to decide what action to take such as using the <a href="/realtime/history">history API</a> to retrieve old messages, or simply to reattach the channel and continue if messsage loss is not important.</p>
+<p>Ably provides automatic message continuity for channels, even when connections are disconnected and later resumed. See <a href="/realtime/connection#connection-state-recovery">connection state recovery</a> for more details on how connections and channel state recovery allows you, as a developer, to publish and receive messages without having to worry about changing network conditions. However, there are times when connection recovery is not possible such as being disconnected from Ably for more than two minutes.  When this occurs, the channels that are attached can no longer provide guaranteed message continuity. We wanted developers to be aware of this discontinuity, and as such, our client libraries will automatically detach all attached channels that have lost continuity. It is then up to the developer to decide what action to take such as using the <a href="/realtime/history">history API</a> to retrieve old messages, or simply to reattach the channel and continue if messsage loss is not important.</p>
 <p>For customers who want to ensure that all channels are attached when a connection is available, regardless of whether messages may have been missed, we recommend the following approach:</p>
 <ul>
 	<li>Add a listener on the connection object for all <code>connected</code> events</li>
 	<li>Reattach all channels you have created. If a channel is already attached, and you call the <a href="/realtime/channels-messages/#attach"><code>channel#attach</code></a> method, the channel will simply remain attached. It is therefore safe to simply attach all channels every time the connection becomes <code>connected</code></li>
 </ul>
-<p>The following Javascript example demonstrates a trivial way to ensure all channels are attached when connected:</p>
-<pre lang="javascript"><code lang="javascript">/* Javascript channel automatic re-attach example */
-realtime.connection.on('connected', function() {
-  for (var channelName in ably.channels.all) {
-    ably.channels.get(channelName).attach();
+<p>The following Javascript example demonstrates a trivial way to ensure all channels are attached when the client becomes connected or the channel becomes detached:</p>
+<pre lang="javascript"><code lang="javascript">function reattach(channel) {
+  channel.attach();
+  /* Example when using presence on the channel */
+  channel.presence.enter();
+}
+
+/* Connection state changes can trigger channels to become detached
+   Automatically re-attach channels, nothing will happen if alreay attached */
+client.connection.on('connected', function() {
+  for (let channelName in client.channels.all) {
+    let channel = client.channels.get(channelName);
+    reattach(channel);
+  }
+});
+
+/* If a channel becomes detached due to channel failure (some edge cases exist)
+   You should explicitly re-attach the channel if you are connected */
+channel.on('detached', function() {
+  if (client.connection.state === 'connected') {
+    reattach(channel);
   }
 });</code></pre>
     </article>
@@ -111,7 +127,7 @@ realtime.connection.on('connected', function() {
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
-<li class=''><a href='/client-lib-development-guide/features/'>Features spec v0.8</a></li>
+<li class=''><a href='/client-lib-development-guide/features/'>Features spec v0.9</a></li>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
 <li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>

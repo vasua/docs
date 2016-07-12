@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Ably API Documentation - Features spec v0.9</title>
+    <title>Ably API Documentation - Features spec v0.8</title>
     <link rel="shortcut icon" href="/favicon.ico">
 
     <link rel="stylesheet" type="text/css" href="/vendor/prettify/prettify.css" media="screen">
@@ -68,23 +68,19 @@
 <optgroup label='Interface Definition'>
 <option id="anchor-idl">Complete API IDL</option>
 </optgroup>
-<optgroup label='Previous version'>
-<option id="anchor-old-specs">Old specs</option>
-</optgroup>
           </select>
         </div>
       </nav>
     
     <header>
       
-        <div class="breadcrumb"><a href="/client-lib-development-guide/">Client Library Development Guide</a><span class="separator">/</span></div>
       
-      
-        <h1 id="title">Features spec v0.9</h1>
+        <h1 id="title">Features spec v0.8</h1>
       
     </header>
     <article>
-      <p>A detailed <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> that applies to all client libraries is generated from the Ably Ruby client library&#8217;s acceptance and test suites.  Whilst every official Ably client library has test coverage, the amount of test coverage varies, and as such our recommendation is to refer to the official <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> when developing a client library.</p>
+      <p class="tip">This version is deprecated. <a href="/client-lib-development-guide/features">View the latest version of this spec</a></p>
+<p>A detailed <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> that applies to all client libraries is generated from the Ably Ruby client library&#8217;s acceptance and test suites.  Whilst every official Ably client library has test coverage, the amount of test coverage varies, and as such our recommendation is to refer to the official <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> when developing a client library.</p>
 <p>However, we have found the <a href="https://github.com/ably/ably-ruby/blob/master/SPEC.md">test specification</a> can be difficult as a reference because of both its breadth and the fact that it applies to the Ruby client library which may be unfamiliar as a language for a lot of developers.</p>
 <p>As a result, this document outlines the complete feature set of both the REST and Realtime client libraries.  It is expected that every client library developer refers to this document to ensure that their client library provides the same API and features as the existing Ably client libraries. In addition to this, it is essential that there is test coverage over all of the features described below.</p>
 <p>We recommend you use the <a href="#idl" title="Interface Definition Language">IDL</a> and the <a href="https://github.com/ably/ably-java">Ably Java library</a> as a reference when reviewing how the API has been implemented.</p>
@@ -93,7 +89,7 @@
 	<li><a id='G1' name='G1' href='#G1'><code>(G1)</code></a> Every test should be executed using all supported protocols (i.e. JSON and <a href="http://msgpack.org/">MessagePack</a> if supported).  This includes both sending &amp; receiving data</li>
 	<li><a id='G2' name='G2' href='#G2'><code>(G2)</code></a> All tests by default are run against a special Ably sandbox environment.  This environment allows apps to be provisioned without any authentication that can then be used for client library testing. Bear in mind that all apps created in the sandbox environment are automatically deleted after 60 minutes and have low limits to prevent abuse. Apps are configured by sending a <code>POST</code> request to <code>https://sandbox-rest.ably.io/apps</code> with a JSON body that specifies the keys and their associated capabilities, channel namespace rules and any presence fixture data that is required; see <a href="https://github.com/ably/ably-common/blob/master/test-resources/test-app-setup.json">ably-common test-app-setup.json</a>.  See the <a href="https://github.com/ably/ably-java/blob/master/test/io/ably/test/rest/RestSetup.java">Java test setup</a>. Presence fixture data is necessary for the REST library presence tests as there is no way to register presence on a channel in the REST library</li>
 	<li><a id='G3' name='G3' href='#G3'><code>(G3)</code></a> Testing statistics can be tricky due to timing issues and slow test suites as a result of sending requests to generate statistics.  As such, we provide a special stats endpoint in our sandbox environment that allows stats to be injected into our metrics system so that stats tests can make predictable assertions.  To create stats you must send an authenticated <code>POST</code> request to the stats JSON to <code>https://sandbox-rest.ably.io/stats</code> with the stats data you wish to create. See the <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/rest/stats.test.js#L8-L51">Javascript stats fixture</a> and <a href="https://github.com/ably/ably-js/blob/4e65d4e13eb8750a375b9511e4dd059092c0e481/spec/common/modules/testapp_manager.js#L158-L182">setup helper</a> as an example</li>
-	<li><a id='G4' name='G4' href='#G4'><code>(G4)</code></a> All REST requests and WebSocket connections to Ably must include the current API version <code>0.9</code>. Should any new API version with breaking changes be released, the client library will continue to use the API version explicitly requested</li>
+	<li><a id='G4' name='G4' href='#G4'><code>(G4)</code></a> All REST requests and WebSocket connections to Ably must include the current API version <code>0.8</code>. Should any new API version with breaking changes be released, the client library will continue to use the API version explicitly requested</li>
 </ul>
 <h2 id="rest">REST client library</h2>
 <p>Client library developers &#8211; clone our <a href="https://docs.google.com/spreadsheets/d/1vBzr9N-0ovtVZ0mxTeg7zLMEhcgj5lB9ivmkOcO-9J0/edit?usp=sharing">REST client library Google Doc spec</a> when developing a REST client library to help you keep track of feature compliance and test coverage.</p>
@@ -116,13 +112,9 @@
 		</ul></li>
 	</ul></li>
 	<li><a id='RSC16' name='RSC16' href='#RSC16'><code>(RSC16)</code></a> <code>RestClient#time</code> function sends a get request to <code>rest.ably.io/time</code> and returns the server time in milliseconds since epoch or as a Date/Time object where suitable</li>
-	<li><a id='RSC7' name='RSC7' href='#RSC7'><code>(RSC7)</code></a> Sends REST requests over HTTP and HTTPS to the REST endpoint <code>rest.ably.io</code>
+	<li><a id='RSC7' name='RSC7' href='#RSC7'><code>(RSC7)</code></a> Sends REST requests over HTTP and HTTPS to the REST end-point <code>rest.ably.io</code>
 	<ul>
-		<li><a id='RSC7a' name='RSC7a' href='#RSC7a'><code>(RSC7a)</code></a> The header <code>X-Ably-Version: 0.9</code> must be included in all REST requests to the Ably endpoint</li>
-		<li><a id='RSC7b' name='RSC7b' href='#RSC7b'><code>(RSC7b)</code></a> The header <code>X-Ably-Lib: [lib][.optional variant]?-[version]</code> should be included in all REST requests to the Ably endpoint where <code>[lib]</code> is the name of the library such as <code>js</code> for <code>ably-js</code>, <code>[.optional variant]</code> is an optional library variant, such as <code>laravel</code> for the <code>php</code> library, which is always delimited with a period such as <code>php.laravel</code>, and where <code>[version]</code> is the full client library version using <a href="http://semver.org/">Semver</a> such as <code>0.9.2</code>. For example, the 0.9.0 version of the Javascript library would use the header <code>X-Ably-Lib: js-0.9.0</code>
-		<ul>
-			<li><a id='RSC7b1' name='RSC7b1' href='#RSC7b1'><code>(RSC7b1)</code></a> When it is not possible to send the <code>X-Ably-Lib</code> header, such as for <code>JSONP</code> requests, the library version should be sent as a query param such as <code>lib=js-0.9.0</code></li>
-		</ul></li>
+		<li><a id='RSC7a' name='RSC7a' href='#RSC7a'><code>(RSC7a)</code></a> The header <code>X-Ably-Version: 0.8</code> must be included in all REST requests to the Ably end-point</li>
 	</ul></li>
 	<li><a id='RSC18' name='RSC18' href='#RSC18'><code>(RSC18)</code></a> If <code>ClientOptions#tls</code> is true, then all communication is over HTTPS. If false, all communication is over HTTP however <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">Basic Auth</a> over HTTP will result in an error as private keys cannot be submitted over an insecure connection. See <code>Auth</code> below</li>
 	<li><a id='RSC8' name='RSC8' href='#RSC8'><code>(RSC8)</code></a> Supports two protocols:
@@ -410,14 +402,12 @@
 		<li><a id='RTN2b' name='RTN2b' href='#RTN2b'><code>(RTN2b)</code></a> <code>echo</code> should be <code>true</code> by default; <code>false</code> will prevent messages published by the client being echoed back</li>
 		<li><a id='RTN2d' name='RTN2d' href='#RTN2d'><code>(RTN2d)</code></a> <code>clientId</code> contains the provided <code>clientId</code> option of <code>ClientOptions</code>, unless <code>clientId</code> is <code>null</code></li>
 		<li><a id='RTN2e' name='RTN2e' href='#RTN2e'><code>(RTN2e)</code></a> Depending on the authentication scheme, either <code>accessToken</code> contains the token string, or <code>key</code> contains the API key</li>
-		<li><a id='RTN2f' name='RTN2f' href='#RTN2f'><code>(RTN2f)</code></a> API version param <code>v</code> should be <code>0.9</code></li>
-		<li><a id='RTN2g' name='RTN2g' href='#RTN2g'><code>(RTN2g)</code></a> Library and version param <code>lib</code> should include the header value described in <a href="#RSC7b">RSC7b</a>. For example, the 0.9.0 version of the Javascript library would use the param <code>lib=js-0.9.0</code></li>
+		<li><a id='RTN2f' name='RTN2f' href='#RTN2f'><code>(RTN2f)</code></a> API version param <code>v</code> should be <code>0.8</code></li>
 	</ul></li>
 	<li><a id='RTN3' name='RTN3' href='#RTN3'><code>(RTN3)</code></a> If connection option <code>autoConnect</code> is true, a connection is initiated immediately; otherwise a connection is only initiated following an explicit call to <code>connect()</code></li>
 	<li><a id='RTN4' name='RTN4' href='#RTN4'><code>(RTN4)</code></a> EventEmitter and states:
 	<ul>
 		<li><a id='RTN4a' name='RTN4a' href='#RTN4a'><code>(RTN4a)</code></a> Implements <code>EventEmitter</code> and emits events for state changes <code>INITIALIZED</code>, <code>CONNECTING</code>, <code>CONNECTED</code>, <code>DISCONNECTED</code>, <code>SUSPENDED</code>, <code>CLOSING</code>, <code>CLOSED</code>, <code>FAILED</code></li>
-		<li><a id='RTN4g' name='RTN4g' href='#RTN4g'><code>(RTN4g)</code></a> Additionally, an <code>ERROR</code> event can be emitted by the <code>Connection</code> that contains details of the error in an <code>ErrorInfo</code> object</li>
 		<li><a id='RTN4b' name='RTN4b' href='#RTN4b'><code>(RTN4b)</code></a> A new connection will emit the following events in order when connecting: <code>CONNECTING</code>, then <code>CONNECTED</code></li>
 		<li><a id='RTN4c' name='RTN4c' href='#RTN4c'><code>(RTN4c)</code></a> A connection will emit the following events when closing the connection: <code>CLOSING</code>, then <code>CLOSED</code></li>
 		<li><a id='RTN4d' name='RTN4d' href='#RTN4d'><code>(RTN4d)</code></a> <code>Connection#state</code> attribute is the current state of the connection</li>
@@ -426,12 +416,12 @@
 	</ul></li>
 	<li><a id='RTN5' name='RTN5' href='#RTN5'><code>(RTN5)</code></a> A test should exist that instances many (50+) clients simultaneously and performs a few basic operations such as attaching to a channel, publishing a message, and expecting all of those messages to arrive on all clients to ensure that there are no concurrency issues with the client library</li>
 	<li><a id='RTN6' name='RTN6' href='#RTN6'><code>(RTN6)</code></a> A <code>Connection</code> is successful and considered <code>CONNECTED</code> once the websocket connection is open and the intial <code>CONNECTED</code> <code>ProtocolMessage</code> has been received</li>
-	<li><a id='RTN21' name='RTN21' href='#RTN21'><code>(RTN21)</code></a> If the <code>CONNECTED</code> <code>ProtocolMessage</code> contains a <code>connectionDetails</code> property, the attributes within <code>ConnectionDetails</code> will be used as the defaults for this client library, overriding any configured options at the time the <code>CONNECTED</code> <code>ProtocolMessage</code> is received</li>
+	<li><a id='RTN19' name='RTN19' href='#RTN19'><code>(RTN19)</code></a> If the <code>CONNECTED</code> <code>ProtocolMessage</code> contains a <code>connectionDetails</code> property, the attributes within <code>ConnectionDetails</code> will be used as the defaults for this client library, overriding any configured options at the time the <code>CONNECTED</code> <code>ProtocolMessage</code> is received</li>
 	<li><a id='RTN7' name='RTN7' href='#RTN7'><code>(RTN7)</code></a> <code>ACK</code> and <code>NACK</code>:
 	<ul>
-		<li><a id='RTN7a' name='RTN7a' href='#RTN7a'><code>(RTN7a)</code></a> All <code>ProtocolMessage</code> <code>Presence</code> and <code>Message</code> objects sent to Ably expect either an <code>ACK</code> or <code>NACK</code> from Ably to confirm successful receipt and acceptance or failure respectively. For clarity, it is unnecessary to fail the publish operation of a message using a timer. Instead the client library can rely on: the realtime system will send an <code>ACK</code> or <code>NACK</code> when connected; the client library will fail all awaiting messages once <code>SUSPENDED</code> (see <a href="#RTN7c">RTN7c</a>); upon reconnecting, the client will resend all message awaiting a response, and the realtime system in turn will respond with an <code>ACK</code> or <code>NACK</code> (see <a href="#RTN19a">RTN19a</a>)</li>
+		<li><a id='RTN7a' name='RTN7a' href='#RTN7a'><code>(RTN7a)</code></a> All <code>ProtocolMessage</code> <code>Presence</code> and <code>Message</code> objects sent to Ably expect either an <code>ACK</code> or <code>NACK</code> from Ably to confirm successful receipt and acceptance or failure respectively</li>
 		<li><a id='RTN7b' name='RTN7b' href='#RTN7b'><code>(RTN7b)</code></a> Every <code>ProtocolMessage</code> sent must contain a unique serially incrementing <code>msgSerial</code> integer value starting at zero. The <code>msgSerial</code> along with the <code>count</code> for incoming <code>ACK</code> and <code>NACK</code> <code>ProtocolMessages</code> indicates which messages succeeded or failed to be delivered</li>
-		<li><a id='RTN7c' name='RTN7c' href='#RTN7c'><code>(RTN7c)</code></a> If a connection enters the <code>SUSPENDED</code>, <code>CLOSED</code> or <code>FAILED</code> state, or if the connection state is lost, and an <code>ACK</code> or <code>NACK</code> has not yet been received for a message, the client should consider the delivery of those messages as failed</li>
+		<li><a id='RTN7c' name='RTN7c' href='#RTN7c'><code>(RTN7c)</code></a> If a connection enters the <code>CLOSED</code> or <code>FAILED</code> state, or if the connection state is lost, and a <code>ACK</code> or <code>NACK</code> has not yet been received for a message, the client should consider the delivery of those messages as failed</li>
 	</ul></li>
 	<li><a id='RTN8' name='RTN8' href='#RTN8'><code>(RTN8)</code></a> <code>Connection#id</code> attribute:
 	<ul>
@@ -474,18 +464,16 @@
 	<li><a id='RTN14' name='RTN14' href='#RTN14'><code>(RTN14)</code></a> <code>Connection</code> opening failures:
 	<ul>
 		<li><a id='RTN14a' name='RTN14a' href='#RTN14a'><code>(RTN14a)</code></a> If an API key is invalid, then the connection will enter the <code>FAILED</code> state and the <code>Connection#errorReason</code> will be set on the <code>Connection</code> object as well as the emitted <code>ConnectionStateChange</code></li>
-		<li><a id='RTN14b' name='RTN14b' href='#RTN14b'><code>(RTN14b)</code></a> If a connection request fails due to an <code>ERROR</code> <code>ProtocolMessage</code> being sent to the client containing a token error (<code>statusCode</code> value of 401 and error <code>code</code> value in the range <code>40140 &lt;= @code &lt; 40150</code>), then if the token is renewable, the error should not be emitted, a single attempt to create a new token will be made and a new connection attempt will be initiated using the newly created token. If the attempt to create a new token fails, or the subsequent connection attempt fails due to another token error, then the connection will transition to the <code>FAILED</code> state and the <code>Connection#errorReason</code> will be set</li>
-		<li><a id='RTN14g' name='RTN14g' href='#RTN14g'><code>(RTN14g)</code></a> If an <code>ERROR</code> <code>ProtocolMessage</code> is received for any reason other than <a href="RTN14b">RTN14b</a>, then the connection will transition to the <code>FAILED</code> state and the server will terminate the connection. Additionally the <code>Connection#errorReason</code> must be set with the error from the <code>ERROR</code> <code>ProtocolMessage</code></li>
+		<li><a id='RTN14b' name='RTN14b' href='#RTN14b'><code>(RTN14b)</code></a> If a connection request fails due to an <code>ERROR</code> ProtocolMessage being sent to the client containing a token error (<code>statusCode</code> value of 401 and error <code>code</code> value in the range <code>40140 &lt;= @code &lt; 40150</code>), then if the token is renewable, the error should not emitted, a single attempt to create a new token will be made and a new connection attempt will be initiated using the new token. If the token creation fails, the next connection attempt fails again due to a token error, or the token was not renewable, the connection will transition to the <code>FAILED</code> state and the <code>Connection#errorReason</code> will be set</li>
 		<li><a id='RTN14c' name='RTN14c' href='#RTN14c'><code>(RTN14c)</code></a> A new connection attempt will fail if not connected within the <a href="#defaults">default realtime request timeout</a></li>
-		<li><a id='RTN14d' name='RTN14d' href='#RTN14d'><code>(RTN14d)</code></a> If a connection attempt fails for any recoverable reason (i.e. a network failure or timeout such as <a href="#RTN14c">RTN14c</a> other than a token failure <a href="#RTN14b">RTN14b</a>), the <code>Connection#state</code> will change to <code>DISCONNECTED</code>, the <code>Connection#errorReason</code> will be updated, a <code>ConnectionStateChange</code> with the <code>reason</code> will be emitted, and new connection attempts will periodically be made until the maximum time in that state threshold is reached.  The <code>retryIn</code> attribute of the <code>ConnectionStateChange</code> object will contain the time in milliseconds until the next connection attempt. See the <code>disconnectedRetryTimeout</code> of <code>ClientOptions</code> below. Each time a new connection attempt is made the state will change to <code>CONNECTING</code> and then to <code>CONNECTED</code> if successful, or <code>DISCONNECTED</code> if unsuccessful and the <a href="#defaults">default <code>connectionStateTtl</code></a> has not been exceeded</li>
+		<li><a id='RTN14d' name='RTN14d' href='#RTN14d'><code>(RTN14d)</code></a> If a connection attempt fails for any recoverable reason (i.e. a network failure or a recoverable authentication failure), the <code>Connection#state</code> will change to <code>DISCONNECTED</code>, the <code>Connection#errorReason</code> will be updated, a <code>ConnectionStateChange</code> with the <code>reason</code> will be emitted, and new connection attempts will periodically be made until the maximum time in that state threshold is reached.  The <code>retryIn</code> attribute of the <code>ConnectionStateChange</code> object will contain the time in milliseconds until the next connection attempt. See the <code>disconnectedRetryTimeout</code> of <code>ClientOptions</code> below. Each time a new connection attempt is made the state will change to <code>CONNECTING</code> and then to <code>CONNECTED</code> if successful, or <code>DISCONNECTED</code> if unsuccessful and the <a href="#defaults">default <code>connectionStateTtl</code></a> has not been exceeded</li>
 		<li><a id='RTN14e' name='RTN14e' href='#RTN14e'><code>(RTN14e)</code></a> Once the connection state has been in the <code>DISCONNECTED</code> state for more than the <a href="#defaults">default <code>connectionStateTtl</code></a>, the state will change to <code>SUSPENDED</code> and be emitted with the <code>reason</code>, and the <code>Connection#errorReason</code> will be updated. In this state, a new connection attempt will be made periodically as specified within <code>suspendedRetryTimeout</code> of <code>ClientOptions</code></li>
 		<li><a id='RTN14f' name='RTN14f' href='#RTN14f'><code>(RTN14f)</code></a> The connection will remain in the <code>SUSPENDED</code> state indefinitely, whilst periodically attempting to reestablish a connection</li>
 	</ul></li>
 	<li><a id='RTN15' name='RTN15' href='#RTN15'><code>(RTN15)</code></a> <code>Connection</code> failures once <code>CONNECTED</code>:
 	<ul>
 		<li><a id='RTN15h' name='RTN15h' href='#RTN15h'><code>(RTN15h)</code></a> If a <code>DISCONNECTED</code> message is received from Ably, then that transport will subsequently be closed by Ably. If the <code>DISCONNECTED</code> message contains a token error (<code>statusCode</code> value of 401 and error <code>code</code> value in the range <code>40140 &lt;= @code &lt; 40150</code>), if the token is renewable, the error should not emitted, a single attempt to create a new token will be made and a new connection attempt will be initiated using the new token. If the token creation fails, the next connection attempt fails due to a token error, or the token was not renewable, the connection will transition to the <code>FAILED</code> state and the <code>Connection#errorReason</code> will be set</li>
-		<li><a id='RTN15i' name='RTN15i' href='#RTN15i'><code>(RTN15i)</code></a> If an <code>ERROR</code> <code>ProtocolMessage</code> is received, this indicates a fatal error in the connection. The server will close the transport immediately after. The client should move to the <code>FAILED</code> state triggering all attached channels to move to the <code>FAILED</code> state as well. Additionally the <code>Connection#errorReason</code> should be set with the error received from Ably</li>
-		<li><a id='RTN15a' name='RTN15a' href='#RTN15a'><code>(RTN15a)</code></a> If a <code>Connection</code> transport is disconnected unexpectedly or if a token expires, then the <code>Connection</code> manager will immediately attempt to reconnect and restore the connection state. Connection state recovery is provided by the Ably service and ensures that whilst the client is disconnected, all events are queued and channel state is retained on the Ably servers. When a new connection is made with the correct connection recovery key, the client is able to catch up by receiving the queued <code>ProtocolMessages</code> from Ably. Connection state is only maintained for a brief period, up to two minutes, so if a client is disconnected for a longer period connection state cannot be resumed</li>
+		<li><a id='RTN15a' name='RTN15a' href='#RTN15a'><code>(RTN15a)</code></a> If a <code>Connection</code> transport is disconnected unexpectedly or if a token expires, then the <code>Connection</code> manager will immediately attempt to reconnect and restore the connection state. Connection state recovery is provided by the Ably service and ensures that whilst the client is disconnected, all events are queued and channel state is retained on the Ably servers. When a new connection is made with the correct connection recovery key, the client is able to catch up by receiving the queued <code>ProtocolMessages</code> from Ably. Connection state is only maintained for a brief period, up to a minute, so if a client is disconnected for a longer period connection state cannot be resumed</li>
 		<li><a id='RTN15b' name='RTN15b' href='#RTN15b'><code>(RTN15b)</code></a> In order for a connection to be resumed and connection state to be recovered, the client library reconnects to the websocket endpoint with two additional querystring params:
 		<ul>
 			<li><a id='RTN15b1' name='RTN15b1' href='#RTN15b1'><code>(RTN15b1)</code></a> <code>resume</code> is the private connection key assigned to the connection when the first <code>CONNECTED</code> <code>ProtocolMessage</code> was received</li>
@@ -495,10 +483,10 @@
 			<ul>
 				<li><a id='RTN15c1' name='RTN15c1' href='#RTN15c1'><code>(RTN15c1)</code></a> <code>CONNECTED</code> <code>ProtocolMessage</code> with the same <code>connectionId</code> as the current client, and no <code>error</code>. In this case, the server is indicating that the resume succeeded, all channels are still attached, and all backlog messages are available. The client should not change the state of attached channels, and immediately process any queued messages for that channel</li>
 				<li><a id='RTN15c2' name='RTN15c2' href='#RTN15c2'><code>(RTN15c2)</code></a> <code>CONNECTED</code> <code>ProtocolMessage</code> with the same <code>connectionId</code> as the current client, and an <code>error</code>. In this case, the server is indicating that the resume succeeded but with a non-fatal error, all channels are still attached, and some backlog messages may be unavailable. The <code>ErrorInfo</code> received should be emitted on the client <code>Connection</code> and the <code>Connection#errorReason</code> should be set. The client should not change the state of attached channels, and immediately process any queued messages for that channel. Any channels that are not resumed in full may receive an <code>ATTACHED</code> <code>ProtocolMessage</code> with an <code>error</code>, see <a href="#RTL12"><code>RTL12</code></a></li>
-				<li><a id='RTN15c3' name='RTN15c3' href='#RTN15c3'><code>(RTN15c3)</code></a> <code>CONNECTED</code> <code>ProtocolMessage</code> with a new <code>connectionId</code>, and an error in <code>error</code>. In this case, a new connection has been established, the resume was unsuccessful, the channels are no longer attached, and the emitted error indicates the cause of the unsuccessful resume. The client library should initiate an attach for channels that are in the <code>SUSPENDED</code> state. For all channels in the <code>ATTACHING</code> or <code>ATTACHED</code> state, the client library should fail any previously queued messages for that channel and initiate a new attach i.e. a new <code>ATTACH</code> <code>ProtocolMessage</code> must be sent for each channel. An <code>ERROR</code> will most likely be emitted when the channels become attached automatically due to a loss of continuity, see <a href="#RTL12"><code>RTL12</code></a>. Finally, the internal <code>msgSerial</code> counter is reset so that the first message published to Ably will contain a <code>msgSerial</code> value of <code>0</code></li>
-				<li><a id='RTN15c5' name='RTN15c5' href='#RTN15c5'><code>(RTN15c5)</code></a> <code>ERROR</code> <code>ProtocolMessage</code> indicating a failure to authenticate as a result of a token error (see <a href="RTN15h">RTN15h</a>). The transport will be closed by the server. The spec described in <a href="RTN15h">RTN15h</a> must be followed for a connection being resumed with a token error</li>
-				<li><a id='RTN15c4' name='RTN15c4' href='#RTN15c4'><code>(RTN15c4)</code></a> Any other <code>ERROR</code> <code>ProtocolMessage</code> indicating a fatal error in the connection. The server will close the transport immediately after. The client should move to the <code>FAILED</code> state triggering all attached channels to move to the <code>FAILED</code> state as well. Additionally the <code>Connection#errorReason</code> will be set should be set with the error received from Ably</li>
+				<li><a id='RTN15c3' name='RTN15c3' href='#RTN15c3'><code>(RTN15c3)</code></a> <code>CONNECTED</code> <code>ProtocolMessage</code> with a new <code>connectionId</code>, and an error in <code>error</code>. In this case, a new connection has been established, the resume has failed, the channels are no longer attached, and the error indicates the resume problem which should be emitted. The client library should immediately detach all channels, fail any queued messages on those channels, and set the <code>Channel#errorReason</code> on each detached <code>Channel</code>. Additionally, the internal <code>msgSerial</code> counter is reset so that the first message published to Ably will contain a <code>msgSerial</code> value of <code>0</code></li>
+				<li><a id='RTN15c4' name='RTN15c4' href='#RTN15c4'><code>(RTN15c4)</code></a> <code>ERROR</code> <code>ProtocolMessage</code> indicating a fatal error in the connection. The server will close the transport immediately after. If the <code>ERROR</code> is non-recoverable, the client will move to the <code>FAILED</code> state triggering all attached channels to move to the <code>FAILED</code> state as well</li>
 			</ul></li>
+		<li><a id='RTN15g' name='RTN15g' href='#RTN15g'><code>(RTN15g)</code></a> When the connection resume has failed, all channels should be detached with a suitable error reason</li>
 		<li><a id='RTN15f' name='RTN15f' href='#RTN15f'><code>(RTN15f)</code></a> <code>ACK</code> and <code>NACK</code> responses for published messages can only ever be received on the transport connection on which those messages were sent. Therefore, once a transport drops, the client library must either fail the publish attempt, or re-attempt by re-sending the messages on a new transport if the resume was successful (i.e. the <code>CONNECTED</code> response includes the expected <code>connectionId</code>)</li>
 		<li><a id='RTN15d' name='RTN15d' href='#RTN15d'><code>(RTN15d)</code></a> Client libraries should have test coverage to ensure connection state recovery is working as expected by forciby disconnecting a client and checking that messages published on channels are delivered once the connection is resumed</li>
 		<li><a id='RTN15e' name='RTN15e' href='#RTN15e'><code>(RTN15e)</code></a> When a connection is resumed, the <code>Connection#key</code> may change and will be provided in the first <code>CONNECTED</code> <code>ProtocolMessage#connectionDetails</code> when the connection is established. The client library must update the <code>Connection#key</code> value with the new <code>connectionKey</code> value every time</li>
@@ -510,7 +498,7 @@
 	</ul></li>
 	<li><a id='RTN16' name='RTN16' href='#RTN16'><code>(RTN16)</code></a> <code>Connection</code> recovery:
 	<ul>
-		<li><a id='RTN16a' name='RTN16a' href='#RTN16a'><code>(RTN16a)</code></a> Connection recovery follows the resume spec <a href="#RTN15c">RTN15c</a> in respect to the expected response from the server. However, connection recovery is different in that the library has no state at the time of connection and recovers the connection based as a result of <code>recover</code> key being explicitly provided to the Realtime library when instanced. Once a connection is recovered, all channels must be explicitly attached by the developer</li>
+		<li><a id='RTN16a' name='RTN16a' href='#RTN16a'><code>(RTN16a)</code></a> Connection recovery is similar to the automatic connection resume except that connection state is recovered explicitly because a <code>recover</code> key is passed to the Realtime library when instanced. Once a connection is recovered, all channels must be explicitly attached by the developer, and any messages queued to be delivered whilst the client was disconnected will be delivered</li>
 		<li><a id='RTN16b' name='RTN16b' href='#RTN16b'><code>(RTN16b)</code></a> <code>Connection#recoveryKey</code> is an attribute composed of the connection key and latest serial received on the connection</li>
 		<li><a id='RTN16c' name='RTN16c' href='#RTN16c'><code>(RTN16c)</code></a> <code>Connection#recoveryKey</code> becomes <code>Null</code> when a connection is explicitly <code>CLOSED</code> or <code>CLOSED</code> by the server, as connection state is not retained for connections closed intentionally. The <code>Connection#key</code> and <code>Connection#id</code> is set to <code>Null</code></li>
 		<li><a id='RTN16d' name='RTN16d' href='#RTN16d'><code>(RTN16d)</code></a> When a connection is successfully recovered, the <code>Connection#id</code> will be identical to the <code>id</code> of the connection that was recovered, and <code>Connection#key</code> will always be updated to the <code>ConnectionDetails#connectionKey</code> provided in the first <code>CONNECTED</code> <code>ProtocolMessage</code></li>
@@ -523,6 +511,12 @@
 		<li><a id='RTN17c' name='RTN17c' href='#RTN17c'><code>(RTN17c)</code></a> In the case of an error necessitating use of an alternative host (see <a href="#RTN17d">RTN17d</a>), the <code>Connection</code> manager should first check if an internet connection is available by issuing a <code>GET</code> request to <code>https://internet-up.ably-realtime.com/is-the-internet-up.txt</code>. If the request succeeds and the text &#8220;yes&#8221; is included in the body, then the client library can assume it has a viable internet connection and should then immediately retry the connection against all fallback hosts to find an alternative healthy data centre. The five fallback hosts are <code>[a-e].ably-realtime.com</code> and should be attempted in random order</li>
 		<li><a id='RTN17d' name='RTN17d' href='#RTN17d'><code>(RTN17d)</code></a> Errors that necessitate use of an alternative host include: host unresolvable or unreachable, connection timeout, or a response but with an <a href="/rest-api#error-response">error body <code>statusCode</code></a> or HTTP response status code in the range <code>500 &lt;= code &lt;= 504</code>. Attempting to reconnect to a fallback host for other failure conditions will not fix the problem and will simply increase the load on other data centres unnecessarily</li>
 		<li><a id='RTN17e' name='RTN17e' href='#RTN17e'><code>(RTN17e)</code></a> If the realtime client is connected to a fallback host endpoint, then for the duration that the transport is connected to that host, all HTTP requests, such as history or token requests, should be first attempted to the same data centre the realtime connection is established with i.e. the same fallback host must be used as the default HTTP request host. If however the HTTP request against that fallback host fails, then the normal fallback host behaviour should be followed attempting the request against another fallback host as described in <a href="#RSC15">RSC15</a></li>
+	</ul></li>
+	<li><a id='RTN18' name='RTN18' href='#RTN18'><code>(RTN18)</code></a> Connection state change side effects:
+	<ul>
+		<li><a id='RTN18a' name='RTN18a' href='#RTN18a'><code>(RTN18a)</code></a> When a connection enters the <code>DISCONNECTED</code> state, it will have no effect on the channel states. Channels in the <code>ATTACHED</code> state will queue messages that are sent as soon as the connection is resumed</li>
+		<li><a id='RTN18b' name='RTN18b' href='#RTN18b'><code>(RTN18b)</code></a> When a connection enters the <code>CLOSED</code> or <code>SUSPENDED</code> state, all channels will move to the <code>DETACHED</code> state. Channels in the <code>DETACHED</code> state should reject publishing of messages</li>
+		<li><a id='RTN18c' name='RTN18c' href='#RTN18c'><code>(RTN18c)</code></a> When a connection enters the <code>FAILED</code> state, all channels will move to the <code>FAILED</code> state. Channels in the <code>FAILED</code> state should reject publishing of messages</li>
 	</ul></li>
 	<li><a id='RTN19' name='RTN19' href='#RTN19'><code>(RTN19)</code></a> Transport state side effects &#8211; when a transport is upgraded or disconnected for any reason:
 	<ul>
@@ -548,27 +542,19 @@
 </ul>
 <h3 id="realtime-channel">Channel</h3>
 <ul>
-	<li><a id='RTL1' name='RTL1' href='#RTL1'><code>(RTL1)</code></a> As soon as a <code>Channel</code> becomes attached, all incoming messages and presence messages are processed and emitted where applicable. <code>PRESENCE</code> and <code>SYNC</code> messages are passed to the <code>Presence</code> object ensuring it maintains a map of current members on a channel in realtime</li>
+	<li><a id='RTL1' name='RTL1' href='#RTL1'><code>(RTL1)</code></a> As soon as a <code>Channel</code> becomes attached, all incoming messages and presence messages are processed and emitted where applicable.  <code>PRESENCE</code> and <code>SYNC</code> messages are passed to the <code>Presence</code> object ensuring it maintains a map of current members on a channel in realtime</li>
 	<li><a id='RTL2' name='RTL2' href='#RTL2'><code>(RTL2)</code></a> EventEmitter and states:
 	<ul>
-		<li><a id='RTL2a' name='RTL2a' href='#RTL2a'><code>(RTL2a)</code></a> Implements <code>EventEmitter</code> and emits events for state changes <code>INITIALIZED</code>, <code>ATTACHING</code>, <code>ATTACHED</code>, <code>DETACHING</code>, <code>DETACHED</code>, <code>SUSPENDED</code> and <code>FAILED</code></li>
+		<li><a id='RTL2a' name='RTL2a' href='#RTL2a'><code>(RTL2a)</code></a> Implements <code>EventEmitter</code> and emits events for state changes <code>INITIALIZED</code>, <code>ATTACHING</code>, <code>ATTACHED</code>, <code>DETACHING</code>, <code>DETACHED</code>, <code>FAILED</code></li>
 		<li><a id='RTL2b' name='RTL2b' href='#RTL2b'><code>(RTL2b)</code></a> <code>Channel#state</code> attribute is the current state of the channel</li>
-		<li><a id='RTL2d' name='RTL2d' href='#RTL2d'><code>(RTL2d)</code></a> A <code>ChannelStateChange</code> object is emitted as the first argument for every channel state change. It may optionally contain a <code>reason</code> with details of the state change error in an <code>ErrorInfo</code> object</li>
-		<li><a id='RTL2f' name='RTL2f' href='#RTL2f'><code>(RTL2f)</code></a> When a channel <code>ATTACHED</code> <code>ProtocolMessage</code> is received, the <code>ProtocolMessage</code> may contain a <code>RESUMED</code> bit flag indicating that the channel has been resumed. The <code>ChannelStateChange</code> will then be emitted for the <code>ATTACHED</code> state and will contain a <code>resumed</code> boolean attribute with value <code>true</code> if the bit flag <code>RESUMED</code> was included. When <code>resumed</code> is <code>true</code>, this indicates that the channel attach resumed the channel state from an existing connection and there has been no loss of message continuity. In all other cases, <code>resumed</code> is false. A test should exist to ensure that <code>resumed</code> is always false when a channel first becomes <code>ATTACHED</code>, it is <code>true</code> when the channel is <code>ATTACHED</code> following a successful <a href="#RTN16">connection recovery</a>, and is <code>false</code> when the channel is <code>ATTACHED</code> following a failed <a href="#RTN16">connection recovery</a></li>
-		<li><a id='RTL2c' name='RTL2c' href='#RTL2c'><code>(RTL2c)</code></a> Additionally, an <code>ERROR</code> event can be emitted by the <code>Channel</code> that contains details of the error in an <code>ErrorInfo</code> object</li>
+		<li><a id='RTL2c' name='RTL2c' href='#RTL2c'><code>(RTL2c)</code></a> Additionally, an <code>ERROR</code> event is emitted that contains an <code>ErrorInfo</code> object with details on an error that has occurred for the <code>Channel</code></li>
 	</ul></li>
 	<li><a id='RTL3' name='RTL3' href='#RTL3'><code>(RTL3)</code></a> Connection state change side effects:
 	<ul>
-		<li><a id='RTL3e' name='RTL3e' href='#RTL3e'><code>(RTL3e)</code></a> If the connection state changes to <code>DISCONNECTED</code>, it will have no effect on the channel states.</li>
 		<li><a id='RTL3a' name='RTL3a' href='#RTL3a'><code>(RTL3a)</code></a> If the connection state changes to <code>FAILED</code> then an <code>ATTACHING</code> or <code>ATTACHED</code> channel state will transition to <code>FAILED</code>, set the <code>Channel#errorReason</code> and emit the error event</li>
-		<li><a id='RTL3b' name='RTL3b' href='#RTL3b'><code>(RTL3b)</code></a> If the connection state changes to <code>CLOSED</code> then an <code>ATTACHING</code> or <code>ATTACHED</code> channel state will transition to <code>DETACHED</code></li>
-		<li><a id='RTL3c' name='RTL3c' href='#RTL3c'><code>(RTL3c)</code></a> If the connection state changes to <code>SUSPENDED</code> then an <code>ATTACHING</code> or <code>ATTACHED</code> channel state will transition to <code>SUSPENDED</code></li>
-		<li><a id='RTL3d' name='RTL3d' href='#RTL3d'><code>(RTL3d)</code></a> If the connection state changes to <code>CONNECTED</code> then a <code>SUSPENDED</code> channel will initiate an attach operation. If the attach operation for the channel times out and the channel returns to the <code>SUSPENDED</code> state (see <a href="#RTL4f">RTL4f</a>), then an <code>ERROR</code> event on the <code>Channel</code> with Ably error code <code>91200</code> should be emitted</li>
+		<li><a id='RTL3b' name='RTL3b' href='#RTL3b'><code>(RTL3b)</code></a> If the connection state changes to <code>CLOSED</code> or <code>SUSPENDED</code> then an <code>ATTACHING</code> or <code>ATTACHED</code> channel state will transition to <code>DETACHED</code></li>
 	</ul></li>
-	<li><a id='RTL11' name='RTL11' href='#RTL11'><code>(RTL11)</code></a> If a channel enters the <code>DETACHED</code>, <code>SUSPENDED</code> or <code>FAILED</code> state, then all messages that are still queued for send on that channel should be deleted from the queue triggering a failure for the publish or presence methods invoked for those messages
-	<ul>
-		<li><a id='RTL11a' name='RTL11a' href='#RTL11a'><code>(RTL11a)</code></a> For clarity, any messages awaiting an <code>ACK</code> or <code>NACK</code> are unaffected by channel state changes i.e. a channel that becomes detached following an explicit request to detach may still receive an <code>ACK</code> or <code>NACK</code> for messages published on that channel later</li>
-	</ul></li>
+	<li><a id='RTL11' name='RTL11' href='#RTL11'><code>(RTL11)</code></a> If a channel enters the <code>DETACHED</code> or <code>FAILED</code> state, then all messages that are still queued for send on that channel should be deleted from the queue triggering a failure for the publish or presence methods invoked for those messages</li>
 	<li><a id='RTL4' name='RTL4' href='#RTL4'><code>(RTL4)</code></a> <code>Channel#attach</code> function:
 	<ul>
 		<li><a id='RTL4a' name='RTL4a' href='#RTL4a'><code>(RTL4a)</code></a> If already <code>ATTACHED</code> nothing is done</li>
@@ -577,7 +563,7 @@
 		<li><a id='RTL4b' name='RTL4b' href='#RTL4b'><code>(RTL4b)</code></a> If the connection state is <code>CLOSED</code>, <code>CLOSING</code>, <code>SUSPENDED</code> or <code>FAILED</code>, the <code>attach</code> request results in an error</li>
 		<li><a id='RTL4h' name='RTL4h' href='#RTL4h'><code>(RTL4h)</code></a> If the connection state is <code>INITIALIZED</code>, <code>CONNECTING</code> or <code>DISCONNECTED</code>, do the operation once the connection state is <code>CONNECTED</code></li>
 		<li><a id='RTL4c' name='RTL4c' href='#RTL4c'><code>(RTL4c)</code></a> Otherwise an <code>ATTACH</code> ProtocolMessage is sent to the server, the state changes to <code>ATTACHING</code> and the channel becomes <code>ATTACHED</code> when the confirmation <code>ATTACHED</code> ProtocolMessage is received</li>
-		<li><a id='RTL4f' name='RTL4f' href='#RTL4f'><code>(RTL4f)</code></a> Once an <code>ATTACH</code> <code>ProtocolMessage</code> is sent, if an <code>ATTACHED</code> <code>ProtocolMessage</code> is not received within the <a href="#defaults">default realtime request timeout</a>, the attach request should be treated as though it has failed and the channel should move to the <code>SUSPENDED</code> state. The channel will then be subsequently automatically re-attached as described in <a href="#RTL13">RTL13</a></li>
+		<li><a id='RTL4f' name='RTL4f' href='#RTL4f'><code>(RTL4f)</code></a> Once an <code>ATTACH</code> <code>ProtocolMessage</code> is sent, if an <code>ATTACHED</code> <code>ProtocolMessage</code> is not received within the <a href="#defaults">default realtime request timeout</a>, the attach request should be treated as though it has failed and the channel will return to its previous state</li>
 		<li><a id='RTL4d' name='RTL4d' href='#RTL4d'><code>(RTL4d)</code></a> If the language permits, a callback can be provided that is called when the channel is attached successfully or the attach fails and the <code>ErrorInfo</code> error is passed as an argument to the callback</li>
 		<li><a id='RTL4e' name='RTL4e' href='#RTL4e'><code>(RTL4e)</code></a> If the user does not have sufficient permissions to attach to the channel, the channel state <code>FAILED</code> is emitted with the error <code>ErrorInfo</code>. An error event is also emitted, and the <code>Channel#errorReason</code> attribute of the <code>Channel</code> is set to the error <code>ErrorInfo</code> object</li>
 	</ul></li>
@@ -586,7 +572,6 @@
 		<li><a id='RTL5a' name='RTL5a' href='#RTL5a'><code>(RTL5a)</code></a> If the channel state is <code>INITIALIZED</code> or <code>DETACHED</code> nothing is done</li>
 		<li><a id='RTL5i' name='RTL5i' href='#RTL5i'><code>(RTL5i)</code></a> If the channel is in a pending state <code>DETACHING</code> or <code>ATTACHING</code>, do the detach operation after the completion of the pending request</li>
 		<li><a id='RTL5b' name='RTL5b' href='#RTL5b'><code>(RTL5b)</code></a> If the channel state is <code>FAILED</code>, the <code>detach</code> request results in an error</li>
-		<li><a id='RTL5j' name='RTL5j' href='#RTL5j'><code>(RTL5j)</code></a> If the channel state is <code>SUSPENDED</code>, the <code>detach</code> request moves the channel immediately to the <code>DETACHED</code> state</li>
 		<li><a id='RTL5g' name='RTL5g' href='#RTL5g'><code>(RTL5g)</code></a> If the connection state is <code>CLOSING</code> or <code>FAILED</code>, the <code>detach</code> request results in an error</li>
 		<li><a id='RTL5h' name='RTL5h' href='#RTL5h'><code>(RTL5h)</code></a> If the connection state is <code>INITIALIZED</code>, <code>CONNECTING</code> or <code>DISCONNECTED</code>, do the detach operation once the connection state is <code>CONNECTED</code></li>
 		<li><a id='RTL5d' name='RTL5d' href='#RTL5d'><code>(RTL5d)</code></a> Otherwise a <code>DETACH</code> ProtocolMessage is sent to the server, the state changes to <code>DETACHING</code> and the channel becomes <code>DETACHED</code> when the confirmation <code>DETACHED</code> ProtocolMessage is received</li>
@@ -604,8 +589,8 @@
 		<li><a id='RTL6c' name='RTL6c' href='#RTL6c'><code>(RTL6c)</code></a> Connection and channel state conditions:
 		<ul>
 			<li><a id='RTL6c1' name='RTL6c1' href='#RTL6c1'><code>(RTL6c1)</code></a> If the connection is <code>CONNECTED</code> and the channel is <code>ATTACHED</code> then the messages are published immediately</li>
-			<li><a id='RTL6c2' name='RTL6c2' href='#RTL6c2'><code>(RTL6c2)</code></a> If the connection is <code>INITIALIZED</code>, <code>CONNECTING</code> or <code>DISCONNECTED</code> or the channel is <code>INITIALIZED</code>, <code>ATTACHING</code> or <code>ATTACHED</code>, and <code>ClientOptions#queueMessages</code> has not been explicitly set to false, then the message will be queued and delivered as soon as the connection state becomes <code>CONNECTED</code> and the channel is <code>ATTACHED</code></li>
-			<li><a id='RTL6c4' name='RTL6c4' href='#RTL6c4'><code>(RTL6c4)</code></a> If the connection is <code>SUSPENDED</code>, <code>CLOSING</code>, <code>CLOSED</code>, or <code>FAILED</code>, or the channel is <code>DETACHING</code>, <code>DETACHED</code>, <code>SUSPENDED</code> or <code>FAILED</code>, the operation will result in an error</li>
+			<li><a id='RTL6c2' name='RTL6c2' href='#RTL6c2'><code>(RTL6c2)</code></a> If the connection is <code>INITIALIZED</code>, <code>CONNECTING</code> or <code>DISCONNECTED</code> or the channel is <code>INITIALIZED</code> or <code>ATTACHING</code>, and <code>ClientOptions#queueMessages</code> has not been explicitly set to false, then the message will be queued and delivered as soon as the connection state becomes <code>CONNECTED</code> and the channel is <code>ATTACHED</code></li>
+			<li><a id='RTL6c4' name='RTL6c4' href='#RTL6c4'><code>(RTL6c4)</code></a> If the connection is <code>SUSPENDED</code>, <code>CLOSING</code>, <code>CLOSED</code>, or <code>FAILED</code>, or the channel is <code>DETACHING</code>, <code>DETACHED</code> or <code>FAILED</code>, the operation will result in an error</li>
 			<li><a id='RTL6c3' name='RTL6c3' href='#RTL6c3'><code>(RTL6c3)</code></a> Implicitly attaches the <code>Channel</code> if the channel is in the <code>INITIALIZED</code> state. However, if the channel is in or moves to the <code>DETACHED</code> or <code>FAILED</code> state before the operation succeeds, it will result in an error</li>
 		</ul></li>
 		<li><a id='RTL6d' name='RTL6d' href='#RTL6d'><code>(RTL6d)</code></a> Messages are delivered using a single <code>ProtocolMessage</code> where possible by bundling in all messages for that channel into the <code>ProtocolMessage#messages</code> array. However, a yet to be implemented feature should limit the total number of messages bundled per <code>ProtocolMessage</code> based on the default max message size, and would reject the publish and indicate an error if any single message exceeds that limit</li>
@@ -652,37 +637,18 @@
 		<li><a id='RTL10c' name='RTL10c' href='#RTL10c'><code>(RTL10c)</code></a> Returns a <code>PaginatedResult</code> page containing the first page of messages in the <code>PaginatedResult#items</code> attribute returned from the history request</li>
 		<li><a id='RTL10d' name='RTL10d' href='#RTL10d'><code>(RTL10d)</code></a> A test should exist that publishes messages from one client, and upon confirmation of message delivery, a history request should be made on another client to ensure all messages are available</li>
 	</ul></li>
-	<li><a id='RTL12' name='RTL12' href='#RTL12'><code>(RTL12)</code></a> An attached channel may receive an additional <code>ATTACHED</code> <code>ProtocolMessage</code> from Ably at any point, however this is typically triggered following a transport being upgraded or resumed. If the <code>ATTACHED</code> message contains an <code>error</code>, the error should be emitted as a <code>ERROR</code> event on the channel and the channel should remain attached. An <code>ATTACHED</code> state change event should not be emitted by the <code>Channel</code> if the <code>Channel</code> is already <code>ATTACHED</code> as no state change has occurred</li>
-	<li><a id='RTL13' name='RTL13' href='#RTL13'><code>(RTL13)</code></a> If the channel receives a server initiated <code>DETACHED</code> message when it is in the <code>ATTACHING</code>, <code>ATTACHED</code> or <code>SUSPENDED</code> state (i.e. the client has not explicitly requested a detach putting the channel into the <code>DETACHING</code> state), then the following applies:
-	<ul>
-		<li><a id='RTL13a' name='RTL13a' href='#RTL13a'><code>(RTL13a)</code></a> An attempt to reattach the channel should be made immediately by sending a new <code>ATTACH</code> message and the channel should move to the <code>ATTACHING</code> state with the error emitted in the <code>ChannelStateChange</code> event.</li>
-		<li><a id='RTL13b' name='RTL13b' href='#RTL13b'><code>(RTL13b)</code></a> If the attempt to re-attach fails, the channel will move to the <code>SUSPENDED</code> state and the error will be emitted in the <code>ChannelStateChange</code> event. An attempt to re-attach the channel automatically will then be made after the period defined in <code>ClientOptions#channelRetryTimeout</code>. When re-attaching the channel, the channel will move to the <code>ATTACHING</code> state. If that request to attach fails i.e. it times out or a <code>DETACHED</code> message is received, then the process described here in <code>RTL13b</code> will be repeated, indefinitely</li>
-		<li><a id='RTL13c' name='RTL13c' href='#RTL13c'><code>(RTL13c)</code></a> If the connection is no longer <code>CONNECTED</code>, then the automatic attempts to re-attach the channel described in <a href="#RTL13b">RTL13b</a> must be cancelled as any implicit channel state changes subsequently will be covered by <a href="#RTL3">RTL3</a></li>
-	</ul></li>
+	<li><a id='RTL12' name='RTL12' href='#RTL12'><code>(RTL12)</code></a> An attached channel may receive an additional <code>ATTACHED</code> <code>ProtocolMessage</code> from Ably at any point, however this is typically triggered following a transport being upgraded or resumed. If the <code>ATTACHED</code> message contains an <code>error</code>, the error should be emitted on the channel, the <code>Channel#errorReason</code> should be set, and the channel should remain attached. An <code>ATTACHED</code> state change event should not be emitted by the <code>Channel</code> if the <code>Channel</code> is already <code>ATTACHED</code> (i.e. no state change has occurred)</li>
 </ul>
 <h3 id="realtime-presence">Presence</h3>
 <ul>
-	<li><a id='RTP1' name='RTP1' href='#RTP1'><code>(RTP1)</code></a> When a channel <code>ATTACHED</code> <code>ProtocolMessage</code> is received, the <code>ProtocolMessage</code> may contain a <code>HAS_PRESENCE" bit flag  indicating that there are currently members present on the channel. If members are present, subsequent @ProtocolMessage SYNC</code> messages will be delivered with presence members (messages) until the <code>SYNC</code> operation is complete. If there is no flag or the right most bit is zero, then the presence map should be considered in sync immediately as there are no members present on the channel at the time of attach</li>
-	<li><a id='RTP2' name='RTP2' href='#RTP2'><code>(RTP2)</code></a> A <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L384-L529"><code>PresenceMap</code></a> should be used to maintain a list of members present on a channel. As there are no guarantees that during the <code>SYNC</code> phase presence events will arrive in order i.e. a leave event for a member can arrive before that member is later registered as as present as part of the initial <code>SYNC</code> operation. As such, until the <code>SYNC</code> operation is complete, the member <code>timestamp</code> value must be used to determine the most recent state for each member, see the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L418-L431">Java implementation</a>.  Once a <code>SYNC</code> event is complete, the members that are now considered <code>ABSENT</code> can be removed from the map, see the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L504-L509">Java implementation</a></li>
+	<li><a id='RTP1' name='RTP1' href='#RTP1'><code>(RTP1)</code></a> When a channel <code>ATTACHED</code> <code>ProtocolMessage</code> is received, the <code>ProtocolMessage</code> may contain a bit flag with value 1 indicating that there are currently members present on the channel. If members are present, subsequent <code>ProtocolMessage SYNC</code> messages will be delivered with presence members (messages) until the <code>SYNC</code> operation is complete. If there is no flag or the right most bit is zero, then the presence map should be considered in sync immediately as there are no members present on the channel at the time of attach</li>
+	<li><a id='RTP2' name='RTP2' href='#RTP2'><code>(RTP2)</code></a> A <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L384-L529">PresenceMap</a> should be used to maintain a list of members present on a channel. As there are no guarantees that during the <code>SYNC</code> phase presence events will arrive in order i.e. a leave event for a member can arrive before that member is later registered as as present as part of the initial <code>SYNC</code> operation. As such, until the <code>SYNC</code> operation is complete, timestamps must be recorded for all members to ensure the most recent present state is used, see the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L418-L431">Java implementation</a>.  Once a <code>SYNC</code> event is complete, the members that are now considered <code>ABSENT</code> can be removed from the map, see the <a href="https://github.com/ably/ably-java/blob/master/src/io/ably/realtime/Presence.java#L504-L509">Java implementation</a></li>
 	<li><a id='RTP3' name='RTP3' href='#RTP3'><code>(RTP3)</code></a> If a <code>SYNC</code> operation is underway but not yet complete, and the transport is disconnected unexpectedly, then if the connection is resumed successfully, it is the responsibility of the client library to complete the <code>SYNC</code> operation. The client library requests a <code>SYNC</code> resume by sending a <code>SYNC</code> <code>ProtocolMessage</code> with the last received sync serial number. See the <a href="https://github.com/ably/ably-ruby/blob/7b18a20/lib/ably/realtime/presence/members_map.rb#L169-L176">Ruby implementation</a> and the <a href="https://github.com/ably/ably-ruby/blob/7b18a20/spec/acceptance/realtime/presence_spec.rb#L1338-L1357">Ruby test</a></li>
-	<li><a id='RTP18' name='RTP18' href='#RTP18'><code>(RTP18)</code></a> The realtime system reserves the right to initiate a sync of the presence members at any point once a channel is attached. A server initiated sync provides Ably with a means to send a complete list of members present on the channel at any point. The client library determines that a new sync has started whenever a <code>SYNC</code> <code>ProtocolMessage</code> is received with a <code>channel</code> attribute and a new sync sequence identifier in the <code>channelSerial</code> attribute. The <code>channelSerial</code> is used as the sync cursor and is a two-part identifier <code>&lt;sync sequence id&gt;:&lt;cursor value&gt;</code>. If a new sequence identifier is sent from Ably, then the client library must consider that to be the start of a new sync sequence and any previous in-flight sync should be discarded. Once the cursor value is empty, then the sync operation for that sequence identifier has completed</li>
-	<li><a id='RTP19' name='RTP19' href='#RTP19'><code>(RTP19)</code></a> If the <code>PresenceMap</code> has existing members when a <code>SYNC</code> is started, the client library must ensure that members no longer present on the channel are removed from the local <code>PresenceMap</code> once the sync is complete. In order to do this, the client library must keep track of any members that have not been added or updated in the <code>PresenceMap</code> during the sync process. Note that a member can be added or updated when received in a <code>SYNC</code> message or when received in a <code>PRESENCE</code> message during the sync process. Once the sync is complete, the members in the <code>PresenceMap</code> that have not been added or updated should be removed from the <code>PresenceMap</code> and a <code>LEAVE</code> event should be published for each. The <code>PresenceMessage</code> published should contain the original attributes of the presence member with the <code>action</code> set to <code>LEAVE</code>, <code>PresenceMessage#id</code> set to <code>null</code>, and the <code>timestamp</code> set to the current time. This behaviour should be tested as follows: <code>ENTER</code> presence on a channel, wait for <code>SYNC</code> to complete, inject a member directly into the local <code>PresenceMap</code> so that it only exists locally and not on the server, send a <code>SYNC</code> message with the <code>channel</code> attribute populated with the current channel which will trigger a server initiated <code>SYNC</code>. A <code>LEAVE</code> event should then be published for the injected member, and checking the <code>PresenceMap</code> should reveal that the member was removed and the valid member entered for this connection is still present</li>
-	<li><a id='RTP17' name='RTP17' href='#RTP17'><code>(RTP17)</code></a> The Presence object is also responsible for keeping a separate copy of an object logically equivalent to the <code>PresenceMap</code> containing only members that match the current <code>connectionId</code>. Any <code>ENTER</code>, <code>PRESENT</code>, <code>UPDATE</code> or <code>LEAVE</code> event that matches the current <code>connectionId</code> should be applied to this object in the same way it is done for the <code>PresenceMap</code>. This object should be private and is used to maintain a list of members that need to be automatically re-entered by the <code>Presence</code> object when a <code>Channel</code> becomes <code>ATTACHED</code> with some or all continuity lost.
-	<ul>
-		<li><a id='RTP17a' name='RTP17a' href='#RTP17a'><code>(RTP17a)</code></a> All members belonging to the current connection are published as a <code>PresenceMessage</code> on the <code>Channel</code> by the server irrespective of whether the client has permission to subscribe or the <code>Channel</code> is configured to publish presence events. A test should exist that attaches to a <code>Channel</code> with a <code>presence</code> capability and without a <code>subscribe</code> capability. It should then enter the <code>Channel</code> and ensure that the member entered from the current connection is present in the internal and public presence set available via <a href="#RTP11"><code>Presence#get</code></a></li>
-	</ul></li>
 	<li><a id='RTP4' name='RTP4' href='#RTP4'><code>(RTP4)</code></a> Ensure a test exists that enters 250 members using <code>Presence#enterClient</code> on a single connection, and checks for <code>PRESENT</code> events to be emitted on another connection for each member, and once sync is complete, all 250 members should be present in a <code>Presence#get</code> request</li>
 	<li><a id='RTP5' name='RTP5' href='#RTP5'><code>(RTP5)</code></a> Channel state change side effects:
 	<ul>
-		<li><a id='RTP5a' name='RTP5a' href='#RTP5a'><code>(RTP5a)</code></a> If the channel enters the <code>DETACHED</code> or <code>FAILED</code> state then all queued presence messages will fail immediately, and the <code>PresenceMap</code> and <a href="#RTP7" title="see RTP17">internal PresenceMap</a> is cleared. The latter ensures members are not automatically re-entered if the <code>Channel</code> later becomes attached</li>
-		<li><a id='RTP5f' name='RTP5f' href='#RTP5f'><code>(RTP5f)</code></a> If the channel enters the <code>SUSPENDED</code> state then all queued presence messages will fail immediately, and the <code>PresenceMap</code> is cleared</li>
-		<li><a id='RTP5b' name='RTP5b' href='#RTP5b'><code>(RTP5b)</code></a> If a channel enters the <code>ATTACHED</code> state then all queued presence messages will be sent immediately and a presence <code>SYNC</code> may be initiated by the Ably service or the Ably service may indicate there is no <code>SYNC</code> necessary</li>
-		<li><a id='RTP5c' name='RTP5c' href='#RTP5c'><code>(RTP5c)</code></a> In addition, when a channel becomes <code>ATTACHED</code>, the following must happen in regards to <code>Presence</code>:
-		<ul>
-			<li><a id='RTP5c1' name='RTP5c1' href='#RTP5c1'><code>(RTP5c1)</code></a> If the <a href="#TH4"><code>resumed</code> flag</a> is true and no <code>SYNC</code> is initiated as part of the attach, do nothing as there is no loss of continuity on the channel and no change to presence. The <code>PresenceMap</code> is not affected and no members need to be re-entered</li>
-			<li><a id='RTP5c2' name='RTP5c2' href='#RTP5c2'><code>(RTP5c2)</code></a> If a <code>SYNC</code> is initiated as part of the attach, then once the <code>SYNC</code> is complete, all members not present in the <code>PresenceMap</code> but present in the <a href="#RTP17">internal <code>PresenceMap</code></a> must be re-entered automatically by the client using the <code>clientId</code> and <code>data</code> attributes from each. The members re-entered automatically must be removed from the <a href="#RTP17">internal <code>PresenceMap</code></a> ensuring that members present on the channel are constructed from presence events sent from Ably since the channel became <code>ATTACHED</code></li>
-			<li><a id='RTP5c3' name='RTP5c3' href='#RTP5c3'><code>(RTP5c3)</code></a> If any of the automatic <code>ENTER</code> presence messages published in <a href="#RTP5c2">RTP5c2</a> or <a href="#RTP5c3">RTP5c3</a> fail, then the error message received from Ably should be emitted as an <code>ERROR</code> event on the <code>Channel</code> with Ably error code <code>91201</code></li>
-		</ul></li>
+		<li><a id='RTP5a' name='RTP5a' href='#RTP5a'><code>(RTP5a)</code></a> If the channel enters the <code>DETACHED</code> or <code>FAILED</code> state then all queued presence messages will fail immediately, and the presence map is cleared</li>
+		<li><a id='RTP5b' name='RTP5b' href='#RTP5b'><code>(RTP5b)</code></a> If a channel enters the <code>ATTACHED</code> state then all queued presence messages will be sent immediately and a presence <code>SYNC</code> will be initiated implicitly</li>
 	</ul></li>
 	<li><a id='RTP16' name='RTP16' href='#RTP16'><code>(RTP16)</code></a> Connection state conditions:
 	<ul>
@@ -873,7 +839,6 @@
   <th>Initialized</th>
   <th>Attaching</th>
   <th>Attached</th>
-  <th>Suspended</th>
   <th>Detaching</th>
   <th>Detached</th>
   <th>Failed</th>
@@ -883,7 +848,6 @@
   <td><a href="#RTL4c">RTL4c</a></td>
   <td><a href="#RTL4h">RTL4h</a></td>
   <td><a href="#RTL4a">RTL4a</a></td>
-  <td><a href="#RTL4c">RTL4c</a></td>
   <td><a href="#RTL4h">RTL4h</a></td>
   <td><a href="#RTL4c">RTL4c</a></td>
   <td><a href="#RTL4g">RTL4g</a></td>
@@ -893,7 +857,6 @@
   <td><a href="#RTL5h">RTL5h</a></td>
   <td><a href="#RTL5i">RTL5i</a></td>
   <td><a href="#RTL5d">RTL5d</a></td>
-  <td><a href="#RTL5j">RTL5j</a></td>
   <td><a href="#RTL5i">RTL5i</a></td>
   <td><a href="#RTL5a">RTL5a</a></td>
   <td><a href="#RTL5b">RTL5b</a></td>
@@ -905,7 +868,6 @@
   <td><a href="#RTL6c1">RTL6c1</a></td>
   <td><a href="#RTL6c4">RTL6c4</a></td>
   <td><a href="#RTL6c4">RTL6c4</a></td>
-  <td><a href="#RTL6c4">RTL6c4</a></td>
   <td><a href="#RTL6c3">RTL6c3</a></td>
 </tr>
 <tr>
@@ -913,7 +875,6 @@
   <td><a href="#RTP16b">RTP16b</a></td>
   <td><a href="#RTP16b">RTP16b</a></td>
   <td><a href="#RTP16a">RTP16a</a></td>
-  <td><a href="#RTP16c">RTP16c</a></td>
   <td><a href="#RTP16c">RTP16c</a></td>
   <td><a href="#RTP16c">RTP16c</a></td>
   <td><a href="#RTP16c">RTP16c</a></td>
@@ -955,7 +916,7 @@
 <ul>
 	<li><a id='TR1' name='TR1' href='#TR1'><code>(TR1)</code></a> A <code>ProtocolMessage</code> represents the type used to send and receive messages over the Realtime protocol.  A ProtocolMessage always relates either to the connection or to a single channel only, but can contain multiple individual Messages or PresenceMessages.  See the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/ProtocolMessage">Ruby ProtocolMessage documentation</a>, but bear in mind the attributes following underscore naming in Ruby</li>
 	<li><a id='TR2' name='TR2' href='#TR2'><code>(TR2)</code></a> <code>ProtocolMessage</code> <code>Action</code> enum has the following values in order from zero: <code>HEARTBEAT</code>, <code>ACK</code>, <code>NACK</code>, <code>CONNECT</code>, <code>CONNECTED</code>, <code>DISCONNECT</code>, <code>DISCONNECTED</code>, <code>CLOSE</code>, <code>CLOSED</code>, <code>ERROR</code>, <code>ATTACH</code>, <code>ATTACHED</code>, <code>DETACH</code>, <code>DETACHED</code>, <code>PRESENCE</code>, <code>MESSAGE</code>, <code>SYNC</code></li>
-	<li><a id='TR3' name='TR3' href='#TR3'><code>(TR3)</code></a> <code>ProtocolMessage</code> <code>Flag</code> enum has the following values in order from zero: <code>HAS_PRESENCE</code>, <code>HAS_BACKLOG</code> and <code>RESUMED</code></li>
+	<li><a id='TR3' name='TR3' href='#TR3'><code>(TR3)</code></a> <code>ProtocolMessage</code> <code>Flag</code> enum has the following values in order from zero: <code>HAS_PRESENCE</code>, <code>HAS_BACKLOG</code></li>
 	<li><a id='TR4' name='TR4' href='#TR4'><code>(TR4)</code></a> Attributes available in a <code>ProtocolMessage</code>, see the <a href="http://www.rubydoc.info/gems/ably/Ably/Models/ProtocolMessage">Ruby ProtocolMessage documentation</a> for an explanation of each attribute:
 	<ul>
 		<li><a id='TR4a' name='TR4a' href='#TR4a'><code>(TR4a)</code></a> <code>action</code> enum</li>
@@ -968,7 +929,7 @@
 		<li><a id='TR4o' name='TR4o' href='#TR4o'><code>(TR4o)</code></a> <code>connectionDetails</code> <code>ConnectionDetails</code> object &#8211; provides details on the constraints or defaults for the connection such as max message size, client ID or connection state TTL</li>
 		<li><a id='TR4g' name='TR4g' href='#TR4g'><code>(TR4g)</code></a> <code>count</code> integer</li>
 		<li><a id='TR4h' name='TR4h' href='#TR4h'><code>(TR4h)</code></a> <code>error</code> <code>ErrorInfo</code> object</li>
-		<li><a id='TR4i' name='TR4i' href='#TR4i'><code>(TR4i)</code></a> <code>flags</code> integer. Contains one or more of the following bit flags: <code>HAS_PRESENCE: 1</code>, <code>HAS_BACKLOG: 2</code>, <code>RESUMED: 4</code></li>
+		<li><a id='TR4i' name='TR4i' href='#TR4i'><code>(TR4i)</code></a> <code>flags</code> integer</li>
 		<li><a id='TR4j' name='TR4j' href='#TR4j'><code>(TR4j)</code></a> <code>msgSerial</code> long</li>
 		<li><a id='TR4k' name='TR4k' href='#TR4k'><code>(TR4k)</code></a> <code>messages</code> Array of <code>Message</code> objects</li>
 		<li><a id='TR4l' name='TR4l' href='#TR4l'><code>(TR4l)</code></a> <code>presence</code> Array of <code>PresenceMessage</code> objects</li>
@@ -1026,13 +987,6 @@
 	<li><a id='TA2' name='TA2' href='#TA2'><code>(TA2)</code></a> The <code>ConnectionStateChange</code> object contains the current state in attribute <code>current</code>, the previous state in attribute <code>previous</code>, and when the client is not connected and a connection attempt will be made automatically by the library, the amount of time in milliseconds until the next retry in the attribute <code>retryIn</code></li>
 	<li><a id='TA3' name='TA3' href='#TA3'><code>(TA3)</code></a> If the connection state change includes error information, then the <code>reason</code> attribute will contain an <code>ErrorInfo</code> object describing the reason for the error</li>
 	<li><a id='TA4' name='TA4' href='#TA4'><code>(TA4)</code></a> See the <a href="https://github.com/ably/ably-java/blob/245a3f20a6dce0d34413ddfed19c5da8ea647422/src/io/ably/realtime/ConnectionStateListener.java#L15-L20">Java library implementation</a> of this object</li>
-</ul>
-<h4>ChannelStateChange</h4>
-<ul>
-	<li><a id='TH1' name='TH1' href='#TH1'><code>(TH1)</code></a> Whenever the channel state changes, a <code>ChannelStateChange</code> object is emitted on the <code>Channel</code> object</li>
-	<li><a id='TH2' name='TH2' href='#TH2'><code>(TH2)</code></a> The <code>ChannelStateChange</code> object contains the current state in attribute <code>current</code>, the previous state in attribute <code>previous</code></li>
-	<li><a id='TH3' name='TH3' href='#TH3'><code>(TH3)</code></a> If the connection state change includes error information, then the <code>reason</code> attribute will contain an <code>ErrorInfo</code> object describing the reason for the error</li>
-	<li><a id='TH4' name='TH4' href='#TH4'><code>(TH4)</code></a> The <code>ChannelStateChange</code> object contains an attribute <code>resumed</code> which in combination with an <code>ATTACHED</code> state, indicates whether the channel attach successfully resumed its state following the connection being resumed or recovered. If <code>resumed</code> is true, then the attribute indicates that the attach within Ably successfully recovered the state for the channel, and as such there is no loss of message continuity. In all other cases, <code>resumed</code> is false, and may be accompanied with a <a href="#TH3">channel state change error reason</a></li>
 </ul>
 <h4>Capability &#8211; <strong>API not defined yet</strong></h4>
 <ul>
@@ -1095,7 +1049,6 @@
 		<ul>
 			<li><a id='TO3l1' name='TO3l1' href='#TO3l1'><code>(TO3l1)</code></a> <code>disconnectedRetryTimeout</code> integer &#8211; default 15,000 (15s). When the connection enters the <code>DISCONNECTED</code> state, after this delay in milliseconds, if the state is still <code>DISCONNECTED</code>, the client library will attempt to reconnect automatically</li>
 			<li><a id='TO3l2' name='TO3l2' href='#TO3l2'><code>(TO3l2)</code></a> <code>suspendedRetryTimeout</code> integer &#8211; default 30,000 (30s). When the connection enters the <code>SUSPENDED</code> state, after this delay in milliseconds, if the state is still <code>SUSPENDED</code>, the client library will attempt to reconnect automatically</li>
-			<li><a id='TO3l7' name='TO3l7' href='#TO3l7'><code>(TO3l7)</code></a> <code>channelRetryTimeout</code> integer &#8211; default 15,000 (15s). When a channel becomes <code>SUSPENDED</code> following a server initiated <code>DETACHED</code>, after this delay in milliseconds, if the channel is still <code>SUSPENDED</code> and the connection is <code>CONNECTED</code>, the client library will attempt to re-attach the channel automatically</li>
 			<li><a id='TO3l3' name='TO3l3' href='#TO3l3'><code>(TO3l3)</code></a> <code>httpOpenTimeout</code> integer &#8211; default 4,000 (4s). Timeout for opening the connection, available in the client library if supported by the transport</li>
 			<li><a id='TO3l4' name='TO3l4' href='#TO3l4'><code>(TO3l4)</code></a> <code>httpRequestTimeout</code> integer &#8211; default 15,000 (15s). Timeout for any single HTTP request and response</li>
 			<li><a id='TO3l5' name='TO3l5' href='#TO3l5'><code>(TO3l5)</code></a> <code>httpMaxRetryCount</code> integer &#8211; default 3. Max number of fallback hosts to use as a fallback when an HTTP request to the primary host is unreachable or indicates that it is unserviceable</li>
@@ -1293,7 +1246,7 @@ class RestChannel:
   publish(name: String?, data: Data?, clientId: String) =&gt; io // RSL1h
 
 class RealtimeChannel:
-  embeds EventEmitter&lt;ChannelEvent, ChannelStateChange?&gt; // RTL2a, RTL2d, RTL2e
+  embeds EventEmitter&lt;ChannelEvent, ErrorInfo?&gt; // RTL2
   errorReason: ErrorInfo? // RTL4e
   state: ChannelState // RTL2b
   presence: RealtimePresence // RTL9
@@ -1321,18 +1274,11 @@ enum ChannelState:
   ATTACHED
   DETACHING
   DETACHED
-  SUSPENDED
   FAILED
 
 enum ChannelEvent:
   embeds ChannelState
   ERROR // RTL2c
-
-class ChannelStateChange:
-  current: ChannelState // RTL2a, RTL2b
-  previous: ChannelState // RTL2a, RTL2b
-  reason: ErrorInfo? // RTL2e, TH3
-  resumed: Boolean // RTL2f, TH4
 
 class ChannelOptions:
   +withCipherKey(key: Binary | String)? -&gt; ChannelOptions // TB3
@@ -1435,7 +1381,7 @@ class ProtocolMessage:
   connectionSerial: Int? // RTN10c, TR4f
   count: Int? // TR4g
   error: ErrorInfo? // RTN15c2, TR4h
-  flags: .HAS_PRESENCE &amp; .HAS_BACKLOG &amp; .RESUMED ? // RTP1, TR3, TR4i, RTL2f
+  flags: .HAS_PRESENCE &amp; .HAS_BACKLOG ? // RTP1, TR3, TR4i
   id: String? // TR4b
   messages: [Message]? // TR4k
   msgSerial: Int? // RTN7b, TR4j
@@ -1462,7 +1408,7 @@ enum ProtocolMessageAction:
   SYNC // TR2
 
 class Connection:
-  embeds EventEmitter&lt;ConnectionEvent, ConnectionStateChange&gt; // RTN4a, RTN4e, RTN4g
+  embeds EventEmitter&lt;ConnectionState, ConnectionStateChange&gt; // RTN4a, RTN4e
   errorReason: ErrorInfo? // RTN14a
   id: String? // RTN8
   key: String? // RTN9
@@ -1482,10 +1428,6 @@ enum ConnectionState:
   CLOSING
   CLOSED
   FAILED
-
-enum ConnectionEvent:
-  embeds ConnectionState
-  ERROR // RTN4g
 
 class ConnectionStateChange:
   current: ConnectionState // TA2
@@ -1533,10 +1475,6 @@ class PaginatedResult&lt;T&gt;:
   hasNext() -&gt; Bool // TG6
   isLast() -&gt; Bool // TG7
   next() =&gt; io PaginatedResult&lt;T&gt;? // TG4</code></pre>
-<h2 id="old-specs">Old specs</h2>
-<ul>
-	<li><a href="/client-lib-development-guide/versions/features-0-8">v0.8</a> (deprecated in June 2016)</li>
-</ul>
     </article>
     <hr class="back">
     <a href="#documentation">Back to top</a>
@@ -1583,7 +1521,7 @@ class PaginatedResult&lt;T&gt;:
 </ul>
   <h2><a href="/client-lib-development-guide/">Library Development</a></h2>
 <ul>
-<li class='selected'><a href='/client-lib-development-guide/features/'>Features spec v0.9</a></li>
+<li class=''><a href='/client-lib-development-guide/features/'>Features spec v0.9</a></li>
 <li class=''><a href='/client-lib-development-guide/feature-prioritisation/'>Feature prioritisation</a></li>
 <li class=''><a href='/client-lib-development-guide/protocol/'>Realtime Protocol Definition</a></li>
 <li class=''><a href='/client-lib-development-guide/rest-api/'>REST API Definition</a></li>
