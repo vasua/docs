@@ -367,6 +367,9 @@ h3(#realtime-connection). Connection
 ** @(RTN19a)@ Any @ProtocolMessage@ that is awaiting an @ACK@/@NACK@ on the old transport will not receive the @ACK@/@NACK@ on the new transport. The client library must therefore resend any @ProtocolMessage@ that is awaiting a @ACK@/@NACK@ to Ably in order to receive the expected @ACK@/@NACK@ for that message. The Ably service is responsible for keeping track of messages, ignoring duplicates and responding with suitable @ACK@/@NACK@ messages
 ** @(RTN19b)@ If there are any pending channels i.e. in the @ATTACHING@ or @DETACHING@ state, the respective @ATTACH@ or @DETACH@ message should be resent to Ably
 ** @(RTN19b)@ If a @SYNC@ is underway, ensure the client library adheres to @RTP3@
+* @(RTN20)@ Heartbeats
+** @(RTN20a)@ If a transport does not receive a heartbeat for a period greater than the sum of the @heartbeatPeriod@ (sent in the @connectionDetails@ in the @CONNECTED@ message received on that transport) and the @realtimeRequestTimeout@, that transport may be disconnected. This requirement is optional; in deciding whether to implement, client library developers should take into account whether the transport in question is susceptible to undetected dropped connections.
+** @(RTN20b)@ When initiating a connection, the client may add a @heartbeat_period@ querystring param, in milliseconds, to request a different @heartbeatPeriod@. The client can not assume that Ably will honour this: the @heartbeatPeriod@ sent in the @connectionDetails@ is definitive.
 
 h3(#realtime-channels). Channels
 
@@ -946,6 +949,7 @@ h4. ConnectionDetails
 ** @(CD2e)@ @maxInboundRate@ is the maximum allowable number of requests per second from a client or Ably. In the case of a realtime connection, this restriction applies to the number of @ProtocolMessage@ objects sent, whereas in the case of REST, it is the total number of REST requests per second
 ** @(CD2f)@ @connectionStateTtl@ is the duration that Ably will persist the connection state when a Realtime client is abruptly disconnected
 ** @(CD2g)@ @serverId@ string is a unique identifier for the front-end server that the client has connected to. This server ID is only used for the purposes of debugging
+** @(CD2h)@ @heartbeatPeriod@ is the period between server-sent heartbeats in milliseconds.
 
 h3(#options). Option types
 
@@ -1279,6 +1283,7 @@ class ConnectionDetails:
   maxInboundRate: Int // CD2e
   maxMessageSize: Int // CD2c
   serverId: String // CD2g
+  heartbeatPeriod: Int // CD2h
 
 class Message:
   constructor(name: String?, data: Data?) // TM2
